@@ -27,7 +27,9 @@ export default {
   setup() {
     const messages = ref([]);
     const message = ref('');
-    const socket = io('https://bubbio-2qce6.ondigitalocean.app', { withCredentials: false });
+    const socket = io('https://bubbio-2qce6.ondigitalocean.app', { 
+      withCredentials: false 
+    });
     const sendMessage = () => {
       socket.emit('message', { user: 'User', text: message.value });
       message.value = '';
