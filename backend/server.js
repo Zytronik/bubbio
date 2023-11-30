@@ -7,7 +7,7 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:8080", // Change this to your Vue.js app's URL
+    origin: "https://bubbio-2qce6.ondigitalocean.app",
     methods: ["GET", "POST"]
   }
 });
