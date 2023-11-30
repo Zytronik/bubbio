@@ -1,5 +1,5 @@
 module.exports = {
     devServer: {
-        disableHostCheck: true,
+      allowedHosts: ['https://bubbio-2qce6.ondigitalocean.app/'],
     },
-};
+  };
