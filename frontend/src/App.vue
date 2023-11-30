@@ -1,6 +1,4 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
   <div id="app">
     <div>
       <h2>Chat</h2>
@@ -15,21 +13,18 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import { ref, onMounted } from 'vue';
 import io from 'socket.io-client';
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
-  },
   setup() {
     const messages = ref([]);
     const message = ref('');
-    const socket = io(window.location.hostname + ':3000', { 
+    const socket = io('https://bubbio-2qce6.ondigitalocean.app', { 
       withCredentials: false 
     });
+
     const sendMessage = () => {
       socket.emit('message', { user: 'User', text: message.value });
       message.value = '';
@@ -49,11 +44,10 @@ export default {
       sendMessage,
     };
   },
-}
+};
 </script>
 
 <style>
-#vueApp,
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
