@@ -16,6 +16,7 @@ app.get('/', (req, res) => {
   res.send('<h1>Hello Server</h1>');
 });
 
+app.use(express.static('public'))
 
 io.on('connection', (socket) => {
   console.log('A user connected');
