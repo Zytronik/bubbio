@@ -27,7 +27,7 @@ export default {
   setup() {
     const messages = ref([]);
     const message = ref('');
-    const socket = io('http://localhost:3000'); // Change the URL to your server address
+    const socket = io('https://bubbio-2qce6.ondigitalocean.app'); // Change the URL to your server address
 
     const sendMessage = () => {
       socket.emit('message', { user: 'User', text: message.value });
