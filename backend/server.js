@@ -12,7 +12,7 @@ const io = socketIo(server, {
     origin: "*",
     methods: ["GET", "POST"]
   },
-  path: "/bubbio-backend",
+  //path: "/bubbio-backend",
 });
 
 app.get('/', (req, res) => {

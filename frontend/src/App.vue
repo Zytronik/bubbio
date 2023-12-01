@@ -24,8 +24,8 @@ export default {
     //const socket = io("http://localhost:3000/", {
     const socket = io("", {
       //reconnectionDelayMax: 10000,
-      transports: ['websocket'],
-      withCredentials: false,
+      //transports: ['websocket'],
+      //withCredentials: false,
       path: "/bubbio-backend",
     });
 
