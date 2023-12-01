@@ -22,10 +22,9 @@ export default {
     const messages = ref([]);
     const message = ref('');
     //const socket = io("http://localhost:3000/", {
-    const socket = io("https://bubbio-2qce6.ondigitalocean.app", {
+    const socket = io("", {
       //reconnectionDelayMax: 10000,
       path: "/bubbio-backend",
-      transports: ['websocket'],
     });
 
     const sendMessage = () => {
