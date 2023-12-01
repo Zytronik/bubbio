@@ -21,8 +21,9 @@ export default {
   setup() {
     const messages = ref([]);
     const message = ref('');
-    const socket = io('https://bubbio-2qce6.ondigitalocean.app:8080/bubbio-backend', { 
-      withCredentials: false 
+    const socket = io('https://bubbio-2qce6.ondigitalocean.app:8080', {
+      withCredentials: false,
+      transports: ['websocket'], // Use only WebSocket transport
     });
 
     const sendMessage = () => {
