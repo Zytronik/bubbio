@@ -10,7 +10,7 @@ app.use(cors()); // Add this line
 
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:8080",
+    origin: "https://bubbio-2qce6.ondigitalocean.app/",
     methods: ["GET", "POST"]
   }
 });

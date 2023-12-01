@@ -21,7 +21,7 @@ export default {
   setup() {
     const messages = ref([]);
     const message = ref('');
-    const socket = io('http://localhost:8080');
+    const socket = io('https://bubbio-2qce6.ondigitalocean.app/bubbio-backend');
 
     const sendMessage = () => {
       socket.emit('message', { user: 'User', text: message.value });
