@@ -30,7 +30,6 @@ io.on('connection', (socket) => {
   });
 });
 
-//server.listen(3000, () => { //localhost
-server.listen(8080, () => { //digital ocean
-  console.log(`Server running on http://localhost:8080`);
+server.listen(3000, () => { //digital ocean
+  console.log(`Server running on http://localhost:3000`);
 });

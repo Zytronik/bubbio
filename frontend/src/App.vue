@@ -21,11 +21,17 @@ export default {
   setup() {
     const messages = ref([]);
     const message = ref('');
-
-    //const socket = io("http://localhost:3000/", { //localhost
-    const socket = io("", { //digital ocean
-      path: "/bubbio-backend/socket.io", //digital ocean
-    }); //digital ocean
+    const host = window.location.host;
+    let serverURL = "";
+    let ioOptions = {
+      path: "/bubbio-backend/socket.io",
+    }
+    if(host === "localhost:8080"){
+      serverURL = "http://localhost:3000/";
+      ioOptions = {};
+    }
+    
+    const socket = io(serverURL, ioOptions);
 
     const sendMessage = () => {
       socket.emit('message', { user: 'User', text: message.value });
