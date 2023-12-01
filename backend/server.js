@@ -7,7 +7,7 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
-    origin: '*',
+    origin: 'https://bubbio-2qce6.ondigitalocean.app',
     methods: ['GET', 'POST'],
   },
 });
