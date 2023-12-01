@@ -22,7 +22,7 @@ export default {
     const messages = ref([]);
     const message = ref('');
     const socket = io("https://bubbio-2qce6.ondigitalocean.app", {
-      reconnectionDelayMax: 10000,
+      //reconnectionDelayMax: 10000,
       path: "/bubbio-backend"
     });
 
