@@ -26,7 +26,7 @@ export default {
       //reconnectionDelayMax: 10000,
       //transports: ['websocket'],
       //withCredentials: false,
-      path: "/bubbio-backend",
+      path: "/bubbio-backend/socket.io",
     });
 
     const sendMessage = () => {
