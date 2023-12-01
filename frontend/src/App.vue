@@ -24,7 +24,8 @@ export default {
     //const socket = io("http://localhost:3000/", {
     const socket = io("https://bubbio-2qce6.ondigitalocean.app", {
       //reconnectionDelayMax: 10000,
-      path: "/bubbio-backend"
+      path: "/bubbio-backend",
+      transports: ['websocket'],
     });
 
     const sendMessage = () => {
