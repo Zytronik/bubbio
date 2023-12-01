@@ -22,7 +22,7 @@ export default {
     const messages = ref([]);
     const message = ref('');
     //const socket = io("http://localhost:3000/", {
-    const socket = io("", {
+    const socket = io("localhost:8080", {
       //reconnectionDelayMax: 10000,
       transports: ['websocket'],
       withCredentials: false,
