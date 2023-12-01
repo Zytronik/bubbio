@@ -21,8 +21,9 @@ export default {
   setup() {
     const messages = ref([]);
     const message = ref('');
-    const socket = io('ws://bubbio-2qce6.ondigitalocean.app/bubbio-backend', {
+    const socket = io("https://bubbio-2qce6.ondigitalocean.app", {
       reconnectionDelayMax: 10000,
+      path: "/bubbio-backend"
     });
 
     const sendMessage = () => {
