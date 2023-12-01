@@ -8,11 +8,9 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
-    //origin: "https://bubbio-2qce6.ondigitalocean.app",
     origin: "*",
     methods: ["GET", "POST"]
   },
-  //path: "/bubbio-backend",
 });
 
 app.get('/', (req, res) => {
@@ -32,6 +30,7 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(8080, () => {
+//server.listen(3000, () => { //localhost
+server.listen(8080, () => { //digital ocean
   console.log(`Server running on http://localhost:8080`);
 });
