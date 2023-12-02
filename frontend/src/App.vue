@@ -27,7 +27,7 @@ const currentComponent = computed(() => pages[currentComponentIndex.value].compo
 
 watchEffect(() => {
   // Update document title with the original HTML title and the name of the current page
-  //document.title = `${document.title.split('|')[0]} | ${pages[currentComponentIndex.value].name}`;
+  document.title = `${document.title.split('|')[0]} | ${pages[currentComponentIndex.value].name}`;
 });
 </script>
 
