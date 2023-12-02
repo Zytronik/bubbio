@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <div>
+      <h1>Home</h1>
       <h2>Chat</h2>
       <div v-for="msg in messages" :key="msg.id">
         {{ msg.user }}: {{ msg.text }}

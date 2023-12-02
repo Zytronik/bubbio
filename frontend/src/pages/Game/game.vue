@@ -1,14 +1,11 @@
 <template>
-  <div id="app">
-    <h2>Game</h2>
+  <div id="game" class="page">
+    <h1>Game</h1>
   </div>
 </template>
 
 <script>
 
-export default {
-  name: 'Game'
-}
 </script>
 
 <style>
