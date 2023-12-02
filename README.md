@@ -1,6 +1,6 @@
 # Blubb.io | Bachelor Project
 ## Frontend
-## Project setup
+### Project setup
 ```
 npm install
 ```
