@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { ref,computed  } from 'vue';
+import { ref,computed,watchEffect  } from 'vue';
 import homePage from './pages/Home/home.vue';
 import gamePage from './pages/Game/game.vue';
 
@@ -24,6 +24,11 @@ function setCurrentComponent(index) {
 };
 
 const currentComponent = computed(() => pages[currentComponentIndex.value].component);
+
+watchEffect(() => {
+  // Update document title with the original HTML title and the name of the current page
+  document.title = `${document.title.split('|')[0]} | ${pages[currentComponentIndex.value].name}`;
+});
 </script>
 
 <style>

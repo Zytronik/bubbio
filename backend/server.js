@@ -14,7 +14,7 @@ const io = socketIo(server, {
 });
 
 app.get('/', (req, res) => {
-  res.send('<h1>Hello Server</h1>');
+  res.send('<title>blubbio | Server</title><h1>Blubb... i am the Server</h1>');
 });
 
 io.on('connection', (socket) => {
