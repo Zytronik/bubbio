@@ -2,25 +2,27 @@
   <div id="app">
     <div>
       <h1>Home</h1>
-      <h2>Chat</h2>
-      <div v-for="msg in messages" :key="msg.id">
+      <h2 v-if="isInRoom">Chat</h2>
+      <div v-if="isInRoom" v-for="msg in messages" :key="msg.id">
         {{ msg.user }}: {{ msg.text }}
+      </div><br>
+      <div>
+        <input v-if="isInRoom" v-model="message" @keyup.enter="sendMessage" placeholder="Type your message" />
       </div>
       <div>
-        <input v-model="message" @keyup.enter="sendMessage" placeholder="Type your message" />
-      </div>
-      <div>
-        <button @click="createRoom">Create Room</button>
-        <input v-model="roomId" placeholder="Enter Room ID" />
-        <button @click="joinRoom">Join Room</button>
-        <button @click="leaveRoom">Leave Room</button>
+        <input v-if="!isInRoom" v-model="roomId" placeholder="Room ID" />
+        <button v-if="!isInRoom" @click="joinRoom">Join Room</button>
+        <p v-if="!isInRoom">- or -</p>
+        <button v-if="!isInRoom" @click="createRoom">Create & Join New Room</button>
+        <button v-if="isInRoom" @click="leaveRoom">Leave Room</button>
       </div>
     </div>
   </div>
 </template>
 
+
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import io from 'socket.io-client';
 
 export default {
@@ -29,6 +31,8 @@ export default {
     const messages = ref([]);
     const message = ref('');
     const roomId = ref('');
+    const username = 'User-' + Math.random().toString(36).substring(5);
+    const isInRoom = computed(() => !!roomId.value);
 
     const host = window.location.host;
     let serverURL = "";
@@ -43,22 +47,22 @@ export default {
     const socket = io(serverURL, ioOptions);
 
     const sendMessage = () => {
-      socket.emit('message', { user: 'User', text: message.value });
+      socket.emit('message', { user: username, text: message.value });
       message.value = '';
     };
 
     const createRoom = () => {
       const newRoomId = Math.random().toString(36).substring(7);
-      socket.emit('joinRoom', newRoomId);
+      socket.emit('joinRoom', {roomId: newRoomId, user: username});
       roomId.value = newRoomId;
     };
 
     const joinRoom = () => {
-      socket.emit('joinRoom', roomId.value);
+      socket.emit('joinRoom', {roomId: roomId.value, user: username});
     };
 
     const leaveRoom = () => {
-      socket.emit('leaveRoom');
+      socket.emit('leaveRoom', {user: username});
       roomId.value = '';
     };
 
@@ -83,6 +87,7 @@ export default {
       roomId,
       joinRoom,
       leaveRoom,
+      isInRoom,
     };
   },
 };
