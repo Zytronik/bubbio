@@ -64,7 +64,14 @@ export default {
     const leaveRoom = () => {
       socket.emit('leaveRoom', {user: username});
       roomId.value = '';
+      removeHashFromUrl();
     };
+
+    function removeHashFromUrl(){
+      const urlWithoutRoom = window.location.href.split('#')[0];
+      history.pushState({}, document.title, urlWithoutRoom);
+    }
+    
 
     socket.on('message', (data) => {
       messages.value.push(data);
