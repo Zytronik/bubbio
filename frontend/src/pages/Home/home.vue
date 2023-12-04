@@ -20,26 +20,24 @@
   </div>
 </template>
 
-
 <script>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import io from 'socket.io-client';
 
 export default {
   name: 'App',
   setup() {
-    const messages = ref([]);
+    let messages = ref([]);
     const message = ref('');
     const roomId = ref('');
-    const username = 'User-' + Math.random().toString(36).substring(5);
-    const isInRoom = computed(() => !!roomId.value);
+    const isInRoom = ref(false);
 
     const host = window.location.host;
     let serverURL = "";
     let ioOptions = {
       path: "/blubbio-backend/socket.io",
     }
-    if(host === "localhost:8080"){
+    if (host === "localhost:8080") {
       serverURL = "http://localhost:3000/";
       ioOptions = {};
     }
@@ -47,33 +45,43 @@ export default {
     const socket = io(serverURL, ioOptions);
 
     const sendMessage = () => {
-      socket.emit('message', { user: username, text: message.value });
+      socket.emit('message', { text: message.value });
       message.value = '';
     };
 
     const createRoom = () => {
       const newRoomId = Math.random().toString(36).substring(7);
-      socket.emit('joinRoom', {roomId: newRoomId, user: username});
+      socket.emit('joinRoom', { roomId: newRoomId });
       roomId.value = newRoomId;
+      isInRoom.value = true;
+      addHashToUrl(newRoomId);
     };
 
     const joinRoom = () => {
-      socket.emit('joinRoom', {roomId: roomId.value, user: username});
+      socket.emit('joinRoom', { roomId: roomId.value });
+      isInRoom.value = true;
+      addHashToUrl(roomId.value);
     };
 
     const leaveRoom = () => {
-      socket.emit('leaveRoom', {user: username});
+      socket.emit('leaveRoom');
       roomId.value = '';
+      isInRoom.value = false;
       removeHashFromUrl();
+      messages.value = [];
     };
 
-    function removeHashFromUrl(){
+    function addHashToUrl(roomId) {
+      window.location.hash = roomId;
+    }
+
+    function removeHashFromUrl() {
       const urlWithoutRoom = window.location.href.split('#')[0];
       history.pushState({}, document.title, urlWithoutRoom);
     }
-    
 
     socket.on('message', (data) => {
+      console.log(data);
       messages.value.push(data);
     });
 
@@ -82,9 +90,12 @@ export default {
       const urlRoomId = window.location.hash.substring(1);
       if (urlRoomId) {
         roomId.value = urlRoomId;
+        isInRoom.value = true;
         joinRoom();
       }
+
     });
+
 
     return {
       messages,

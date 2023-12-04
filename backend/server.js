@@ -14,77 +14,143 @@ const io = socketIo(server, {
 });
 
 const rooms = new Map();
-let connectedUsers = 0;
+let connectedUsers = [];
 
 app.get('/', (req, res) => {
   res.send('<title>blubbio | Server</title><h1>Blubb... i am the Server</h1>');
 });
 
 io.on('connection', (socket) => {
-  connectedUsers++;
-  logRoomInformation('User connected');
+  //regist new user
+  connectedUsers.push({
+    user: {
+      socketId: socket.id,
+      username: 'User-' + Math.random().toString(36).substring(5),
+    }
+  });
+
+  const username = getUsername(socket.id);
+
+  logRoomsInformations('User connected');
 
   socket.on('joinRoom', (data) => {
     // Create the room if it doesn't exist
     if (!rooms.has(data.roomId)) {
-      rooms.set(data.roomId, []);
+      rooms.set(data.roomId, { messages: [], users: [] });
     }
-    socket.join(data.roomId);
-    io.to(data.roomId).emit('message', { user: 'Server', text: `${data.user} joined the room: ${data.roomId}` });
-    rooms.get(data.roomId).push({ user: 'Server', text: `${data.user} joined the room: ${data.roomId}` });
-    logRoomInformation('User joined a room');
+    socket.join(data.roomId); //join socket
+    io.to(data.roomId).emit('message', { user: 'Server', text: `${username} joined the room: ${data.roomId}` }); //send User joined msg to room
+    rooms.get(data.roomId).messages.push({ user: 'Server', text: `${username} joined the room: ${data.roomId}` }); //save User joined msg in room obj
+    rooms.get(data.roomId).users.push(socket.id); //add User to rooms obj
+    logRoomsInformations('User joined a room');
   });
 
   socket.on('message', (data) => {
-    const roomId = Array.from(socket.rooms)[1]; // Assuming the first room is the actual chat room
-    io.to(roomId).emit('message', data);
-    rooms.get(roomId).push(data);
+    const roomId = getCurrentRoom(socket.id);
+    io.to(roomId).emit('message', { user: username, text: data.text }); // send message to room
+    rooms.get(roomId).messages.push({ user: 'Server', text: `${username} joined the room: ${data.roomId}` }); //save message in room obj
+    logRoomsInformations("Messages was send");
   });
 
-  socket.on('leaveRoom', (data) => {
-    const roomsArray = Array.from(socket.rooms);
-    if (roomsArray.length > 1) {
-      const roomId = roomsArray[1];
-      socket.leave(roomId);
-      io.to(roomId).emit('message', { user: 'Server', text: `${data.user} left the room: ${roomId}` });
-      rooms.get(roomId).push({ user: 'Server', text: `${data.user} left the room: ${roomId}` });
-      logRoomInformation('User left a room');
+  socket.on('leaveRoom', () => {
+    const roomId = getCurrentRoom(socket.id);
+    if (roomId) { // if is in a room
+      socket.leave(roomId); // leave room
+      io.to(roomId).emit('message', { user: 'Server', text: `${username} left the room: ${roomId}` }); // send leave msg to room
+      rooms.get(roomId).messages.push({ user: 'Server', text: `${username} left the room: ${roomId}` }); // save leave msg in room obj
+      removeElementFromArray(rooms.get(roomId).users, socket.id); //remove user from rooms obj
+      deleteEmptyRooms(); // delete empty rooms
+      logRoomsInformations('User left a room');
     } else {
       console.log(`${data.user} is trying to leave a room without being in one`);
     }
   });
 
-  socket.on('disconnect', () => {
-    connectedUsers--;
-    // Remove the user from all rooms
-    rooms.forEach((users, roomId) => {
-      const index = users.findIndex((u) => u.id === socket.id);
-      if (index !== -1) {
-        users.splice(index, 1);
-        // Delete the room if there are no users left
-        if (users.length === 0) {
-          rooms.delete(roomId);
-        }
-      }
-    });
-    logRoomInformation('User disconnected');
+  socket.on('disconnecting', () => {
+    const roomId = getCurrentRoom(socket.id);
+    io.to(roomId).emit('message', { user: 'Server', text: `${username} left the room: ${roomId}` }); // send leave msg to room
+    rooms.get(roomId).messages.push({ user: 'Server', text: `${username} left the room: ${roomId}` }); // save leave msg in room obj
+    removeUserFromAllRooms(socket.id); // remove User from rooms Obj
+    deleteEmptyRooms(); //delete Empty rooms
+    removeUser(socket.id); //remove User from connectedUsers Array
+    logRoomsInformations('User disconnected');
   });
 
-  function logRoomInformation(event) {
+  function getCurrentRoom(socketId) {
+    for (const [roomId, room] of rooms.entries()) {
+      if (room.users && room.users.includes(socketId)) {
+        return roomId;
+      }
+    }
+    return null;
+  }
+
+  function removeElementFromArray(array, value) {
+    const index = array.indexOf(value);
+
+    if (index !== -1) {
+      array.splice(index, 1);
+    }
+  }
+
+  function removeUserFromAllRooms(socketIdToRemove) {
+    rooms.forEach((room) => {
+      if (room.users && room.users.includes(socketIdToRemove)) {
+        room.users = room.users.filter(socketId => socketId !== socketIdToRemove);
+      }
+    });
+  }
+
+  function removeUser(socketId) {
+    let indexToRemove = -1;
+    connectedUsers.forEach((entry, index) => {
+      if (entry.user.socketId === socketId) {
+        indexToRemove = index;
+      }
+    });
+    if (indexToRemove !== -1) {
+      connectedUsers.splice(indexToRemove, 1)[0];
+    }
+  }
+
+  function getUsername(socketId) {
+    let r;
+    connectedUsers.forEach((entry) => {
+      if (entry.user.socketId == socketId) {
+        r = entry.user.username;
+        return r;
+      }
+    });
+    return r;
+  }
+
+  function deleteEmptyRooms() {
+    rooms.forEach((room, roomId) => {
+      if (room.users && room.users.length === 0) {
+        rooms.delete(roomId);
+      }
+    });
+  }
+
+  function logRoomsInformations(eventMsg) {
+    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     console.log(`--Event--`);
-    console.log(event);
+    console.log(eventMsg);
     console.log(`--Connected Users--`);
-    console.log(connectedUsers);
+    /* console.log(connectedUsers); */
+    console.log(connectedUsers.length);
     console.log('--Rooms and Users--');
-    if(rooms.size > 0) {
-      rooms.forEach((users, roomId) => {
-        console.log(`Room ${roomId}: ${users.length} users`);
-      });
-    }else{
+    if (rooms.size > 0) {
+      /* console.log(rooms); */
+      for (let [roomId, data] of rooms) {
+        console.log(`Room ${roomId}: ${data.users.length} users`);
+      }
+    } else {
       console.log("no rooms");
     }
     console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-  } 
+  }
+
 });
 
 server.listen(3000, () => {
