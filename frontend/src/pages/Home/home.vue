@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted  } from 'vue';
 import io from 'socket.io-client';
 
 export default {
@@ -93,9 +93,17 @@ export default {
         isInRoom.value = true;
         joinRoom();
       }
-
     });
 
+    onUnmounted(() => {
+      if (isInRoom.value) {
+        socket.emit('leftPage');
+        roomId.value = '';
+        isInRoom.value = false;
+        removeHashFromUrl();
+        messages.value = [];
+      }
+    });
 
     return {
       messages,

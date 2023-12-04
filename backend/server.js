@@ -66,10 +66,24 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('leftPage', () => {
+    const roomId = getCurrentRoom(socket.id);
+    if(roomId){
+      io.to(roomId).emit('message', { user: 'Server', text: `${username} left the room: ${roomId}` }); // send leave msg to room
+      rooms.get(roomId).messages.push({ user: 'Server', text: `${username} left the room: ${roomId}` }); // save leave msg in room obj
+    }
+    removeUserFromAllRooms(socket.id); // remove User from rooms Obj
+    deleteEmptyRooms(); //delete Empty rooms
+    removeUser(socket.id); //remove User from connectedUsers Array
+    logRoomsInformations('User left page');
+  });
+
   socket.on('disconnecting', () => {
     const roomId = getCurrentRoom(socket.id);
-    io.to(roomId).emit('message', { user: 'Server', text: `${username} left the room: ${roomId}` }); // send leave msg to room
-    rooms.get(roomId).messages.push({ user: 'Server', text: `${username} left the room: ${roomId}` }); // save leave msg in room obj
+    if(roomId){
+      io.to(roomId).emit('message', { user: 'Server', text: `${username} left the room: ${roomId}` }); // send leave msg to room
+      rooms.get(roomId).messages.push({ user: 'Server', text: `${username} left the room: ${roomId}` }); // save leave msg in room obj
+    }
     removeUserFromAllRooms(socket.id); // remove User from rooms Obj
     deleteEmptyRooms(); //delete Empty rooms
     removeUser(socket.id); //remove User from connectedUsers Array
