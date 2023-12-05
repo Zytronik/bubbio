@@ -2,6 +2,12 @@
   <div id="app">
     <div>
       <h1>Home</h1>
+      <h3 v-if="isInRoom">Users</h3>
+      <div v-if="isInRoom">
+        <div v-for="user in users" :key="user.socketId">
+          {{ user }}
+        </div>
+      </div>
       <h2 v-if="isInRoom">Chat</h2>
       <div v-if="isInRoom" v-for="msg in messages" :key="msg.id">
         {{ msg.user }}: {{ msg.text }}
@@ -22,7 +28,7 @@
 
 <script>
 import { ref, onMounted, onUnmounted  } from 'vue';
-import io from 'socket.io-client';
+import { socket } from '../../clientWebsocket.js';
 
 export default {
   name: 'App',
@@ -31,18 +37,7 @@ export default {
     const message = ref('');
     const roomId = ref('');
     const isInRoom = ref(false);
-
-    const host = window.location.host;
-    let serverURL = "";
-    let ioOptions = {
-      path: "/blubbio-backend/socket.io",
-    }
-    if (host === "localhost:8080") {
-      serverURL = "http://localhost:3000/";
-      ioOptions = {};
-    }
-
-    const socket = io(serverURL, ioOptions);
+    let users = ref([]);
 
     const sendMessage = () => {
       socket.emit('message', { text: message.value });
@@ -63,6 +58,11 @@ export default {
       addHashToUrl(roomId.value);
     };
 
+    socket.on('joinRoom', (data) => {
+      console.log(data.users);
+      users.value = data.users;
+    });
+
     const leaveRoom = () => {
       socket.emit('leaveRoom');
       roomId.value = '';
@@ -70,6 +70,10 @@ export default {
       removeHashFromUrl();
       messages.value = [];
     };
+
+    socket.on('leaveRoom', (data) => {
+      users.value = data.users;
+    });
 
     function addHashToUrl(roomId) {
       window.location.hash = roomId;
@@ -81,12 +85,11 @@ export default {
     }
 
     socket.on('message', (data) => {
-      console.log(data);
       messages.value.push(data);
     });
 
     onMounted(() => {
-      console.log('Vue app mounted');
+      console.log('Vue app mounted | home');
       const urlRoomId = window.location.hash.substring(1);
       if (urlRoomId) {
         roomId.value = urlRoomId;
@@ -114,6 +117,7 @@ export default {
       joinRoom,
       leaveRoom,
       isInRoom,
+      users,
     };
   },
 };
