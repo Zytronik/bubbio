@@ -90,6 +90,7 @@ export default {
 
     onMounted(() => {
       console.log('Vue app mounted | home');
+      socket.connect();
       const urlRoomId = window.location.hash.substring(1);
       if (urlRoomId) {
         roomId.value = urlRoomId;
@@ -99,8 +100,8 @@ export default {
     });
 
     onUnmounted(() => {
+      socket.disconnect();
       if (isInRoom.value) {
-        socket.emit('leftPage');
         roomId.value = '';
         isInRoom.value = false;
         removeHashFromUrl();
