@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <!--<LoginForm v-if="!isInRoom" />-->
     <div>
       <h1>Home</h1>
       <h3 v-if="isInRoom">Users</h3>
@@ -27,11 +28,15 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted  } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { socket } from '../../clientWebsocket.js';
+import LoginForm from './components/LoginForm.vue';
 
 export default {
   name: 'App',
+  components: {
+    LoginForm,
+  },
   setup() {
     let messages = ref([]);
     const message = ref('');
@@ -100,6 +105,7 @@ export default {
     });
 
     onUnmounted(() => {
+      console.log('Vue app unmounted | home');
       socket.disconnect();
       if (isInRoom.value) {
         roomId.value = '';

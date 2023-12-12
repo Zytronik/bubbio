@@ -6,7 +6,7 @@ function genereateBubbleQueue(queueLength) {
     for (let i = 0; i < queueLength; i++) {
         resultQueue += POSSIBLE_COLORS[Math.random(POSSIBLE_COLORS.length)];
     }
-    console.log(resultQueue);
+    /* console.log(resultQueue); */
     return resultQueue;
 }
 
