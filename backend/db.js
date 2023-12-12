@@ -15,6 +15,8 @@ function setup(){
   // Connect to the database
   conn.connect((err) => {
     console.log(process.env.DB_HOST);
+    console.log(process.env.DB_USER);
+    console.log(process.env.DB_PASSWORD);
     if (err) {
       console.error('Error connecting to MySQL database: ' + err.stack);
       return;
