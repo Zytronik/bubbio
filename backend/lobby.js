@@ -150,7 +150,7 @@ function setup(io) {
         function logRoomsInformations(eventMsg) {
             //console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
             //console.log(util.inspect(lobbyData, { showHidden: false, depth: null, colors: true }));
-            console.log(`--Event--`);
+           /* console.log(`--Event--`);
             console.log(eventMsg);
             console.log(`--Connected Users--`);
             const noRoomUserCount = lobbyData["noRoom"].length;
@@ -170,7 +170,7 @@ function setup(io) {
             } else {
                 console.log("no rooms");
             }
-            console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");*/
         }
 
     });
