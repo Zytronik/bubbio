@@ -1,10 +1,10 @@
 <template>
-  <div id="app">
+  <article id="app">
     <button v-for="(page, index) in pages" :key="index" @click="setCurrentComponent(index)">
       {{ page.name }}
     </button>
     <component :is="currentComponent"></component>
-  </div>
+  </article>
 </template>
 
 <script lang="ts">

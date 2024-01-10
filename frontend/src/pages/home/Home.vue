@@ -1,32 +1,38 @@
 <template>
-  <div id="app">
+  <section class="page" id="home">
     <!-- <LoginForm v-if="!isInRoom" /> -->
     <div>
-      <h1>Home</h1>
-      <h3 v-if="isInRoom">Users</h3>
-      <div v-if="isInRoom">
-        <div v-for="user in users" :key="user.socketId">
-          {{ user }}
+      <h1>Lobby<span v-if="isInRoom">: {{ roomId }}</span></h1>
+
+      <div class="inRoom" v-if="isInRoom">
+        <h3 v-if="isInRoom">Users</h3>
+        <div v-if="isInRoom">
+          <span v-for="user in roomUserList" :key="user.clientId">
+            {{ user.username }}, 
+          </span> 
         </div>
-      </div>
-      <h2 v-if="isInRoom">Chat</h2>
-      <div v-if="isInRoom">
-        <div v-for="(msg, i) in messages" :key="i">
-          {{ msg.user }}: {{ msg.text }}
+        <h2>Chat</h2>
+        <div id="chat">
+          <div id="chatMessages">
+            <div v-for="(msg, i) in chatMessages" :key="i">
+              {{ msg.username }}: {{ msg.text }}
+            </div>
+          </div>
+          <input id="messageInputField" v-model="messageInputField" @keyup.enter="sendMessage(messageInputField)"
+            placeholder="Type your message" />
         </div>
-      </div><br>
-      <div>
-        <input v-if="isInRoom" v-model="message" @keyup.enter="sendMessage" placeholder="Type your message" />
+        <button @click="leaveRoom">Leave Room</button>
       </div>
-      <div>
-        <input v-if="!isInRoom" v-model="roomId" placeholder="Room ID" />
-        <button v-if="!isInRoom" @click="joinRoom">Join Room</button>
-        <p v-if="!isInRoom">- or -</p>
-        <button v-if="!isInRoom" @click="createRoom">Create & Join New Room</button>
-        <button v-if="isInRoom" @click="leaveRoom">Leave Room</button>
+
+      <div class="notInRoom" v-if="!isInRoom">
+        <input v-model="roomId" placeholder="Room ID" />
+        <button @click="joinRoom">Join Room</button>
+        <p>- or -</p>
+        <button @click="createRoom">Create & Join New Room</button>
       </div>
+
     </div>
-  </div>
+  </section>
 </template>
 
 <script lang="ts">
@@ -40,67 +46,66 @@ export default {
   },
   name: 'HomePage',
   setup() {
-    interface User {
-      socketId: string;
-    }
 
     interface Message {
-      user: string;
+      username: string;
       text: string;
     }
 
-    let messages = ref<Message[]>([]);
-    let users = ref<User[]>([]);
-    const message = ref('');
-    const roomId = ref('');
-    const isInRoom = ref(false);
+    interface User {
+      clientId: string;
+      username: string;
+    }
 
-    const sendMessage = () => {
-      socket.emit('message', { text: message.value });
-      message.value = '';
-    };
+    type RoomUserList = User[];
 
-    const createRoom = () => {
+    const chatMessages = ref<Message[]>([]);
+    const messageInputField = ref();
+    const roomId = ref<string>('');
+    const isInRoom = ref<boolean>(false);
+    const roomUserList = ref<RoomUserList>([]);
+
+    socket.on('message', (data: Message) => {
+      chatMessages.value.push(data);
+    });
+
+    socket.on('updateFrontendRoomUserList', (data: RoomUserList) => {
+      roomUserList.value = data;
+    });
+
+    function sendMessage(msg: string){
+      socket.emit('message', { text: msg });
+      clearMessageInputField();
+    }
+
+    function createRoom(){
       const newRoomId: string = Math.random().toString(36).substring(7);
       roomId.value = newRoomId;
       joinRoom();
-    };
+    }
 
-
-
-
-    const joinRoom = () => {
-      clearMessage();
+    function joinRoom(){
+      clearChat();
       socket.emit('joinRoom', { roomId: roomId.value });
       isInRoom.value = true;
       addHashToUrl(roomId.value);
-      console.log(message.value);
-      console.log(users.value);
-    };
-
-    const clearMessage = () => {
-      messages.value = [];
     }
 
-    socket.on('joinRoom', (data) => {
-      users.value = data.users;
-      console.log("joined room");
-    });
+    function clearChat(){
+      chatMessages.value = [];
+    }
 
-    const leaveRoom = () => {
+    function clearMessageInputField(){
+      messageInputField.value = '';
+    }
+
+    function leaveRoom() {
       socket.emit('leaveRoom');
       roomId.value = '';
       isInRoom.value = false;
       removeHashFromUrl();
-      clearMessage();
-    };
-
-    socket.on('leaveRoom', (data) => {
-      users.value = data.users;
-      clearMessage();
-      console.log(message.value);
-      console.log(users.value);
-    });
+      clearChat();
+    }
 
     function addHashToUrl(roomId: string) {
       window.location.hash = roomId;
@@ -111,43 +116,37 @@ export default {
       history.pushState({}, document.title, urlWithoutRoom);
     }
 
-    socket.on('message', (data: any) => {
-      messages.value.push(data);
-    });
+    function getRoomIdFromHash() {
+      return window.location.hash.substring(1);
+    }
 
     onMounted(() => {
       console.log('Vue app mounted | home');
       socket.connect();
-      const urlRoomId = window.location.hash.substring(1);
+      const urlRoomId = getRoomIdFromHash();
       if (urlRoomId) {
         roomId.value = urlRoomId;
-        isInRoom.value = true;
         joinRoom();
       }
     });
 
     onUnmounted(() => {
       console.log('Vue app unmounted | home');
-      /* socket.disconnect(); */
-      socket.emit('leaveRoom');
       if (isInRoom.value) {
-        roomId.value = '';
-        isInRoom.value = false;
-        removeHashFromUrl();
-        messages.value = [];
+        leaveRoom();
       }
     });
 
     return {
-      messages,
-      message,
-      sendMessage,
+      chatMessages,
+      messageInputField,
       createRoom,
       roomId,
       joinRoom,
       leaveRoom,
       isInRoom,
-      users,
+      sendMessage,
+      roomUserList,
     };
   },
 };
@@ -162,5 +161,28 @@ input {
 
 button {
   margin-top: 10px;
+}
+
+#chat {
+  text-align: left;
+  max-width: 60%;
+  margin: 0 auto;
+  border: 1px solid white;
+  padding: 15px 30px;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+}
+
+#chatMessages {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 25vh;
+}
+
+#messageInputField{
+  width: 100%;
 }
 </style>
