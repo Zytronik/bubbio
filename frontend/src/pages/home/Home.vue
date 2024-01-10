@@ -37,11 +37,22 @@ export default {
     LoginForm,
   },
   setup() {
-    let messages = ref([]);
+    interface User {
+      socketId: string;
+      // add other user properties here
+    }
+
+    interface Message {
+      id: string;
+      user: string;
+      text: string;
+    }
+
+    let messages = ref<Message[]>([]);
+    let users = ref<User[]>([]);
     const message = ref('');
     const roomId = ref('');
     const isInRoom = ref(false);
-    let users = ref([]);
 
     const sendMessage = () => {
       socket.emit('message', { text: message.value });
@@ -79,7 +90,7 @@ export default {
       users.value = data.users;
     });
 
-    function addHashToUrl(roomId) {
+    function addHashToUrl(roomId: any) {
       window.location.hash = roomId;
     }
 
@@ -88,7 +99,7 @@ export default {
       history.pushState({}, document.title, urlWithoutRoom);
     }
 
-    socket.on('message', (data) => {
+    socket.on('message', (data: any) => {
       messages.value.push(data);
     });
 
