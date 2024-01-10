@@ -27,9 +27,9 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-import { socket } from '../../clientWebsocket.js';
+import { socket } from '../../networking/clientWebsocket';
 import LoginForm from './components/LoginForm.vue';
 
 export default {
