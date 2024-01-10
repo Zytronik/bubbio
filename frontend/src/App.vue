@@ -1,27 +1,47 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <div id="app">
+    <button v-for="(page, index) in pages" :key="index" @click="setCurrentComponent(index)">
+      {{ page.name }}
+    </button>
+    <component :is="currentComponent"></component>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import { ref, computed, watchEffect, Ref } from 'vue';
+import { Page } from './interfaces/interfaces.page';
+import homePage from './pages/Home/home.vue';
+import gamePage from './pages/Game/game.vue';
 
-export default defineComponent({
+export default {
   name: 'App',
-  components: {
-    HelloWorld
-  }
-});
+  setup() {
+    const pages: Page[] = [
+      { name: 'Home', component: homePage },
+      { name: 'Game', component: gamePage },
+    ];
+
+    const currentComponentIndex: Ref<number> = ref(0);
+
+    function setCurrentComponent(index: number) {
+      currentComponentIndex.value = index;
+    };
+
+    const currentComponent = computed(() => pages[currentComponentIndex.value].component);
+
+    watchEffect(() => {
+      // Update document title with the original HTML title and the name of the current page
+      document.title = `${document.title.split('|')[0]} | ${pages[currentComponentIndex.value].name}`;
+    });
+
+    return {
+      pages, 
+      setCurrentComponent, 
+      currentComponent
+    };
+  },
+}
+
+
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
