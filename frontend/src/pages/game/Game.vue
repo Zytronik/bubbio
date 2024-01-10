@@ -25,30 +25,30 @@
 </template>
 
 <script lang="ts">
-import { socket } from '../../clientWebsocket.js';
+import { socket } from '../../networking/clientWebsocket';
 import { ref, Ref, onMounted } from 'vue';
 
 export default {
-  name: 'App',
+  name: 'Game',
   setup() {
-    let queue = ref("bro\nbroo");
-    let currentBubble = ref("nice");
-    let holdBubble = ref("meme");
-    let board = ref("haha");
+    let queue: Ref<string> = ref("bro\nbroo");
+    let currentBubble: Ref<string> = ref("nice");
+    let holdBubble: Ref<string> = ref("meme");
+    let board: Ref<string> = ref("haha");
     let angle: Ref<string> = ref("all i need");
-    let currentCombo = ref("for christmas");
+    let currentCombo: Ref<string> = ref("for christmas");
 
-    let sentPackages = ref("");
-    let receivedPackages = ref("");
+    let sentPackages: Ref<string> = ref("");
+    let receivedPackages: Ref<string> = ref("");
 
     onMounted(() => {
       console.log('Vue app mounted | game');
-      socket.on('generateQueue', (data) => {
+      socket.on('generateQueue', (data: any) => {
         console.log(data);
       });
     });
 
-    socket.on('testma', (data) => {
+    socket.on('testma', (data: any) => {
       receivedPackages.value += "\n" + data;
       console.log(data);
     });
