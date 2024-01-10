@@ -16,7 +16,7 @@
       <h2>Want to Join?</h2>
       <button @click="backToUsername">Back</button>
       <button @click="playAsGuest">Play as Guest</button>
-      <button @click="goToRegister" >Register</button>
+      <button @click="goToRegister">Register</button>
     </div>
     <div v-if="showRegisterOverlay" class="overlay-content">
       <h2>Register here</h2>
@@ -24,7 +24,7 @@
       <input @keyup.enter="registerUser" type="password" v-model="r_password" placeholder="Password" />
       <input @keyup.enter="registerUser" type="password" v-model="r_password_confirm" placeholder="Password again" />
       <button @click="goToJoinAsGuestPage">Back</button>
-      <button @click="registerUser" >Register</button>
+      <button @click="registerUser">Register</button>
     </div>
   </div>
 </template>
@@ -32,14 +32,15 @@
 <script>
 import { ref } from 'vue';
 import { socket } from '../../../clientWebsocket.js';
+import { httpClient } from '../../../httpClient.js';
 
 export default {
   name: 'LoginForm',
   setup() {
     const username = ref('');
     const password = ref('');
-    const email= ref('');
-    const r_password= ref('');
+    const email = ref('');
+    const r_password = ref('');
     const r_password_confirm = ref('');
     const usernameIsSet = ref(false);
     const showOverlay = ref(true);
@@ -50,7 +51,7 @@ export default {
       closeOverlay();
     }
 
-    function goToJoinAsGuestPage(){
+    function goToJoinAsGuestPage() {
       usernameIsSet.value = true;
       showRegisterOverlay.value = false;
       showPasswordOverlay.value = false;
@@ -59,31 +60,36 @@ export default {
       r_password_confirm.value = '';
     }
 
-    function loginUser(){
-      console.log("login user");
+    function loginUser() {
+      console.log(httpClient);
+      /* console.log("login user");
       console.log("username: " + username.value);
-      console.log("pw: " + password.value);
-      socket.emit('loginUser', { 
+      console.log("pw: " + password.value); */
+      httpClient.post('/auth/login', {
         username: username.value,
-        pw: password.value,
-      });
+        password: password.value
+      })
+        .then(response => {
+          console.log(response.data);
+          // Handle successful login
+          //closeOverlay();
+        })
+        .catch(error => {
+          console.error("Login failed", error);
+          // Handle login error
+        });
     }
 
-    function registerUser(){
+    function registerUser() {
       console.log("register user");
       console.log("username: " + username.value);
       console.log("email: " + email.value);
       console.log("pw: " + r_password.value);
       console.log("pw2: " + r_password_confirm.value);
-      socket.emit('registerUser', { 
-        username: username.value,
-        email: email.value,
-        pw: r_password.value,
-        pw_confirm: r_password_confirm.value,
-      });
+
     }
 
-    function goToRegister(){
+    function goToRegister() {
       showRegisterOverlay.value = true;
     }
 
@@ -99,18 +105,9 @@ export default {
     }
 
     function checkUsername() {
-      if (username.value.trim() !== '') {
-        socket.emit('checkUsername', { username: username.value });
-      }
+      //usernameIsSet.value = true;
+      showPasswordOverlay.value = true;
     }
-
-    socket.on('checkUsername', (result) => {
-      if(result.isAvailable){
-        usernameIsSet.value = true;
-      }else{
-        showPasswordOverlay.value = true;
-      }
-    });
 
     return {
       username,

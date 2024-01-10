@@ -7,7 +7,9 @@ let ioOptions = {
 }
 if (host === "localhost:8080") {
     serverURL = "http://localhost:3000/";
-    ioOptions = {};
+    ioOptions = {
+        transports: ['websocket']
+    };
 }
 
 export const socket = io(serverURL, ioOptions);

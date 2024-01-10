@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <!--<LoginForm v-if="!isInRoom" />-->
+    <!-- <LoginForm v-if="!isInRoom" /> -->
     <div>
       <h1>Home</h1>
       <h3 v-if="isInRoom">Users</h3>
@@ -63,7 +63,7 @@ export default {
       addHashToUrl(roomId.value);
     };
 
-    socket.on('joinRoom', (data) => {
+   socket.on('joinRoom', (data) => {
       console.log(data.users);
       users.value = data.users;
     });
