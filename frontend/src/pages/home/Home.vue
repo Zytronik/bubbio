@@ -11,7 +11,7 @@
       </div>
       <h2 v-if="isInRoom">Chat</h2>
       <div v-if="isInRoom">
-        <div v-for="msg in messages" :key="msg.id">
+        <div v-for="(msg, i) in messages" :key="i">
           {{ msg.user }}: {{ msg.text }}
         </div>
       </div><br>
@@ -42,11 +42,9 @@ export default {
   setup() {
     interface User {
       socketId: string;
-      // add other user properties here
     }
 
     interface Message {
-      id: string;
       user: string;
       text: string;
     }
@@ -63,22 +61,30 @@ export default {
     };
 
     const createRoom = () => {
-      const newRoomId = Math.random().toString(36).substring(7);
-      socket.emit('joinRoom', { roomId: newRoomId });
+      const newRoomId: string = Math.random().toString(36).substring(7);
       roomId.value = newRoomId;
-      isInRoom.value = true;
-      addHashToUrl(newRoomId);
+      joinRoom();
     };
 
+
+
+
     const joinRoom = () => {
+      clearMessage();
       socket.emit('joinRoom', { roomId: roomId.value });
       isInRoom.value = true;
       addHashToUrl(roomId.value);
+      console.log(message.value);
+      console.log(users.value);
     };
 
+    const clearMessage = () => {
+      messages.value = [];
+    }
+
     socket.on('joinRoom', (data) => {
-      console.log(data.users);
       users.value = data.users;
+      console.log("joined room");
     });
 
     const leaveRoom = () => {
@@ -86,14 +92,17 @@ export default {
       roomId.value = '';
       isInRoom.value = false;
       removeHashFromUrl();
-      messages.value = [];
+      clearMessage();
     };
 
     socket.on('leaveRoom', (data) => {
       users.value = data.users;
+      clearMessage();
+      console.log(message.value);
+      console.log(users.value);
     });
 
-    function addHashToUrl(roomId: any) {
+    function addHashToUrl(roomId: string) {
       window.location.hash = roomId;
     }
 
@@ -119,7 +128,8 @@ export default {
 
     onUnmounted(() => {
       console.log('Vue app unmounted | home');
-      socket.disconnect();
+      /* socket.disconnect(); */
+      socket.emit('leaveRoom');
       if (isInRoom.value) {
         roomId.value = '';
         isInRoom.value = false;
