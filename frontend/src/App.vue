@@ -10,8 +10,8 @@
 <script lang="ts">
 import { ref, computed, watchEffect, Ref } from 'vue';
 import { Page } from './interfaces/interfaces.page';
-import homePage from './pages/Home/home.vue';
-import gamePage from './pages/Game/game.vue';
+import homePage from './pages/home/Home.vue';
+import gamePage from './pages/game/Game.vue';
 
 export default {
   name: 'App',
@@ -25,7 +25,7 @@ export default {
 
     function setCurrentComponent(index: number) {
       currentComponentIndex.value = index;
-    };
+    }
 
     const currentComponent = computed(() => pages[currentComponentIndex.value].component);
 

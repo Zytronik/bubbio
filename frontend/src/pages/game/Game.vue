@@ -29,7 +29,7 @@ import { socket } from '../../networking/clientWebsocket';
 import { ref, Ref, onMounted } from 'vue';
 
 export default {
-  name: 'Game',
+  name: 'GamePage',
   setup() {
     let queue: Ref<string> = ref("bro\nbroo");
     let currentBubble: Ref<string> = ref("nice");

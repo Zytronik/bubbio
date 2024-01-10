@@ -10,8 +10,10 @@
         </div>
       </div>
       <h2 v-if="isInRoom">Chat</h2>
-      <div v-if="isInRoom" v-for="msg in messages" :key="msg.id">
-        {{ msg.user }}: {{ msg.text }}
+      <div v-if="isInRoom">
+        <div v-for="msg in messages" :key="msg.id">
+          {{ msg.user }}: {{ msg.text }}
+        </div>
       </div><br>
       <div>
         <input v-if="isInRoom" v-model="message" @keyup.enter="sendMessage" placeholder="Type your message" />
@@ -30,12 +32,13 @@
 <script lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { socket } from '../../networking/clientWebsocket';
-import LoginForm from './components/LoginForm.vue';
+/* import LoginForm from './components/LoginForm.vue'; */
 
 export default {
   components: {
-    LoginForm,
+    /* LoginForm, */
   },
+  name: 'HomePage',
   setup() {
     interface User {
       socketId: string;

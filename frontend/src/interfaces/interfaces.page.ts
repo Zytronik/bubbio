@@ -1,6 +1,6 @@
-import { DefineComponent } from "vue";
+import { Component } from 'vue';
 
 export interface Page {
-    name: string;
-    component: DefineComponent<{}, {}, any>;
+  name: string;
+  component: Component;
 }
