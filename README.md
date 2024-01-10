@@ -15,5 +15,5 @@ npm run build
 ## Backend
 ### Starts local Server on localhost:3000
 ```
-npm run server
+npm run start:dev
 ```
