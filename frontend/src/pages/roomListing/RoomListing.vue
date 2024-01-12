@@ -49,7 +49,9 @@ export default {
     }
 
     function joinRoom(roomId: string) {
-      emit('joinedRoom', roomId);
+      if(roomId){
+        emit('joinedRoom', roomId);
+      }
     }
 
     socket.on('updateActiveRooms', (rooms: ActiveRoomInfo[]) => {
