@@ -1,5 +1,5 @@
-<template>
-  <section id="game" class="page">
+<template class="page" id="game">
+  <div>
     <div>
       <h1>Game</h1>
       <span>queue: {{ queue }}</span> <br>
@@ -23,11 +23,11 @@
     <div>
       <button @click="testma">testma</button>
     </div>
-  </section>
+  </div>
 </template>
 
 <script lang="ts">
-import { socket } from '../../networking/clientWebsocket';
+import { socket } from '../../../networking/clientWebsocket';
 import { ref, Ref, onMounted } from 'vue';
 
 export default {
@@ -70,7 +70,6 @@ export default {
       currentCombo,
       sentPackages,
       receivedPackages,
-
       testma,
     };
 

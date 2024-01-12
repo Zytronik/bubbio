@@ -30,6 +30,7 @@ export class LobbyGateway implements OnGatewayConnection {
   handleJoinRoom(@MessageBody() data, @ConnectedSocket() client: Socket) {
     this.processUserJoiningRoom(client, data.roomId);
     this.sendJoinRoomMessage(client.id, data.roomId);
+    this.emitActiveRoomsUpdate();
     this.lobbyData.logRoomsInformations('User joined a room');
   }
 
@@ -40,11 +41,13 @@ export class LobbyGateway implements OnGatewayConnection {
       this.sendLeaveMessage(client.id, roomId);
       this.lobbyData.moveUserToNoRoom(client.id);
       this.updateFrontendRoomUserList(roomId);
+      this.emitActiveRoomsUpdate();
       this.lobbyData.logRoomsInformations('User left a room');
     } else {
       console.log(`Client Id: ${client.id} is trying to leave a room without being in one`);
     }
   }
+  
 
   @SubscribeMessage('message')
   handleMessage(@MessageBody() data, @ConnectedSocket() client: Socket) {
@@ -54,6 +57,17 @@ export class LobbyGateway implements OnGatewayConnection {
     } else {
       console.log(`Client Id: ${client.id} is not in any room and cannot send messages`);
     }
+  }
+
+  @SubscribeMessage('updateActiveRooms')
+  handleGetActiveRooms(@ConnectedSocket() client: Socket) {
+    const activeRoomsInfo = this.lobbyData.getActiveRoomsInfo();
+    client.emit('updateActiveRooms', activeRoomsInfo);
+  }
+
+  private emitActiveRoomsUpdate() {
+    const activeRoomsInfo = this.lobbyData.getActiveRoomsInfo();
+    this.server.emit('updateActiveRooms', activeRoomsInfo);
   }
 
   private broadcastMessage(roomId: string, text: string, clientId: string) {

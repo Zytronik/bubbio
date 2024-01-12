@@ -22,6 +22,11 @@ export interface Room {
     users: User[];
 }
 
+export interface ActiveRoomInfo {
+    roomId: string;
+    userCount: number;
+}
+
 export type RoomUserList = User[];
 
 export class LobbyData {
@@ -57,6 +62,13 @@ export class LobbyData {
 
     removeUserFromNoRoom(clientIdToRemove: string) {
         this["noRoom"] = this["noRoom"].filter(room => room && room.clientId !== clientIdToRemove);
+    }
+
+    getActiveRoomsInfo(): ActiveRoomInfo[] {
+        return this.inRoom.map(room => ({
+            roomId: room.roomId,
+            userCount: room.users.length
+        }));
     }
 
     moveConnectedUserToRoom(clientId: string, roomId: string) {
