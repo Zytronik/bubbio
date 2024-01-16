@@ -27,7 +27,10 @@
 </template>
 
 <script lang="ts">
-import { socket } from '../../../networking/clientWebsocket';
+import { APS } from '@/ts/game-settings/game-settings.handling';
+import { InputReader } from '@/ts/input/input.input-reader';
+import { leftInput } from '@/ts/input/input.possible-inputs';
+import { socket } from '@/ts/networking/networking.client-websocket';
 import { ref, Ref, onMounted } from 'vue';
 
 export default {
@@ -38,7 +41,7 @@ export default {
     let holdBubble: Ref<string> = ref("meme");
     let board: Ref<string> = ref("haha");
     let angle: Ref<number> = ref(90);
-    let currentCombo: Ref<string> = ref("for christmas");
+    let currentCombo: Ref<string> = ref("abc");
 
     let sentPackages: Ref<string> = ref("");
     let receivedPackages: Ref<string> = ref("");
@@ -61,6 +64,24 @@ export default {
       socket.emit('testma', { pog: "asdf" });
     };
 
+    function left(): void {
+      let timePassed = performance.now() - leftInput.lastFiredAtTime
+      let leftAmount = APS.value * timePassed
+      angle.value = cleanUpAngle(angle.value - leftAmount);
+    }
+
+    function cleanUpAngle(angle: number): number {
+      if (angle < 0) {
+        return 0;
+      }
+      else if (angle > 180) {
+        return 180;
+      } 
+      else {
+        return Number(angle.toFixed(1));
+      }
+    }
+
     return {
       queue,
       currentBubble,
@@ -75,6 +96,12 @@ export default {
 
   },
 };
+
+
+let inputReader = new InputReader();
+let inputReader2 = new InputReader();
+
 </script>
 
 <style></style>
+@/settings/input/inputReader@/gameSettings/input/inputReader../../../ts/networking/clientWebsocket

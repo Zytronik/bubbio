@@ -23,8 +23,8 @@
 </template>
 
 <script lang="ts">
+import { socket } from '@/ts/networking/networking.client-websocket';
 import { ref, SetupContext, onMounted, PropType } from 'vue';
-import { socket } from '../../networking/clientWebsocket';
 
 interface ActiveRoomInfo {
   roomId: string;
@@ -141,3 +141,4 @@ a {
   text-align: center;
 }
 </style>
+../../ts/networking/clientWebsocket

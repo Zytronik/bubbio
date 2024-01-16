@@ -11,13 +11,13 @@
 
 <script lang="ts">
 import { ref, computed, watchEffect, Ref, onMounted, onUnmounted } from 'vue';
-import { Page } from './interfaces/interfaces.page';
 import StartMenu from './pages/startmenu/StartMenu.vue';
 import Room from './pages/room/Room.vue';
 import Config from './pages/config/Config.vue';
-import RoomListing from './pages/roomListing/RoomListing.vue';
+import RoomListing from './pages/room-listing/RoomListing.vue';
 import Me from './pages/me/Me.vue';
-import { socket } from './networking/clientWebsocket';
+import { socket } from './ts/networking/networking.client-websocket';
+import { Page } from './ts/page/page.i-page';
 
 export default {
   name: 'App',
@@ -94,3 +94,4 @@ export default {
 
 
 </script>
+./ts/networking/clientWebsocket./ts/interfaces/interfaces.page
