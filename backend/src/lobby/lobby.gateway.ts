@@ -28,10 +28,14 @@ export class LobbyGateway implements OnGatewayConnection {
 
   @SubscribeMessage('joinRoom')
   handleJoinRoom(@MessageBody() data, @ConnectedSocket() client: Socket) {
-    this.processUserJoiningRoom(client, data.roomId);
-    this.sendJoinRoomMessage(client.id, data.roomId);
-    this.emitActiveRoomsUpdate();
-    this.lobbyData.logRoomsInformations('User joined a room');
+    if (data.roomId && data.roomId.trim() !== ''){
+      this.processUserJoiningRoom(client, data.roomId);
+      this.sendJoinRoomMessage(client.id, data.roomId);
+      this.emitActiveRoomsUpdate();
+      this.lobbyData.logRoomsInformations('User joined a room');
+    }else{
+      console.error(`Invalid Room ID provided by client Id: ${client.id}`);
+    }
   }
 
   @SubscribeMessage('leaveRoom')
@@ -44,7 +48,7 @@ export class LobbyGateway implements OnGatewayConnection {
       this.emitActiveRoomsUpdate();
       this.lobbyData.logRoomsInformations('User left a room');
     } else {
-      console.log(`Client Id: ${client.id} is trying to leave a room without being in one`);
+      console.error(`Client Id: ${client.id} is trying to leave a room without being in one`);
     }
   }
   
@@ -72,12 +76,13 @@ export class LobbyGateway implements OnGatewayConnection {
 
   private broadcastMessage(roomId: string, text: string, clientId: string) {
     const username = this.lobbyData.getUsername(clientId) || 'Unknown User';
-    const message: Message = {
-      username: username,
-      text: text
-    };
-    this.server.to(roomId).emit('message', message);
-    this.lobbyData.getRoom(roomId)?.messages.push(message);
+    this.sendMessageToRoom(
+      roomId,
+      {
+        username: username,
+        text: text,
+      }
+    );
     this.lobbyData.logRoomsInformations('Message send');
   }
 
@@ -90,12 +95,13 @@ export class LobbyGateway implements OnGatewayConnection {
 
   private sendLeaveMessage(clientId: string, roomId: string) {
     const username = this.lobbyData.getUsername(clientId) || 'Unknown User';
-    const leaveMessage: Message = {
-      username: 'Server',
-      text: `${username} left the room.`
-    };
-    this.server.to(roomId).emit('message', leaveMessage);
-    this.lobbyData.getRoom(roomId)?.messages.push(leaveMessage);
+    this.sendMessageToRoom(
+      roomId,
+      {
+        username: 'Server',
+        text: `${username} left the room.`
+      }
+    );
   }
 
   private removeUserAndLogDisconnection(clientId: string) {
@@ -132,12 +138,26 @@ export class LobbyGateway implements OnGatewayConnection {
 
   private sendJoinRoomMessage(clientId: string, roomId: string) {
     const username = this.lobbyData.getUsername(clientId) || 'Unknown User';
-    const joinMessage = `${username} joined the room.`;
-    const message: Message = {
-      username: 'Server',
-      text: joinMessage
-    };
-    this.server.to(roomId).emit('message', message);
-    this.lobbyData.getRoom(roomId)?.messages.push(message);
+    this.sendMessageToRoom(
+      roomId,
+      {
+        username: 'Server',
+        text: `${username} joined the room.`
+      }
+    );
+  }
+
+  private sendMessageToRoom(roomId: string, msg: Message) {
+    if (!roomId || !msg.text || !msg.username) {
+      console.error('Invalid parameters for sending message to room.');
+      return;
+    }
+    this.server.to(roomId).emit('message', msg);
+    const room = this.lobbyData.getRoom(roomId);
+    if (room) {
+      room.messages.push(msg);
+    } else {
+      console.error(`Room with ID ${roomId} not found.`);
+    }
   }
 }

@@ -1,12 +1,14 @@
 <template>
   <article id="app">
-    <component :is="currentComponent" 
+ <!--  <LoginOverlay v-if="showLogin" @login="handleLogin" /> -->
+  <component :is="currentComponent" 
     :room-id="roomId"
     :set-current-page="setCurrentPage" 
     @joinedRoom="handleJoinRoom"
     @leftRoom="handleLeaveRoom"
-    ></component>
-  </article>
+  ></component>
+</article>
+
 </template>
 
 <script lang="ts">
@@ -14,14 +16,19 @@ import { ref, computed, watchEffect, Ref, onMounted, onUnmounted } from 'vue';
 import { Page } from './interfaces/interfaces.page';
 import StartMenu from './pages/startmenu/StartMenu.vue';
 import Room from './pages/room/Room.vue';
+import Game from './pages/room/components/Game.vue';
 import Config from './pages/config/Config.vue';
 import RoomListing from './pages/roomListing/RoomListing.vue';
 import Me from './pages/me/Me.vue';
 import { socket } from './networking/clientWebsocket';
+import LoginOverlay from './globalComponents/LoginOverlay.vue';
+import { httpClient } from './networking/httpClient';
 
 export default {
   name: 'App',
+  components: { LoginOverlay },
   setup() {
+    const showLogin = ref<boolean>(true);
     const roomId = ref<string>('');
     const randomReconnectString = ref<string>('');
     const pages: Page[] = [
@@ -30,6 +37,7 @@ export default {
       { name: 'Room', component: Room },
       { name: 'Me', component: Me },
       { name: 'Config', component: Config },
+      { name: 'Game', component: Game },
     ];
 
     const currentComponentIndex: Ref<number> = ref(0);
@@ -80,7 +88,26 @@ export default {
       console.log('Vue app unmounted');
       socket.disconnect();
     });
-      
+
+    async function login(username: string, password: string): Promise<boolean> {
+      try {
+        const response = await httpClient.post('/auth/login', { username, password });
+        return response.data === 'Login Successful';
+      } catch (error) {
+        console.error('Login failed:', error);
+        return false;
+      }
+    }
+
+    async function handleLogin(username: string, password: string) {
+      const isSuccess = await login(username, password);
+      if (isSuccess) {
+        console.log('Login successful. Hiding login component.');
+        showLogin.value = false;
+      } else {
+        console.log('Login failed.');
+      }
+    }
 
     return {
       currentComponent,
@@ -88,6 +115,8 @@ export default {
       roomId,
       handleJoinRoom,
       handleLeaveRoom,
+      showLogin,
+      handleLogin,
     };
   },
 }

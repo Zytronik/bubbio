@@ -1,22 +1,34 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-}
-
+// you will need to create in a .env file at root of your project 
+// a DATABASE_URL property if is not already present. 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  email String @unique
-  hash String
-  username String? @unique
+generator client {
+  provider = "prisma-client-js"
+}
 
-  @@map("users")
+//Here is a declaration of user Table and it properties 
+//configurations. 
+model User {
+  id        Int       @id @default(autoincrement())
+  login     String
+  password  String
+  name      String
+  surname   String?
+  role Role @default(CLIENT)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+
+  @@map("user")
+}
+
+//That is a list of a role that we will use for this tutorial
+//we can extend this depend of your project.
+enum Role {
+  CLIENT
+  ADMIN
+  ROOT
 }
