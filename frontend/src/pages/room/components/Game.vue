@@ -6,8 +6,8 @@
       <span>currentBubble: {{ currentBubble }}</span> <br>
       <span>holdBubble: {{ holdBubble }}</span> <br>
       <span>board: {{ board }}</span> <br>
-      <span>angle: {{ angle }}</span> <br>
       <span>currentCombo: {{ currentCombo }}</span> <br>
+      <input type="range" v-model="angle" min="0" max="180" step="1">
     </div>
     <hr>
     <div>
@@ -37,7 +37,7 @@ export default {
     let currentBubble: Ref<string> = ref("nice");
     let holdBubble: Ref<string> = ref("meme");
     let board: Ref<string> = ref("haha");
-    let angle: Ref<string> = ref("all i need");
+    let angle: Ref<number> = ref(90);
     let currentCombo: Ref<string> = ref("for christmas");
 
     let sentPackages: Ref<string> = ref("");

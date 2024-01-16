@@ -35,7 +35,7 @@ export default {
     const currentComponentIndex: Ref<number> = ref(0);
 
     const currentComponent = computed(() => pages[currentComponentIndex.value].component);
-    const currentComponentIndex: Ref<number> = ref(0);
+
     watchEffect(() => {
       // Update document title with the original HTML title and the name of the current page
       document.title = `${document.title.split('|')[0]} | ${pages[currentComponentIndex.value].name}`;
@@ -89,8 +89,8 @@ export default {
       handleJoinRoom,
       handleLeaveRoom,
     };
-  }
+  },
 }
-const inputReader = new InputReader();
-</script>
 
+
+</script>
