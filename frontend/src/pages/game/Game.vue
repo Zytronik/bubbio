@@ -7,6 +7,7 @@
     <span>board: {{ board }}</span> <br>
     <span>angle: {{ angle }}</span> <br>
     <span>currentCombo: {{ currentCombo }}</span> <br>
+    <input type="range" min="0" max="180" value="90"/>
   </div>
   <hr>
   <div>
