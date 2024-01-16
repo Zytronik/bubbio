@@ -12,7 +12,7 @@ export interface Room {
 }
 
 export interface Message {
-    user: string;
+    username: string;
     text: string;
 }
 
@@ -21,6 +21,13 @@ export interface Room {
     messages: Message[];
     users: User[];
 }
+
+export interface ActiveRoomInfo {
+    roomId: string;
+    userCount: number;
+}
+
+export type RoomUserList = User[];
 
 export class LobbyData {
     noRoom: User[] = [];
@@ -55,6 +62,13 @@ export class LobbyData {
 
     removeUserFromNoRoom(clientIdToRemove: string) {
         this["noRoom"] = this["noRoom"].filter(room => room && room.clientId !== clientIdToRemove);
+    }
+
+    getActiveRoomsInfo(): ActiveRoomInfo[] {
+        return this.inRoom.map(room => ({
+            roomId: room.roomId,
+            userCount: room.users.length
+        }));
     }
 
     moveConnectedUserToRoom(clientId: string, roomId: string) {
@@ -100,7 +114,7 @@ export class LobbyData {
         return this["inRoom"].find(room => room.roomId === roomId) || null;
     }
 
-    getCurrentRoom(clientId: string): string | null {
+    getCurrentRoomId(clientId: string): string | null {
         for (const room of this["inRoom"]) {
             const userExists = room.users.some(user => user.clientId === clientId);
             if (userExists) {

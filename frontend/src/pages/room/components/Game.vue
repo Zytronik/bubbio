@@ -1,32 +1,33 @@
-<template>
-  <div id="game" class="page">
-    <h1>Game</h1>
-    <span>queue: {{ queue }}</span> <br>
-    <span>currentBubble: {{ currentBubble }}</span> <br>
-    <span>holdBubble: {{ holdBubble }}</span> <br>
-    <span>board: {{ board }}</span> <br>
-    <span>angle: {{ angle }}</span> <br>
-    <span>currentCombo: {{ currentCombo }}</span> <br>
-    <input type="range" min="0" max="180" value="90"/>
-  </div>
-  <hr>
+<template class="page" id="game">
   <div>
-    <span>sentPackages: </span>
-    <p>{{ sentPackages }}</p>
-  </div>
-  <hr>
-  <div>
-    <span>receivedPackages: </span>
-    <p>{{ receivedPackages }}</p>
-  </div>
-  <hr>
-  <div>
-    <button @click="testma">testma</button>
+    <div>
+      <h1>Game</h1>
+      <span>queue: {{ queue }}</span> <br>
+      <span>currentBubble: {{ currentBubble }}</span> <br>
+      <span>holdBubble: {{ holdBubble }}</span> <br>
+      <span>board: {{ board }}</span> <br>
+      <span>angle: {{ angle }}</span> <br>
+      <span>currentCombo: {{ currentCombo }}</span> <br>
+    </div>
+    <hr>
+    <div>
+      <span>sentPackages: </span>
+      <p>{{ sentPackages }}</p>
+    </div>
+    <hr>
+    <div>
+      <span>receivedPackages: </span>
+      <p>{{ receivedPackages }}</p>
+    </div>
+    <hr>
+    <div>
+      <button @click="testma">testma</button>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { socket } from '../../networking/clientWebsocket';
+import { socket } from '../../../networking/clientWebsocket';
 import { ref, Ref, onMounted } from 'vue';
 
 export default {
@@ -69,7 +70,6 @@ export default {
       currentCombo,
       sentPackages,
       receivedPackages,
-
       testma,
     };
 

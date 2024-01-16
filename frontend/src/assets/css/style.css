@@ -13,3 +13,9 @@ html body {
     color: white;
     margin-top: 60px;
 }
+
+section.page {
+    max-width: 80%;
+    margin: 0 auto;
+    padding: 0 15px;
+}

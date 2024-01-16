@@ -1,6 +1,6 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { LobbyData } from './lobby/lobby.data';
+import { LobbyData, Message, RoomUserList } from './data/lobby.data';
 
 @WebSocketGateway()
 export class LobbyGateway implements OnGatewayConnection {
@@ -17,10 +17,11 @@ export class LobbyGateway implements OnGatewayConnection {
 
   @SubscribeMessage('disconnecting')
   handleDisconnecting(@ConnectedSocket() client: Socket) {
-    const roomId = this.lobbyData.getCurrentRoom(client.id);
+    const roomId = this.lobbyData.getCurrentRoomId(client.id);
     if (roomId) { //if user in room
       this.sendLeaveMessage(client.id, roomId);
       this.lobbyData.moveUserToNoRoom(client.id);
+      this.updateFrontendRoomUserList(roomId);
     }
     this.removeUserAndLogDisconnection(client.id);
   }
@@ -29,24 +30,28 @@ export class LobbyGateway implements OnGatewayConnection {
   handleJoinRoom(@MessageBody() data, @ConnectedSocket() client: Socket) {
     this.processUserJoiningRoom(client, data.roomId);
     this.sendJoinRoomMessage(client.id, data.roomId);
+    this.emitActiveRoomsUpdate();
     this.lobbyData.logRoomsInformations('User joined a room');
   }
 
   @SubscribeMessage('leaveRoom')
   handleLeaveRoom(@ConnectedSocket() client: Socket) {
-    const roomId = this.lobbyData.getCurrentRoom(client.id);
+    const roomId = this.lobbyData.getCurrentRoomId(client.id);
     if (roomId) {
       this.sendLeaveMessage(client.id, roomId);
       this.lobbyData.moveUserToNoRoom(client.id);
+      this.updateFrontendRoomUserList(roomId);
+      this.emitActiveRoomsUpdate();
       this.lobbyData.logRoomsInformations('User left a room');
     } else {
       console.log(`Client Id: ${client.id} is trying to leave a room without being in one`);
     }
   }
+  
 
   @SubscribeMessage('message')
   handleMessage(@MessageBody() data, @ConnectedSocket() client: Socket) {
-    const roomId = this.lobbyData.getCurrentRoom(client.id);
+    const roomId = this.lobbyData.getCurrentRoomId(client.id);
     if (roomId) {
       this.broadcastMessage(roomId, data.text, client.id);
     } else {
@@ -54,9 +59,23 @@ export class LobbyGateway implements OnGatewayConnection {
     }
   }
 
+  @SubscribeMessage('updateActiveRooms')
+  handleGetActiveRooms(@ConnectedSocket() client: Socket) {
+    const activeRoomsInfo = this.lobbyData.getActiveRoomsInfo();
+    client.emit('updateActiveRooms', activeRoomsInfo);
+  }
+
+  private emitActiveRoomsUpdate() {
+    const activeRoomsInfo = this.lobbyData.getActiveRoomsInfo();
+    this.server.emit('updateActiveRooms', activeRoomsInfo);
+  }
+
   private broadcastMessage(roomId: string, text: string, clientId: string) {
     const username = this.lobbyData.getUsername(clientId) || 'Unknown User';
-    const message = { user: username, text: text };
+    const message: Message = {
+      username: username,
+      text: text
+    };
     this.server.to(roomId).emit('message', message);
     this.lobbyData.getRoom(roomId)?.messages.push(message);
     this.lobbyData.logRoomsInformations('Message send');
@@ -71,9 +90,12 @@ export class LobbyGateway implements OnGatewayConnection {
 
   private sendLeaveMessage(clientId: string, roomId: string) {
     const username = this.lobbyData.getUsername(clientId) || 'Unknown User';
-    const leaveMessage = `${username} left the room: ${roomId}`;
-    this.server.to(roomId).emit('message', { user: 'Server', text: leaveMessage });
-    this.lobbyData.getRoom(roomId)?.messages.push({ user: 'Server', text: leaveMessage });
+    const leaveMessage: Message = {
+      username: 'Server',
+      text: `${username} left the room.`
+    };
+    this.server.to(roomId).emit('message', leaveMessage);
+    this.lobbyData.getRoom(roomId)?.messages.push(leaveMessage);
   }
 
   private removeUserAndLogDisconnection(clientId: string) {
@@ -88,6 +110,15 @@ export class LobbyGateway implements OnGatewayConnection {
       this.lobbyData.setRoom({ roomId: roomId, messages: [], users: [] });
     }
     this.moveUserToRoom(client, roomId);
+    this.updateFrontendRoomUserList(roomId);
+  }
+
+  private updateFrontendRoomUserList(roomId: string): void {
+    const room = this.lobbyData.getRoom(roomId);
+    if (room) {
+      const roomUserList: RoomUserList = room.users;
+      this.server.to(roomId).emit("updateFrontendRoomUserList", roomUserList);
+    }
   }
 
   private moveUserToRoom(client: Socket, roomId: string) {
@@ -101,8 +132,12 @@ export class LobbyGateway implements OnGatewayConnection {
 
   private sendJoinRoomMessage(clientId: string, roomId: string) {
     const username = this.lobbyData.getUsername(clientId) || 'Unknown User';
-    const joinMessage = `${username} joined the room: ${roomId}`;
-    this.server.to(roomId).emit('message', { user: 'Server', text: joinMessage });
-    this.lobbyData.getRoom(roomId)?.messages.push({ user: 'Server', text: joinMessage });
+    const joinMessage = `${username} joined the room.`;
+    const message: Message = {
+      username: 'Server',
+      text: joinMessage
+    };
+    this.server.to(roomId).emit('message', message);
+    this.lobbyData.getRoom(roomId)?.messages.push(message);
   }
 }
