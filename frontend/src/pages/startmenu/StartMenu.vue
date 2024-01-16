@@ -4,6 +4,7 @@
     <button @click="setCurrentPage('Config')">Go to Config Page</button>
     <button @click="setCurrentPage('RoomListing')">Go to RoomListing</button>
     <button @click="setCurrentPage('Me')">Go to My Page</button>
+    <button @click="setCurrentPage('Game')">Go to Game</button>
   </section>
 </template>
 

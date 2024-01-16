@@ -60,8 +60,10 @@ export default defineComponent( {
     });
 
     function sendMessage(msg: string){
-      socket.emit('message', { text: msg });
-      clearMessageInputField();
+      if(msg.trim()){
+        socket.emit('message', { text: msg });
+        clearMessageInputField();
+      }
     }
 
     function clearMessageInputField(){
@@ -97,7 +99,7 @@ export default defineComponent( {
 
     function joinRoom(){
       clearChat();
-      if(props.roomId){
+      if(props.roomId?.trim()){
         addHashToUrl(props.roomId);
         socket.emit('joinRoom', { roomId: props.roomId });
       }
