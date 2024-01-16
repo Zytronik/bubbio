@@ -1,6 +1,6 @@
 <template>
   <article id="app">
- <!--  <LoginOverlay v-if="showLogin" @login="handleLogin" /> -->
+  <LoginOverlay v-if="showLogin" @login="handleLogin" />
   <component :is="currentComponent" 
     :room-id="roomId"
     :set-current-page="setCurrentPage" 
