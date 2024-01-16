@@ -24,8 +24,8 @@
 
 <script lang="ts">
 import { ref, onMounted, onUnmounted, defineComponent, SetupContext } from 'vue';
-import { socket } from '../../networking/clientWebsocket';
-import Game from './components/Game.vue';
+import Game from '../game/Game.vue';
+import { socket } from '@/ts/networking/networking.client-websocket';
 
 interface Message {
   username: string;
@@ -150,4 +150,4 @@ button {
 #messageInputField{
   width: 100%;
 }
-</style>
+</style>../../ts/networking/clientWebsocket
