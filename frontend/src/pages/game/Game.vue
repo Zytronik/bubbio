@@ -7,6 +7,7 @@
       <span>holdBubble: {{ holdBubble }}</span> <br>
       <span>board: {{ board }}</span> <br>
       <span>currentCombo: {{ currentCombo }}</span> <br>
+      <span>angle: {{ angle }}</span> <br>
       <input type="range" v-model="angle" min="0" max="180" step="1">
     </div>
     <hr>
@@ -67,8 +68,13 @@ export default {
     function left(): void {
       let timePassed = performance.now() - leftInput.lastFiredAtTime
       let leftAmount = APS.value * timePassed
-      angle.value = cleanUpAngle(angle.value - leftAmount);
+      let test = cleanUpAngle(angle.value - leftAmount);
+      console.log(angle.value - leftAmount);
+      console.log(test);
+      angle.value = test;
     }
+
+    leftInput.fire = left;
 
     function cleanUpAngle(angle: number): number {
       if (angle < 0) {
