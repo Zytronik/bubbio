@@ -28,31 +28,24 @@
 </template>
 
 <script lang="ts">
-import { APS } from '@/ts/game-settings/game-settings.handling';
 import { InputReader } from '@/ts/input/input.input-reader';
-import { leftInput } from '@/ts/input/input.possible-inputs';
 import { socket } from '@/ts/networking/networking.client-websocket';
-import { ref, Ref, onMounted } from 'vue';
+import { ref, Ref } from 'vue';
+import { angle, setupAngleControls, getXY } from '@/ts/gameplay/gameplay.angle'
 
 export default {
   name: 'GamePage',
   setup() {
+    new InputReader();
+    setupAngleControls();
     let queue: Ref<string> = ref("bro\nbroo");
     let currentBubble: Ref<string> = ref("nice");
     let holdBubble: Ref<string> = ref("meme");
     let board: Ref<string> = ref("haha");
-    let angle: Ref<number> = ref(90);
     let currentCombo: Ref<string> = ref("abc");
 
     let sentPackages: Ref<string> = ref("");
     let receivedPackages: Ref<string> = ref("");
-
-    onMounted(() => {
-      console.log('Vue app mounted | game');
-      socket.on('generateQueue', (data: any) => {
-        console.log(data);
-      });
-    });
 
     socket.on('testma', (data: any) => {
       receivedPackages.value += "\n" + data;
@@ -65,28 +58,6 @@ export default {
       socket.emit('testma', { pog: "asdf" });
     };
 
-    function left(): void {
-      let timePassed = performance.now() - leftInput.lastFiredAtTime
-      let leftAmount = APS.value * timePassed
-      let test = cleanUpAngle(angle.value - leftAmount);
-      console.log(angle.value - leftAmount);
-      console.log(test);
-      angle.value = test;
-    }
-
-    leftInput.fire = left;
-
-    function cleanUpAngle(angle: number): number {
-      if (angle < 0) {
-        return 0;
-      }
-      else if (angle > 180) {
-        return 180;
-      } 
-      else {
-        return Number(angle.toFixed(1));
-      }
-    }
 
     return {
       queue,
@@ -103,11 +74,6 @@ export default {
   },
 };
 
-
-let inputReader = new InputReader();
-let inputReader2 = new InputReader();
-
 </script>
 
 <style></style>
-@/settings/input/inputReader@/gameSettings/input/inputReader../../../ts/networking/clientWebsocket

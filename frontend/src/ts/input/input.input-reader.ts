@@ -28,6 +28,9 @@ export class InputReader {
             if (event.code === input.defaultKeyCode) {
                 input.pressed = false;
                 input.releasedAtTime = performance.now();
+                if (input.release) {
+                    input.release();
+                }
             }
         });
     }
