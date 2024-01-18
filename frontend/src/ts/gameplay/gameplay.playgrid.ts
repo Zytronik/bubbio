@@ -68,7 +68,7 @@ function generateASCIIBoard(): void {
     });
     playGridASCII.value += "|_________________________________|\n| . . . . . . . . . . . . . . . . |\n| . . . . . . . . . . . . . . . . |";
     playGridASCII.value += `\n| . . . . . . . .${getASCIIArrow()}. . . . . . . . |\n\n`;
-    console.log(playGridASCII.value);
+    requestAnimationFrame(() => generateASCIIBoard());
 }
 
 function getASCIIArrow(): string {
