@@ -2,11 +2,7 @@
   <div>
     <div>
       <h1>Game</h1>
-      <span>queue: {{ queue }}</span> <br>
-      <span>currentBubble: {{ currentBubble }}</span> <br>
-      <span>holdBubble: {{ holdBubble }}</span> <br>
-      <span>board: {{ board }}</span> <br>
-      <span>currentCombo: {{ currentCombo }}</span> <br>
+      <span class="monospace">{{ playGridASCII }}</span> <br>
       <span>angle: {{ angle }}</span> <br>
       <input type="range" v-model="angle" min="0" max="180" step="1">
     </div>
@@ -31,8 +27,8 @@
 import { InputReader } from '@/ts/input/input.input-reader';
 import { socket } from '@/ts/networking/networking.client-websocket';
 import { ref, Ref } from 'vue';
-import { angle, setupAngleControls, getXY } from '@/ts/gameplay/gameplay.angle'
-import { setupGrid } from '@/ts/gameplay/gameplay.playgrid';
+import { angle, setupAngleControls } from '@/ts/gameplay/gameplay.angle'
+import { setupGrid, playGridASCII } from '@/ts/gameplay/gameplay.playgrid';
 
 export default {
   name: 'GamePage',
@@ -62,15 +58,11 @@ export default {
 
 
     return {
-      queue,
-      currentBubble,
-      holdBubble,
-      board,
+      playGridASCII,
       angle,
-      currentCombo,
       sentPackages,
       receivedPackages,
-      testma,
+      testma
     };
 
   },
@@ -78,4 +70,10 @@ export default {
 
 </script>
 
-<style></style>
+<style>
+.monospace {
+  white-space: pre-line;
+  font-family: 'Consolas', monospace;
+}
+
+</style>
