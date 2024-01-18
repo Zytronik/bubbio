@@ -48,26 +48,28 @@ export function setupGrid(): void {
 }
 
 function generateASCIIBoard(): void {
+    let boardText = "";
     playGrid.rows.forEach(row => {
         if (!row.isEven) {
-            playGridASCII.value += "|.. ";
+            boardText += "|.. ";
         } else {
-            playGridASCII.value += "| ";
+            boardText += "| ";
         }
 
         row.fields.forEach(field => {
             const bubbleASCII = field.bubble ? field.bubble.ascii : "-"
-            playGridASCII.value += `-${bubbleASCII}- `
+            boardText += `-${bubbleASCII}- `
         });
 
         if (!row.isEven) {
-            playGridASCII.value += "..|\n";
+            boardText += "..|\n";
         } else {
-            playGridASCII.value += "|\n";
+            boardText += "|\n";
         }
     });
-    playGridASCII.value += "|_________________________________|\n| . . . . . . . . . . . . . . . . |\n| . . . . . . . . . . . . . . . . |";
-    playGridASCII.value += `\n| . . . . . . . .${getASCIIArrow()}. . . . . . . . |\n\n`;
+    boardText += "|_________________________________|\n| . . . . . . . . . . . . . . . . |\n| . . . . . . . . . . . . . . . . |";
+    boardText += `\n| . . . . . . . .${getASCIIArrow()}. . . . . . . . |\n\n`;
+    playGridASCII.value = boardText;
     requestAnimationFrame(() => generateASCIIBoard());
 }
 
