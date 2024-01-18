@@ -32,12 +32,14 @@ import { InputReader } from '@/ts/input/input.input-reader';
 import { socket } from '@/ts/networking/networking.client-websocket';
 import { ref, Ref } from 'vue';
 import { angle, setupAngleControls, getXY } from '@/ts/gameplay/gameplay.angle'
+import { setupGrid } from '@/ts/gameplay/gameplay.playgrid';
 
 export default {
   name: 'GamePage',
   setup() {
     new InputReader();
     setupAngleControls();
+    setupGrid();
     let queue: Ref<string> = ref("bro\nbroo");
     let currentBubble: Ref<string> = ref("nice");
     let holdBubble: Ref<string> = ref("meme");
