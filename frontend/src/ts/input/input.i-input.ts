@@ -6,4 +6,5 @@ export interface Input {
     lastFiredAtTime: number;
     releasedAtTime: number;
     fire: () => void;
+    release?: () => void;
 }

@@ -2,12 +2,8 @@
   <div>
     <div>
       <h1>Game</h1>
-      <button @click="goToState(PageState.mainMenu)">Go to Menu</button><br>
-      <span>queue: {{ queue }}</span> <br>
-      <span>currentBubble: {{ currentBubble }}</span> <br>
-      <span>holdBubble: {{ holdBubble }}</span> <br>
-      <span>board: {{ board }}</span> <br>
-      <span>currentCombo: {{ currentCombo }}</span> <br>
+      <span class="monospace">{{ playGridASCII }}</span> <br>
+      <span>angle: {{ angle }}</span> <br>
       <input type="range" v-model="angle" min="0" max="180" step="1">
     </div>
     <hr>
@@ -28,36 +24,28 @@
 </template>
 
 <script lang="ts">
-import { APS } from '@/ts/game-settings/game-settings.handling';
 import { InputReader } from '@/ts/input/input.input-reader';
-import { leftInput } from '@/ts/input/input.possible-inputs';
 import state from '@/ts/networking/networking.client-websocket';
-import { ref, Ref, onMounted } from 'vue';
-import { goToState } from '@/ts/page/page.page-manager';
-import { PageState } from '@/ts/page/page.e-page-state';
+import { ref, Ref } from 'vue';
+import { angle, setupAngleControls } from '@/ts/gameplay/gameplay.angle'
+import { setupGrid, playGridASCII } from '@/ts/gameplay/gameplay.playgrid';
 
 export default {
   name: 'GamePage',
   setup() {
+    new InputReader();
+    setupAngleControls();
+    setupGrid();
     let queue: Ref<string> = ref("bro\nbroo");
     let currentBubble: Ref<string> = ref("nice");
     let holdBubble: Ref<string> = ref("meme");
     let board: Ref<string> = ref("haha");
-    let angle: Ref<number> = ref(90);
     let currentCombo: Ref<string> = ref("abc");
 
     let sentPackages: Ref<string> = ref("");
     let receivedPackages: Ref<string> = ref("");
 
-    onMounted(() => {
-      console.log('Vue app mounted | game');
-    });
-
-    if(state.socket){
-      state.socket.on('generateQueue', (data: any) => {
-        console.log(data);
-      });
-
+    if (state.socket) {
       state.socket.on('testma', (data: any) => {
         receivedPackages.value += "\n" + data;
         console.log(data);
@@ -67,50 +55,28 @@ export default {
     const testma = () => {
       sentPackages.value += "\ntestma";
       console.log(sentPackages.value)
-      if(state.socket){
+      if (state.socket) {
         state.socket.emit('testma', { pog: "asdf" });
       }
     };
 
-    function left(): void {
-      let timePassed = performance.now() - leftInput.lastFiredAtTime
-      let leftAmount = APS.value * timePassed
-      angle.value = cleanUpAngle(angle.value - leftAmount);
-    }
-
-    function cleanUpAngle(angle: number): number {
-      if (angle < 0) {
-        return 0;
-      }
-      else if (angle > 180) {
-        return 180;
-      }
-      else {
-        return Number(angle.toFixed(1));
-      }
-    }
 
     return {
-      queue,
-      currentBubble,
-      holdBubble,
-      board,
+      playGridASCII,
       angle,
-      currentCombo,
       sentPackages,
       receivedPackages,
-      testma,
-      PageState,
-      goToState,
-    };
+      testma
+    }
 
   },
-};
-
-
-let inputReader = new InputReader();
-let inputReader2 = new InputReader();
+}
 
 </script>
 
-<style></style>
+<style>
+.monospace {
+  white-space: pre-line;
+  font-family: 'Consolas', monospace;
+}
+</style>
