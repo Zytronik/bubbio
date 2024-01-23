@@ -1,17 +1,29 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { LobbyData, Message, RoomUserList } from './data/lobby.data';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'src/user/user.service';
 
 @WebSocketGateway()
 export class LobbyGateway implements OnGatewayConnection {
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private userService: UserService
+  ) { }
   @WebSocketServer()
   server: Server;
 
   private lobbyData: LobbyData = new LobbyData();
 
-  handleConnection(client: any) {
-    const username = 'User-' + Math.random().toString(36).substring(5);
-    this.addUserToNoRoom(client, username);
+  async handleConnection(client: any) {
+    const isAuthenticated = await this.authenticateUser(client);
+    if (!isAuthenticated) {
+      client.disconnect(); // Disconnect if authentication fails
+      return;
+    }
+    this.addUserToNoRoom(client);
     this.lobbyData.logRoomsInformations('User connected');
   }
 
@@ -28,12 +40,12 @@ export class LobbyGateway implements OnGatewayConnection {
 
   @SubscribeMessage('joinRoom')
   handleJoinRoom(@MessageBody() data, @ConnectedSocket() client: Socket) {
-    if (data.roomId && data.roomId.trim() !== ''){
+    if (data.roomId && data.roomId.trim() !== '') {
       this.processUserJoiningRoom(client, data.roomId);
       this.sendJoinRoomMessage(client.id, data.roomId);
       this.emitActiveRoomsUpdate();
       this.lobbyData.logRoomsInformations('User joined a room');
-    }else{
+    } else {
       console.error(`Invalid Room ID provided by client Id: ${client.id}`);
     }
   }
@@ -51,7 +63,7 @@ export class LobbyGateway implements OnGatewayConnection {
       console.error(`Client Id: ${client.id} is trying to leave a room without being in one`);
     }
   }
-  
+
 
   @SubscribeMessage('message')
   handleMessage(@MessageBody() data, @ConnectedSocket() client: Socket) {
@@ -67,6 +79,29 @@ export class LobbyGateway implements OnGatewayConnection {
   handleGetActiveRooms(@ConnectedSocket() client: Socket) {
     const activeRoomsInfo = this.lobbyData.getActiveRoomsInfo();
     client.emit('updateActiveRooms', activeRoomsInfo);
+  }
+
+  async authenticateUser(client: Socket): Promise<boolean> {
+    try {
+      const token = Array.isArray(client.handshake.query.token)
+        ? client.handshake.query.token[0]
+        : client.handshake.query.token;
+  
+      if (!token) {
+        throw new Error('Token not provided');
+      }
+  
+      const payload = this.jwtService.verify(token, {
+        secret: this.configService.get<string>('JWT_SECRET')
+      });
+  
+      const userDetails = await this.userService.findByUsername(payload.username);
+      client.data.user = userDetails;
+      return true;
+    } catch (error) {
+      console.error('Authentication failed:', error);
+      return false;
+    }
   }
 
   private emitActiveRoomsUpdate() {
@@ -86,10 +121,10 @@ export class LobbyGateway implements OnGatewayConnection {
     this.lobbyData.logRoomsInformations('Message send');
   }
 
-  private addUserToNoRoom(client: any, username: string) {
+  private addUserToNoRoom(client: any) {
     this.lobbyData["noRoom"].push({
       clientId: client.id,
-      username: username,
+      username: client.data.user.username,
     });
   }
 

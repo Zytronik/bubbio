@@ -1,55 +1,103 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/auth.dto.register';
 import { LoginDto } from './dto/auth.dto.login';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private prisma: PrismaService,
         private jwtService: JwtService,
-        private configService: ConfigService
+        private configService: ConfigService,
+        private userService: UserService,
     ) { }
 
     async register(registerDto: RegisterDto): Promise<any> {
-        const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-        const user = await this.prisma.user.create({
-            data: {
-                username: registerDto.username, // Ensure this matches your DTO and Prisma schema
-                password: hashedPassword,
-            },
-        });
-        delete user.password; // Remove password from the response
-        return user;
+        return this.userService.create(registerDto); 
     }
 
     async login(loginDto: LoginDto): Promise<any> {
-        try {
-            const user = await this.prisma.user.findUnique({
-                where: { username: loginDto.username },
+        const user = await this.userService.findByUsername(loginDto.username);
+
+        if (!user) {
+            throw new BadRequestException({
+                message: ['Invalid credentials'],
+                error: 'Bad Request',
+                statusCode: 400,
             });
+        }
 
-            if (!user) {
-                throw new Error('User not found');
-            }
+        const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+        if (!isPasswordValid) {
+            throw new BadRequestException({
+                message: ['Invalid credentials'],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
+        }
 
-            const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
-            if (!isPasswordValid) {
-                throw new Error('Invalid credentials');
-            }
+        const jti = crypto.randomBytes(16).toString('hex');
 
-            // Define the payload for the JWT
-            const payload = { username: user.username, sub: user.id };
-            const secret = this.configService.get<string>('JWT_SECRET'); // Get secret from ConfigService
-            return {
-                access_token: this.jwtService.sign(payload, { secret }),
-            };
-        } catch (error) {
-            console.error(error);
-            throw new Error('An error occurred during login');
+        const payload = {
+            username: user.username,
+            sub: user.id,
+            jti: jti
+        };
+        const secret = this.configService.get<string>('JWT_SECRET');
+        const expi = this.configService.get<string>('JWT_EXI');
+        return {
+            access_token: this.jwtService.sign(payload, {
+                secret,
+                expiresIn: expi,
+            }),
+        };
+    }
+
+    async logout(token: string): Promise<void> {
+        const decodedToken = this.jwtService.decode(token) as any;
+
+        if (!decodedToken || !decodedToken.jti) {
+            throw new BadRequestException({
+                message: ['Invalid Logout Token'],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
+        }
+
+        const expiresAt = decodedToken.exp ? new Date(decodedToken.exp * 1000) : new Date();
+        if (isNaN(expiresAt.getTime())) {
+            throw new BadRequestException({
+                message: ['Invalid expiration date'],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
+        }
+
+        // Check if the tokenJTI is already in the blacklist
+        const existingToken = await this.prisma.tokenBlacklist.findUnique({
+            where: { tokenJTI: decodedToken.jti },
+        });
+
+        if (!existingToken) {
+            // If not, blacklist the token
+            await this.prisma.tokenBlacklist.create({
+                data: {
+                    token: token, // The actual token string
+                    tokenJTI: decodedToken.jti, // The unique identifier of the token
+                    expiresAt: expiresAt, // Token expiry date
+                },
+            });
+        } else {
+            throw new BadRequestException({
+                message: ['User already logged out'],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
         }
     }
 

@@ -2,6 +2,7 @@
   <div>
     <div>
       <h1>Game</h1>
+      <button @click="goToState(PageState.mainMenu)">Go to Menu</button><br>
       <span>queue: {{ queue }}</span> <br>
       <span>currentBubble: {{ currentBubble }}</span> <br>
       <span>holdBubble: {{ holdBubble }}</span> <br>
@@ -30,8 +31,10 @@
 import { APS } from '@/ts/game-settings/game-settings.handling';
 import { InputReader } from '@/ts/input/input.input-reader';
 import { leftInput } from '@/ts/input/input.possible-inputs';
-import { socket } from '@/ts/networking/networking.client-websocket';
+import state from '@/ts/networking/networking.client-websocket';
 import { ref, Ref, onMounted } from 'vue';
+import { goToState } from '@/ts/page/page.page-manager';
+import { PageState } from '@/ts/page/page.e-page-state';
 
 export default {
   name: 'GamePage',
@@ -48,20 +51,25 @@ export default {
 
     onMounted(() => {
       console.log('Vue app mounted | game');
-      socket.on('generateQueue', (data: any) => {
-        console.log(data);
-      });
     });
 
-    socket.on('testma', (data: any) => {
-      receivedPackages.value += "\n" + data;
-      console.log(data);
-    });
+    if(state.socket){
+      state.socket.on('generateQueue', (data: any) => {
+        console.log(data);
+      });
+
+      state.socket.on('testma', (data: any) => {
+        receivedPackages.value += "\n" + data;
+        console.log(data);
+      });
+    }
 
     const testma = () => {
       sentPackages.value += "\ntestma";
       console.log(sentPackages.value)
-      socket.emit('testma', { pog: "asdf" });
+      if(state.socket){
+        state.socket.emit('testma', { pog: "asdf" });
+      }
     };
 
     function left(): void {
@@ -76,7 +84,7 @@ export default {
       }
       else if (angle > 180) {
         return 180;
-      } 
+      }
       else {
         return Number(angle.toFixed(1));
       }
@@ -92,6 +100,8 @@ export default {
       sentPackages,
       receivedPackages,
       testma,
+      PageState,
+      goToState,
     };
 
   },
@@ -104,4 +114,3 @@ let inputReader2 = new InputReader();
 </script>
 
 <style></style>
-@/settings/input/inputReader@/gameSettings/input/inputReader../../../ts/networking/clientWebsocket
