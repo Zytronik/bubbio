@@ -1,6 +1,8 @@
 import { Component } from 'vue';
+import { PageState } from './page.e-page-state';
 
 export interface Page {
-  name: string;
+  title: string;
+  pageState: PageState;
   component: Component;
 }

@@ -9,6 +9,8 @@
         <label for="password">Password:</label>
         <input type="password" id="password" v-model="formData.password" required />
 
+        <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+
         <button type="submit">Login</button>
       </form>
     </div>
@@ -16,9 +18,12 @@
 </template>
 
 <script lang="ts">
-import { onMounted, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
+  props: {
+    errorMessage: String
+  },
   data() {
     return {
       formData: {
@@ -30,15 +35,9 @@ export default defineComponent({
   name: "LoginForm",
   methods: {
     login() {
-      // Call your login method here, passing username and password
       this.$emit('login', this.formData.username, this.formData.password);
     },
   },
-  setup() {
-    onMounted(() => {
-      console.log('Showing login overlay');
-    });
-  }
 });
 </script>
 
@@ -60,7 +59,7 @@ export default defineComponent({
   background: rgb(30, 30, 30);
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width:30%;
 }
 
 form {
@@ -85,5 +84,11 @@ button {
   border-radius: 4px;
   cursor: pointer;
 }
+
+.error-message {
+  color: red;
+  margin-bottom: 10px;
+}
+
 </style>
   

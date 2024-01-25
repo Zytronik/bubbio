@@ -25,7 +25,7 @@
 <script lang="ts">
 import { ref, onMounted, onUnmounted, defineComponent, SetupContext } from 'vue';
 import Game from '../game/Game.vue';
-import { socket } from '@/ts/networking/networking.client-websocket';
+import state from '@/ts/networking/networking.client-websocket';
 
 interface Message {
   username: string;
@@ -37,7 +37,7 @@ interface User {
   username: string;
 }
 
-export default defineComponent( {
+export default defineComponent({
   name: 'RoomPage',
   components: { Game },
   props: {
@@ -51,33 +51,55 @@ export default defineComponent( {
     const roomUserList = ref<User[]>([]);
     const gameOnGoing = ref(false);
 
-    socket.on('message', (data: Message) => {
-      chatMessages.value.push(data);
-    });
+    if (state.socket) {
 
-    socket.on('updateFrontendRoomUserList', (data: User[]) => {
-      roomUserList.value = data;
-    });
+      state.socket.on('message', (data: Message) => {
+        chatMessages.value.push(data);
+      });
 
-    function sendMessage(msg: string){
-      if(msg.trim()){
-        socket.emit('message', { text: msg });
-        clearMessageInputField();
-      }
+      state.socket.on('updateFrontendRoomUserList', (data: User[]) => {
+        roomUserList.value = data;
+      });
+
+      state.socket.on('disconnect', () => {
+        leaveRoom();
+        emit('leftRoom')
+      });
     }
 
-    function clearMessageInputField(){
+    function clearMessageInputField() {
       messageInputField.value = '';
     }
 
-    function clearChat(){
+    function clearChat() {
       chatMessages.value = [];
     }
 
     function leaveRoom() {
-      socket.emit('leaveRoom');
-      removeHashFromUrl();
+      if(state.socket){
+        state.socket.emit('leaveRoom');
+        removeHashFromUrl();
+        clearChat();
+      }
+    }
+
+    function sendMessage(msg: string) {
+      if (msg.trim()) {
+        if(state.socket){
+          state.socket.emit('message', { text: msg });
+          clearMessageInputField();
+        }
+      }
+    }
+
+    function joinRoom() {
       clearChat();
+      if (props.roomId?.trim()) {
+        addHashToUrl(props.roomId);
+        if(state.socket){
+          state.socket.emit('joinRoom', { roomId: props.roomId });
+        }
+      }
     }
 
     function addHashToUrl(roomId: string) {
@@ -89,7 +111,7 @@ export default defineComponent( {
       history.pushState({}, document.title, urlWithoutRoom);
     }
 
-    function startGame(){
+    function startGame() {
       gameOnGoing.value = true;
     }
 
@@ -97,22 +119,9 @@ export default defineComponent( {
       leaveRoom();
     });
 
-    function joinRoom(){
-      clearChat();
-      if(props.roomId?.trim()){
-        addHashToUrl(props.roomId);
-        socket.emit('joinRoom', { roomId: props.roomId });
-      }
-    }
-
-    socket.on('disconnect', () => {
-      leaveRoom();
-      emit('leftRoom')
-    });
-
     onMounted(() => {
-      console.log('Vue app mounted | Room');     
-      joinRoom(); 
+      console.log('Vue app mounted | Room');
+      joinRoom();
     });
 
     return { chatMessages, messageInputField, roomUserList, sendMessage, gameOnGoing, startGame, leaveRoom };
@@ -147,7 +156,7 @@ button {
   height: 25vh;
 }
 
-#messageInputField{
+#messageInputField {
   width: 100%;
 }
-</style>../../ts/networking/clientWebsocket
+</style>

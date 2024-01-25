@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import { InputReader } from '@/ts/input/input.input-reader';
-import { socket } from '@/ts/networking/networking.client-websocket';
+import state from '@/ts/networking/networking.client-websocket';
 import { ref, Ref } from 'vue';
 import { angle, setupAngleControls } from '@/ts/gameplay/gameplay.angle'
 import { setupGrid, playGridASCII } from '@/ts/gameplay/gameplay.playgrid';
@@ -42,15 +42,19 @@ export default {
     let sentPackages: Ref<string> = ref("");
     let receivedPackages: Ref<string> = ref("");
 
-    socket.on('testma', (data: any) => {
-      receivedPackages.value += "\n" + data;
-      console.log(data);
-    });
+    if (state.socket) {
+      state.socket.on('testma', (data: any) => {
+        receivedPackages.value += "\n" + data;
+        console.log(data);
+      });
+    }
 
     const testma = () => {
       sentPackages.value += "\ntestma";
       console.log(sentPackages.value)
-      socket.emit('testma', { pog: "asdf" });
+      if (state.socket) {
+        state.socket.emit('testma', { pog: "asdf" });
+      }
     };
 
     return {
@@ -59,10 +63,10 @@ export default {
       sentPackages,
       receivedPackages,
       testma
-    };
+    }
 
   },
-};
+}
 
 </script>
 
@@ -71,5 +75,4 @@ export default {
   white-space: pre-line;
   font-family: 'Consolas', monospace;
 }
-
 </style>

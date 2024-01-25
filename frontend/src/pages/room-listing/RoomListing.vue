@@ -5,7 +5,7 @@
       <button @click="joinRoom(roomId)">Join Room</button>
       <p>- or -</p>
       <button @click="createRoom()">Create & Join New Room</button>
-      <button @click="setCurrentPage('StartMenu')">Go to Menu</button>
+      <button @click="goToState(PageState.mainMenu)">Go to Menu</button>
     </div>
     <div class="active-rooms">
       <h2>Active Rooms</h2>
@@ -23,8 +23,10 @@
 </template>
 
 <script lang="ts">
-import { socket } from '@/ts/networking/networking.client-websocket';
-import { ref, SetupContext, onMounted, PropType } from 'vue';
+import state from '@/ts/networking/networking.client-websocket';
+import { ref, SetupContext, onMounted } from 'vue';
+import { PageState } from '@/ts/page/page.e-page-state';
+import { goToState } from '@/ts/page/page.page-manager';
 
 interface ActiveRoomInfo {
   roomId: string;
@@ -33,12 +35,6 @@ interface ActiveRoomInfo {
 
 export default {
   name: 'RoomListing',
-  props: {
-    setCurrentPage: {
-      type: Function as PropType<(pageName: string) => void>,
-      required: true
-    }
-  },
   setup(_: unknown, { emit }: SetupContext) {
     const roomId = ref<string>('');
     const activeRooms = ref<ActiveRoomInfo[]>([]);
@@ -49,29 +45,33 @@ export default {
     }
 
     function joinRoom(roomId: string) {
-      if(roomId){
+      if (roomId) {
         emit('joinedRoom', roomId);
       }
     }
 
-    socket.on('updateActiveRooms', (rooms: ActiveRoomInfo[]) => {
-      activeRooms.value = rooms;
-    });
+    if (state.socket) {
+      state.socket.on('updateActiveRooms', (rooms: ActiveRoomInfo[]) => {
+        activeRooms.value = rooms;
+      });
 
-    function fetchActiveRooms() {
-      socket.emit('updateActiveRooms');
+      state.socket.on('disconnect', () => {
+        activeRooms.value = [];
+      });
     }
 
-    socket.on('disconnect', () => {
-      activeRooms.value = [];
-    });
+    function fetchActiveRooms() {
+      if (state.socket) {
+        state.socket.emit('updateActiveRooms');
+      }
+    }
 
     onMounted(() => {
       console.log('Vue app mounted | Room Listing');
       fetchActiveRooms();
     });
 
-    return { roomId, joinRoom, createRoom, activeRooms };
+    return { roomId, joinRoom, createRoom, activeRooms, goToState, PageState };
   },
 };
 </script>
@@ -141,4 +141,3 @@ a {
   text-align: center;
 }
 </style>
-../../ts/networking/clientWebsocket
