@@ -2,35 +2,32 @@ import { Ref, ref } from "vue";
 import { Field } from "./i/gameplay.i.field";
 import { Grid } from "./i/gameplay.i.grid";
 import { Row } from "./i/gameplay.i.row";
-import { Bubble } from "./i/gameplay.i.bubble";
-import { getRandomBubble } from "./gameplay.bubble-manager";
 import { angle } from "./gameplay.angle";
-
-const widthUnits = 1000000;
-
-//Gameplay Settings
-const gridWidth = 8;
-const gridHeight = 20;
-const gridHeightExtra = 20;
-
-const bubbleRadius = widthUnits / (2 * gridWidth);
+import { GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH } from "../game-settings/game-settings.game";
 
 export const playGridASCII: Ref<string> = ref("");
-const playGrid: Grid = {
-    width: 0,
-    height: 0,
-    extraHeight: 0,
-    rows: []
+export const playGrid: Grid = {
+    visualWidth: 0,
+    visualHeight: 0,
+    gridWidth: 0,
+    gridHeight: 0,
+    extraGridHeight: 0,
+    rows: [],
+    bubbleRadius: 0
 }
 
 export function setupGrid(): void {
-    playGrid.width = gridWidth;
-    playGrid.height = gridHeight;
-    playGrid.extraHeight = gridHeightExtra;
-    for (let h = 0; h < playGrid.height; h++) {
+    const WIDTH_UNITS = 100000000;
+    playGrid.visualWidth = WIDTH_UNITS;
+    playGrid.visualHeight = Math.floor(WIDTH_UNITS/GRID_WIDTH.value*GRID_HEIGHT.value);
+    playGrid.gridWidth = GRID_WIDTH.value;
+    playGrid.gridHeight = GRID_HEIGHT.value;
+    playGrid.extraGridHeight = GRID_EXTRA_HEIGHT.value;
+    playGrid.bubbleRadius = WIDTH_UNITS / (2 * playGrid.gridWidth);
+    for (let h = 0; h < playGrid.gridHeight; h++) {
         const row: Row = {
             fields: [],
-            size: playGrid.width - ((h % 2 === 0) ? 0 : 1),
+            size: playGrid.gridWidth - ((h % 2 === 0) ? 0 : 1),
             isEven: h % 2 === 0,
         }
         for (let w = 0; w < row.size; w++) {
@@ -90,12 +87,6 @@ function getASCIIArrow(): string {
     return "→"
 }
 
-function shootBubble(): void {
-    const nextBubble: Bubble = getRandomBubble();
-
-}
-
 // function addGarbage(): void {
-    // ↖ ↑ ↗
-    // ← · →
+
 // }

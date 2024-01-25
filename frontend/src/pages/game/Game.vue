@@ -29,18 +29,15 @@ import { socket } from '@/ts/networking/networking.client-websocket';
 import { ref, Ref } from 'vue';
 import { angle, setupAngleControls } from '@/ts/gameplay/gameplay.angle'
 import { setupGrid, playGridASCII } from '@/ts/gameplay/gameplay.playgrid';
+import { setupShootControls } from '@/ts/gameplay/gameplay.shoot';
 
 export default {
   name: 'GamePage',
   setup() {
+    setupGrid();
     new InputReader();
     setupAngleControls();
-    setupGrid();
-    let queue: Ref<string> = ref("bro\nbroo");
-    let currentBubble: Ref<string> = ref("nice");
-    let holdBubble: Ref<string> = ref("meme");
-    let board: Ref<string> = ref("haha");
-    let currentCombo: Ref<string> = ref("abc");
+    setupShootControls();
 
     let sentPackages: Ref<string> = ref("");
     let receivedPackages: Ref<string> = ref("");
@@ -55,7 +52,6 @@ export default {
       console.log(sentPackages.value)
       socket.emit('testma', { pog: "asdf" });
     };
-
 
     return {
       playGridASCII,

@@ -1,7 +1,7 @@
 import { Bubble } from "./gameplay.i.bubble";
-import { Coords } from "./gameplay.i.coordinate";
+import { GridCoordinates } from "./gameplay.i.grid-coordinates";
 
 export interface Field {
-    coords: Coords,
+    coords: GridCoordinates,
     bubble?: Bubble,
 }

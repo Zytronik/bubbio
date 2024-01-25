@@ -13,39 +13,6 @@ export function setupAngleControls() {
     changeAPSInput.release = revertAPS;
 }
 
-// const generateCosTable: number[] = [];
-// const generateSinTable: number[] = [];
-// export function setupLookupTable10k() {
-//     for (let angle = 0; angle <= 1800; angle += 1) {
-//         const radians = (cleanUpAngle(angle/10) * Math.PI) / 180;
-//         generateCosTable[angle] = -(Math.round(Math.cos(radians) * 10000));
-//         generateSinTable[angle] = (Math.round(Math.sin(radians) * 10000));
-//     }
-//     // console.log(generateCosTable)
-//     // console.log(generateSinTable)
-// }
-
-// export function testLookupTable() {
-//     let trues = 0;
-//     let falses = 0;
-//     for (let angle = 0; angle <= 180; angle += 0.1) {
-//         const cleanedUpAngle = cleanUpAngle(angle)
-//         const radians = (cleanedUpAngle * Math.PI) / 180;
-//         const fromTable = getXY(cleanedUpAngle)
-//         if (-(Math.round(Math.cos(radians) * 10000)) === fromTable[0]) {
-//             trues++;
-//         } else {
-//             falses++;
-//         }
-//         if ((Math.round(Math.sin(radians) * 10000)) === fromTable[1]) {
-//             trues++;
-//         } else {
-//             falses++;
-//         }
-//     }
-//     console.log("trues: ", trues, "falses: ", falses);
-// }
-
 export function getXY(angle: number) {
     return [cosTable[angle*10], sinTable[angle*10]]
 }
@@ -85,6 +52,41 @@ function cleanUpAngle(angle: number): number {
         return Number(angle.toFixed(1));
     }
 }
+
+
+
+// const generateCosTable: number[] = [];
+// const generateSinTable: number[] = [];
+// export function setupLookupTable10k() {
+//     for (let angle = 0; angle <= 1800; angle += 1) {
+//         const radians = (cleanUpAngle(angle/10) * Math.PI) / 180;
+//         generateCosTable[angle] = -(Math.round(Math.cos(radians) * 10000));
+//         generateSinTable[angle] = (Math.round(Math.sin(radians) * 10000));
+//     }
+//     // console.log(generateCosTable)
+//     // console.log(generateSinTable)
+// }
+
+// export function testLookupTable() {
+//     let trues = 0;
+//     let falses = 0;
+//     for (let angle = 0; angle <= 180; angle += 0.1) {
+//         const cleanedUpAngle = cleanUpAngle(angle)
+//         const radians = (cleanedUpAngle * Math.PI) / 180;
+//         const fromTable = getXY(cleanedUpAngle)
+//         if (-(Math.round(Math.cos(radians) * 10000)) === fromTable[0]) {
+//             trues++;
+//         } else {
+//             falses++;
+//         }
+//         if ((Math.round(Math.sin(radians) * 10000)) === fromTable[1]) {
+//             trues++;
+//         } else {
+//             falses++;
+//         }
+//     }
+//     console.log("trues: ", trues, "falses: ", falses);
+// }
 
 const cosTable: number[] = [
     -10000,
