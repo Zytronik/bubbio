@@ -9,7 +9,7 @@
     "db:dev:rm": "docker compose rm dev-db -s -f -v",
     "db:dev:up": "docker compose up dev-db -d",
     "prisma:types": "prisma generate",
-    "prisma:start": "npm run prisma:deploy & timeout /t 3 /nobreak & npm run prisma:types",
+    "prisma:start": "npm run prisma:deploy & npm run prisma:types",
     "db:dev:restart": "npm run db:dev:rm & npm run db:dev:up & timeout /t 1 /nobreak & npm run prisma:dev:deploy",
     "build": "npm run prisma:start & nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
