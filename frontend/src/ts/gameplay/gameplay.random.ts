@@ -17,15 +17,15 @@ export class XORShift32 {
         return x & 0x7FFFFFFF; // Ensure the result is a positive integer
     }
 
-    // Get a random float in the range [0, 1)
+    // Get a random float in the range [0, 1[
     public random(): number {
         return this.xorshift() / 0x80000000;
     }
 
-    // Get a random integer in a specified range [min, max)
+    // Get a random integer in a specified range [min, max[
     public randomInt(min: number, max: number): number {
-        min = Math.ceil(min);
-        max = Math.floor(max);
+        min = Math.floor(min);
+        max = Math.ceil(max) + 1;
         return Math.floor(this.random() * (max - min)) + min;
     }
 }

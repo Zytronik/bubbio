@@ -15,7 +15,7 @@ export class InputReader {
 
     private handleKeyDown(event: KeyboardEvent): void {
         allInputs.forEach((input: Input) => {
-            if (event.code === input.defaultKeyCode) {
+            if (event.code === input.defaultKeyCode && !input.pressed) {
                 input.pressed = true;
                 input.lastFiredAtTime = performance.now();
                 input.fire();
