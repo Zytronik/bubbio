@@ -12,6 +12,7 @@ export const playGrid: Grid = {
     gridWidth: 0,
     gridHeight: 0,
     extraGridHeight: 0,
+    rowHeight: 0,
     rows: [],
     bubbleRadius: 0
 }
@@ -24,17 +25,26 @@ export function setupGrid(): void {
     playGrid.gridHeight = GRID_HEIGHT.value;
     playGrid.extraGridHeight = GRID_EXTRA_HEIGHT.value;
     playGrid.bubbleRadius = WIDTH_UNITS / (2 * playGrid.gridWidth);
+    playGrid.rowHeight = Math.floor(playGrid.bubbleRadius * Math.sqrt(3));
     for (let h = 0; h < playGrid.gridHeight; h++) {
+        const isEvenRow = (h % 2 === 0);
         const row: Row = {
             fields: [],
-            size: playGrid.gridWidth - ((h % 2 === 0) ? 0 : 1),
+            size: playGrid.gridWidth - (isEvenRow ? 0 : 1),
             isEven: h % 2 === 0,
         }
         for (let w = 0; w < row.size; w++) {
+            const bubbleRadius = playGrid.bubbleRadius
+            const bubbleDiameter = playGrid.bubbleRadius * 2;
+            const rowHeight = playGrid.rowHeight;
             const field: Field = {
                 coords: {
                     x: w,
                     y: h,
+                },
+                centerPointCoords: {
+                    x: w * bubbleDiameter + (isEvenRow ? bubbleRadius : bubbleDiameter),
+                    y: rowHeight * h,
                 },
             };
             row.fields.push(field)

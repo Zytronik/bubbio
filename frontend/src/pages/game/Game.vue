@@ -75,4 +75,25 @@ export default {
   white-space: pre-line;
   font-family: 'Consolas', monospace;
 }
+html body {
+	margin: 0;
+	padding: 0;
+	border: 0;
+    background-color: black;
+}
+
+#vue {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: white;
+    margin-top: 60px;
+}
+
+section.page {
+    max-width: 80%;
+    margin: 0 auto;
+    padding: 0 15px;
+}
 </style>

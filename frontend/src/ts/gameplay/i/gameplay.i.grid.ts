@@ -6,6 +6,7 @@ export interface Grid {
     gridWidth: number,
     gridHeight: number,
     extraGridHeight: number,
+    rowHeight: number,
     rows: Row[],
     bubbleRadius: number,
 }
