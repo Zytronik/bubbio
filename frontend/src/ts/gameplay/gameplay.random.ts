@@ -25,7 +25,7 @@ export class XORShift32 {
     // Get a random integer in a specified range [min, max[
     public randomInt(min: number, max: number): number {
         min = Math.floor(min);
-        max = Math.ceil(max) + 1;
+        max = Math.ceil(max);
         return Math.floor(this.random() * (max - min)) + min;
     }
 }

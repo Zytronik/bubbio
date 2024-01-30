@@ -1,8 +1,9 @@
 import { shootInput } from "../input/input.possible-inputs";
 import { getRandomBubble } from "./gameplay.bubble-manager";
-import { playGrid } from "./gameplay.playgrid";
+import { getAllFields, playGrid } from "./gameplay.playgrid";
 import { XORShift32 } from "./gameplay.random";
 import { Bubble } from "./i/gameplay.i.bubble";
+import { Field } from "./i/gameplay.i.field";
 import { Coordinates } from "./i/gameplay.i.grid-coordinates";
 
 export function setupShootControls() {
@@ -12,21 +13,40 @@ export function setupShootControls() {
 function shootBubble(): void {
     const nextBubble: Bubble = getRandomBubble();
     const randomCoords = getRandomCoords();
-    const gridCoords = snapToGrid(randomCoords);
-    console.log("randomCoords", randomCoords, "gridCoords", gridCoords);
+    const gridField = snapToGrid(randomCoords);
+    gridField.bubble = nextBubble;
+    console.log("randomCoords", randomCoords, "gridField", gridField);
 }
 
-function snapToGrid(visualCoordinates: Coordinates): Coordinates {
-    const bubbleRadius = playGrid.bubbleRadius;
-    const bubbleDiameter = playGrid.bubbleRadius * 2;
-    const gridY = Math.round(visualCoordinates.y / playGrid.rowHeight);
-    const isEvenRow = playGrid.rows[gridY];
-    const gridX = Math.round((visualCoordinates.x - (isEvenRow ? bubbleRadius : bubbleDiameter))/bubbleDiameter);
-    const gridCoordinates: Coordinates = {
-        x: gridX,
-        y: gridY,
+function snapToGrid(collisionCoords: Coordinates): Field {
+    let closestField: Field = {
+        coords: {
+            x: -1,
+            y: -1,
+        },
+        centerPointCoords: {
+            x: 0,
+            y: 0,
+        }
     }
-    return gridCoordinates;
+    let closestDistance = Infinity;
+    getAllFields().forEach(field => {
+        if (!field.bubble) {
+            const distance = getDistance(collisionCoords, field.centerPointCoords);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestField = field;
+            }
+        }
+    });
+
+    return closestField;
+}
+
+function getDistance(p1: Coordinates, p2: Coordinates): number {
+    const deltaXSquared = (p1.x - p2.x) ** 2;
+    const deltaYSquared = (p1.y - p2.y) ** 2;
+    return Math.sqrt(deltaXSquared + deltaYSquared);
 }
 
 function getRandomCoords(): Coordinates {

@@ -4,6 +4,7 @@ import { Grid } from "./i/gameplay.i.grid";
 import { Row } from "./i/gameplay.i.row";
 import { angle } from "./gameplay.angle";
 import { GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH } from "../game-settings/game-settings.game";
+import { all } from "axios";
 
 export const playGridASCII: Ref<string> = ref("");
 export const playGrid: Grid = {
@@ -47,11 +48,24 @@ export function setupGrid(): void {
                     y: rowHeight * h,
                 },
             };
+            if (!field.bubble) {
+                console.log("asdf")
+            }
             row.fields.push(field)
         }
         playGrid.rows.push(row);
     }
     generateASCIIBoard();
+}
+
+export function getAllFields(): Field[] {
+    const allFields: Field[] = []
+    playGrid.rows.forEach(row => {
+        row.fields.forEach(field => {
+            allFields.push(field);
+        });
+    });
+    return allFields;
 }
 
 function generateASCIIBoard(): void {
