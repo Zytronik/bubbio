@@ -5,44 +5,50 @@ export function getBubbleByType(typeCode: number): Bubble {
     return allBubbles[typeCode];
 }
 
+
 const random = new XORShift32();
 export function getRandomBubble(): Bubble {
     return allBubbles[random.randomInt(0, allBubbles.length)];
 }
 
+export let currentBubble: Bubble;
+export function prepareNextBubble(): void {
+    currentBubble = getRandomBubble();
+}
+
 const b1: Bubble = {
-    color: "Red",
-    ascii: "x",
+    color: "rgb(255, 0, 0)",
+    ascii: `<span style="color: rgb(255, 0, 0);">R</span>`,
     type: 0,
 }
 const b2: Bubble = {
-    color: "Blue",
-    ascii: "o",
+    color: "rgb(255, 174, 0)",
+    ascii: `<span style="color: rgb(255, 174, 0);">O</span>`,
     type: 1,
 }
 const b3: Bubble = {
-    color: "Green",
-    ascii: "z",
+    color: "rgb(255, 255, 0)",
+    ascii: `<span style="color: rgb(255, 255, 0);">Y</span>`,
     type: 2,
 }
 const b4: Bubble = {
-    color: "Silver",
-    ascii: "s",
+    color: "rgb(123, 255, 0)",
+    ascii: `<span style="color: rgb(123, 255, 0);">G</span>`,
     type: 3,
 }
 const b5: Bubble = {
-    color: "White",
-    ascii: "u",
+    color: "rgb(0, 255, 255)",
+    ascii: `<span style="color: rgb(0, 255, 255);">B</span>`,
     type: 4,
 }
 const b6: Bubble = {
-    color: "Purple",
-    ascii: "r",
+    color: "rgb(255, 0, 255)",
+    ascii: `<span style="color: rgb(255, 0, 255);">P</span>`,
     type: 5,
 }
 const b7: Bubble = {
-    color: "Black",
-    ascii: "n",
+    color: "rgb(255, 255, 255)",
+    ascii: `<span style="color: rgb(255, 255, 255);">W</span>`,
     type: 6,
 }
 const allBubbles: Bubble[] = [

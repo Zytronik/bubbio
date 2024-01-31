@@ -2,7 +2,7 @@
   <div>
     <div>
       <h1>Game</h1>
-      <span class="monospace">{{ playGridASCII }}</span> <br>
+      <span class="monospace" v-html="playGridASCII"></span> <br>
       <span>angle: {{ angle }}</span> <br>
       <input type="range" v-model="angle" min="0" max="180" step="1">
     </div>

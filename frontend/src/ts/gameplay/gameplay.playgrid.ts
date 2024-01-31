@@ -5,6 +5,8 @@ import { Row } from "./i/gameplay.i.row";
 import { angle } from "./gameplay.angle";
 import { GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH } from "../game-settings/game-settings.game";
 import { Coordinates } from "./i/gameplay.i.grid-coordinates";
+import { calculatePreview } from "./gameplay.shoot";
+import { currentBubble, prepareNextBubble } from "./gameplay.bubble-manager";
 
 export const playGridASCII: Ref<string> = ref("");
 export const playGrid: Grid = {
@@ -21,7 +23,10 @@ export const playGrid: Grid = {
 }
 
 export function setupGrid(): void {
-    const WIDTH_UNITS = 50000000;
+    //todo into the game manager
+    prepareNextBubble()
+
+    const WIDTH_UNITS = 100000000;
     playGrid.visualWidth = WIDTH_UNITS;
     playGrid.gridWidth = GRID_WIDTH.value;
     playGrid.bubbleRadius = WIDTH_UNITS / (2 * playGrid.gridWidth);
@@ -60,16 +65,6 @@ export function setupGrid(): void {
     generateASCIIBoard();
 }
 
-export function getAllFields(): Field[] {
-    const allFields: Field[] = [];
-    playGrid.rows.forEach(row => {
-        row.fields.forEach(field => {
-            allFields.push(field);
-        });
-    });
-    return allFields;
-}
-
 export function getNearbyFields(pointPosition: Coordinates): Field[] {
     const bubbleRadius = playGrid.bubbleRadius;
     const bubbleDiameter = playGrid.bubbleRadius * 2;
@@ -79,9 +74,9 @@ export function getNearbyFields(pointPosition: Coordinates): Field[] {
     const x = Math.round((pointPosition.x - xOffSet) / bubbleDiameter);
 
     const nearbyFields: Field[] = []
-    for (let row = y-1; row < y+1; row++) {
-        for (let column = x-1; column < x+1; column++) {
-            if(playGrid.rows[row] && playGrid.rows[row].fields[column]){
+    for (let row = y - 1; row < y + 1; row++) {
+        for (let column = x - 1; column < x + 1; column++) {
+            if (playGrid.rows[row] && playGrid.rows[row].fields[column]) {
                 nearbyFields.push(playGrid.rows[row].fields[column]);
             }
         }
@@ -90,8 +85,15 @@ export function getNearbyFields(pointPosition: Coordinates): Field[] {
 }
 
 function generateASCIIBoard(): void {
+    const previewPosition = calculatePreview();
     let boardText = "";
+    let once = true;
     playGrid.rows.forEach(row => {
+        if (row.isInDeathZone && once) {
+            boardText += "|–––––––––––––––––––––––––––––––––|\n"
+            once = false;
+        }
+
         if (!row.isEven) {
             boardText += "|.. ";
         } else {
@@ -99,8 +101,12 @@ function generateASCIIBoard(): void {
         }
 
         row.fields.forEach(field => {
-            const bubbleASCII = field.bubble ? field.bubble.ascii : "-"
-            boardText += `-${bubbleASCII}- `
+            if (previewPosition.x === field.coords.x && previewPosition.y === field.coords.y) {
+                boardText += `|${currentBubble.ascii}| `;
+            } else {
+                const bubbleASCII = field.bubble ? field.bubble.ascii : "-";
+                boardText += `-${bubbleASCII}- `;
+            }
         });
 
         if (!row.isEven) {
@@ -109,8 +115,7 @@ function generateASCIIBoard(): void {
             boardText += "|\n";
         }
     });
-    boardText += "|_________________________________|\n| . . . . . . . . . . . . . . . . |\n| . . . . . . . . . . . . . . . . |";
-    boardText += `\n| . . . . . . . .${getASCIIArrow()}. . . . . . . . |\n\n`;
+    boardText += `| . . . . . . . .${getASCIIArrow()}. . . . . . . . |\n`;
     playGridASCII.value = boardText;
     requestAnimationFrame(() => generateASCIIBoard());
 }
