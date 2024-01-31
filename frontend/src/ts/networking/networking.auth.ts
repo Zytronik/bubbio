@@ -50,16 +50,41 @@ export async function login(username: string, password: string): Promise<{succes
       localStorage.setItem('authToken', token);
       return { success: true, error: '' };
     } else {
-      //console.error('No token received');
       return { success: false, error: 'No token received' };
     }
   } catch (error) {
-    //console.error('Login failed:', error);
     if (axios.isAxiosError(error)) {
       return { success: false, error: error.response?.data?.message[0] || 'Login failed' };
     } else {
       return { success: false, error: 'An unknown error occurred' };
     }
+  }
+}
+
+export async function register(username: string, password: string, passwordAgain: string): Promise<{success: boolean, error: string}> {
+  if (password !== passwordAgain) {
+    return { success: false, error: 'Passwords do not match' };
+  }
+
+  try {
+    await httpClient.post('/auth/register', { username, password });
+    return { success: true, error: '' };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return { success: false, error: error.response?.data?.message[0] || 'Registration failed' };
+    } else {
+      return { success: false, error: 'An unknown error occurred' };
+    }
+  }
+}
+
+export async function checkIfUsernameIsTaken(username: string): Promise<boolean> {
+  const response = await httpClient.get('/users/userExists', { params: { username } });
+
+  if (response.data) {
+    return true;
+  } else {
+    return false;
   }
 }
 

@@ -1,6 +1,12 @@
 <template>
   <article id="app">
-    <LoginOverlay v-if="showLogin" @login="handleLogin" :error-message="loginErrorMessage" />
+    <button v-if="!showLogin" @click="logUserOut">Log Out</button>
+    <LoginOverlay v-if="showLogin" 
+    @login="handleLogin" 
+    @checkUsername="handleCheckUsername" 
+    @register="handleRegister" 
+    @switchToUsernameForm="clearErrorMessage" 
+    :error-message="errorMessage" />
     <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom">
     </component>
   </article>
@@ -13,14 +19,14 @@ import { currentPageState, goToState, pages, setupTransitionFunctions } from './
 import LoginOverlay from './globalComponents/LoginOverlay.vue';
 import { eventBus } from './ts/page/page.event-bus';
 import { PageState } from './ts/page/page.e-page-state';
-import { checkUserAuthentication, clearClientState, login, showLoginForm } from './ts/networking/networking.auth';
+import { checkIfUsernameIsTaken, checkUserAuthentication, clearClientState, login, logUserOut, register, showLoginForm } from './ts/networking/networking.auth';
 
 export default {
   name: 'App',
   components: { LoginOverlay },
   setup() {
     const showLogin = ref<boolean>(false);
-    const loginErrorMessage = ref<string>('');
+    const errorMessage = ref<string>('');
     const roomId = ref<string>('');
     const currentPageIndex = computed(() => pages.findIndex(p => p.pageState === currentPageState.value));
     const currentComponent = computed(() => {
@@ -82,18 +88,43 @@ export default {
         initializeGlobalSocket();
         joinRoomFromHash();
       } else {
-        loginErrorMessage.value = error;
+        errorMessage.value = error;
       }
+    }
+
+    async function handleCheckUsername(username: string,) {
+      if (await checkIfUsernameIsTaken(username)) {
+        eventBus.emit('navigateToLogin');
+      } else {
+        eventBus.emit('navigateToRegister');
+      }
+    }
+
+    async function handleRegister(username: string, password: string, passwordAgain: string){
+      const { success, error } = await register(username, password, passwordAgain);
+      if(success){
+        handleLogin(username, password);
+      }else{
+        errorMessage.value = error;
+      }
+    }
+
+    function clearErrorMessage() {
+      errorMessage.value = '';
     }
 
     return {
       showLogin,
-      loginErrorMessage,
+      errorMessage,
       currentComponent,
       roomId,
       handleJoinRoom,
       handleLeaveRoom,
       handleLogin,
+      handleCheckUsername,
+      handleRegister,
+      clearErrorMessage,
+      logUserOut,
     };
   },
 }
