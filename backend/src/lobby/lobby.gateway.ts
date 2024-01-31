@@ -86,6 +86,12 @@ export class LobbyGateway implements OnGatewayConnection {
     client.emit('updateActiveRooms', activeRoomsInfo);
   }
 
+  @SubscribeMessage('isUserInRoomAlready')
+  handleIsUserInRoomAlready(@MessageBody() data, @ConnectedSocket() client: Socket) {
+    const username = client.data.user.username;
+    client.emit('isUserInRoomAlready', this.isUserInAnyRoom(username), data.roomId);
+  }
+
   async authenticateUser(client: Socket): Promise<boolean> {
     try {
       const token = Array.isArray(client.handshake.query.token)

@@ -1,13 +1,11 @@
 <template>
   <article id="app">
     <button v-if="!showLogin" @click="logUserOut">Log Out</button>
-    <LoginOverlay v-if="showLogin" 
-    @login="handleLogin" 
-    @checkUsername="handleCheckUsername" 
-    @register="handleRegister" 
-    @switchToUsernameForm="clearErrorMessage" 
-    :error-message="errorMessage" />
-    <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom">
+    <InfoMessages ref="infoMessageRef" />
+    <LoginOverlay v-if="showLogin" @login="handleLogin" @checkUsername="handleCheckUsername" @register="handleRegister"
+      @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" />
+    <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom"
+      @showInfoMessage="showInfoMessage">
     </component>
   </article>
 </template>
@@ -17,14 +15,20 @@ import { ref, computed, watchEffect, onMounted, onUnmounted } from 'vue';
 import { disconnectGlobalSocket, initializeGlobalSocket } from './ts/networking/networking.client-websocket';
 import { currentPageState, goToState, pages, setupTransitionFunctions } from './ts/page/page.page-manager';
 import LoginOverlay from './globalComponents/LoginOverlay.vue';
+import InfoMessages from './globalComponents/InfoMessages.vue';
 import { eventBus } from './ts/page/page.event-bus';
 import { PageState } from './ts/page/page.e-page-state';
 import { checkIfUsernameIsTaken, checkUserAuthentication, clearClientState, login, logUserOut, register, showLoginForm } from './ts/networking/networking.auth';
 
+interface InfoMessageComponent {
+  showMessage: (message: string, type: string) => void;
+}
+
 export default {
   name: 'App',
-  components: { LoginOverlay },
+  components: { LoginOverlay, InfoMessages },
   setup() {
+    const infoMessageRef = ref<InfoMessageComponent | null>(null);
     const showLogin = ref<boolean>(false);
     const errorMessage = ref<string>('');
     const roomId = ref<string>('');
@@ -65,12 +69,21 @@ export default {
       }
     }
 
+    function showInfoMessage(message: string, type: string) {
+  if (infoMessageRef.value) {
+    infoMessageRef.value.showMessage(message, type);
+  } else {
+    console.error('InfoMessage component is not available');
+  }
+}
+
+
     onMounted(() => {
       setupTransitionFunctions();
-      if(checkUserAuthentication()){
+      if (checkUserAuthentication()) {
         initializeGlobalSocket();
         joinRoomFromHash();
-      }else{
+      } else {
         clearClientState();
         showLoginForm();
       }
@@ -100,11 +113,11 @@ export default {
       }
     }
 
-    async function handleRegister(username: string, password: string, passwordAgain: string){
+    async function handleRegister(username: string, password: string, passwordAgain: string) {
       const { success, error } = await register(username, password, passwordAgain);
-      if(success){
+      if (success) {
         handleLogin(username, password);
-      }else{
+      } else {
         errorMessage.value = error;
       }
     }
@@ -125,6 +138,8 @@ export default {
       handleRegister,
       clearErrorMessage,
       logUserOut,
+      showInfoMessage,
+      infoMessageRef,
     };
   },
 }
