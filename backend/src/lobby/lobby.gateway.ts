@@ -40,13 +40,18 @@ export class LobbyGateway implements OnGatewayConnection {
 
   @SubscribeMessage('joinRoom')
   handleJoinRoom(@MessageBody() data, @ConnectedSocket() client: Socket) {
-    if (data.roomId && data.roomId.trim() !== '') {
-      this.processUserJoiningRoom(client, data.roomId);
-      this.sendJoinRoomMessage(client.id, data.roomId);
-      this.emitActiveRoomsUpdate();
-      this.lobbyData.logRoomsInformations('User joined a room');
+    const username = client.data.user.username;
+    if (!this.isUserInAnyRoom(username)) {
+      if (data.roomId && data.roomId.trim() !== '') {
+        this.processUserJoiningRoom(client, data.roomId);
+        this.sendJoinRoomMessage(client.id, data.roomId);
+        this.emitActiveRoomsUpdate();
+        this.lobbyData.logRoomsInformations('User joined a room');
+      } else {
+        console.error(`Invalid Room ID provided by client Id: ${client.id}`);
+      }
     } else {
-      console.error(`Invalid Room ID provided by client Id: ${client.id}`);
+      console.error(`Username: ${username} is already in a room and cannot join another`);
     }
   }
 
@@ -86,15 +91,15 @@ export class LobbyGateway implements OnGatewayConnection {
       const token = Array.isArray(client.handshake.query.token)
         ? client.handshake.query.token[0]
         : client.handshake.query.token;
-  
+
       if (!token) {
         throw new Error('Token not provided');
       }
-  
+
       const payload = this.jwtService.verify(token, {
         secret: this.configService.get<string>('JWT_SECRET')
       });
-  
+
       const userDetails = await this.userService.getUserByUsername(payload.username);
       client.data.user = userDetails;
       return true;
@@ -147,11 +152,17 @@ export class LobbyGateway implements OnGatewayConnection {
   }
 
   private processUserJoiningRoom(client: Socket, roomId: string) {
-    if (!this.lobbyData.hasRoom(roomId)) { //if room doesnt exists
+    if (!this.lobbyData.hasRoom(roomId)) {
       this.lobbyData.setRoom({ roomId: roomId, messages: [], users: [] });
     }
     this.moveUserToRoom(client, roomId);
     this.updateFrontendRoomUserList(roomId);
+  }
+
+  private isUserInAnyRoom(username: string): boolean {
+    return this.lobbyData.inRoom.some(room =>
+      room.users.some(user => user.username === username)
+    );
   }
 
   private updateFrontendRoomUserList(roomId: string): void {
