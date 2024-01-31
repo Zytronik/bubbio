@@ -1,6 +1,7 @@
 import { shootInput } from "../input/input.possible-inputs";
+import { getVelocity } from "./gameplay.angle";
 import { getRandomBubble } from "./gameplay.bubble-manager";
-import { getAllFields, playGrid } from "./gameplay.playgrid";
+import { getAllFields, getNearbyFields, playGrid } from "./gameplay.playgrid";
 import { XORShift32 } from "./gameplay.random";
 import { Bubble } from "./i/gameplay.i.bubble";
 import { Field } from "./i/gameplay.i.field";
@@ -11,11 +12,43 @@ export function setupShootControls() {
 }
 
 function shootBubble(): void {
+    const t1 = performance.now()
     const nextBubble: Bubble = getRandomBubble();
-    const randomCoords = getRandomCoords();
-    const gridField = snapToGrid(randomCoords);
+    const bubbleCoords = { x: playGrid.bubbleLauncherPosition.x, y: playGrid.bubbleLauncherPosition.y };
+    let xDirection = getVelocity().x;
+    const yDirection = getVelocity().y;
+    let bounceAmount = 0
+    while (!checkForCollision(bubbleCoords)) {
+        bubbleCoords.x += xDirection;
+        bubbleCoords.y += yDirection;
+        const hitLeftWall = bubbleCoords.x < playGrid.bubbleRadius
+        const hitRightWall = bubbleCoords.x > playGrid.visualWidth - playGrid.bubbleRadius
+        if (hitLeftWall || hitRightWall) {
+            xDirection = -xDirection;
+            bounceAmount++;
+        }
+    }
+    console.log("bounceAmount", bounceAmount, "performance:", performance.now() - t1)
+    const gridField = snapToGrid(bubbleCoords);
     gridField.bubble = nextBubble;
-    console.log("randomCoords", randomCoords, "gridField", gridField);
+}
+
+function checkForCollision(bubbleCenterCoords: Coordinates): boolean {
+    let hasCollided = false;
+    if (bubbleCenterCoords.y < playGrid.bubbleRadius) {
+        console.log("wallcollision", bubbleCenterCoords)
+        return true;
+    }
+    getNearbyFields(bubbleCenterCoords).forEach(field => {
+        if (field.bubble) {
+            const distance = getDistanceSquared(bubbleCenterCoords, field.centerPointCoords);
+            if (distance < playGrid.collisionRangeSquared) {
+                console.log("bubblecollision", bubbleCenterCoords)
+                hasCollided = true;
+            }
+        }
+    });
+    return hasCollided;
 }
 
 function snapToGrid(collisionCoords: Coordinates): Field {
@@ -46,7 +79,13 @@ function snapToGrid(collisionCoords: Coordinates): Field {
 function getDistance(p1: Coordinates, p2: Coordinates): number {
     const deltaXSquared = (p1.x - p2.x) ** 2;
     const deltaYSquared = (p1.y - p2.y) ** 2;
-    return Math.sqrt(deltaXSquared + deltaYSquared);
+    return Math.floor(Math.sqrt(deltaXSquared + deltaYSquared));
+}
+
+function getDistanceSquared(p1: Coordinates, p2: Coordinates): number {
+    const deltaXSquared = (p1.x - p2.x) ** 2;
+    const deltaYSquared = (p1.y - p2.y) ** 2;
+    return deltaXSquared + deltaYSquared;
 }
 
 function getRandomCoords(): Coordinates {

@@ -1,6 +1,7 @@
 import { APS, APS2 } from '@/ts/game-settings/game-settings.handling';
 import { centerCursorInput, changeAPSInput, leftInput, rightInput } from '@/ts/input/input.possible-inputs';
 import { Ref, ref } from 'vue';
+import { Coordinates } from './i/gameplay.i.grid-coordinates';
 
 export const angle: Ref<number> = ref(90);
 let currentAPS: number = APS.value;
@@ -13,8 +14,8 @@ export function setupAngleControls() {
     changeAPSInput.release = revertAPS;
 }
 
-export function getXY(angle: number) {
-    return [cosTable[angle*10], sinTable[angle*10]]
+export function getVelocity(): Coordinates {
+    return { x: cosTable[angle.value * 10], y: -sinTable[angle.value * 10] };
 }
 
 function left(): void {
@@ -42,11 +43,11 @@ function revertAPS(): void {
 }
 
 function cleanUpAngle(angle: number): number {
-    if (angle < 0) {
-        return 0;
+    if (angle < 12) {
+        return 12;
     }
-    else if (angle > 180) {
-        return 180;
+    else if (angle > 168) {
+        return 168;
     }
     else {
         return Number(angle.toFixed(1));
@@ -1890,7 +1891,7 @@ const cosTable: number[] = [
     10000,
     10000,
     10000
-  ]
+]
 const sinTable: number[] = [
     0,
     17,
@@ -3693,4 +3694,4 @@ const sinTable: number[] = [
     35,
     17,
     0
-  ]
+]
