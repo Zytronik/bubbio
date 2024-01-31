@@ -7,7 +7,7 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
     constructor(private prisma: PrismaService) { }
 
-    async create(createUserDto: CreateUserDto): Promise<any> {
+    async createUser(createUserDto: CreateUserDto): Promise<any> {
         // Check if a user with the given username already exists
         const existingUser = await this.userExists(createUserDto.username);
         if (existingUser) {
@@ -32,13 +32,17 @@ export class UserService {
     }
 
     async userExists(username: string): Promise<boolean> {
+        if (!username || username.trim() === '') {
+            return false;
+        }
+    
         const user = await this.prisma.user.findUnique({
             where: { username },
         });
         return !!user;
     }
 
-    async findByUsername(username: string): Promise<any> {
+    async getUserByUsername(username: string): Promise<any> {
         const user = await this.prisma.user.findUnique({
             where: { username },
         });
@@ -55,7 +59,7 @@ export class UserService {
     }
 
 
-    async findProfileByUsername(username: string): Promise<any> {
+    async getUserProfileByUsername(username: string): Promise<any> {
         const user = await this.prisma.user.findUnique({
             where: { username },
             select: {

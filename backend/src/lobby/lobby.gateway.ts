@@ -95,7 +95,7 @@ export class LobbyGateway implements OnGatewayConnection {
         secret: this.configService.get<string>('JWT_SECRET')
       });
   
-      const userDetails = await this.userService.findByUsername(payload.username);
+      const userDetails = await this.userService.getUserByUsername(payload.username);
       client.data.user = userDetails;
       return true;
     } catch (error) {
