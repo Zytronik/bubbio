@@ -18,11 +18,11 @@ export class AuthService {
     ) { }
 
     async register(registerDto: RegisterDto): Promise<any> {
-        return this.userService.create(registerDto); 
+        return this.userService.createUser(registerDto); 
     }
 
     async login(loginDto: LoginDto): Promise<any> {
-        const user = await this.userService.findByUsername(loginDto.username);
+        const user = await this.userService.getUserByUsername(loginDto.username);
 
         if (!user) {
             throw new BadRequestException({
