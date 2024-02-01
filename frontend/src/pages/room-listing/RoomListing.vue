@@ -46,23 +46,13 @@ export default {
 
     function joinRoom(roomId: string) {
       if (roomId) {
-        if (state.socket) {
-          state.socket.emit('isUserInRoomAlready', { roomId });
-        }
+        emit('joinedRoom', roomId);
       }
     }
 
     if (state.socket) {
       state.socket.on('updateActiveRooms', (rooms: ActiveRoomInfo[]) => {
         activeRooms.value = rooms;
-      });
-
-      state.socket.on('isUserInRoomAlready', (isUserInRoomAlready: boolean, roomId: string) => {
-        if (!isUserInRoomAlready) {
-          emit('joinedRoom', roomId);
-        } else {
-          emit('showInfoMessage', 'You are already in this room.', 'info');
-        }
       });
 
       state.socket.on('disconnect', () => {

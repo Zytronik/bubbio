@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { eventBus } from '@/ts/page/page.event-bus';
+import eventBus from '@/ts/page/page.event-bus';
 import { defineComponent } from 'vue';
 
 export default defineComponent({

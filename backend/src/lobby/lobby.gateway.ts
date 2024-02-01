@@ -18,7 +18,9 @@ export class LobbyGateway implements OnGatewayConnection {
   private lobbyData: LobbyData = new LobbyData();
 
   async handleConnection(client: any) {
-    const isAuthenticated = await this.authenticateUser(client);
+    const authenticationPromise = this.authenticateUser(client);
+    this.authenticationPromises.set(client.id, authenticationPromise);
+    const isAuthenticated = await authenticationPromise;
     if (!isAuthenticated) {
       client.disconnect(); // Disconnect if authentication fails
       return;
@@ -87,10 +89,19 @@ export class LobbyGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('isUserInRoomAlready')
-  handleIsUserInRoomAlready(@MessageBody() data, @ConnectedSocket() client: Socket) {
+  async handleIsUserInRoomAlready(@MessageBody() data, @ConnectedSocket() client: Socket) {
+    const isAuthenticated = await this.authenticationPromises.get(client.id);
+    // Ensure the client is authenticated before proceeding
+    if (!isAuthenticated || !client.data.user) {
+      console.error('Authentication required or failed for client:', client.id);
+      return;
+    }
+  
     const username = client.data.user.username;
-    client.emit('isUserInRoomAlready', this.isUserInAnyRoom(username), data.roomId);
+    client.emit('isUserInRoomAlready', this.isUserInAnyRoom(username), data.rId);
   }
+
+  private authenticationPromises: Map<string, Promise<boolean>> = new Map();
 
   async authenticateUser(client: Socket): Promise<boolean> {
     try {
