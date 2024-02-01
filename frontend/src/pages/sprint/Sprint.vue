@@ -1,6 +1,6 @@
 <template>
   <section id="template" class="page">
-    <button @click="goToState(PageState.mainMenu)">Go to Menu</button>
+    <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
     <button>Retry</button>
     <div>
       <p>Timer: 00:00</p>
@@ -34,7 +34,7 @@
 <script lang="ts">
 import Game from '../game/Game.vue';
 import { goToState } from '@/ts/page/page.page-manager';
-import { PageState } from '@/ts/page/page.e-page-state';
+import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 //import { onMounted } from 'vue';
 
 export default {
@@ -47,7 +47,7 @@ export default {
 
     return {
       goToState,
-      PageState
+      PAGE_STATE
     };
   },
 };

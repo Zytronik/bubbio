@@ -17,12 +17,24 @@ export class LobbyGateway implements OnGatewayConnection {
 
   private lobbyData: LobbyData = new LobbyData();
 
-  async handleConnection(client: any) {
-    const authenticationPromise = this.authenticateUser(client);
-    this.authenticationPromises.set(client.id, authenticationPromise);
-    const isAuthenticated = await authenticationPromise;
-    if (!isAuthenticated) {
-      client.disconnect(); // Disconnect if authentication fails
+  async handleConnection(client: Socket) {
+    const isGuest = client.handshake.query.isGuest === 'true';
+    let authPromise;
+
+    if (isGuest) {
+      // Handle as guest immediately
+      this.handleGuestConnection(client);
+      // Guests are "authenticated" for the sake of proceeding
+      authPromise = Promise.resolve(true);
+    } else {
+      // Proceed with JWT authentication
+      authPromise = this.authenticateUser(client);
+    }
+    this.authenticationPromises.set(client.id, authPromise);
+
+    const isAuthenticated = await authPromise;
+    if (!isAuthenticated && !isGuest) {
+      client.disconnect();
       return;
     }
     this.addUserToNoRoom(client);
@@ -90,13 +102,11 @@ export class LobbyGateway implements OnGatewayConnection {
 
   @SubscribeMessage('isUserInRoomAlready')
   async handleIsUserInRoomAlready(@MessageBody() data, @ConnectedSocket() client: Socket) {
-    const isAuthenticated = await this.authenticationPromises.get(client.id);
-    // Ensure the client is authenticated before proceeding
-    if (!isAuthenticated || !client.data.user) {
+    const isAuthenticated = await this.authenticationPromises.get(client.id) ?? false;
+    if (!isAuthenticated) {
       console.error('Authentication required or failed for client:', client.id);
       return;
     }
-  
     const username = client.data.user.username;
     client.emit('isUserInRoomAlready', this.isUserInAnyRoom(username), data.rId);
   }
@@ -119,11 +129,18 @@ export class LobbyGateway implements OnGatewayConnection {
 
       const userDetails = await this.userService.getUserByUsername(payload.username);
       client.data.user = userDetails;
+      client.data.isGuest = false;
       return true;
     } catch (error) {
       console.error('Authentication failed:', error);
       return false;
     }
+  }
+
+  private handleGuestConnection(client: Socket) {
+    const guestUsername = "Guest-" + client.handshake.query.guestUsername || `Guest-${Math.random().toString(36).substring(2, 15)}`;
+    client.data.user = { username: guestUsername };
+    client.data.isGuest = true;
   }
 
   private emitActiveRoomsUpdate() {

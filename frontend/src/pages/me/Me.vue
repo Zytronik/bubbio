@@ -1,7 +1,7 @@
 <template>
   <section id="me" class="page">
     <h1>Me</h1>
-    <button @click="goToState(PageState.mainMenu)">Go to Menu</button>
+    <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
     <div v-if="userData">
       <p>Username: {{ userData.username }}</p>
       <p>Created at: {{ userData.createdAt }}</p>
@@ -15,7 +15,7 @@ import { httpClient } from '@/ts/networking/networking.http-client';
 import { logUserOut } from '@/ts/networking/networking.auth';
 import { onMounted, ref } from 'vue';
 import { goToState } from '@/ts/page/page.page-manager';
-import { PageState } from '@/ts/page/page.e-page-state';
+import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 
 interface UserData {
   username: string;
@@ -49,7 +49,7 @@ export default {
     return {
       userData,
       goToState,
-      PageState
+      PAGE_STATE
     };
   },
 };

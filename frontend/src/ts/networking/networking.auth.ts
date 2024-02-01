@@ -34,7 +34,6 @@ export function clearClientState() {
 }
 
 export function showLoginForm() {
-  console.log("shooooooooooooow");
   eventBus.setShowLogin(true);
 }
 
@@ -77,6 +76,11 @@ export async function register(username: string, password: string, passwordAgain
   }
 }
 
+export async function loginAsGuest(username: string) {
+  sessionStorage.setItem('isGuest', 'true');
+  sessionStorage.setItem('guestUsername', username );
+}
+
 export async function checkIfUsernameIsTaken(username: string): Promise<boolean> {
   const response = await httpClient.get('/users/userExists', { params: { username } });
 
@@ -89,6 +93,7 @@ export async function checkIfUsernameIsTaken(username: string): Promise<boolean>
 
 export function checkUserAuthentication() {
   const token = localStorage.getItem('authToken');
+  const isGuest = sessionStorage.getItem('isGuest') === 'true';
   if (token) {
     try {
       const decodedToken = jwtDecode<JwtPayload>(token);
@@ -101,6 +106,8 @@ export function checkUserAuthentication() {
     } catch (error) {
       return false;
     }
+  } else if (isGuest) {
+    return true;
   } else {
     return false;
   }

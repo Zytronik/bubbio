@@ -2,7 +2,7 @@
   <article id="app">
     <InfoMessages ref="infoMessageRef" />
     <LoginOverlay v-if="showLogin" @login="handleLogin" @checkUsername="handleCheckUsername" @register="handleRegister"
-      @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" />
+      @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" @playAsGuest="handlePlayAsGuest"/>
     <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom"
       @showInfoMessage="showInfoMessage">
     </component>
@@ -11,12 +11,12 @@
 
 <script lang="ts">
 import { ref, computed, watchEffect, onMounted, onUnmounted } from 'vue';
-import state, { disconnectGlobalSocket, initializeGlobalSocket } from './ts/networking/networking.client-websocket';
+import state, { addSocketConnectListener, disconnectGlobalSocket, initializeGlobalSocket } from './ts/networking/networking.client-websocket';
 import { currentPageState, goToState, pages, setupTransitionFunctions } from './ts/page/page.page-manager';
 import LoginOverlay from './globalComponents/LoginOverlay.vue';
 import InfoMessages from './globalComponents/InfoMessages.vue';
-import { PageState } from './ts/page/page.e-page-state';
-import { checkIfUsernameIsTaken, checkUserAuthentication, clearClientState, login, logUserOut, register, showLoginForm } from './ts/networking/networking.auth';
+import { PAGE_STATE } from './ts/page/page.e-page-state';
+import { checkIfUsernameIsTaken, checkUserAuthentication, clearClientState, login, loginAsGuest, logUserOut, register, showLoginForm } from './ts/networking/networking.auth';
 import eventBus from './ts/page/page.event-bus';
 
 interface InfoMessageComponent {
@@ -70,8 +70,20 @@ export default {
       }
     }
 
+    async function handlePlayAsGuest(username: string) {
+      loginAsGuest(username);
+      eventBus.setShowLogin(false);
+      initializeGlobalSocket();
+      joinRoomFromHash();
+    }
+
     function clearErrorMessage() {
       errorMessage.value = '';
+    }
+
+    function clearGuestCookies(){
+      sessionStorage.removeItem('isGuest');
+      sessionStorage.removeItem('guestUsername');
     }
 
     /* Room Component */
@@ -85,7 +97,7 @@ export default {
 
     function handleLeaveRoom() {
       roomId.value = '';
-      goToState(PageState.roomListing);
+      goToState(PAGE_STATE.roomListing);
     }
 
     function getRoomIdFromHash() {
@@ -100,11 +112,15 @@ export default {
     }
 
     function initOnIsUserInRoomAlready() {
+      console.log("test3");
+      console.log(state.socket);
       if (state.socket) {
+        console.log("test2");
         state.socket.on('isUserInRoomAlready', (isUserInRoomAlready: boolean, rId: string) => {
+          console.log("test1");
           if (!isUserInRoomAlready) {
             roomId.value = rId;
-            goToState(PageState.roomPage);
+            goToState(PAGE_STATE.roomPage);
           } else {
             showInfoMessage('You are already in this room.', 'info');
             //emit('showInfoMessage', 'You are already in this room.', 'info'); 
@@ -135,11 +151,14 @@ export default {
         showLoginForm();
       }
 
-      initOnIsUserInRoomAlready();
+      addSocketConnectListener(initOnIsUserInRoomAlready);
+      window.addEventListener('beforeunload', clearGuestCookies);
     });
 
     onUnmounted(() => {
       disconnectGlobalSocket();
+      window.removeEventListener('beforeunload', clearGuestCookies);
+      clearGuestCookies();
     });
 
     return {
@@ -156,6 +175,7 @@ export default {
       logUserOut,
       showInfoMessage,
       infoMessageRef,
+      handlePlayAsGuest,
     };
   },
 }

@@ -5,7 +5,7 @@
       <button @click="joinRoom(roomId)">Join Room</button>
       <p>- or -</p>
       <button @click="createRoom()">Create & Join New Room</button>
-      <button @click="goToState(PageState.mainMenu)">Go to Menu</button>
+      <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
     </div>
     <div class="active-rooms">
       <h2>Active Rooms</h2>
@@ -25,7 +25,7 @@
 <script lang="ts">
 import state from '@/ts/networking/networking.client-websocket';
 import { ref, SetupContext, onMounted } from 'vue';
-import { PageState } from '@/ts/page/page.e-page-state';
+import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { goToState } from '@/ts/page/page.page-manager';
 
 interface ActiveRoomInfo {
@@ -71,7 +71,7 @@ export default {
       fetchActiveRooms();
     });
 
-    return { roomId, joinRoom, createRoom, activeRooms, goToState, PageState };
+    return { roomId, joinRoom, createRoom, activeRooms, goToState, PAGE_STATE };
   },
 };
 </script>

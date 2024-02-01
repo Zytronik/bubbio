@@ -1,4 +1,4 @@
-export enum PageState {
+export enum PAGE_STATE {
     mainMenu = 'mainMenu',
     settingsPage = 'settingsPage',
     roomListing = 'roomListing',

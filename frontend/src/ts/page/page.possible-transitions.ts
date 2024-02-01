@@ -1,10 +1,10 @@
-import { PageState } from "./page.e-page-state";
+import { PAGE_STATE } from "./page.e-page-state";
 import { PageTransition } from "./page.i-page-transition";
 
 export const mainMenuToSettingsPageTransition: PageTransition = {
     name: "mainMenuToSettingsPageTransition",
-    origin: PageState.mainMenu,
-    destination: PageState.settingsPage,
+    origin: PAGE_STATE.mainMenu,
+    destination: PAGE_STATE.settingsPage,
     transitionFunction: () => {
         console.error("transition not yet defined for " + mainMenuToSettingsPageTransition.name);
     }
@@ -12,8 +12,8 @@ export const mainMenuToSettingsPageTransition: PageTransition = {
 
 export const mainMenuToRoomListingTransition: PageTransition = {
     name: "mainMenuToRoomListingTransition",
-    origin: PageState.mainMenu,
-    destination: PageState.roomListing,
+    origin: PAGE_STATE.mainMenu,
+    destination: PAGE_STATE.roomListing,
     transitionFunction: () => {
         console.error("transition not yet defined for " + mainMenuToRoomListingTransition.name);
     }
@@ -21,8 +21,8 @@ export const mainMenuToRoomListingTransition: PageTransition = {
 
 export const mainMenuToGamePageTransition: PageTransition = {
     name: "mainMenuToGamePageTransition",
-    origin: PageState.mainMenu,
-    destination: PageState.gamePage,
+    origin: PAGE_STATE.mainMenu,
+    destination: PAGE_STATE.gamePage,
     transitionFunction: () => {
         console.error("transition not yet defined for " + mainMenuToGamePageTransition.name);
     }
@@ -30,8 +30,8 @@ export const mainMenuToGamePageTransition: PageTransition = {
 
 export const mainMenuToMyPageTransition: PageTransition = {
     name: "mainMenuToMyPageTransition",
-    origin: PageState.mainMenu,
-    destination: PageState.myPage,
+    origin: PAGE_STATE.mainMenu,
+    destination: PAGE_STATE.myPage,
     transitionFunction: () => {
         console.error("transition not yet defined for " + mainMenuToMyPageTransition.name);
     }
@@ -39,8 +39,8 @@ export const mainMenuToMyPageTransition: PageTransition = {
 
 export const mainMenuToRoomPageTransition: PageTransition = {
     name: "mainMenuToRoomPageTransition",
-    origin: PageState.mainMenu,
-    destination: PageState.roomPage,
+    origin: PAGE_STATE.mainMenu,
+    destination: PAGE_STATE.roomPage,
     transitionFunction: () => {
         console.error("transition not yet defined for " + mainMenuToRoomPageTransition.name);
     }
@@ -48,8 +48,8 @@ export const mainMenuToRoomPageTransition: PageTransition = {
 
 export const settingsPageToMainMenuTransition: PageTransition = {
     name: "settingsPageToMainMenuTransition",
-    origin: PageState.settingsPage,
-    destination: PageState.mainMenu,
+    origin: PAGE_STATE.settingsPage,
+    destination: PAGE_STATE.mainMenu,
     transitionFunction: () => {
         console.error("transition not yet defined for " + settingsPageToMainMenuTransition.name);
     }
@@ -57,8 +57,8 @@ export const settingsPageToMainMenuTransition: PageTransition = {
 
 export const roomListingToMainMenuTransition: PageTransition = {
     name: "roomListingToMainMenuTransition",
-    origin: PageState.roomListing,
-    destination: PageState.mainMenu,
+    origin: PAGE_STATE.roomListing,
+    destination: PAGE_STATE.mainMenu,
     transitionFunction: () => {
         console.error("transition not yet defined for " + roomListingToMainMenuTransition.name);
     }
@@ -66,8 +66,8 @@ export const roomListingToMainMenuTransition: PageTransition = {
 
 export const roomListingToRoomPageTransition: PageTransition = {
     name: "roomListingToRoomPageTransition",
-    origin: PageState.roomListing,
-    destination: PageState.roomPage,
+    origin: PAGE_STATE.roomListing,
+    destination: PAGE_STATE.roomPage,
     transitionFunction: () => {
         console.error("transition not yet defined for " + roomListingToRoomPageTransition.name);
     }
@@ -75,8 +75,8 @@ export const roomListingToRoomPageTransition: PageTransition = {
 
 export const roomPageToRoomListingTransition: PageTransition = {
     name: "roomPageToRoomListingTransition",
-    origin: PageState.roomPage,
-    destination: PageState.roomListing,
+    origin: PAGE_STATE.roomPage,
+    destination: PAGE_STATE.roomListing,
     transitionFunction: () => {
         console.error("transition not yet defined for " + roomPageToRoomListingTransition.name);
     }
@@ -84,8 +84,8 @@ export const roomPageToRoomListingTransition: PageTransition = {
 
 export const roomPageToMainMenuTransition: PageTransition = {
     name: "roomPageToMainMenuTransition",
-    origin: PageState.roomPage,
-    destination: PageState.mainMenu,
+    origin: PAGE_STATE.roomPage,
+    destination: PAGE_STATE.mainMenu,
     transitionFunction: () => {
         console.error("transition not yet defined for " + roomPageToMainMenuTransition.name);
     }
@@ -93,8 +93,8 @@ export const roomPageToMainMenuTransition: PageTransition = {
 
 export const myPageToMainMenuTransition: PageTransition = {
     name: "myPageToMainMenuTransition",
-    origin: PageState.myPage,
-    destination: PageState.mainMenu,
+    origin: PAGE_STATE.myPage,
+    destination: PAGE_STATE.mainMenu,
     transitionFunction: () => {
         console.error("transition not yet defined for " + myPageToMainMenuTransition.name);
     }
@@ -102,8 +102,8 @@ export const myPageToMainMenuTransition: PageTransition = {
 
 export const gamePageToMainMenuTransition: PageTransition = {
     name: "gamePageToMainMenuTransition",
-    origin: PageState.gamePage,
-    destination: PageState.mainMenu,
+    origin: PAGE_STATE.gamePage,
+    destination: PAGE_STATE.mainMenu,
     transitionFunction: () => {
         console.error("transition not yet defined for " + gamePageToMainMenuTransition.name);
     }
@@ -111,8 +111,8 @@ export const gamePageToMainMenuTransition: PageTransition = {
 
 export const gamePageToRoomPageTransition: PageTransition = {
     name: "gamePageToRoomPageTransition",
-    origin: PageState.gamePage,
-    destination: PageState.roomPage,
+    origin: PAGE_STATE.gamePage,
+    destination: PAGE_STATE.roomPage,
     transitionFunction: () => {
         console.error("transition not yet defined for " + gamePageToRoomPageTransition.name);
     }
@@ -120,8 +120,8 @@ export const gamePageToRoomPageTransition: PageTransition = {
 
 export const spintPageToMainMenuTransition: PageTransition = {
     name: "spintPageToMainMenuTransition",
-    origin: PageState.sprintPage,
-    destination: PageState.mainMenu,
+    origin: PAGE_STATE.sprintPage,
+    destination: PAGE_STATE.mainMenu,
     transitionFunction: () => {
         console.error("transition not yet defined for " + spintPageToMainMenuTransition.name);
     }
@@ -129,8 +129,8 @@ export const spintPageToMainMenuTransition: PageTransition = {
 
 export const mainMenuToSprintPageTransition: PageTransition = {
     name: "mainMenuToSprintPageTransition",
-    origin: PageState.mainMenu,
-    destination: PageState.sprintPage,
+    origin: PAGE_STATE.mainMenu,
+    destination: PAGE_STATE.sprintPage,
     transitionFunction: () => {
         console.error("transition not yet defined for " + mainMenuToSprintPageTransition.name);
     }

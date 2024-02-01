@@ -12,7 +12,7 @@
             <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
 
             <button type="submit">Join</button>
-            <button type="button" @click="playAsGuest">Play as Guest (doesnt work yet)</button>
+            <button type="button" @click="playAsGuest">Play as Guest (experimental)</button>
           </form>
 
           <form @submit.prevent="register" v-show="showRegister" key="register-form">
@@ -110,7 +110,7 @@ export default defineComponent({
       this.$emit('register', this.formData.username, this.formData.password, this.formData.passwordAgain);
     },
     playAsGuest() {
-      console.log("play as guest");
+      this.$emit('playAsGuest', this.formData.username);
     },
     login() {
       this.$emit('login', this.formData.username, this.formData.password);
