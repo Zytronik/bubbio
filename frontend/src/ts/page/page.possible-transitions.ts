@@ -118,6 +118,24 @@ export const gamePageToRoomPageTransition: PageTransition = {
     }
 }
 
+export const spintPageToMainMenuTransition: PageTransition = {
+    name: "spintPageToMainMenuTransition",
+    origin: PageState.sprintPage,
+    destination: PageState.mainMenu,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + spintPageToMainMenuTransition.name);
+    }
+}
+
+export const mainMenuToSprintPageTransition: PageTransition = {
+    name: "mainMenuToSprintPageTransition",
+    origin: PageState.mainMenu,
+    destination: PageState.sprintPage,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + mainMenuToSprintPageTransition.name);
+    }
+}
+
 export const allPossibleTransitions: PageTransition[] = [
     mainMenuToSettingsPageTransition,
     mainMenuToRoomListingTransition,
@@ -132,4 +150,6 @@ export const allPossibleTransitions: PageTransition[] = [
     myPageToMainMenuTransition,
     gamePageToMainMenuTransition,
     gamePageToRoomPageTransition,
+    spintPageToMainMenuTransition,
+    mainMenuToSprintPageTransition,
 ];

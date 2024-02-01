@@ -1,8 +1,8 @@
 import { jwtDecode, JwtPayload } from "jwt-decode";
-import { eventBus } from "../page/page.event-bus";
 import { disconnectGlobalSocket } from "./networking.client-websocket";
 import { httpClient } from "./networking.http-client";
 import axios from "axios";
+import eventBus from "../page/page.event-bus";
 
 export function logUserOut() {
   const authToken = localStorage.getItem('authToken');
@@ -34,9 +34,8 @@ export function clearClientState() {
 }
 
 export function showLoginForm() {
-  if (eventBus.setShowLogin) {
-    eventBus.setShowLogin(true);
-  }
+  console.log("shooooooooooooow");
+  eventBus.setShowLogin(true);
 }
 
 export async function login(username: string, password: string): Promise<{success: boolean, error: string}> {

@@ -1,10 +1,11 @@
 import { checkUserAuthentication, logUserOut } from "../networking/networking.auth";
 import { PageState } from "./page.e-page-state";
-import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToGamePageTransition, mainMenuToRoomListingTransition, myPageToMainMenuTransition, roomListingToMainMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, mainMenuToMyPageTransition, roomPageToMainMenuTransition, mainMenuToRoomPageTransition } from "./page.possible-transitions";
+import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToGamePageTransition, mainMenuToRoomListingTransition, myPageToMainMenuTransition, roomListingToMainMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, mainMenuToMyPageTransition, roomPageToMainMenuTransition, mainMenuToRoomPageTransition, mainMenuToSprintPageTransition, spintPageToMainMenuTransition } from "./page.possible-transitions";
 import { Page } from "./page.i-page";
 import StartMenu from '../../pages/startmenu/StartMenu.vue';
 import Room from '../../pages/room/Room.vue';
 import Game from '../../pages/game/Game.vue';
+import Sprint from '../../pages/sprint/Sprint.vue';
 import Config from '../../pages/config/Config.vue';
 import RoomListing from '../../pages/room-listing/RoomListing.vue';
 import Me from '../../pages/me/Me.vue';
@@ -17,6 +18,7 @@ export const pages: Page[] = [
     { title: 'Me', pageState: PageState.myPage, component: Me },
     { title: 'Config', pageState: PageState.settingsPage, component: Config },
     { title: 'Game', pageState: PageState.gamePage, component: Game },
+    { title: 'Sprint', pageState: PageState.sprintPage, component: Sprint },
 ];
 
 export function setupTransitionFunctions() {
@@ -33,6 +35,8 @@ export function setupTransitionFunctions() {
     myPageToMainMenuTransition.transitionFunction = myPageToMainMenu;
     gamePageToMainMenuTransition.transitionFunction = gamePageToMainMenu;
     gamePageToRoomPageTransition.transitionFunction = gamePageToRoomPage;
+    spintPageToMainMenuTransition.transitionFunction = spintPageToMainMenu;
+    mainMenuToSprintPageTransition.transitionFunction = mainMenuToSprintPage;
 }
 
 export const currentPageState = ref<PageState>(PageState.mainMenu);
@@ -109,5 +113,13 @@ function gamePageToMainMenu() {
 }
 
 function gamePageToRoomPage() {
+    console.log("current page: " + currentPageState.value);
+}
+
+function spintPageToMainMenu(){
+    console.log("current page: " + currentPageState.value);
+}
+
+function mainMenuToSprintPage(){
     console.log("current page: " + currentPageState.value);
 }
