@@ -5,4 +5,5 @@ export enum PageState {
     roomPage = 'roomPage',
     myPage = 'myPage',
     gamePage = 'gamePage',
+    sprintPage = 'sprintPage',
 }

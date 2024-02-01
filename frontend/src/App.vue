@@ -1,6 +1,5 @@
 <template>
   <article id="app">
-    <button v-if="!showLogin" @click="logUserOut">Log Out</button>
     <InfoMessages ref="infoMessageRef" />
     <LoginOverlay v-if="showLogin" @login="handleLogin" @checkUsername="handleCheckUsername" @register="handleRegister"
       @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" />

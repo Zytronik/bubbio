@@ -1,7 +1,6 @@
 <template class="page" id="game">
   <div>
     <div>
-      <h1>Game</h1>
       <span class="monospace" v-html="playGridASCII"></span> <br>
       <span>angle: {{ angle }}</span> <br>
       <input type="range" v-model="angle" min="0" max="180" step="1">
@@ -26,7 +25,7 @@
 <script lang="ts">
 import { InputReader } from '@/ts/input/input.input-reader';
 import state from '@/ts/networking/networking.client-websocket';
-import { ref, Ref } from 'vue';
+import { onMounted, onUnmounted, ref, Ref } from 'vue';
 import { angle, setupAngleControls } from '@/ts/gameplay/gameplay.angle'
 import { setupGrid, playGridASCII } from '@/ts/gameplay/gameplay.playgrid';
 import { setupShootControls } from '@/ts/gameplay/gameplay.shoot';
