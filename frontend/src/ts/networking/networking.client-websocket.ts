@@ -41,7 +41,7 @@ export default state;
 
 function initializeSocket(): Socket {
     // Define default server URL and options
-    let serverURL = "http://localhost:3000/";
+    let serverURL = "https://blubb.io/";
     const ioOptions: Partial<ManagerOptions & SocketOptions> = {
         transports: ['websocket'],
         path: "/blubbio-backend/socket.io",
