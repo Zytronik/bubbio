@@ -84,6 +84,11 @@ export function getNearbyFields(pointPosition: Coordinates): Field[] {
     return nearbyFields;
 }
 
+
+function dissolveBubbles(collidedAtField: Field): void {
+    const colorToCheck = collidedAtField.bubble?.type
+}
+
 function generateASCIIBoard(): void {
     const previewPosition = calculatePreview();
     let boardText = "";
