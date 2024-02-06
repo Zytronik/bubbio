@@ -60,14 +60,14 @@ export function setupGrid(): void {
 export function getNearbyFields(pointPosition: Coordinates): Field[] {
     const bubbleRadius = playGrid.bubbleRadius;
     const bubbleDiameter = playGrid.bubbleRadius * 2;
-    const y = Math.round((pointPosition.y - bubbleRadius) / playGrid.rowHeight);
-    const isEvenRow = playGrid.rows[y].isEven;
+    const h = Math.round((pointPosition.y - bubbleRadius) / playGrid.rowHeight);
+    const isEvenRow = playGrid.rows[h].isEven;
     const xOffSet = (isEvenRow ? bubbleRadius : bubbleDiameter)
-    const x = Math.round((pointPosition.x - xOffSet) / bubbleDiameter);
+    const w = Math.round((pointPosition.x - xOffSet) / bubbleDiameter);
 
     const nearbyFields: Field[] = []
-    for (let row = y - 1; row < y + 1; row++) {
-        for (let column = x - 1; column < x + 1; column++) {
+    for (let row = h - 2; row < h + 2; row++) {
+        for (let column = w - 2; column < w + 2; column++) {
             if (playGrid.rows[row] && playGrid.rows[row].fields[column]) {
                 nearbyFields.push(playGrid.rows[row].fields[column]);
             }
@@ -76,9 +76,46 @@ export function getNearbyFields(pointPosition: Coordinates): Field[] {
     return nearbyFields;
 }
 
-// function dissolveBubbles(collidedAtField: Field): void {
-//     const colorToCheck = collidedAtField.bubble?.type
-// }
+export function dissolveBubbles(collidedAtField: Field): void {
+    const komma = ','
+    const x = collidedAtField.coords.x;
+    const y = collidedAtField.coords.y;
+    const colorToCheck = collidedAtField.bubble!.type;
+    const visited = new Set<string>();
+    const result = new Set<string>();
+    findAdjacentBubbles(x, y, colorToCheck, visited, result);
+    console.log(result)
+    if (result.size >= 3) {
+        result.forEach(xyString => {
+            const x = parseInt(xyString.split(komma)[0]);
+            const y = parseInt(xyString.split(komma)[1]);
+            getField(x, y).bubble = undefined;
+        })
+    }
+
+    function findAdjacentBubbles(x: number, y: number, colorToCheck: number, visited: Set<string>, result: Set<string>) {
+        if (visited.has(`${x}${komma}${y}`) || !playGrid.rows[y] || !playGrid.rows[y].fields[x]) {
+            return;
+        }
+        visited.add(`${x}${komma}${y}`);
+
+        const field = getField(x, y);
+        if (!field.bubble || field.bubble.type !== colorToCheck) {
+            return;
+        }
+
+        result.add(`${x}${komma}${y}`);
+
+        findAdjacentBubbles(x - 1, y, colorToCheck, visited, result);
+        findAdjacentBubbles(x + 1, y, colorToCheck, visited, result);
+        findAdjacentBubbles(x, y - 1, colorToCheck, visited, result);
+        findAdjacentBubbles(x, y + 1, colorToCheck, visited, result);
+    }
+
+    function getField(x: number, y: number): Field {
+        return playGrid.rows[y].fields[x]
+    }
+}
 
 
 // function addGarbage(): void {

@@ -6,40 +6,24 @@ import { angle } from "./gameplay.angle";
 
 export const playGridASCII: Ref<string> = ref("");
 
-let animationFrameId: number | null = null;
 let asciiAnimationRunning = false;
-
 export function startASCIIAnimation(): void {
-    if (!asciiAnimationRunning) {
-        asciiAnimationRunning = true;
-        asciiBoardAnimation();
-    }
+    asciiAnimationRunning = true;
+    asciiBoardAnimation();
 }
 
 export function stopASCIIAnimation(): void {
-    if (asciiAnimationRunning && animationFrameId !== null) {
-        asciiAnimationRunning = false;
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-    }
+    asciiAnimationRunning = false;
 }
 
 export function showASCIIVictory(): void {
     stopASCIIAnimation();
-    const victoryBoard = playGridASCII.value
-    const topRows = victoryBoard.split('\n').slice(0, 7).join('\n');
-    const bottomRows = victoryBoard.split('\n').slice(12).join('\n');
-    const finalBoardText = topRows + victoryASCII + bottomRows;
-    playGridASCII.value = finalBoardText;
+    playGridASCII.value = victoryASCII;
 }
 
 export function showASCIIDefeat(): void {
     stopASCIIAnimation();
-    const lossBoard = playGridASCII.value
-    const topRows = lossBoard.split('\n').slice(0, 7).join('\n');
-    const bottomRows = lossBoard.split('\n').slice(12).join('\n');
-    const finalBoardText = topRows + defeatASCII + bottomRows;
-    playGridASCII.value = finalBoardText;
+    playGridASCII.value = defeatASCII;
 }
 
 function asciiBoardAnimation(): void {
@@ -76,7 +60,7 @@ function asciiBoardAnimation(): void {
     boardText += `| . . . . . . . .${getASCIIArrow()}. . . . . . . . |\n`;
     playGridASCII.value = boardText;
     if (asciiAnimationRunning) {
-        animationFrameId = requestAnimationFrame(() => asciiBoardAnimation());
+        requestAnimationFrame(() => asciiBoardAnimation());
     }
 }
 

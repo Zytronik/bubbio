@@ -1,8 +1,8 @@
 import { shootInput } from "../input/input.possible-inputs";
 import { getVelocity } from "./gameplay.angle";
 import { currentBubble, prepareNextBubble } from "./gameplay.bubble-manager";
-import { playerDiedEvent } from "./gameplay.game-master";
-import { getNearbyFields, playGrid } from "./gameplay.playgrid";
+import { firePlayerDiedEvent } from "./gameplay.game-master";
+import { dissolveBubbles, getNearbyFields, playGrid } from "./gameplay.playgrid";
 import { XORShift32 } from "./gameplay.random";
 import { Field } from "./i/gameplay.i.field";
 import { Coordinates } from "./i/gameplay.i.grid-coordinates";
@@ -38,9 +38,10 @@ function shootBubble(): void {
     // console.log("bounceAmount", bounceAmount, "performance:", performance.now() - t1)
     const gridField = snapToNextEmptyField(bubbleCoords);
     if (playGrid.rows[gridField.coords.y].isInDeathZone) {
-        playerDiedEvent.fire();
+        firePlayerDiedEvent();
     }
     gridField.bubble = currentBubble;
+    dissolveBubbles(gridField);
     prepareNextBubble();
 }
 

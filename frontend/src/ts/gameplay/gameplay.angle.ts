@@ -32,6 +32,10 @@ export function getVelocity(): Coordinates {
     return { x: cosTable[angle.value * 10], y: -sinTable[angle.value * 10] };
 }
 
+export function resetAngle(): void {
+    angle.value = 90;
+}
+
 function left(): void {
     const timePassed = performance.now() - angleLeftInput.lastFiredAtTime
     const leftAmount = currentAPS * timePassed / 1000

@@ -3,15 +3,16 @@ import { StartGameEvent } from "./e/gameplay.e.start-game";
 import { PlayerAbortedEvent } from "./e/gamplay.e.player-aborted";
 import { PlayerDiedEvent } from "./e/gamplay.e.player-died";
 import { PlayerWinEvent } from "./e/gamplay.e.player-win";
-import { disableAngleControls, enableAngleControls, setupAngleControls } from "./gameplay.angle";
-import { showASCIIDefeat, showASCIIVictory, stopASCIIAnimation } from "./gameplay.ascii-visuals";
+import { disableAngleControls, enableAngleControls, resetAngle, setupAngleControls } from "./gameplay.angle";
+import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, stopASCIIAnimation } from "./gameplay.ascii-visuals";
+import { getBubbleQueue } from "./gameplay.bubble-manager";
 import { setupGrid } from "./gameplay.playgrid";
 import { disableShootControls, enableShootControls, setupShootControls } from "./gameplay.shoot";
 
 const startGameEvent: StartGameEvent = {
     fire: () => { console.error("startGameEvent has not been initialized yet!"); },
 };
-export const playerDiedEvent: PlayerDiedEvent = {
+const playerDiedEvent: PlayerDiedEvent = {
     fire: () => { console.error("playerDiedEvent has not been initialized yet!"); },
 };
 const playerWinEvent: PlayerWinEvent = {
@@ -25,18 +26,14 @@ function setupGameEssentials(): void {
     new InputReader();
     setupAngleControls();
     setupShootControls();
-    setupGrid();
 }
 
 export function startGame(): void {
-    enableAngleControls();
-    enableShootControls();
     startGameEvent.fire();
 }
 
 export function leaveGame(): void {
-    disableAngleControls();
-    disableShootControls();
+    disableGameInputs();
     playerAbortedEvent.fire();
 }
 
@@ -46,31 +43,52 @@ export function setupSprintGame(): void {
     playerDiedEvent.fire = sprintDeath;
     playerWinEvent.fire = sprintVictory;
     playerAbortedEvent.fire = cancelSprint;
+    startSprint();
     function startSprint(): void {
-        console.log("asdf")
         /*
             reset stat tracking
             reset gamefield
             reset angle
-            reset board
             reset queue
-        */
+            start animations
+            enable inputs
+            */
+        stopASCIIAnimation();
+        //stats
+        setupGrid();
+        resetAngle();
+        getBubbleQueue();
+        startASCIIAnimation();
+        enableGameInputs();
     }
     function sprintDeath(): void {
+        disableGameInputs();
+        stopASCIIAnimation();
         showASCIIDefeat();
     }
     function sprintVictory(): void {
+        disableGameInputs();
+        stopASCIIAnimation();
         showASCIIVictory();
     }
     function cancelSprint(): void {
+        disableGameInputs();
+        //TODO enable menu controls
         stopASCIIAnimation();
     }
 }
 
-export function showVictory(): void {
-    showASCIIVictory();
+export function firePlayerDiedEvent(): void {
+    playerDiedEvent.fire();
 }
 
-export function showDefeat(): void {
-    showASCIIDefeat();
+function disableGameInputs(): void {
+    disableAngleControls();
+    disableShootControls();
 }
+
+function enableGameInputs(): void {
+    enableAngleControls();
+    enableShootControls();
+}
+

@@ -1,14 +1,14 @@
 import { Input } from "./input.i-input";
 import { allInputs } from "./input.possible-inputs";
 
+let hasAttachedAlready = false;
 export class InputReader {
-    private hasAttachedAlready = false;
 
     constructor() {
-        if (!this.hasAttachedAlready) {
+        if (!hasAttachedAlready) {
             document.addEventListener("keydown", (event) => this.handleKeyDown(event));
             document.addEventListener("keyup", (event) => this.handleKeyUp(event));
-            this.hasAttachedAlready = true;
+            hasAttachedAlready = true;
         }
         this.handleHeldDownKeys();
     }
