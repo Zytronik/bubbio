@@ -5,7 +5,6 @@ export function getBubbleByType(typeCode: number): Bubble {
     return allBubbles[typeCode];
 }
 
-
 const random = new XORShift32();
 export function getRandomBubble(): Bubble {
     return allBubbles[random.randomInt(0, allBubbles.length)];

@@ -1,14 +1,14 @@
 <template>
   <section id="template" class="page">
     <button @click="goToState(PageState.mainMenu)">Go to Menu</button>
-    <button>Retry</button>
+    <button @click="startGame()">Retry</button>
     <div>
       <p>Timer: 00:00</p>
       <p>Bubbles left Countdown: 30</p>
       <p>bps: 0</p>
       <p>Bubbles shot : 0</p>
     </div>
-    <Game/>
+    <Game />
     <div>
       <h2>After Submit</h2>
       <p>Bubbles Shot: 0</p>
@@ -26,32 +26,28 @@
       <p>Show Handlings (aps 1, aps 2)</p>
       <p>Date & Time</p>
     </div>
-    
-    
   </section>
 </template>
 
 <script lang="ts">
 import Game from '../game/Game.vue';
+import { setupSprintGame, startGame } from '@/ts/gameplay/gameplay.game-master';
 import { goToState } from '@/ts/page/page.page-manager';
 import { PageState } from '@/ts/page/page.e-page-state';
-//import { onMounted } from 'vue';
 
 export default {
   name: 'SprintPage',
   components: { Game },
   setup() {
-    /* onMounted(() => {
-     
-    }); */
+    setupSprintGame();
 
     return {
       goToState,
-      PageState
+      PageState,
+      startGame
     };
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

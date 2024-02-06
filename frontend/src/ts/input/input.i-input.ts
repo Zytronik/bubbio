@@ -7,4 +7,5 @@ export interface Input {
     releasedAtTime: number;
     fire: () => void;
     release?: () => void;
+    enabled: boolean;
 }

@@ -1,17 +1,31 @@
 import { APS, APS2 } from '@/ts/game-settings/game-settings.handling';
-import { centerCursorInput, changeAPSInput, leftInput, rightInput } from '@/ts/input/input.possible-inputs';
+import { centerCursorInput, changeAPSInput, angleLeftInput, angleRightInput } from '@/ts/input/input.possible-inputs';
 import { Ref, ref } from 'vue';
 import { Coordinates } from './i/gameplay.i.grid-coordinates';
 
 export const angle: Ref<number> = ref(90);
 let currentAPS: number = APS.value;
 
-export function setupAngleControls() {
-    leftInput.fire = left;
-    rightInput.fire = right;
+export function setupAngleControls(): void {
+    angleLeftInput.fire = left;
+    angleRightInput.fire = right;
     centerCursorInput.fire = center;
     changeAPSInput.fire = changeAPS;
     changeAPSInput.release = revertAPS;
+}
+
+export function enableAngleControls(): void {
+    angleLeftInput.enabled = true;
+    angleRightInput.enabled = true;
+    centerCursorInput.enabled = true;
+    changeAPSInput.enabled = true;
+}
+
+export function disableAngleControls(): void {
+    angleLeftInput.enabled = false;
+    angleRightInput.enabled = false;
+    centerCursorInput.enabled = false;
+    changeAPSInput.enabled = false;
 }
 
 export function getVelocity(): Coordinates {
@@ -19,13 +33,13 @@ export function getVelocity(): Coordinates {
 }
 
 function left(): void {
-    const timePassed = performance.now() - leftInput.lastFiredAtTime
+    const timePassed = performance.now() - angleLeftInput.lastFiredAtTime
     const leftAmount = currentAPS * timePassed / 1000
     angle.value = cleanUpAngle(angle.value - leftAmount);
 }
 
 function right(): void {
-    const timePassed = performance.now() - rightInput.lastFiredAtTime
+    const timePassed = performance.now() - angleRightInput.lastFiredAtTime
     const rightAmount = currentAPS * timePassed / 1000
     angle.value = cleanUpAngle(angle.value + rightAmount);
 }

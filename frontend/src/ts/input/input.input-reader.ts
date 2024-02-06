@@ -15,7 +15,7 @@ export class InputReader {
 
     private handleKeyDown(event: KeyboardEvent): void {
         allInputs.forEach((input: Input) => {
-            if (event.code === input.defaultKeyCode && !input.pressed) {
+            if (event.code === input.defaultKeyCode && !input.pressed && input.enabled) {
                 input.pressed = true;
                 input.lastFiredAtTime = performance.now();
                 input.fire();
@@ -25,7 +25,7 @@ export class InputReader {
 
     private handleKeyUp(event: KeyboardEvent): void {
         allInputs.forEach((input: Input) => {
-            if (event.code === input.defaultKeyCode) {
+            if (event.code === input.defaultKeyCode && input.enabled) {
                 input.pressed = false;
                 input.releasedAtTime = performance.now();
                 if (input.release) {
@@ -37,7 +37,7 @@ export class InputReader {
 
     private handleHeldDownKeys(): void {
         allInputs.forEach((input: Input) => {
-            if (!input.isTrigger && input.pressed) {
+            if (!input.isTrigger && input.pressed && input.enabled) {
                 input.fire();
                 input.lastFiredAtTime = performance.now();
             }

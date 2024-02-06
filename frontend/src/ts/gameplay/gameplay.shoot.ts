@@ -1,42 +1,47 @@
 import { shootInput } from "../input/input.possible-inputs";
 import { getVelocity } from "./gameplay.angle";
 import { currentBubble, prepareNextBubble } from "./gameplay.bubble-manager";
+import { playerDiedEvent } from "./gameplay.game-master";
 import { getNearbyFields, playGrid } from "./gameplay.playgrid";
 import { XORShift32 } from "./gameplay.random";
 import { Field } from "./i/gameplay.i.field";
 import { Coordinates } from "./i/gameplay.i.grid-coordinates";
 
-export function setupShootControls() {
+export function setupShootControls(): void {
     shootInput.fire = shootBubble;
 }
 
-let areyouded = false;
+export function enableShootControls(): void {
+    shootInput.enabled = true;
+}
+
+export function disableShootControls(): void {
+    shootInput.enabled = false;
+}
+
 function shootBubble(): void {
-    if (!areyouded) {
-        // const t1 = performance.now()
-        const bubbleCoords = { x: playGrid.bubbleLauncherPosition.x, y: playGrid.bubbleLauncherPosition.y };
-        let xDirection = getVelocity().x;
-        const yDirection = getVelocity().y;
-        let bounceAmount = 0
-        while (!checkForCollision(bubbleCoords)) {
-            bubbleCoords.x += xDirection;
-            bubbleCoords.y += yDirection;
-            const hitLeftWall = bubbleCoords.x < playGrid.bubbleRadius
-            const hitRightWall = bubbleCoords.x > playGrid.visualWidth - playGrid.bubbleRadius
-            if (hitLeftWall || hitRightWall) {
-                xDirection = -xDirection;
-                bounceAmount++;
-            }
+    // const t1 = performance.now()
+    const bubbleCoords = { x: playGrid.bubbleLauncherPosition.x, y: playGrid.bubbleLauncherPosition.y };
+    let xDirection = getVelocity().x;
+    const yDirection = getVelocity().y;
+    let bounceAmount = 0
+    while (!checkForCollision(bubbleCoords)) {
+        bubbleCoords.x += xDirection;
+        bubbleCoords.y += yDirection;
+        const hitLeftWall = bubbleCoords.x < playGrid.bubbleRadius
+        const hitRightWall = bubbleCoords.x > playGrid.visualWidth - playGrid.bubbleRadius
+        if (hitLeftWall || hitRightWall) {
+            xDirection = -xDirection;
+            bounceAmount++;
         }
-        // console.log("bounceAmount", bounceAmount, "performance:", performance.now() - t1)
-        const gridField = snapToNextEmptyField(bubbleCoords);
-        if (playGrid.rows[gridField.coords.y].isInDeathZone) {
-            console.log("you ded")
-            areyouded = true;
-        }
-        gridField.bubble = currentBubble;
-        prepareNextBubble();
     }
+    // console.log("bounceAmount", bounceAmount, "performance:", performance.now() - t1)
+    const gridField = snapToNextEmptyField(bubbleCoords);
+    if (playGrid.rows[gridField.coords.y].isInDeathZone) {
+        playerDiedEvent.fire();
+    }
+    gridField.bubble = currentBubble;
+    prepareNextBubble();
 }
 
 export function calculatePreview(): Coordinates {
