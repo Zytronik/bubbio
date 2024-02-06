@@ -35,7 +35,7 @@ export class UserService {
         if (!username || username.trim() === '') {
             return false;
         }
-    
+
         const user = await this.prisma.user.findUnique({
             where: { username },
         });
@@ -76,4 +76,24 @@ export class UserService {
         return user;
     }
 
+    async searchUsers(query: string) {
+        return this.prisma.user.findMany({
+            where: {
+                username: {
+                    contains: query,
+                    mode: 'insensitive',
+                },
+            },
+            take: 5, // Limit the results to the top 5 matches
+            select: {
+                id: true,
+                username: true,
+                // Specify any other fields you want to include here
+            },
+        });
+    }
+
+    async getTotalRegisteredUsersCount(): Promise<number> {
+        return await this.prisma.user.count();
+    }
 }

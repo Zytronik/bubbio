@@ -1,12 +1,13 @@
 <template>
   <section id="startmenu" class="page">
-    <button @click="logUserOut">Log Out</button>
+    <button @click="logUserOut">Log Out (Temp)</button>
     <h1>StartMenu</h1>
-    <button @click="goToState(PAGE_STATE.settingsPage)">Go to Config Page</button>
-    <button @click="goToState(PAGE_STATE.roomListing)">Go to RoomListing</button>
-    <button @click="goToState(PAGE_STATE.myPage)">Go to My Page</button>
-    <button @click="goToState(PAGE_STATE.gamePage)">Go to Game</button>
-    <button @click="goToState(PAGE_STATE.sprintPage)">Go to Sprint</button>
+    <button class="m-btn">Play Ranked (TODO)</button>
+    <button class="m-btn" @click="goToState(PAGE_STATE.sprintPage)">Sprint</button>
+    <button class="m-btn" @click="goToState(PAGE_STATE.gamePage)">Game (Temp)</button>
+    <button class="m-btn" @click="goToState(PAGE_STATE.roomListing)">Room Listing</button>
+    <button class="m-btn" @click="goToState(PAGE_STATE.settingsPage)">Config Page</button>
+    <button class="m-btn" @click="goToState(PAGE_STATE.myPage)">My Page (Temp)</button>
   </section>
 </template>
 
@@ -33,3 +34,19 @@ export default {
 };
 </script>
 
+<style scoped>
+  #startmenu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .m-btn {
+    width: 50%;
+    border: none;
+    border-radius: 10px;
+    font-size: 150%;
+    padding: 15px 0;
+    margin-bottom: 10px;
+  }
+</style>

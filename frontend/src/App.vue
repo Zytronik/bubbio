@@ -1,8 +1,10 @@
 <template>
   <article id="app">
+    <button @click="openChannelOverlay">Channel</button>
     <InfoMessages ref="infoMessageRef" />
     <LoginOverlay v-if="showLogin" @login="handleLogin" @checkUsername="handleCheckUsername" @register="handleRegister"
       @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" @playAsGuest="handlePlayAsGuest"/>
+    <Channel v-if="isChannelOpen"/>
     <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom"
       @showInfoMessage="showInfoMessage">
     </component>
@@ -12,9 +14,11 @@
 <script lang="ts">
 import { ref, computed, watchEffect, onMounted, onUnmounted } from 'vue';
 import state, { addSocketConnectListener, disconnectGlobalSocket, initializeGlobalSocket } from './ts/networking/networking.client-websocket';
-import { currentPageState, goToState, pages, setupTransitionFunctions } from './ts/page/page.page-manager';
+import { currentPageState, goToState, isChannelActive, openChannelOverlay, pages, setupTransitionFunctions } from './ts/page/page.page-manager';
 import LoginOverlay from './globalComponents/LoginOverlay.vue';
 import InfoMessages from './globalComponents/InfoMessages.vue';
+import Channel from './globalComponents/Channel.vue';
+
 import { PAGE_STATE } from './ts/page/page.e-page-state';
 import { checkIfUsernameIsTaken, checkUserAuthentication, clearClientState, login, loginAsGuest, logUserOut, register, showLoginForm } from './ts/networking/networking.auth';
 import eventBus from './ts/page/page.event-bus';
@@ -25,8 +29,19 @@ interface InfoMessageComponent {
 
 export default {
   name: 'App',
-  components: { LoginOverlay, InfoMessages },
+  components: { LoginOverlay, InfoMessages, Channel },
   setup() {
+    /* Channel */
+    const isChannelOpen = isChannelActive();
+
+    function showUserPageFromURL(){
+      const path = window.location.pathname;
+      const match = path.match(/^\/user\/(.+)$/);
+      if (match) {
+        isChannelOpen.value = true;
+      }
+    }
+
     /* Message Component */
     const infoMessageRef = ref<InfoMessageComponent | null>(null);
 
@@ -112,12 +127,8 @@ export default {
     }
 
     function initOnIsUserInRoomAlready() {
-      console.log("test3");
-      console.log(state.socket);
       if (state.socket) {
-        console.log("test2");
         state.socket.on('isUserInRoomAlready', (isUserInRoomAlready: boolean, rId: string) => {
-          console.log("test1");
           if (!isUserInRoomAlready) {
             roomId.value = rId;
             goToState(PAGE_STATE.roomPage);
@@ -143,14 +154,15 @@ export default {
     /* General */
     onMounted(() => {
       setupTransitionFunctions();
+      initializeGlobalSocket();
       if (checkUserAuthentication()) {
-        initializeGlobalSocket();
         joinRoomFromHash();
       } else {
         clearClientState();
         showLoginForm();
       }
 
+      showUserPageFromURL();
       addSocketConnectListener(initOnIsUserInRoomAlready);
       window.addEventListener('beforeunload', clearGuestCookies);
     });
@@ -176,6 +188,8 @@ export default {
       showInfoMessage,
       infoMessageRef,
       handlePlayAsGuest,
+      isChannelOpen,
+      openChannelOverlay,
     };
   },
 }

@@ -100,6 +100,18 @@ export class LobbyGateway implements OnGatewayConnection {
     client.emit('updateActiveRooms', activeRoomsInfo);
   }
 
+  @SubscribeMessage('fetchGlobalStats')
+  async handleFetchGlobalStats(@ConnectedSocket() client: Socket) {
+    const activeLobbies = this.lobbyData.getActiveRoomsInfo().length;
+    const peopleOnline = this.lobbyData["noRoom"].length;
+    const registeredUsers = await this.userService.getTotalRegisteredUsersCount();
+    client.emit('fetchGlobalStats', {
+      activeLobbies,
+      peopleOnline,
+      registeredUsers,
+    });
+  }
+
   @SubscribeMessage('isUserInRoomAlready')
   async handleIsUserInRoomAlready(@MessageBody() data, @ConnectedSocket() client: Socket) {
     const isAuthenticated = await this.authenticationPromises.get(client.id) ?? false;

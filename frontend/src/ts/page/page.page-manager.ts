@@ -46,7 +46,7 @@ export function goToState(destination: PAGE_STATE) {
         const isLoggedIn = checkUserAuthentication();
         if (!isLoggedIn) {
             logUserOut();
-            destination = PAGE_STATE.mainMenu;                
+            destination = PAGE_STATE.mainMenu;
         }
         const result = allPossibleTransitions.filter(transition =>
             transition.origin === currentPageState.value && transition.destination === destination
@@ -80,7 +80,7 @@ function mainMenuToMyPage() {
     console.log("current page: " + currentPageState.value);
 }
 
-function mainMenuToRoomPage(){
+function mainMenuToRoomPage() {
     console.log("current page: " + currentPageState.value);
 }
 
@@ -100,7 +100,7 @@ function roomPageToRoomListing() {
     console.log("current page: " + currentPageState.value);
 }
 
-function roomPageToMainMenu(){
+function roomPageToMainMenu() {
     console.log("current page: " + currentPageState.value);
 }
 
@@ -116,10 +116,25 @@ function gamePageToRoomPage() {
     console.log("current page: " + currentPageState.value);
 }
 
-function spintPageToMainMenu(){
+function spintPageToMainMenu() {
     console.log("current page: " + currentPageState.value);
 }
 
-function mainMenuToSprintPage(){
+function mainMenuToSprintPage() {
     console.log("current page: " + currentPageState.value);
+}
+
+//overlay Transitions
+const isChannelOpen = ref(false);
+
+export function openChannelOverlay() {
+    isChannelOpen.value = true;
+}
+
+export function closeChannelOverlay() {
+    isChannelOpen.value = false;
+}
+
+export function isChannelActive() {
+    return isChannelOpen;
 }
