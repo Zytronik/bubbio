@@ -1,15 +1,26 @@
 <template>
   <section id="template" class="page">
-    <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
-    <button @click="startGame()">Retry</button>
-    <div>
-      <p>{{formattedCurrentTime}}</p>
-      <p>{{bubblesCleared}}/{{bubbleClearToWin}}</p>
-      <p>{{bubblesLeftToClear}}</p>
-      <p>{{bubblesShot}} BPS: {{bubblesPerSecond}}</p>
+    <div v-if="!isGaming && isDasboard" class="sprintDashboard">
+      <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button><br>
+      <h2>Leaderboards (TODO)</h2>
+      <h2>History (TODO)</h2>
+      <h2>Personal Stats (TODO)</h2>
+      <button @click="showGameView()">Start Game</button>
     </div>
-    <Game />
-    <div>
+    <div v-if="isGaming" class="inGame">
+      <button @click="startGame()">Retry</button>
+      <button @click="showDashboard()">Back</button>
+      <div>
+        <p>{{ formattedCurrentTime }}</p>
+        <p>{{ bubblesCleared }}/{{ bubbleClearToWin }}</p>
+        <p>{{ bubblesLeftToClear }}</p>
+        <p>{{ bubblesShot }} BPS: {{ bubblesPerSecond }}</p>
+      </div>
+      <Game />
+    </div>
+    <div v-if="!isGaming && !isDasboard" class="gameComplete">
+      <button @click="showDashboard()">Back</button>
+      <button @click="showGameView()">Try Again</button>
       <h2>More Stats</h2>
       <p>Bubbles Shot: 0</p>
       <p>Wallbounce Clear Count: 0</p>
@@ -31,18 +42,31 @@
 
 <script lang="ts">
 import Game from '../game/Game.vue';
-import { setupSprintGame, startGame } from '@/ts/gameplay/gameplay.game-master';
+import { setupSprintGame, startGame, leaveGame } from '@/ts/gameplay/gameplay.game-master';
 import { goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesPerSecond, bubblesShot, formattedCurrentTime } from '@/ts/gameplay/gameplay.stat-tracker';
+import { ref } from 'vue';
 
 export default {
   name: 'SprintPage',
   components: { Game },
   setup() {
+    const isGaming = ref<boolean>(false);
+    const isDasboard = ref<boolean>(true);
     setupSprintGame();
 
-    bubbleClearToWin
+    function showGameView(){
+      startGame();
+      isGaming.value = true;
+      isDasboard.value = false;
+    }
+
+    function showDashboard(){
+      isGaming.value = false;
+      isDasboard.value = true;
+      leaveGame();
+    }
 
     return {
       formattedCurrentTime,
@@ -53,7 +77,11 @@ export default {
       bubblesPerSecond,
       goToState,
       PAGE_STATE,
-      startGame
+      showGameView,
+      isGaming,
+      isDasboard,
+      startGame,
+      showDashboard
     };
   },
 };

@@ -47,7 +47,7 @@ export function setupSprintGame(): void {
     playerDiedEvent.fire = sprintDeath;
     playerWinEvent.fire = sprintVictory;
     playerAbortedEvent.fire = cancelSprint;
-    startSprint();
+    
     function startSprint(): void {
         /*
             stop animations
