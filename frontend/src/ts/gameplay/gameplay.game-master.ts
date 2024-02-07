@@ -8,7 +8,7 @@ import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, stopASCIIAnimat
 import { getBubbleQueue } from "./gameplay.bubble-manager";
 import { setupGrid } from "./gameplay.playgrid";
 import { disableShootControls, enableShootControls, setupShootControls } from "./gameplay.shoot";
-import { startStatTracking, stopStatTracking } from "./gameplay.stat-tracker";
+import { startStatTracking, stopStatTracking, submitGametoDB } from "./gameplay.stat-tracker";
 import { GAME_MODE } from "./i/gameplay.i.stats";
 
 let selectedGameMode: GAME_MODE = GAME_MODE.NONE;
@@ -59,11 +59,12 @@ export function setupSprintGame(): void {
             enable inputs
             */
         stopASCIIAnimation();
-        startStatTracking();
+        stopStatTracking();
         setupGrid();
         resetAngle();
         getBubbleQueue();
         startASCIIAnimation();
+        startStatTracking();
         enableGameInputs();
     }
     function sprintDeath(): void {

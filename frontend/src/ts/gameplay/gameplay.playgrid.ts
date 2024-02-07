@@ -73,6 +73,7 @@ export function getNearbyFields(pointPosition: Coordinates): Field[] {
 }
 
 export function dissolveBubbles(collidedAtField: Field): number {
+    let dissolvedBubblesAmount = 0;
     const komma = ','
     const x = collidedAtField.coords.x;
     const y = collidedAtField.coords.y;
@@ -86,13 +87,22 @@ export function dissolveBubbles(collidedAtField: Field): number {
             const y = parseInt(xyString.split(komma)[1]);
             getField(x, y).bubble = undefined;
         })
-        checkForFreeFloatingBubbles();
-        return result.size;
+        dissolvedBubblesAmount += result.size;
     }
-    return 0;
+    const unconnected = getFreeFloatingBubbles();
+    console.log(unconnected)
+    unconnected.forEach(xyString => {
+        const x = parseInt(xyString.split(komma)[0]);
+        const y = parseInt(xyString.split(komma)[1]);
+        getField(x, y).bubble = undefined;
+        dissolvedBubblesAmount++;
+    })
+    return dissolvedBubblesAmount;
 
-    function findAdjacentBubbles(x: number, y: number, colorToCheck: number, visited: Set<string>, result: Set<string>) {
-        if (visited.has(`${x}${komma}${y}`) || !playGrid.rows[y] || !playGrid.rows[y].fields[x]) {
+    function findAdjacentBubbles(x: number, y: number, colorToCheck: number, visited: Set<string>, result: Set<string>): void {
+        const isInBounds = playGrid.rows[y] != undefined && playGrid.rows[y].fields[x] != undefined;
+        const alreadyTraversed = visited.has(`${x}${komma}${y}`);
+        if (alreadyTraversed || !isInBounds) {
             return;
         }
         visited.add(`${x}${komma}${y}`);
@@ -111,8 +121,38 @@ export function dissolveBubbles(collidedAtField: Field): number {
         });
     }
 
-    function checkForFreeFloatingBubbles(): void {
-        console.log("checkForFreeFloatingBubbles!!!")
+    function getFreeFloatingBubbles(): Set<string> {
+        const connected = new Set<string>();
+        const unconnected = new Set<string>();
+        playGrid.rows[0].fields.forEach(firstRowField => {
+            findBubblesConnectoToTop(firstRowField.coords.x, firstRowField.coords.y, connected);
+        });
+
+        playGrid.rows.forEach(row => {
+            row.fields.forEach(field => {
+                const xyString = `${field.coords.x}${komma}${field.coords.y}`;
+                if (!connected.has(xyString) && field.bubble) {
+                    unconnected.add(xyString);
+                }
+            });
+        });
+        return unconnected;
+
+        function findBubblesConnectoToTop(x: number, y: number, connected: Set<string>): void {
+            const isInBounds = playGrid.rows[y] != undefined && playGrid.rows[y].fields[x] != undefined;
+            const alreadyTraversed = connected.has(`${x}${komma}${y}`);
+            if (!isInBounds || !playGrid.rows[y].fields[x].bubble || alreadyTraversed) {
+                return;
+            }
+
+            connected.add(`${x}${komma}${y}`);
+
+            getAdjacentFieldVectors({ x: x, y: y }).forEach(fieldVector => {
+                const nextX = x + fieldVector.x;
+                const nextY = y + fieldVector.y;
+                findBubblesConnectoToTop(nextX, nextY, connected);
+            });
+        }
     }
 
     function getField(x: number, y: number): Field {
