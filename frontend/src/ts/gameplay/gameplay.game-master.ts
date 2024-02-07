@@ -8,7 +8,10 @@ import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, stopASCIIAnimat
 import { getBubbleQueue } from "./gameplay.bubble-manager";
 import { setupGrid } from "./gameplay.playgrid";
 import { disableShootControls, enableShootControls, setupShootControls } from "./gameplay.shoot";
+import { startStatTracking, stopStatTracking } from "./gameplay.stat-tracker";
+import { GAME_MODE } from "./i/gameplay.i.stats";
 
+let selectedGameMode: GAME_MODE = GAME_MODE.NONE;
 const startGameEvent: StartGameEvent = {
     fire: () => { console.error("startGameEvent has not been initialized yet!"); },
 };
@@ -38,6 +41,7 @@ export function leaveGame(): void {
 }
 
 export function setupSprintGame(): void {
+    selectedGameMode = GAME_MODE.SPRINT;
     setupGameEssentials();
     startGameEvent.fire = startSprint;
     playerDiedEvent.fire = sprintDeath;
@@ -46,6 +50,7 @@ export function setupSprintGame(): void {
     startSprint();
     function startSprint(): void {
         /*
+            stop animations
             reset stat tracking
             reset gamefield
             reset angle
@@ -54,7 +59,7 @@ export function setupSprintGame(): void {
             enable inputs
             */
         stopASCIIAnimation();
-        //stats
+        startStatTracking();
         setupGrid();
         resetAngle();
         getBubbleQueue();
@@ -64,18 +69,26 @@ export function setupSprintGame(): void {
     function sprintDeath(): void {
         disableGameInputs();
         stopASCIIAnimation();
+        stopStatTracking();
         showASCIIDefeat();
     }
     function sprintVictory(): void {
         disableGameInputs();
         stopASCIIAnimation();
+        stopStatTracking();
         showASCIIVictory();
+        submitGametoDB();
     }
     function cancelSprint(): void {
         disableGameInputs();
         //TODO enable menu controls
         stopASCIIAnimation();
+        stopStatTracking();
     }
+}
+
+export function fireGameWinEvent(): void {
+    playerWinEvent.fire();
 }
 
 export function firePlayerDiedEvent(): void {
@@ -92,3 +105,6 @@ function enableGameInputs(): void {
     enableShootControls();
 }
 
+export function getSelectedGameMode(): GAME_MODE {
+    return selectedGameMode;
+}

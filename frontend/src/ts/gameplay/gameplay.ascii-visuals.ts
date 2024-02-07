@@ -1,6 +1,6 @@
 import { Ref, ref } from "vue";
-import { playGrid } from "./gameplay.playgrid";
-import { currentBubble } from "./gameplay.bubble-manager";
+import { getPlayGridRows } from "./gameplay.playgrid";
+import { getCurrentBubble } from "./gameplay.bubble-manager";
 import { calculatePreview } from "./gameplay.shoot";
 import { angle } from "./gameplay.angle";
 
@@ -46,13 +46,13 @@ function asciiBoardAnimation(): void {
     const previewPosition = calculatePreview();
     let boardText = "___________________________________\n";
     let once = true;
-    playGrid.rows.forEach(row => {
+    getPlayGridRows().forEach(row => {
         if (row.isInDeathZone && once) {
             boardText += "|–––––––––––––––––––––––––––––––––|\n"
             once = false;
         }
 
-        if (!row.isEven) {
+        if (!row.isEvenRow) {
             boardText += "| . ";
         } else {
             boardText += "| ";
@@ -60,14 +60,18 @@ function asciiBoardAnimation(): void {
 
         row.fields.forEach(field => {
             if (previewPosition.x === field.coords.x && previewPosition.y === field.coords.y) {
-                boardText += `|${currentBubble.ascii}| `;
+                boardText += `|${getCurrentBubble().ascii}| `;
             } else {
                 const bubbleASCII = field.bubble ? field.bubble.ascii : "-";
-                boardText += `-${bubbleASCII}- `;
+                if (bubbleASCII != "-") {
+                    boardText += `(${bubbleASCII}) `;
+                } else {
+                    boardText += `-${bubbleASCII}- `;
+                }
             }
         });
 
-        if (!row.isEven) {
+        if (!row.isEvenRow) {
             boardText += ". |\n";
         } else {
             boardText += "|\n";
