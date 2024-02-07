@@ -4,10 +4,8 @@
     <h1>StartMenu</h1>
     <button class="m-btn">Play Ranked (TODO)</button>
     <button class="m-btn" @click="goToState(PAGE_STATE.sprintPage)">Sprint</button>
-    <button class="m-btn" @click="goToState(PAGE_STATE.gamePage)">Game (Temp)</button>
     <button class="m-btn" @click="goToState(PAGE_STATE.roomListing)">Room Listing</button>
     <button class="m-btn" @click="goToState(PAGE_STATE.settingsPage)">Config Page</button>
-    <button class="m-btn" @click="goToState(PAGE_STATE.myPage)">My Page (Temp)</button>
   </section>
 </template>
 
