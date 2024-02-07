@@ -17,8 +17,8 @@ export class AuthService {
         private userService: UserService,
     ) { }
 
-    async register(registerDto: RegisterDto): Promise<any> {
-        return this.userService.createUser(registerDto); 
+    async register(registerDto: RegisterDto, clientIp: string): Promise<any> {
+        return this.userService.createUser(registerDto, clientIp); 
     }
 
     async login(loginDto: LoginDto): Promise<any> {

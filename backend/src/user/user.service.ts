@@ -2,20 +2,29 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateUserDto } from 'src/auth/dto/auth.dto.createUser';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import axios from 'axios';
 
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) { }
 
-    async createUser(createUserDto: CreateUserDto): Promise<any> {
+    async createUser(createUserDto: CreateUserDto, clientIp: string): Promise<any> {
+        // Fetch the country code using the client's IP address
+        let countryCode = '';
+        console.log("createrUser");
+        try {
+            const { data } = await axios.get(`http://ip-api.com/json/${clientIp}`);
+            console.log(data);
+            countryCode = data.countryCode;
+        } catch (error) {
+            console.log("ijuedsnrgoiujnserigjuonwerg");
+            console.error('Failed to fetch country code:', error);
+        }
+
         // Check if a user with the given username already exists
         const existingUser = await this.userExists(createUserDto.username);
         if (existingUser) {
-            throw new BadRequestException({
-                message: ['username already exists'],
-                error: 'Bad Request',
-                statusCode: 400,
-            });
+            throw new BadRequestException('username already exists');
         }
 
         // If no existing user, proceed with creating a new user
@@ -24,10 +33,11 @@ export class UserService {
             data: {
                 username: createUserDto.username,
                 password: hashedPassword,
+                countryCode,
             },
         });
 
-        delete user.password; // Remove password from the response
+        delete user.password;
         return user;
     }
 

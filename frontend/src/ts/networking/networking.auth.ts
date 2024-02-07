@@ -78,7 +78,20 @@ export async function register(username: string, password: string, passwordAgain
 
 export async function loginAsGuest(username: string) {
   sessionStorage.setItem('isGuest', 'true');
+  if(username.length < 5){
+    username = generateRandomString(6);
+  }
   sessionStorage.setItem('guestUsername', username );
+}
+
+function generateRandomString(length: number): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }
 
 export async function checkIfUsernameIsTaken(username: string): Promise<boolean> {

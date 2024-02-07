@@ -4,7 +4,14 @@
     <div class="channel-container">
       <button @click="closeChannelOverlay">Close</button>
       <h2>Blubbiunity</h2>
-      <h3>Global Chat (TODO)</h3>
+      <h3>Global Chat</h3>
+      <div class="global-chat">
+        <div class="messages">
+          <div v-for="(msg, i) in chatMessages" :key="i">{{ msg.username }}: {{ msg.text }}</div>
+        </div>
+        <input v-model="chatInput" placeholder="Type a message..." @keyup.enter="sendChatMessage"/>
+        <button @click="sendChatMessage">Send</button>
+      </div>
       <h3>Direct Chat (NOT NOW)</h3>
       <h3>Friend Listing (NOT NOW)</h3>
       <h3>Basic Stats</h3>
@@ -23,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, onUnmounted, ref, watchEffect } from 'vue';
+import { onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import debounce from 'debounce';
 import { closeChannelOverlay } from '@/ts/page/page.page-manager';
 import { httpClient } from '@/ts/networking/networking.http-client';
@@ -34,6 +41,11 @@ import state from '@/ts/networking/networking.client-websocket';
 interface User {
   id: number;
   username: string;
+}
+
+interface GlobalChatMessage {
+  username: string;
+  text: string;
 }
 
 export default {
@@ -50,6 +62,8 @@ export default {
       registeredUsers: 0,
     });
     let intervalId = 0;
+    const chatMessages = ref<GlobalChatMessage[]>([]);
+    const chatInput = ref('');
 
     const fetchSearchResults = debounce(async (query) => {
       if (query.trim() === '') {
@@ -95,7 +109,25 @@ export default {
       }
     }
 
-    function fetchStats(){
+    function sendChatMessage() {
+      if (state.socket && chatInput.value.trim() !== '') {
+        state.socket.emit('sendGlobalChatMessage', { text: chatInput.value });
+        chatInput.value = '';
+      }
+    }
+
+    function loadChatHistory() {
+      const storedMessages = sessionStorage.getItem('globalChatHistory');
+      if (storedMessages) {
+        chatMessages.value = JSON.parse(storedMessages);
+      }
+    }
+
+    function saveChatHistory() {
+      sessionStorage.setItem('globalChatHistory', JSON.stringify(chatMessages.value));
+    }
+
+    function fetchStats() {
       if (state.socket) {
         state.socket.emit('fetchGlobalStats');
       }
@@ -105,13 +137,23 @@ export default {
       state.socket.on('fetchGlobalStats', (globalStats) => {
         stats.value = globalStats;
       });
+
+      state.socket.on('sendGlobalChatMessage', (message: GlobalChatMessage) => {
+        console.log(message);
+        chatMessages.value.push(message);
+      });
     }
 
     onMounted(() => {
+      loadChatHistory();
       showUserPageFromURL();
       fetchStats();
       intervalId = setInterval(fetchStats, 10000);
     });
+
+    watch(chatMessages, () => {
+      saveChatHistory();
+    }, { deep: true });
 
     onUnmounted(() => {
       if (intervalId) {
@@ -128,6 +170,9 @@ export default {
       showUserProfileOverlay,
       closeUserProfileOverlay,
       stats,
+      chatMessages,
+      chatInput,
+      sendChatMessage,
     };
   },
 }
@@ -150,5 +195,10 @@ li {
 
 li:hover {
   opacity: 0.5;
+}
+
+.global-chat .messages {
+    height: 200px;
+    overflow-y: auto;
 }
 </style>
