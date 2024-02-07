@@ -10,8 +10,7 @@ export class AuthController {
 
     @Post('register')
     async register(@Body() registerDto: RegisterDto, @Req() req: Request) {
-        const clientIp = req.ip;
-        return this.authService.register(registerDto, clientIp);
+        return this.authService.register(registerDto, this.authService.getClientIp(req));
     }
 
     @Post('login')
