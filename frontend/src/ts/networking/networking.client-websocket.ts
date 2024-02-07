@@ -1,6 +1,6 @@
 import io, { ManagerOptions, SocketOptions, Socket } from 'socket.io-client';
 import { reactive } from 'vue';
-import { backendURL, isLocal } from './paths';
+import { frontendURL, isLocal } from './paths';
 
 interface StateType {
     socket: Socket | null;
@@ -57,7 +57,7 @@ function initializeSocket(): Socket {
     }
 
     console.log("Initializing socket connection");
-    const socket = io(backendURL, ioOptions);
+    const socket = io(frontendURL, ioOptions);
 
     socket.on('connect', () => {
         console.log('Socket connected:', socket.id);

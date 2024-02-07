@@ -5,12 +5,12 @@ export let backendURL: string;
 
 if (host === "localhost:8080") {
     isLocal = true;
-    frontendURL = "localhost:8080/";
-    backendURL = "localhost:3000/"
+    frontendURL = "http://localhost:8080/";
+    backendURL = "http://localhost:3000/"
 }else{
     isLocal = false;
-    frontendURL = "blubb.io/";
-    backendURL = "blubb.io/blubbio-backend/"
+    frontendURL = "https://blubb.io/";
+    backendURL = "https://blubb.io/blubbio-backend/"
 }
 
 export function getProfilePicURL(){
