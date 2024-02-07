@@ -1,28 +1,31 @@
 import { Input } from "./input.i-input";
 
-export const leftInput: Input = {
-    name: "Left",
+export const angleLeftInput: Input = {
+    name: "Angle Left",
     defaultKeyCode: "ArrowLeft",
     isTrigger: false,
     pressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
-        console.error("no fire event attached to keyCode: " + leftInput.name);
+        console.error("no fire event attached to keyCode: " + angleLeftInput.name);
     },
+    enabled: false,
 };
 
-export const rightInput: Input = {
-    name: "Right",
+export const angleRightInput: Input = {
+    name: "Angle Right",
     defaultKeyCode: "ArrowRight",
     isTrigger: false,
     pressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
-        console.error("no fire event attached to keyCode: " + rightInput.name);
+        console.error("no fire event attached to keyCode: " + angleRightInput.name);
     },
+    enabled: false,
 };
+
 export const changeAPSInput: Input = {
     name: "Change APS",
     defaultKeyCode: "ShiftLeft",
@@ -36,6 +39,7 @@ export const changeAPSInput: Input = {
     release: () => {
         console.error("no release event attached to keyCode: " + changeAPSInput.name);
     },
+    enabled: false,
 };
 
 export const centerCursorInput: Input = {
@@ -48,6 +52,7 @@ export const centerCursorInput: Input = {
     fire: () => {
         console.error("no fire event attached to keyCode: " + shootInput.name);
     },
+    enabled: false,
 };
 
 export const shootInput: Input = {
@@ -60,11 +65,12 @@ export const shootInput: Input = {
     fire: () => {
         console.error("no fire event attached to keyCode: " + shootInput.name);
     },
+    enabled: false,
 };
 
 export const allInputs: Input[] = [
-    leftInput, 
-    rightInput, 
+    angleLeftInput, 
+    angleRightInput, 
     changeAPSInput, 
     centerCursorInput, 
     shootInput

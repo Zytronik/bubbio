@@ -1,16 +1,16 @@
 <template>
   <section id="template" class="page">
     <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
-    <button>Retry</button>
+    <button @click="startGame()">Retry</button>
     <div>
-      <p>Timer: 00:00</p>
-      <p>Bubbles left Countdown: 30</p>
-      <p>bps: 0</p>
-      <p>Bubbles shot : 0</p>
+      <p>{{formattedCurrentTime}}</p>
+      <p>{{bubblesCleared}}/{{bubbleClearToWin}}</p>
+      <p>{{bubblesLeftToClear}}</p>
+      <p>{{bubblesShot}} BPS: {{bubblesPerSecond}}</p>
     </div>
-    <Game/>
+    <Game />
     <div>
-      <h2>After Submit</h2>
+      <h2>More Stats</h2>
       <p>Bubbles Shot: 0</p>
       <p>Wallbounce Clear Count: 0</p>
       <p>Triple Clear Count: 0</p>
@@ -26,32 +26,37 @@
       <p>Show Handlings (aps 1, aps 2)</p>
       <p>Date & Time</p>
     </div>
-    
-    
   </section>
 </template>
 
 <script lang="ts">
 import Game from '../game/Game.vue';
+import { setupSprintGame, startGame } from '@/ts/gameplay/gameplay.game-master';
 import { goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-//import { onMounted } from 'vue';
+import { bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesPerSecond, bubblesShot, formattedCurrentTime } from '@/ts/gameplay/gameplay.stat-tracker';
 
 export default {
   name: 'SprintPage',
   components: { Game },
   setup() {
-    /* onMounted(() => {
-     
-    }); */
+    setupSprintGame();
+
+    bubbleClearToWin
 
     return {
+      formattedCurrentTime,
+      bubbleClearToWin,
+      bubblesCleared,
+      bubblesLeftToClear,
+      bubblesShot,
+      bubblesPerSecond,
       goToState,
-      PAGE_STATE
+      PAGE_STATE,
+      startGame
     };
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

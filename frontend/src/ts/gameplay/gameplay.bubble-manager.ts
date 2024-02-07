@@ -5,13 +5,19 @@ export function getBubbleByType(typeCode: number): Bubble {
     return allBubbles[typeCode];
 }
 
+export function getBubbleQueue(): void {
+    //TODO RNG from backend
+    prepareNextBubble();
+}
 
 const random = new XORShift32();
 export function getRandomBubble(): Bubble {
     return allBubbles[random.randomInt(0, allBubbles.length)];
 }
-
-export let currentBubble: Bubble;
+let currentBubble: Bubble;
+export function getCurrentBubble(): Bubble {
+    return currentBubble;
+}
 export function prepareNextBubble(): void {
     currentBubble = getRandomBubble();
 }
