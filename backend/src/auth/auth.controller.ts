@@ -1,4 +1,5 @@
-import { Body, Controller, Post, Headers, HttpCode, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, Headers, HttpCode, HttpStatus, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/auth.dto.login';
 import { RegisterDto } from './dto/auth.dto.register';
@@ -8,8 +9,8 @@ export class AuthController {
     constructor(private authService: AuthService) { }
 
     @Post('register')
-    async register(@Body() registerDto: RegisterDto) {
-        return this.authService.register(registerDto);
+    async register(@Body() registerDto: RegisterDto, @Req() req: Request) {
+        return this.authService.register(registerDto, this.authService.getClientIp(req));
     }
 
     @Post('login')

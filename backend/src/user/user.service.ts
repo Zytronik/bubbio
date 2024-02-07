@@ -2,20 +2,28 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateUserDto } from 'src/auth/dto/auth.dto.createUser';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import axios from 'axios';
 
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) { }
 
-    async createUser(createUserDto: CreateUserDto): Promise<any> {
+    async createUser(createUserDto: CreateUserDto, clientIp: string): Promise<any> {
+        // Fetch the country code using the client's IP address
+        let countryCode = '';
+        let country = '';
+        try {
+            const { data } = await axios.get(`http://ip-api.com/json/${clientIp}`);
+            countryCode = data.countryCode;
+            country = data.country;
+        } catch (error) {
+            console.error('Failed to fetch ip api data:', error);
+        }
+
         // Check if a user with the given username already exists
         const existingUser = await this.userExists(createUserDto.username);
         if (existingUser) {
-            throw new BadRequestException({
-                message: ['username already exists'],
-                error: 'Bad Request',
-                statusCode: 400,
-            });
+            throw new BadRequestException('username already exists');
         }
 
         // If no existing user, proceed with creating a new user
@@ -24,10 +32,12 @@ export class UserService {
             data: {
                 username: createUserDto.username,
                 password: hashedPassword,
+                countryCode,
+                country,
             },
         });
 
-        delete user.password; // Remove password from the response
+        delete user.password;
         return user;
     }
 
@@ -35,7 +45,7 @@ export class UserService {
         if (!username || username.trim() === '') {
             return false;
         }
-    
+
         const user = await this.prisma.user.findUnique({
             where: { username },
         });
@@ -65,6 +75,10 @@ export class UserService {
             select: {
                 username: true,
                 createdAt: true,
+                countryCode: true,
+                country: true,
+                pbUrl: true,
+                bannerUrl: true,
                 // Add other fields you want to return
             },
         });
@@ -76,4 +90,24 @@ export class UserService {
         return user;
     }
 
+    async searchUsers(query: string) {
+        return this.prisma.user.findMany({
+            where: {
+                username: {
+                    contains: query,
+                    mode: 'insensitive',
+                },
+            },
+            take: 5, // Limit the results to the top 5 matches
+            select: {
+                id: true,
+                username: true,
+                // Specify any other fields you want to include here
+            },
+        });
+    }
+
+    async getTotalRegisteredUsersCount(): Promise<number> {
+        return await this.prisma.user.count();
+    }
 }

@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 import { UserService } from 'src/user/user.service';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -17,8 +18,24 @@ export class AuthService {
         private userService: UserService,
     ) { }
 
-    async register(registerDto: RegisterDto): Promise<any> {
-        return this.userService.createUser(registerDto); 
+    async register(registerDto: RegisterDto, clientIp: string): Promise<any> {
+        return this.userService.createUser(registerDto, clientIp); 
+    }
+
+    getClientIp(req: Request): string {
+        // Try to obtain the IP address set by the X-Forwarded-For header.
+        const forwarded = req.headers['x-forwarded-for'];
+        let ip;
+        if (typeof forwarded === 'string') {
+            ip = forwarded.split(',')[0].trim();
+        } else if (req.socket && req.socket.remoteAddress) {
+            // Fallback to the direct IP address of the request.
+            ip = req.socket.remoteAddress;
+        }
+    
+        console.log(`Client IP: ${ip}`);
+    
+        return ip;
     }
 
     async login(loginDto: LoginDto): Promise<any> {

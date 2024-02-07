@@ -34,7 +34,6 @@ export function clearClientState() {
 }
 
 export function showLoginForm() {
-  console.log("shooooooooooooow");
   eventBus.setShowLogin(true);
 }
 
@@ -77,6 +76,24 @@ export async function register(username: string, password: string, passwordAgain
   }
 }
 
+export async function loginAsGuest(username: string) {
+  sessionStorage.setItem('isGuest', 'true');
+  if(username.length < 5){
+    username = generateRandomString(6);
+  }
+  sessionStorage.setItem('guestUsername', username );
+}
+
+function generateRandomString(length: number): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
 export async function checkIfUsernameIsTaken(username: string): Promise<boolean> {
   const response = await httpClient.get('/users/userExists', { params: { username } });
 
@@ -89,6 +106,7 @@ export async function checkIfUsernameIsTaken(username: string): Promise<boolean>
 
 export function checkUserAuthentication() {
   const token = localStorage.getItem('authToken');
+  const isGuest = sessionStorage.getItem('isGuest') === 'true';
   if (token) {
     try {
       const decodedToken = jwtDecode<JwtPayload>(token);
@@ -101,6 +119,8 @@ export function checkUserAuthentication() {
     } catch (error) {
       return false;
     }
+  } else if (isGuest) {
+    return true;
   } else {
     return false;
   }

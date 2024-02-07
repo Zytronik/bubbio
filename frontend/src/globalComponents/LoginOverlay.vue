@@ -1,5 +1,5 @@
 <template>
-  <div class="login-overlay">
+  <div class="overlay">
     <div class="login-container">
       <transition name="fade" mode="out-in">
         <div :key="currentFormKey">
@@ -12,7 +12,7 @@
             <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
 
             <button type="submit">Join</button>
-            <button type="button" @click="playAsGuest">Play as Guest (doesnt work yet)</button>
+            <button type="button" @click="playAsGuest">Play as Guest (experimental)</button>
           </form>
 
           <form @submit.prevent="register" v-show="showRegister" key="register-form">
@@ -110,7 +110,7 @@ export default defineComponent({
       this.$emit('register', this.formData.username, this.formData.password, this.formData.passwordAgain);
     },
     playAsGuest() {
-      console.log("play as guest");
+      this.$emit('playAsGuest', this.formData.username);
     },
     login() {
       this.$emit('login', this.formData.username, this.formData.password);
@@ -126,25 +126,6 @@ export default defineComponent({
 
   
 <style scoped>
-.login-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.login-container {
-  background: rgb(30, 30, 30);
-  padding: 30px 20px;
-  border-radius: 8px;
-  width: 30%;
-}
-
 form {
   display: flex;
   flex-direction: column;
@@ -197,5 +178,12 @@ p {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.login-container {
+    background: rgb(30, 30, 30);
+    padding: 30px 20px;
+    border-radius: 8px;
+    width: 30%;
 }
 </style>
