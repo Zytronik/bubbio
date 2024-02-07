@@ -6,21 +6,27 @@
                 {{ userError }}
             </div>
             <div v-if="userData">
-
                 <h2>User Profile: {{ userData.username }}</h2>
-                <p>Account Created: {{ userData.createdAt }}</p>
+                <p>Account Created: {{ formattedDate }}</p> 
+                <p v-if="userData.country">Country: {{ userData.country }}</p>
+                <img v-if="userData.pbUrl" :src="profilePicImagePath" alt="Profile Picture">
+                <img v-if="userData.countryCode && userData.country" :src="flagImagePath" :title="userData.country" alt="Country Flag">
             </div>
         </div>
     </div>
 </template>
   
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
+import { getProfilePicURL } from '@/ts/networking/paths';
 
 interface UserData {
     username: string;
     createdAt: string;
+    countryCode: string;
+    country: string;
+    pbUrl: string;
     // ... other user fields
 }
 
@@ -33,6 +39,31 @@ export default defineComponent({
     setup(props, { emit }) {
         const userData = ref<UserData | null>(null);
         const userError = ref<string | null>(null);
+
+        const formattedDate = computed(() => {
+            if (userData.value && userData.value.createdAt) {
+                const date = new Date(userData.value.createdAt);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}.${month}.${year}`;
+            }
+            return "";
+        });
+
+        const profilePicImagePath = computed(() => {
+            if(userData.value && userData.value.pbUrl){
+                return userData.value ? getProfilePicURL() + userData.value.pbUrl : '';
+            }
+            return "";
+        });
+        
+        const flagImagePath = computed(() => {
+            if(userData.value && userData.value.countryCode){
+                return userData.value ? require(`@/img/countryFlags/${userData.value.countryCode.toLowerCase()}.svg`) : '';
+            }
+            return "";
+        });
 
         onMounted(async () => {
             if (props.username) {
@@ -58,6 +89,9 @@ export default defineComponent({
             userData,
             closeUserProfile,
             userError,
+            flagImagePath,
+            formattedDate,
+            profilePicImagePath
         };
     },
 });
@@ -71,5 +105,10 @@ export default defineComponent({
     height: 100%;
     width: 100%;
     background-color: black;
+}
+
+img {
+    width: 10%;
+    object-fit: contain;
 }
 </style>

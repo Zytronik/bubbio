@@ -1,5 +1,6 @@
 import io, { ManagerOptions, SocketOptions, Socket } from 'socket.io-client';
 import { reactive } from 'vue';
+import { backendURL, isLocal } from './paths';
 
 interface StateType {
     socket: Socket | null;
@@ -41,7 +42,6 @@ export default state;
 
 function initializeSocket(): Socket {
     // Define default server URL and options
-    let serverURL = "https://blubb.io/";
     const ioOptions: Partial<ManagerOptions & SocketOptions> = {
         transports: ['websocket'],
         path: "/blubbio-backend/socket.io",
@@ -52,15 +52,12 @@ function initializeSocket(): Socket {
         }
     };
 
-    // Override for specific host condition
-    const host: string = window.location.host;
-    if (host === "localhost:8080") {
-        serverURL = "http://localhost:3000/";
+    if (isLocal) {
         ioOptions.path = "";
     }
 
     console.log("Initializing socket connection");
-    const socket = io(serverURL, ioOptions);
+    const socket = io(backendURL, ioOptions);
 
     socket.on('connect', () => {
         console.log('Socket connected:', socket.id);

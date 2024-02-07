@@ -11,14 +11,13 @@ export class UserService {
     async createUser(createUserDto: CreateUserDto, clientIp: string): Promise<any> {
         // Fetch the country code using the client's IP address
         let countryCode = '';
-        console.log("createrUser");
+        let country = '';
         try {
             const { data } = await axios.get(`http://ip-api.com/json/${clientIp}`);
-            console.log(data);
             countryCode = data.countryCode;
+            country = data.country;
         } catch (error) {
-            console.log("ijuedsnrgoiujnserigjuonwerg");
-            console.error('Failed to fetch country code:', error);
+            console.error('Failed to fetch ip api data:', error);
         }
 
         // Check if a user with the given username already exists
@@ -34,6 +33,7 @@ export class UserService {
                 username: createUserDto.username,
                 password: hashedPassword,
                 countryCode,
+                country,
             },
         });
 
@@ -75,6 +75,10 @@ export class UserService {
             select: {
                 username: true,
                 createdAt: true,
+                countryCode: true,
+                country: true,
+                pbUrl: true,
+                bannerUrl: true,
                 // Add other fields you want to return
             },
         });
