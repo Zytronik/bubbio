@@ -5,36 +5,40 @@
       <h2>Leaderboards</h2>
       <ul>
         <li v-for="(entry, index) in leaderboard" :key="index">
-          {{ index + 1 }}. {{ entry.user.username }} -
-          Date: {{ formatDateTime(new Date(entry.submittedAt)) }}
-          Time: {{ formatTimeNumberToString(entry.sprintTime) }}
-          Bubbles Shot: {{ entry.bubblesShot }}
-          BPS: {{ entry.bubblesPerSecond }}
-          Bubbles Cleared: {{ entry.bubblesCleared }}
+          <span class="sp">{{ index + 1 }}. {{ entry.user.username }}</span>
+          <span>Time: {{ formatTimeNumberToString(entry.sprintTime) }}</span>
+          <span>Bubbles Shot: {{ entry.bubblesShot }}</span>
+          <span>BPS: {{ entry.bubblesPerSecond }}</span>
+          <span>Bubbles Cleared: {{ entry.bubblesCleared }}</span>
+          <span>Date: {{ formatDateTime(new Date(entry.submittedAt)) }}</span>
         </li>
       </ul>
       <h2>History</h2>
       <ul>
         <li v-for="(record, index) in userHistory" :key="index">
-          Date: {{ formatDateTime(new Date(record.submittedAt)) }}
-          Time: {{ formatTimeNumberToString(record.sprintTime) }}
-          Bubbles Shot: {{ record.bubblesShot }}
-          BPS: {{ record.bubblesPerSecond }}
-          Bubbles Cleared: {{ record.bubblesCleared }}
+          <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
+          <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
+          <span>Bubbles Shot: {{ record.bubblesShot }}</span>
+          <span>BPS: {{ record.bubblesPerSecond }}</span>
+          <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
         </li>
       </ul>
       <h2>Personal Stats</h2>
       <h3>Top 3 Runs</h3>
       <ul>
         <li v-for="(record, index) in personalBests" :key="index">
-          {{ index + 1 }}.
-          Date: {{ formatDateTime(new Date(record.submittedAt)) }}
-          Time: {{ formatTimeNumberToString(record.sprintTime) }}
-          Bubbles Shot: {{ record.bubblesShot }}
-          BPS: {{ record.bubblesPerSecond }}
-          Bubbles Cleared: {{ record.bubblesCleared }}
+          <span>{{ index + 1 }}.</span>
+          <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
+          <span>Bubbles Shot: {{ record.bubblesShot }}</span>
+          <span>BPS: {{ record.bubblesPerSecond }}</span>
+          <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
+          <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
         </li>
-      </ul>      
+      </ul>
+      <div v-if="isLoading" class="loading-animation">
+        Loading...
+      </div>
+
       <button @click="showGameView()">Start Game</button>
     </div>
     <div v-if="isGaming" class="inGame">
@@ -109,6 +113,7 @@ export default {
     const userHistory = ref<GameRecord[]>([]);
     const personalBests = ref<GameRecord[]>([]);
     const leaderboard = ref<LeaderboardEntry[]>([]);
+    const isLoading = ref<boolean>(true);
 
     setupSprintGame();
 
@@ -165,10 +170,15 @@ export default {
       leaderboard.value = response.data;
     }
 
-    async function fetchSprintData(){
-      await fetchUserHistory();
-      await fetchPersonalBests();
-      await fetchLeaderboard();
+    async function fetchSprintData() {
+      isLoading.value = true;
+      try {
+        await fetchUserHistory();
+        await fetchPersonalBests();
+        await fetchLeaderboard();
+      } finally {
+        isLoading.value = false;
+      }
     }
 
     onMounted(async () => {
@@ -194,6 +204,7 @@ export default {
       personalBests,
       formatDateTime,
       formatTimeNumberToString,
+      isLoading,
     };
   },
 };
@@ -202,5 +213,36 @@ export default {
 <style>
 ul {
   list-style-type: none;
+}
+
+.loading-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 100;
+  font-size: 20px;
+  color: white;
+}
+
+ul li span {
+  text-align: left;
+  display: block;
+}
+
+ul li {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 2%;
+}
+
+ul li span.sp {
+  min-width: 5%;
 }
 </style>
