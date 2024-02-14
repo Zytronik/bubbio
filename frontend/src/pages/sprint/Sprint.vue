@@ -1,6 +1,6 @@
 <template>
   <section id="template" class="page">
-    <div v-if="!isGaming && isDasboard" class="sprintDashboard">
+    <div v-if="!isGaming && isDashboard" class="sprintDashboard">
       <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button><br>
       <h2>Leaderboards</h2>
       <ul>
@@ -52,7 +52,7 @@
       </div>
       <Game />
     </div>
-    <div v-if="!isGaming && !isDasboard" class="gameComplete">
+    <div v-if="!isGaming && !isDashboard" class="gameComplete">
       <button @click="showDashboard()">Back</button>
       <button @click="showGameView()">Try Again</button>
       <h2>More Stats</h2>
@@ -80,7 +80,7 @@ import { setupSprintGame, startGame, leaveGame } from '@/ts/gameplay/gameplay.ga
 import { goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/gameplay/gameplay.stat-tracker';
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
 
 interface LeaderboardEntry extends GameRecord {
@@ -109,7 +109,8 @@ export default {
   components: { Game },
   setup() {
     const isGaming = ref<boolean>(false);
-    const isDasboard = ref<boolean>(true);
+    const isDashboard = ref<boolean>(true);
+    const intervalId = ref(0);
     const userHistory = ref<GameRecord[]>([]);
     const personalBests = ref<GameRecord[]>([]);
     const leaderboard = ref<LeaderboardEntry[]>([]);
@@ -120,13 +121,12 @@ export default {
     function showGameView() {
       startGame();
       isGaming.value = true;
-      isDasboard.value = false;
+      isDashboard.value = false;
     }
 
     async function showDashboard() {
       isGaming.value = false;
-      isDasboard.value = true;
-      await fetchSprintData();
+      isDashboard.value = true;
       leaveGame();
     }
 
@@ -176,13 +176,37 @@ export default {
         await fetchUserHistory();
         await fetchPersonalBests();
         await fetchLeaderboard();
+      } catch (error) {
+        console.error("Error fetching data:", error);
       } finally {
         isLoading.value = false;
       }
     }
 
-    onMounted(async () => {
-      await fetchSprintData();
+    function startDataFetchInterval() {
+      if (!isGaming.value && isDashboard.value) {
+        clearInterval(intervalId.value);
+        fetchSprintData();
+
+        intervalId.value = setInterval(() => {
+          fetchSprintData();
+        }, 20000); // Fetch data every 20 seconds
+      } else {
+        clearInterval(intervalId.value);
+      }
+    }
+
+    watch([isGaming, isDashboard], () => {
+      startDataFetchInterval();
+    });
+
+
+    onMounted(() => {
+      startDataFetchInterval();
+    });
+
+    onUnmounted(() => {
+      clearInterval(intervalId.value);
     });
 
     return {
@@ -196,7 +220,7 @@ export default {
       PAGE_STATE,
       showGameView,
       isGaming,
-      isDasboard,
+      isDashboard,
       startGame,
       showDashboard,
       userHistory,
