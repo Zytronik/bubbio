@@ -46,20 +46,30 @@ export class UserService {
             return false;
         }
 
-        const user = await this.prisma.user.findUnique({
-            where: { username },
+        const user = await this.prisma.user.findFirst({
+            where: {
+                username: {
+                    equals: username,
+                    mode: 'insensitive',
+                },
+            },
         });
         return !!user;
     }
 
     async getUserByUsername(username: string): Promise<any> {
-        const user = await this.prisma.user.findUnique({
-            where: { username },
+        const user = await this.prisma.user.findFirst({
+            where: {
+                username: {
+                    equals: username,
+                    mode: 'insensitive',
+                },
+            },
         });
 
         if (!user) {
             throw new BadRequestException({
-                message: [`user with username ${username} not found`],
+                message: [`User with Username ${username} not found`],
                 error: 'Bad Request',
                 statusCode: 400,
             });
