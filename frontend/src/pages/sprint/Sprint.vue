@@ -2,9 +2,39 @@
   <section id="template" class="page">
     <div v-if="!isGaming && isDasboard" class="sprintDashboard">
       <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button><br>
-      <h2>Leaderboards (TODO)</h2>
-      <h2>History (TODO)</h2>
-      <h2>Personal Stats (TODO)</h2>
+      <h2>Leaderboards</h2>
+      <ul>
+        <li v-for="(entry, index) in leaderboard" :key="index">
+          {{ index + 1 }}. {{ entry.user.username }} -
+          Date: {{ formatDateTime(new Date(entry.submittedAt)) }}
+          Time: {{ formatTimeNumberToString(entry.sprintTime) }}
+          Bubbles Shot: {{ entry.bubblesShot }}
+          BPS: {{ entry.bubblesPerSecond }}
+          Bubbles Cleared: {{ entry.bubblesCleared }}
+        </li>
+      </ul>
+      <h2>History</h2>
+      <ul>
+        <li v-for="(record, index) in userHistory" :key="index">
+          Date: {{ formatDateTime(new Date(record.submittedAt)) }}
+          Time: {{ formatTimeNumberToString(record.sprintTime) }}
+          Bubbles Shot: {{ record.bubblesShot }}
+          BPS: {{ record.bubblesPerSecond }}
+          Bubbles Cleared: {{ record.bubblesCleared }}
+        </li>
+      </ul>
+      <h2>Personal Stats</h2>
+      <h3>Top 3 Runs</h3>
+      <ul>
+        <li v-for="(record, index) in personalBests" :key="index">
+          {{ index + 1 }}.
+          Date: {{ formatDateTime(new Date(record.submittedAt)) }}
+          Time: {{ formatTimeNumberToString(record.sprintTime) }}
+          Bubbles Shot: {{ record.bubblesShot }}
+          BPS: {{ record.bubblesPerSecond }}
+          Bubbles Cleared: {{ record.bubblesCleared }}
+        </li>
+      </ul>      
       <button @click="showGameView()">Start Game</button>
     </div>
     <div v-if="isGaming" class="inGame">
@@ -45,8 +75,30 @@ import Game from '../game/Game.vue';
 import { setupSprintGame, startGame, leaveGame } from '@/ts/gameplay/gameplay.game-master';
 import { goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesPerSecond, bubblesShot, formattedCurrentTime } from '@/ts/gameplay/gameplay.stat-tracker';
-import { ref } from 'vue';
+import { bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/gameplay/gameplay.stat-tracker';
+import { onMounted, ref } from 'vue';
+import { httpClient } from '@/ts/networking/networking.http-client';
+
+interface LeaderboardEntry extends GameRecord {
+  user: {
+    username: string;
+  };
+  userId: number;
+}
+
+interface GameRecord {
+  submittedAt: Date | string;
+  bubblesCleared: number;
+  bubblesPerSecond: number;
+  bubblesShot: number;
+  sprintTime: number;
+}
+
+interface DashboardData {
+  leaderboard: LeaderboardEntry[];
+  userHistory: GameRecord[];
+  personalBests: GameRecord[];
+}
 
 export default {
   name: 'SprintPage',
@@ -54,19 +106,69 @@ export default {
   setup() {
     const isGaming = ref<boolean>(false);
     const isDasboard = ref<boolean>(true);
+    const userHistory = ref<GameRecord[]>([]);
+    const personalBests = ref<GameRecord[]>([]);
+    const leaderboard = ref<LeaderboardEntry[]>([]);
+
     setupSprintGame();
 
-    function showGameView(){
+    function showGameView() {
       startGame();
       isGaming.value = true;
       isDasboard.value = false;
     }
 
-    function showDashboard(){
+    function showDashboard() {
       isGaming.value = false;
       isDasboard.value = true;
       leaveGame();
     }
+
+    function formatDateTime(date: Date): string {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // January is 0!
+      const year = date.getFullYear().toString().substr(-2); // Get last two digits of year
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+
+      return `${day}.${month}.${year} ${hours}:${minutes}`;
+    }
+
+    async function fetchUserHistory() {
+      const token = localStorage.getItem('authToken');
+      const response = await httpClient.get('/sprint/userHistory', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      userHistory.value = response.data;
+    }
+
+    async function fetchPersonalBests() {
+      const token = localStorage.getItem('authToken');
+      const response = await httpClient.get('/sprint/personalBests', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      personalBests.value = response.data;
+    }
+
+    async function fetchLeaderboard() {
+      const token = localStorage.getItem('authToken');
+      const response = await httpClient.get<LeaderboardEntry[]>('/sprint/leaderboard', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      leaderboard.value = response.data;
+    }
+
+    onMounted(async () => {
+      await fetchUserHistory();
+      await fetchPersonalBests();
+      await fetchLeaderboard();
+    });
 
     return {
       formattedCurrentTime,
@@ -81,10 +183,19 @@ export default {
       isGaming,
       isDasboard,
       startGame,
-      showDashboard
+      showDashboard,
+      userHistory,
+      leaderboard,
+      personalBests,
+      formatDateTime,
+      formatTimeNumberToString,
     };
   },
 };
 </script>
 
-<style></style>
+<style>
+ul {
+  list-style-type: none;
+}
+</style>

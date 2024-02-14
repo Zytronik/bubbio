@@ -68,26 +68,81 @@ export class UserService {
         return user;
     }
 
+    async getUserSprintRank(username: string): Promise<number | null> {
+        // Step 1: Get the user's best sprint time
+        const userBestTimeRecord = await this.prisma.sprint.findFirst({
+            where: { user: { username: username } },
+            orderBy: { sprintTime: 'asc' },
+            select: { sprintTime: true },
+        });
+    
+        if (!userBestTimeRecord) {
+            return null; // User has no sprint times
+        }
+    
+        // Step 2: Get the best sprint time for each user and sort them
+        const bestTimes = await this.prisma.sprint.groupBy({
+            by: ['userId'],
+            _min: {
+                sprintTime: true,
+            },
+            orderBy: {
+                _min: {
+                    sprintTime: 'asc',
+                },
+            },
+        });
+    
+        // Find the rank of the user's best time among these best times
+        // We count how many times have a better (lower) sprintTime than the user's best time
+        const rank = bestTimes.findIndex(time => time._min.sprintTime >= userBestTimeRecord.sprintTime) + 1;
+    
+        return rank;
+    }
 
     async getUserProfileByUsername(username: string): Promise<any> {
         const user = await this.prisma.user.findUnique({
             where: { username },
             select: {
+                id: true,
                 username: true,
                 createdAt: true,
                 countryCode: true,
                 country: true,
                 pbUrl: true,
                 bannerUrl: true,
-                // Add other fields you want to return
             },
         });
-
+    
         if (!user) {
             throw new NotFoundException(`User with username ${username} not found`);
         }
+    
+        // Fetch average sprint statistics for this user
+        const sprintStats = await this.prisma.sprint.aggregate({
+            _avg: {
+                bubblesCleared: true,
+                bubblesPerSecond: true,
+                bubblesShot: true,
+                sprintTime: true,
+            },
+            where: {
+                userId: user.id,
+            },
+        });
 
-        return user;
+        const sprintRank = await this.getUserSprintRank(username);
+
+        return {
+            ...user,
+            sprintStats: {
+                averageBubblesCleared: sprintStats._avg.bubblesCleared,
+                averageBubblesPerSecond: sprintStats._avg.bubblesPerSecond,
+                averageBubblesShot: sprintStats._avg.bubblesShot,
+                averageSprintTime: sprintStats._avg.sprintTime,
+                rank: sprintRank,
+            },
+        };
     }
 
     async searchUsers(query: string) {

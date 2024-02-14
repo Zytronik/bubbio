@@ -1,6 +1,6 @@
 <template>
   <article id="app">
-    <button @click="openChannelOverlay">Channel</button>
+    <button @click="openChannelOverlay" style="z-index: 5; position: relative;">Channel</button>
     <InfoMessages ref="infoMessageRef" />
     <LoginOverlay v-if="showLogin" @login="handleLogin" @checkUsername="handleCheckUsername" @register="handleRegister"
       @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" @playAsGuest="handlePlayAsGuest"/>
@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { ref, computed, watchEffect, onMounted, onUnmounted } from 'vue';
-import state, { addSocketConnectListener, disconnectGlobalSocket, initializeGlobalSocket } from './ts/networking/networking.client-websocket';
+import state, { addSocketConnectListener, disconnectGlobalSocket, initializeGlobalSocket, reconnectGlobalSocket } from './ts/networking/networking.client-websocket';
 import { currentPageState, goToState, isChannelActive, openChannelOverlay, pages, setupTransitionFunctions } from './ts/page/page.page-manager';
 import LoginOverlay from './globalComponents/LoginOverlay.vue';
 import InfoMessages from './globalComponents/InfoMessages.vue';
@@ -61,7 +61,7 @@ export default {
       const { success, error } = await login(username, password);
       if (success) {
         eventBus.setShowLogin(false);
-        initializeGlobalSocket();
+        reconnectGlobalSocket();
         joinRoomFromHash();
       } else {
         errorMessage.value = error;
@@ -87,8 +87,8 @@ export default {
 
     async function handlePlayAsGuest(username: string) {
       loginAsGuest(username);
+      reconnectGlobalSocket();
       eventBus.setShowLogin(false);
-      initializeGlobalSocket();
       joinRoomFromHash();
     }
 

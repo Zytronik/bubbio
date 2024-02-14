@@ -1,5 +1,6 @@
 <template>
-  <UserProfileOverlay v-if="showUserProfileOverlay && selectedUsername" :username="selectedUsername" @close-overlay="closeUserProfileOverlay" />
+  <UserProfileOverlay v-if="showUserProfileOverlay && selectedUsername" :username="selectedUsername"
+    @close-overlay="closeUserProfileOverlay" />
   <div class="overlay channel-overlay">
     <div class="channel-container">
       <button @click="closeChannelOverlay">Close</button>
@@ -9,11 +10,12 @@
         <div class="messages">
           <div v-for="(msg, i) in chatMessages" :key="i">{{ msg.username }}: {{ msg.text }}</div>
         </div>
-        <input v-model="chatInput" placeholder="Type a message..." @keyup.enter="sendChatMessage"/>
-        <button @click="sendChatMessage">Send</button>
+        <input v-if="isAuthenticated" v-model="chatInput" placeholder="Type a message..." @keyup.enter="sendChatMessage" />
+        <button v-if="isAuthenticated" @click="sendChatMessage">Send</button>
       </div>
-      <h3>Direct Chat (NOT NOW)</h3>
-      <h3>Friend Listing (NOT NOW)</h3>
+
+      <h3 v-if="isAuthenticated">Direct Chat (NOT NOW)</h3>
+      <h3 v-if="isAuthenticated">Friend Listing (NOT NOW)</h3>
       <h3>Basic Stats</h3>
       <p>People Online: {{ stats.peopleOnline }}</p>
       <p>Active Lobbies: {{ stats.activeLobbies }}</p>
@@ -30,13 +32,14 @@
 </template>
 
 <script lang="ts">
-import { onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import debounce from 'debounce';
 import { closeChannelOverlay } from '@/ts/page/page.page-manager';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import axios from 'axios';
 import UserProfileOverlay from './UserProfileOverlay.vue';
 import state from '@/ts/networking/networking.client-websocket';
+import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 
 interface User {
   id: number;
@@ -64,6 +67,7 @@ export default {
     let intervalId = 0;
     const chatMessages = ref<GlobalChatMessage[]>([]);
     const chatInput = ref('');
+    const isAuthenticated = computed(() => checkUserAuthentication());
 
     const fetchSearchResults = debounce(async (query) => {
       if (query.trim() === '') {
@@ -95,12 +99,12 @@ export default {
 
     function closeUserProfileOverlay() {
       searchQuery.value = "";
-      showUserProfileOverlay.value = false; 
+      showUserProfileOverlay.value = false;
       selectedUsername.value = null;
       history.replaceState(null, '', '/');
     }
 
-    function showUserPageFromURL(){
+    function showUserPageFromURL() {
       const path = window.location.pathname;
       const match = path.match(/^\/user\/(.+)$/);
       if (match) {
@@ -173,6 +177,7 @@ export default {
       chatMessages,
       chatInput,
       sendChatMessage,
+      isAuthenticated,
     };
   },
 }
@@ -183,6 +188,10 @@ export default {
   background: rgb(30, 30, 30);
   padding: 30px 20px;
   width: 100%;
+}
+
+.channel-overlay{
+  z-index: 10;
 }
 
 ul {
@@ -198,7 +207,7 @@ li:hover {
 }
 
 .global-chat .messages {
-    height: 200px;
-    overflow-y: auto;
+  height: 200px;
+  overflow-y: auto;
 }
 </style>

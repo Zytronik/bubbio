@@ -1,28 +1,25 @@
 import { jwtDecode, JwtPayload } from "jwt-decode";
-import { disconnectGlobalSocket } from "./networking.client-websocket";
+import state, { reconnectGlobalSocket } from "./networking.client-websocket";
 import { httpClient } from "./networking.http-client";
 import axios from "axios";
 import eventBus from "../page/page.event-bus";
 
-export function logUserOut() {
+export async function logUserOut() {
   const authToken = localStorage.getItem('authToken');
 
-  // If there's a token, include it in the logout request
+  // Attempt to make the logout request if there's a token
   if (authToken) {
-    httpClient.post('/auth/logout', {}, {
-      headers: { Authorization: `Bearer ${authToken}` }
-    }).then(() => {
-      clearClientState();
-      showLoginForm();
-    }).catch(error => {
+    try {
+      await httpClient.post('/auth/logout', {}, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+    } catch (error) {
       console.error('Error during logout:', error);
-      clearClientState();
-      showLoginForm();
-    });
-  } else {
-    clearClientState();
-    showLoginForm();
+    }
   }
+  clearClientState();
+  showLoginForm();
+  reconnectGlobalSocket();
 }
 
 export function clearClientState() {
@@ -30,7 +27,6 @@ export function clearClientState() {
   document.cookie = 'authToken=; Max-Age=0; path=/; domain=yourdomain.com';
   localStorage.clear();
   sessionStorage.clear();
-  disconnectGlobalSocket();
 }
 
 export function showLoginForm() {
@@ -46,6 +42,7 @@ export async function login(username: string, password: string): Promise<{succes
     if (token) {
       // Store the token in local storage
       localStorage.setItem('authToken', token);
+      /* state.socket?.emit('userAuthenticated'); */
       return { success: true, error: '' };
     } else {
       return { success: false, error: 'No token received' };
@@ -66,6 +63,7 @@ export async function register(username: string, password: string, passwordAgain
 
   try {
     await httpClient.post('/auth/register', { username, password });
+    /* state.socket?.emit('userAuthenticated'); */
     return { success: true, error: '' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -82,6 +80,7 @@ export async function loginAsGuest(username: string) {
     username = generateRandomString(6);
   }
   sessionStorage.setItem('guestUsername', username );
+  /* state.socket?.emit('guestLoggedIn'); */
 }
 
 function generateRandomString(length: number): string {

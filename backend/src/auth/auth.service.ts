@@ -75,7 +75,7 @@ export class AuthService {
         };
     }
 
-    async logout(token: string): Promise<void> {
+    async logout(token: string, userId: number): Promise<void> {
         const decodedToken = this.jwtService.decode(token) as any;
 
         if (!decodedToken || !decodedToken.jti) {
@@ -107,6 +107,7 @@ export class AuthService {
                     token: token, // The actual token string
                     tokenJTI: decodedToken.jti, // The unique identifier of the token
                     expiresAt: expiresAt, // Token expiry date
+                    userId: userId,
                 },
             });
         } else {

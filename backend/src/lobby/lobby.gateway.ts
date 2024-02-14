@@ -18,25 +18,26 @@ export class LobbyGateway implements OnGatewayConnection {
   private lobbyData: LobbyData = new LobbyData();
 
   async handleConnection(client: Socket) {
-    const isGuest = client.handshake.query.isGuest === 'true';
     let authPromise;
-
-    if (isGuest) {
-      // Handle as guest immediately
-      this.handleGuestConnection(client);
-      // Guests are "authenticated" for the sake of proceeding
-      authPromise = Promise.resolve(true);
-    } else {
-      // Proceed with JWT authentication
-      authPromise = this.authenticateUser(client);
+    const { token, isGuest, guestUsername } = client.handshake.query;
+    if (token === "null" && isGuest === "null" && guestUsername === "null") {
+      client.data.role = "Spectator";
+      client.data.user = { username: "Spectator-" + client.id };
+    } else { 
+      if (isGuest === 'true') {
+        this.handleGuestConnection(client);
+        authPromise = Promise.resolve(true);
+      } else if (token) {
+        authPromise = this.authenticateUser(client);
+      }
+      this.authenticationPromises.set(client.id, authPromise);
+      const isAuthenticated = await authPromise;
+      if (!isAuthenticated && !isGuest) {
+        client.disconnect();
+        return;
+      }
     }
-    this.authenticationPromises.set(client.id, authPromise);
 
-    const isAuthenticated = await authPromise;
-    if (!isAuthenticated && !isGuest) {
-      client.disconnect();
-      return;
-    }
     this.addUserToNoRoom(client);
     this.lobbyData.logRoomsInformations('User connected');
   }
@@ -134,14 +135,13 @@ export class LobbyGateway implements OnGatewayConnection {
       if (!token) {
         throw new Error('Token not provided');
       }
-
       const payload = this.jwtService.verify(token, {
         secret: this.configService.get<string>('JWT_SECRET')
       });
 
       const userDetails = await this.userService.getUserByUsername(payload.username);
       client.data.user = userDetails;
-      client.data.isGuest = false;
+      client.data.role = "User";
       return true;
     } catch (error) {
       console.error('Authentication failed:', error);
@@ -152,7 +152,7 @@ export class LobbyGateway implements OnGatewayConnection {
   private handleGuestConnection(client: Socket) {
     const guestUsername = "Guest-" + client.handshake.query.guestUsername || `Guest-${Math.random().toString(36).substring(2, 15)}`;
     client.data.user = { username: guestUsername };
-    client.data.isGuest = true;
+    client.data.role = "Guest";
   }
 
   private emitActiveRoomsUpdate() {

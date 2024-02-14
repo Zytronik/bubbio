@@ -7,10 +7,23 @@
             </div>
             <div v-if="userData">
                 <h2>User Profile: {{ userData.username }}</h2>
-                <p>Account Created: {{ formattedDate }}</p> 
+                <p>Account Created: {{ formattedDate }}</p>
                 <p v-if="userData.country">Country: {{ userData.country }}</p>
                 <img v-if="userData.pbUrl" :src="profilePicImagePath" alt="Profile Picture">
-                <img v-if="userData.countryCode && userData.country" :src="flagImagePath" :title="userData.country" alt="Country Flag">
+                <img v-if="userData.countryCode && userData.country" :src="flagImagePath" :title="userData.country"
+                    alt="Country Flag">
+
+                <h2>Sprint</h2>
+                <div v-if="userData.sprintStats.rank">
+                    <p>Leaderboard Rank: {{ userData.sprintStats.rank }}</p>
+                    <p>Average Bubbles Cleared: {{ userData.sprintStats.averageBubblesCleared }}</p>
+                    <p>Average Bubbles Per Second: {{ userData.sprintStats.averageBubblesPerSecond }}</p>
+                    <p>Average Bubbles Shot: {{ userData.sprintStats.averageBubblesShot }}</p>
+                    <p>Average Sprint Time: {{ userData.sprintStats.averageSprintTime }}</p>
+                </div>
+                <div v-else>
+                    <p>This User has never played Sprint.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -27,7 +40,16 @@ interface UserData {
     countryCode: string;
     country: string;
     pbUrl: string;
+    sprintStats: SprintStats;
     // ... other user fields
+}
+
+interface SprintStats {
+    averageBubblesCleared: number;
+    averageBubblesPerSecond: number;
+    averageBubblesShot: number;
+    averageSprintTime: number;
+    rank: number;
 }
 
 export default defineComponent({
@@ -52,14 +74,14 @@ export default defineComponent({
         });
 
         const profilePicImagePath = computed(() => {
-            if(userData.value && userData.value.pbUrl){
+            if (userData.value && userData.value.pbUrl) {
                 return userData.value ? getProfilePicURL() + userData.value.pbUrl : '';
             }
             return "";
         });
-        
+
         const flagImagePath = computed(() => {
-            if(userData.value && userData.value.countryCode){
+            if (userData.value && userData.value.countryCode) {
                 return userData.value ? require(`@/img/countryFlags/${userData.value.countryCode.toLowerCase()}.svg`) : '';
             }
             return "";
@@ -98,7 +120,7 @@ export default defineComponent({
 </script>
 <style>
 .user-profile-overlay {
-    z-index: 5;
+    z-index: 15;
 }
 
 .user-profile-wrapper {
