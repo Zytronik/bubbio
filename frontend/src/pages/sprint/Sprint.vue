@@ -2,6 +2,7 @@
   <section id="template" class="page">
     <div v-if="!isGaming && isDashboard" class="sprintDashboard">
       <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button><br>
+      <h1>Sprint</h1>
       <h2>Leaderboards</h2>
       <ul>
         <li v-for="(entry, index) in leaderboard" :key="index">

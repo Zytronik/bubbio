@@ -20,6 +20,7 @@
                     <p>Average Bubbles Per Second: {{ userData.sprintStats.averageBubblesPerSecond }}</p>
                     <p>Average Bubbles Shot: {{ userData.sprintStats.averageBubblesShot }}</p>
                     <p>Average Sprint Time: {{ userData.sprintStats.averageSprintTime }}</p>
+                    <p>Games Played: {{ userData.sprintStats.sprintGamesPlayed }}</p>
                 </div>
                 <div v-else>
                     <p>This User has never played Sprint.</p>
@@ -50,6 +51,7 @@ interface SprintStats {
     averageBubblesShot: number;
     averageSprintTime: number;
     rank: number;
+    sprintGamesPlayed: number;
 }
 
 export default defineComponent({

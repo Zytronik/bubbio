@@ -141,6 +141,12 @@ export class UserService {
             },
         });
 
+        const sprintGamesPlayed = await this.prisma.sprint.count({
+            where: {
+                userId: user.id,
+            },
+        });
+
         const sprintRank = await this.getUserSprintRank(username);
 
         return {
@@ -150,6 +156,7 @@ export class UserService {
                 averageBubblesPerSecond: sprintStats._avg.bubblesPerSecond,
                 averageBubblesShot: sprintStats._avg.bubblesShot,
                 averageSprintTime: sprintStats._avg.sprintTime,
+                sprintGamesPlayed: sprintGamesPlayed,
                 rank: sprintRank,
             },
         };
