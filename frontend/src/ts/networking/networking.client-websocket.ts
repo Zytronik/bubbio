@@ -1,6 +1,6 @@
 import io, { ManagerOptions, SocketOptions, Socket } from 'socket.io-client';
 import { reactive } from 'vue';
-import { backendURL, isLocal } from './paths';
+import { isLocal, socketIoHost } from './paths';
 
 interface StateType {
     socket: Socket | null;
@@ -44,7 +44,7 @@ function initializeSocket(): Socket {
     // Define default server URL and options
     const ioOptions: Partial<ManagerOptions & SocketOptions> = {
         transports: ['websocket'],
-        path: "/socket.io",
+        path: "/blubbio-backend/socket.io",
         query: {
             token: localStorage.getItem('authToken'),
             isGuest: sessionStorage.getItem('isGuest'),
@@ -57,7 +57,7 @@ function initializeSocket(): Socket {
     }
 
     console.log("Initializing socket connection");
-    const socket = io(backendURL, ioOptions);
+    const socket = io(socketIoHost, ioOptions);
     socket.connect();
 
     socket.on('connect', () => {
