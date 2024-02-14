@@ -1,5 +1,5 @@
 import { jwtDecode, JwtPayload } from "jwt-decode";
-import state, { reconnectGlobalSocket } from "./networking.client-websocket";
+import { reconnectGlobalSocket } from "./networking.client-websocket";
 import { httpClient } from "./networking.http-client";
 import axios from "axios";
 import eventBus from "../page/page.event-bus";
