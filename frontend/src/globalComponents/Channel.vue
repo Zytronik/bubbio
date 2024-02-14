@@ -8,9 +8,10 @@
       <h3>Global Chat</h3>
       <div class="global-chat">
         <div class="messages">
-          <div v-for="(msg, i) in chatMessages" :key="i">{{ msg.username }}: {{ msg.text }}</div>
+          <div v-for="(msg, i) in messages" :key="i">{{ msg.username }}: {{ msg.text }}</div>
         </div>
-        <input v-if="isAuthenticated" v-model="chatInput" placeholder="Type a message..." @keyup.enter="sendChatMessage" />
+        <input v-if="isAuthenticated" v-model="chatInput" placeholder="Type a message..."
+          @keyup.enter="sendChatMessage" />
         <button v-if="isAuthenticated" @click="sendChatMessage">Send</button>
       </div>
 
@@ -40,15 +41,11 @@ import axios from 'axios';
 import UserProfileOverlay from './UserProfileOverlay.vue';
 import state from '@/ts/networking/networking.client-websocket';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
+import useChatStore from '@/ts/page/page.globalChat';
 
 interface User {
   id: number;
   username: string;
-}
-
-interface GlobalChatMessage {
-  username: string;
-  text: string;
 }
 
 export default {
@@ -65,8 +62,9 @@ export default {
       registeredUsers: 0,
     });
     let intervalId = 0;
-    const chatMessages = ref<GlobalChatMessage[]>([]);
+    const { messages } = useChatStore();
     const chatInput = ref('');
+
     const isAuthenticated = computed(() => checkUserAuthentication());
 
     const fetchSearchResults = debounce(async (query) => {
@@ -120,17 +118,6 @@ export default {
       }
     }
 
-    function loadChatHistory() {
-      const storedMessages = sessionStorage.getItem('globalChatHistory');
-      if (storedMessages) {
-        chatMessages.value = JSON.parse(storedMessages);
-      }
-    }
-
-    function saveChatHistory() {
-      sessionStorage.setItem('globalChatHistory', JSON.stringify(chatMessages.value));
-    }
-
     function fetchStats() {
       if (state.socket) {
         state.socket.emit('fetchGlobalStats');
@@ -141,22 +128,13 @@ export default {
       state.socket.on('fetchGlobalStats', (globalStats) => {
         stats.value = globalStats;
       });
-
-      state.socket.on('sendGlobalChatMessage', (message: GlobalChatMessage) => {
-        chatMessages.value.push(message);
-      });
     }
 
     onMounted(() => {
-      loadChatHistory();
       showUserPageFromURL();
       fetchStats();
       intervalId = setInterval(fetchStats, 10000);
     });
-
-    watch(chatMessages, () => {
-      saveChatHistory();
-    }, { deep: true });
 
     onUnmounted(() => {
       if (intervalId) {
@@ -173,10 +151,10 @@ export default {
       showUserProfileOverlay,
       closeUserProfileOverlay,
       stats,
-      chatMessages,
       chatInput,
       sendChatMessage,
       isAuthenticated,
+      messages,
     };
   },
 }
@@ -189,7 +167,7 @@ export default {
   width: 100%;
 }
 
-.channel-overlay{
+.channel-overlay {
   z-index: 10;
 }
 

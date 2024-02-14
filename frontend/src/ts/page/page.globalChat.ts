@@ -1,43 +1,45 @@
-/* import { reactive, toRefs } from 'vue';
-import state from '@/ts/networking/networking.client-websocket';
+// src/store/useChatStore.ts
+import { reactive, toRefs } from 'vue';
+import state, { addSocketConnectListener } from '@/ts/networking/networking.client-websocket';
 
 interface GlobalChatMessage {
     username: string;
     text: string;
-  }
+}
 
 const chatState = reactive({
-  messages: [],
+    messages: [] as GlobalChatMessage[],
 });
 
-// Function to initialize chat message listener
-export function initializeChat() {
-  if (state.socket) {
-    state.socket.on('sendGlobalChatMessage', (message: GlobalChatMessage) => {
-      chatState.messages.push(message);
-    });
-  }
+function initializeGlobalChat() {
+    console.log("test");
+    if (state.socket && !state.socket.hasListeners('sendGlobalChatMessage')) {
+        state.socket.on('sendGlobalChatMessage', (message: GlobalChatMessage) => {
+            chatState.messages.push(message);
+        });
+    }
 }
 
-// Save and load chat history to sessionStorage
-function saveChatHistory() {
-  sessionStorage.setItem('globalChatHistory', JSON.stringify(chatState.messages));
-}
-
+// Load chat history from sessionStorage
 function loadChatHistory() {
-  const storedMessages = sessionStorage.getItem('globalChatHistory');
-  if (storedMessages) {
-    chatState.messages = JSON.parse(storedMessages);
-  }
+    const storedMessages = sessionStorage.getItem('globalChatHistory');
+    if (storedMessages) {
+        chatState.messages = JSON.parse(storedMessages);
+    }
 }
 
-// Call loadChatHistory on initial load
-loadChatHistory();
+// Save chat history to sessionStorage
+function saveChatHistory() {
+    sessionStorage.setItem('globalChatHistory', JSON.stringify(chatState.messages));
+}
 
-// Ensure chat history is saved when window is unloaded
+// Call these functions to initialize and manage chat history
+loadChatHistory();
+addSocketConnectListener(initializeGlobalChat);
+
+// Ensure chat history is saved when the window is unloaded
 window.addEventListener('beforeunload', saveChatHistory);
 
 export default function useChatStore() {
-  return { ...toRefs(chatState), initializeChat };
+    return { ...toRefs(chatState) };
 }
- */
