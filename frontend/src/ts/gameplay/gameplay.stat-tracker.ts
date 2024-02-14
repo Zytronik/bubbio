@@ -157,21 +157,24 @@ export function trackBubbleShot(wallBounces: number, amountCleared: number): voi
 }
 
 export async function submitGametoDB() {
-    const submitStats = {
-        "sprintTime": gameStats.currentTime,
-        "bubblesCleared": gameStats.bubblesCleared,
-        "bubblesShot": gameStats.bubblesShot,
-        "bubblesPerSecond": gameStats.bubblesPerSecond,
-    };
-    try {
-        const token = localStorage.getItem('authToken');
-        const response = await httpClient.post('/sprint/submit', submitStats, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
-        });
-        console.log('Game stats submitted successfully:', response.data);
-    } catch (error) {
-        console.error('Error submitting game stats:', error);
+    const isGuest = sessionStorage.getItem('isGuest');
+    if(isGuest !== "true"){
+        const submitStats = {
+            "sprintTime": gameStats.currentTime,
+            "bubblesCleared": gameStats.bubblesCleared,
+            "bubblesShot": gameStats.bubblesShot,
+            "bubblesPerSecond": gameStats.bubblesPerSecond,
+        };
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await httpClient.post('/sprint/submit', submitStats, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+            });
+            console.log('Game stats submitted successfully:', response.data);
+        } catch (error) {
+            console.error('Error submitting game stats:', error);
+        }
     }
 }

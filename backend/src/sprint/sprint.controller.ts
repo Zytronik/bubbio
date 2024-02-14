@@ -13,7 +13,6 @@ export class SprintController {
     return await this.sprintService.saveGameStats(req.user.userId, gameStatsDto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('leaderboard')
   async getLeaderboard() {
     return await this.sprintService.getLeaderboard();

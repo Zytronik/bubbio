@@ -13,28 +13,33 @@
           <span>Date: {{ formatDateTime(new Date(entry.submittedAt)) }}</span>
         </li>
       </ul>
-      <h2>History</h2>
-      <ul>
-        <li v-for="(record, index) in userHistory" :key="index">
-          <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
-          <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
-          <span>Bubbles Shot: {{ record.bubblesShot }}</span>
-          <span>BPS: {{ record.bubblesPerSecond }}</span>
-          <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
-        </li>
-      </ul>
-      <h2>Personal Stats</h2>
-      <h3>Top 3 Runs</h3>
-      <ul>
-        <li v-for="(record, index) in personalBests" :key="index">
-          <span>{{ index + 1 }}.</span>
-          <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
-          <span>Bubbles Shot: {{ record.bubblesShot }}</span>
-          <span>BPS: {{ record.bubblesPerSecond }}</span>
-          <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
-          <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
-        </li>
-      </ul>
+      <div v-if="!isGuest">
+        <h2>History</h2>
+        <ul>
+          <li v-for="(record, index) in userHistory" :key="index">
+            <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
+            <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
+            <span>Bubbles Shot: {{ record.bubblesShot }}</span>
+            <span>BPS: {{ record.bubblesPerSecond }}</span>
+            <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
+          </li>
+        </ul>
+      </div>
+      <div v-if="!isGuest">
+        <h2>Personal Stats</h2>
+        <h3>Top 3 Runs</h3>
+        <ul>
+          <li v-for="(record, index) in personalBests" :key="index">
+            <span>{{ index + 1 }}.</span>
+            <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
+            <span>Bubbles Shot: {{ record.bubblesShot }}</span>
+            <span>BPS: {{ record.bubblesPerSecond }}</span>
+            <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
+            <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
+          </li>
+        </ul>
+      </div>
+      <h4 v-if="isGuest"><br>Log in for Stats and Submit Scores.</h4>
       <div v-if="isLoading" class="loading-animation">
         Loading...
       </div>
@@ -115,6 +120,8 @@ export default {
     const personalBests = ref<GameRecord[]>([]);
     const leaderboard = ref<LeaderboardEntry[]>([]);
     const isLoading = ref<boolean>(true);
+    const isGuestString = sessionStorage.getItem('isGuest');
+    const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
 
     setupSprintGame();
 
@@ -142,31 +149,30 @@ export default {
 
     async function fetchUserHistory() {
       const token = localStorage.getItem('authToken');
-      const response = await httpClient.get('/sprint/userHistory', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      userHistory.value = response.data;
+      if (!isGuest) {
+        const response = await httpClient.get('/sprint/userHistory', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        userHistory.value = response.data;
+      }
     }
 
     async function fetchPersonalBests() {
       const token = localStorage.getItem('authToken');
-      const response = await httpClient.get('/sprint/personalBests', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      personalBests.value = response.data;
+      if(!isGuest){
+        const response = await httpClient.get('/sprint/personalBests', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        personalBests.value = response.data;
+      }
     }
 
     async function fetchLeaderboard() {
-      const token = localStorage.getItem('authToken');
-      const response = await httpClient.get<LeaderboardEntry[]>('/sprint/leaderboard', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await httpClient.get<LeaderboardEntry[]>('/sprint/leaderboard');
       leaderboard.value = response.data;
     }
 
@@ -229,6 +235,7 @@ export default {
       formatDateTime,
       formatTimeNumberToString,
       isLoading,
+      isGuest,
     };
   },
 };
