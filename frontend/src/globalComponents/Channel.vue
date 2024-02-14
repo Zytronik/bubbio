@@ -143,7 +143,6 @@ export default {
       });
 
       state.socket.on('sendGlobalChatMessage', (message: GlobalChatMessage) => {
-        console.log(message);
         chatMessages.value.push(message);
       });
     }

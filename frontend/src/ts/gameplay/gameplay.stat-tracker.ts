@@ -160,7 +160,7 @@ export async function submitGametoDB() {
     const isGuest = sessionStorage.getItem('isGuest');
     if(isGuest !== "true"){
         const submitStats = {
-            "sprintTime": gameStats.currentTime,
+            "sprintTime": Math.floor(gameStats.currentTime),
             "bubblesCleared": gameStats.bubblesCleared,
             "bubblesShot": gameStats.bubblesShot,
             "bubblesPerSecond": gameStats.bubblesPerSecond,
