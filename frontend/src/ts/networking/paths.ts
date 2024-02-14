@@ -5,8 +5,6 @@ export let backendURL: string;
 export let socketIoHost: string;
 const ipRegex = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
 
-console.log(host);
-
 if (host === "localhost" || ipRegex.test(host)) {
     isLocal = true;
     frontendURL = "http://"+host+":8080/";

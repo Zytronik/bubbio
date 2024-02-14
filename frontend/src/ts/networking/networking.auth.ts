@@ -42,7 +42,6 @@ export async function login(username: string, password: string): Promise<{succes
     if (token) {
       // Store the token in local storage
       localStorage.setItem('authToken', token);
-      /* state.socket?.emit('userAuthenticated'); */
       return { success: true, error: '' };
     } else {
       return { success: false, error: 'No token received' };
@@ -63,7 +62,6 @@ export async function register(username: string, password: string, passwordAgain
 
   try {
     await httpClient.post('/auth/register', { username, password });
-    /* state.socket?.emit('userAuthenticated'); */
     return { success: true, error: '' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -80,7 +78,6 @@ export async function loginAsGuest(username: string) {
     username = generateRandomString(6);
   }
   sessionStorage.setItem('guestUsername', username );
-  /* state.socket?.emit('guestLoggedIn'); */
 }
 
 function generateRandomString(length: number): string {

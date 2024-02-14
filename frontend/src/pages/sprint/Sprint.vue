@@ -94,11 +94,11 @@ interface GameRecord {
   sprintTime: number;
 }
 
-interface DashboardData {
+/* interface DashboardData {
   leaderboard: LeaderboardEntry[];
   userHistory: GameRecord[];
   personalBests: GameRecord[];
-}
+} */
 
 export default {
   name: 'SprintPage',
@@ -118,9 +118,10 @@ export default {
       isDasboard.value = false;
     }
 
-    function showDashboard() {
+    async function showDashboard() {
       isGaming.value = false;
       isDasboard.value = true;
+      await fetchSprintData();
       leaveGame();
     }
 
@@ -164,10 +165,14 @@ export default {
       leaderboard.value = response.data;
     }
 
-    onMounted(async () => {
+    async function fetchSprintData(){
       await fetchUserHistory();
       await fetchPersonalBests();
       await fetchLeaderboard();
+    }
+
+    onMounted(async () => {
+      await fetchSprintData();
     });
 
     return {

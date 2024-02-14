@@ -10,7 +10,7 @@ export class SprintController {
   @UseGuards(JwtAuthGuard)
   @Post('submit')
   async submitGameStats(@Request() req, @Body() gameStatsDto: GameStatsDto) {
-    return await this.sprintService.saveGameStats(req.userId, gameStatsDto);
+    return await this.sprintService.saveGameStats(req.user.userId, gameStatsDto);
   }
 
   @UseGuards(JwtAuthGuard)
