@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { LobbyGateway } from './lobby/lobby.gateway';
-import { GameGateway } from './game/game.gateway';
+import { GameGateway } from './gameplay/gameplay.gateway';
 import { AuthModule } from './auth/auth.module';
 import { GlobalChatGateway } from './globalChat/globalChat.gateway';
 import { join } from 'path';

@@ -22,47 +22,47 @@ export function prepareNextBubble(): void {
     currentBubble = getRandomBubble();
 }
 
-const b1: Bubble = {
+const red: Bubble = {
     color: "rgb(255, 0, 0)",
     ascii: `<span style="color: rgb(255, 0, 0);">R</span>`,
     type: 0,
 }
-const b2: Bubble = {
+const orange: Bubble = {
     color: "rgb(255, 174, 0)",
     ascii: `<span style="color: rgb(255, 174, 0);">O</span>`,
     type: 1,
 }
-const b3: Bubble = {
+const yellow: Bubble = {
     color: "rgb(255, 255, 0)",
     ascii: `<span style="color: rgb(255, 255, 0);">Y</span>`,
     type: 2,
 }
-const b4: Bubble = {
+const green: Bubble = {
     color: "rgb(123, 255, 0)",
     ascii: `<span style="color: rgb(123, 255, 0);">G</span>`,
     type: 3,
 }
-const b5: Bubble = {
+const cyan: Bubble = {
     color: "rgb(0, 255, 255)",
     ascii: `<span style="color: rgb(0, 255, 255);">B</span>`,
     type: 4,
 }
-const b6: Bubble = {
+const magenta: Bubble = {
     color: "rgb(255, 0, 255)",
     ascii: `<span style="color: rgb(255, 0, 255);">P</span>`,
     type: 5,
 }
-const b7: Bubble = {
+const white: Bubble = {
     color: "rgb(255, 255, 255)",
     ascii: `<span style="color: rgb(255, 255, 255);">W</span>`,
     type: 6,
 }
 const allBubbles: Bubble[] = [
-    b1,
-    b2,
-    b3,
-    b4,
-    b5,
-    b6,
-    b7,
+    red,
+    orange,
+    yellow,
+    green,
+    cyan,
+    magenta,
+    white,
 ]
