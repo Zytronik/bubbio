@@ -1,29 +1,36 @@
 <template>
     <div class="overlay user-profile-overlay">
         <div class="user-profile-wrapper">
-            <button @click="closeUserProfile">Close</button>
+            <button class="goBackButton" title="Back" @click="closeUserProfile">X</button>
             <div v-if="userError" class="user-error-message">
                 {{ userError }}
             </div>
-            <div v-if="userData">
-                <h2>User Profile: {{ userData.username }}</h2>
-                <p>Account Created: {{ formattedDate }}</p>
-                <p v-if="userData.country">Country: {{ userData.country }}</p>
-                <img v-if="userData.pbUrl" :src="profilePicImagePath" alt="Profile Picture">
-                <img v-if="userData.countryCode && userData.country" :src="flagImagePath" :title="userData.country"
-                    alt="Country Flag">
+            <div v-if="userData" class="user-profile-outer-container">
+                <div class="profile-banner" :style="{ backgroundImage: `url(${profileBannerImagePath})` }"></div>
+                <div class="user-profile-inner-container">
+                    <div class="user-profile-meta">
+                        <img class="profile-pic" :src="profilePicImagePath" alt="Profile Picture">
+                        <h2>{{ userData.username.toUpperCase() }}</h2>
+                        <p>Joined: {{ formattedDate }}</p>
+                        <div class="user-country">
+                            <p v-if="userData.country">{{ userData.country }}</p>
+                            <img class="user-flag" v-if="userData.countryCode && userData.country" :src="flagImagePath"
+                                :title="userData.country" alt="Country Flag">
+                        </div>
+                    </div>
 
-                <h2>Sprint</h2>
-                <div v-if="userData.sprintStats.rank">
-                    <p>Leaderboard Rank: {{ userData.sprintStats.rank }}</p>
-                    <p>Average Bubbles Cleared: {{ userData.sprintStats.averageBubblesCleared }}</p>
-                    <p>Average Bubbles Per Second: {{ userData.sprintStats.averageBubblesPerSecond }}</p>
-                    <p>Average Bubbles Shot: {{ userData.sprintStats.averageBubblesShot }}</p>
-                    <p>Average Sprint Time: {{ userData.sprintStats.averageSprintTime }}</p>
-                    <p>Games Played: {{ userData.sprintStats.sprintGamesPlayed }}</p>
-                </div>
-                <div v-else>
-                    <p>This User has never played Sprint.</p>
+                    <h3>Sprint</h3>
+                    <div v-if="userData.sprintStats.rank">
+                        <p>Leaderboard Rank: {{ userData.sprintStats.rank }}</p>
+                        <p>Average Bubbles Cleared: {{ userData.sprintStats.averageBubblesCleared }}</p>
+                        <p>Average Bubbles Per Second: {{ userData.sprintStats.averageBubblesPerSecond }}</p>
+                        <p>Average Bubbles Shot: {{ userData.sprintStats.averageBubblesShot }}</p>
+                        <p>Average Sprint Time: {{ userData.sprintStats.averageSprintTime }}</p>
+                        <p>Games Played: {{ userData.sprintStats.sprintGamesPlayed }}</p>
+                    </div>
+                    <div v-else>
+                        <p>This User has never played Sprint.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -33,7 +40,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
-import { getProfilePicURL } from '@/ts/networking/paths';
+import { getProfileBannerURL, getProfilePbURL } from '@/ts/networking/paths';
 
 interface UserData {
     username: string;
@@ -41,6 +48,7 @@ interface UserData {
     countryCode: string;
     country: string;
     pbUrl: string;
+    bannerUrl: string;
     sprintStats: SprintStats;
     // ... other user fields
 }
@@ -75,11 +83,18 @@ export default defineComponent({
             return "";
         });
 
+        const profileBannerImagePath = computed(() => {
+            if (userData.value && userData.value.bannerUrl) {
+                return userData.value ? getProfileBannerURL() + userData.value.bannerUrl : '';
+            }
+            return getProfileBannerURL() + '/default/bannerPlaceholder.png';
+        });
+
         const profilePicImagePath = computed(() => {
             if (userData.value && userData.value.pbUrl) {
-                return userData.value ? getProfilePicURL() + userData.value.pbUrl : '';
+                return userData.value ? getProfilePbURL() + userData.value.pbUrl : '';
             }
-            return "";
+            return getProfilePbURL() + '/default/pbPlaceholder.png';
         });
 
         const flagImagePath = computed(() => {
@@ -115,7 +130,8 @@ export default defineComponent({
             userError,
             flagImagePath,
             formattedDate,
-            profilePicImagePath
+            profilePicImagePath,
+            profileBannerImagePath
         };
     },
 });
@@ -123,16 +139,112 @@ export default defineComponent({
 <style>
 .user-profile-overlay {
     z-index: 15;
+    background: rgba(0, 0, 0, 0.0) !important;
 }
 
 .user-profile-wrapper {
-    height: 100%;
-    width: 100%;
+    height: 80vh;
+    width: 100vw;
     background-color: black;
 }
 
-img {
-    width: 10%;
+button.goBackButton {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5vw;
+    height: 2.5vw;
+    border: none;
+    background-color: rgb(28, 28, 28);
+    color: white;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 0;
+    margin-top: unset;
+    margin: 10px;
+    transition: 200ms;
+}
+
+button.goBackButton:hover,
+button.goBackButton:focus {
+    background-color: #363636;
+    outline: none;
+}
+
+.profile-banner {
+    width: 100vw;
+    height: 20%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.profile-pic {
+    position: absolute;
+    height: 10vw;
+    width: 10vw;
+    object-fit: cover;
+    left: 0;
+    border-radius: 20%;
+    top: -2vw;
+}
+
+.user-profile-outer-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.user-profile-inner-container {
+    width: 80%;
+    height: 80%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-profile-meta {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-left: calc(10vw + 30px);
+    font-size: 18px;
+    height: 10vw;
+}
+
+.user-profile-meta h2 {
+    margin-bottom: 1.5%;
+    margin-top: 1%;
+    font-size: 30px;
+}
+
+.user-profile-meta p {
+    margin: unset;
+}
+
+.user-flag {
     object-fit: contain;
+    height: 80%;
+    border-radius: 20%;
+}
+
+.user-country {
+    margin-top: 10px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    height: 17%;
+}
+
+h3 {
+    margin: unset;
+    font-size: 20px;
 }
 </style>

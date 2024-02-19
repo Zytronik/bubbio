@@ -1,7 +1,9 @@
-import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { generateMulterOptions } from 'src/multerConfig';
 
 @Controller('users')
 export class UserController {
@@ -27,6 +29,25 @@ export class UserController {
   async getUserProfile(@Param('username') username: string) {
     return this.userService.getUserProfileByUsername(username);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('updateProfilePic')
+  @UseInterceptors(FileInterceptor('profilePic', generateMulterOptions('pb')))
+  async updateProfilePicture(@UploadedFile() file, @Req() req: AuthenticatedRequest) {
+    const userId = req.user.userId;
+    await this.userService.updateProfileImgs(userId, file, "pb");
+    return { message: 'Profile picture updated successfully.' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('updateProfileBanner')
+  @UseInterceptors(FileInterceptor('profileBanner', generateMulterOptions('banner')))
+  async updateProfileBanner(@UploadedFile() file, @Req() req: AuthenticatedRequest) {
+    const userId = req.user.userId;
+    await this.userService.updateProfileImgs(userId, file, "banner");
+    return { message: 'Banner updated successfully.' };
+  }
+
 }
 
 export interface AuthenticatedRequest extends Request {

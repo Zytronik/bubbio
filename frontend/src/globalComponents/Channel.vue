@@ -163,8 +163,9 @@ export default {
 <style scoped>
 .channel-container {
   background: rgb(30, 30, 30);
-  padding: 30px 20px;
   width: 100%;
+  height: 80vh;
+  overflow-y: scroll;
 }
 
 .channel-overlay {
@@ -173,6 +174,7 @@ export default {
 
 ul {
   list-style-type: none;
+  padding-left: unset;
 }
 
 li {

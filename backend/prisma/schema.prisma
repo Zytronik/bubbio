@@ -13,7 +13,7 @@ model User {
   password        String
   countryCode     String?
   country         String?
-  pbUrl           String          @default("pbPlaceholder.png")
+  pbUrl           String?         
   bannerUrl       String?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @default(now()) @updatedAt

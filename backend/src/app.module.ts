@@ -14,8 +14,12 @@ import { SprintModule } from './sprint/sprint.module';
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'src', 'img', 'pb'),
-      serveRoot: '/pb/',
+      rootPath: join(__dirname, '..', 'uploads', 'pb'),
+      serveRoot: '/userData/pb/',
+    },
+    {
+      rootPath: join(__dirname, '..', 'uploads', 'banner'),
+      serveRoot: '/userData/banner/',
     }),
     AuthModule,
     SprintModule,

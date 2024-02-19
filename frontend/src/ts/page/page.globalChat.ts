@@ -12,7 +12,6 @@ const chatState = reactive({
 });
 
 function initializeGlobalChat() {
-    console.log("test");
     if (state.socket && !state.socket.hasListeners('sendGlobalChatMessage')) {
         state.socket.on('sendGlobalChatMessage', (message: GlobalChatMessage) => {
             chatState.messages.push(message);

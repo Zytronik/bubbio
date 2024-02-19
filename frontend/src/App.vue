@@ -1,6 +1,6 @@
 <template>
   <article id="app">
-    <button @click="openChannelOverlay" style="z-index: 5; position: relative;">Channel</button>
+    <button @click="openChannelOverlay" style="position:  absolute; left: 50%; transform: translateX(-50%); z-index: 5; position: relative;">Channel</button>
     <InfoMessages ref="infoMessageRef" />
     <LoginOverlay v-if="showLogin" @login="handleLogin" @checkUsername="handleCheckUsername" @register="handleRegister"
       @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" @playAsGuest="handlePlayAsGuest"/>
@@ -134,7 +134,6 @@ export default {
             goToState(PAGE_STATE.roomPage);
           } else {
             showInfoMessage('You are already in this room.', 'info');
-            //emit('showInfoMessage', 'You are already in this room.', 'info'); 
           }
         });
       }

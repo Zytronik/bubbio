@@ -3,6 +3,8 @@ import { CreateUserDto } from 'src/auth/dto/auth.dto.createUser';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import axios from 'axios';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class UserService {
@@ -85,11 +87,11 @@ export class UserService {
             orderBy: { sprintTime: 'asc' },
             select: { sprintTime: true },
         });
-    
+
         if (!userBestTimeRecord) {
             return null; // User has no sprint times
         }
-    
+
         // Step 2: Get the best sprint time for each user and sort them
         const bestTimes = await this.prisma.sprint.groupBy({
             by: ['userId'],
@@ -102,11 +104,11 @@ export class UserService {
                 },
             },
         });
-    
+
         // Find the rank of the user's best time among these best times
         // We count how many times have a better (lower) sprintTime than the user's best time
         const rank = bestTimes.findIndex(time => time._min.sprintTime >= userBestTimeRecord.sprintTime) + 1;
-    
+
         return rank;
     }
 
@@ -123,11 +125,11 @@ export class UserService {
                 bannerUrl: true,
             },
         });
-    
+
         if (!user) {
             throw new NotFoundException(`User with username ${username} not found`);
         }
-    
+
         // Fetch average sprint statistics for this user
         const sprintStats = await this.prisma.sprint.aggregate({
             _avg: {
@@ -182,4 +184,34 @@ export class UserService {
     async getTotalRegisteredUsersCount(): Promise<number> {
         return await this.prisma.user.count();
     }
+
+    async updateProfileImgs(userId: number, file, imgType: "pb" | "banner"): Promise<void> {
+        const user = await this.prisma.user.findUnique({
+          where: { id: userId },
+        });
+      
+        // Determine the field to update and the previous file to delete
+        const fieldToUpdate = imgType === "pb" ? "pbUrl" : "bannerUrl";
+        const oldFilename = user[fieldToUpdate];
+      
+        // Define the upload path
+        const uploadPath = path.join(__dirname, '..', '..', 'uploads', imgType);
+        const newFilename = file.filename;
+      
+        // Update the database
+        await this.prisma.user.update({
+          where: { id: userId },
+          data: { [fieldToUpdate]: newFilename },
+        });
+      
+        // Delete the old file, if necessary
+        if (oldFilename && oldFilename !== newFilename) {
+          const oldFilePath = path.join(uploadPath, oldFilename);
+          if (fs.existsSync(oldFilePath)) {
+            fs.unlinkSync(oldFilePath);
+          }
+        }
+      }
+      
+      
 }
