@@ -8,9 +8,9 @@
 
 <script lang="ts">
 import { onUnmounted } from 'vue';
-import { leaveGame } from '@/ts/gameplay/gameplay.game-master';
-import { playGridASCII } from '@/ts/gameplay/gameplay.ascii-visuals';
-import { angle } from '@/ts/gameplay/gameplay.angle';
+import { leaveGame } from '@/ts/game/game.master';
+import { playGridASCII } from '@/ts/game/visuals/game.logic.visuals.ascii';
+import { angle } from '@/ts/game/logic/game.logic.angle';
 
 window.addEventListener('keydown', function (e) {
   if (e.keyCode == 32 && e.target == document.body) {
