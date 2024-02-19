@@ -1,5 +1,5 @@
-import { convertSeedToRandomNumber, getNextSeed } from "./gameplay.random";
-import { Bubble } from "./i/gameplay.i.bubble";
+import { convertSeedToRandomNumber, getNextSeed } from "./game.logic.random";
+import { Bubble } from "../i/game.i.bubble";
 
 export function setupBubbleQueueAndCurrent(seed: number, currentBubble: Bubble, queue: Bubble[], queueLength: number): number {
     let randomIndex = convertSeedToRandomNumber(0, allBubbles.length, seed);

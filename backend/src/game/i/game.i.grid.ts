@@ -1,6 +1,6 @@
-import { Coordinates } from "./gameplay.i.grid-coordinates";
-import { PreviewBubble } from "./gameplay.i.preview-bubble";
-import { Row } from "./gameplay.i.row";
+import { Coordinates } from "./game.i.grid-coordinates";
+import { PreviewBubble } from "./game.i.preview-bubble";
+import { Row } from "./game.i.row";
 
 export interface Grid {
     precisionWidth: number,

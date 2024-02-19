@@ -1,4 +1,4 @@
-import { Field } from "./gameplay.i.field";
+import { Field } from "./game.i.field";
 
 export interface Row {
     fields: Field[],

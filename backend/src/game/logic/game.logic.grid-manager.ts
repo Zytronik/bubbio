@@ -1,8 +1,8 @@
-import { Field } from "./i/gameplay.i.field";
-import { Grid } from "./i/gameplay.i.grid";
-import { Row } from "./i/gameplay.i.row";
-import { Coordinates } from "./i/gameplay.i.grid-coordinates";
-import { GameSettings } from "./i/gameplay.i-game-settings";
+import { Field } from "../i/game.i.field";
+import { Grid } from "../i/game.i.grid";
+import { Row } from "../i/game.i.row";
+import { Coordinates } from "../i/game.i.grid-coordinates";
+import { GameSettings } from "../i/game.i.game-settings";
 
 export function setupGrid(settings: GameSettings): Grid {
     const precisionWidth = settings.widthPrecisionUnits.value;

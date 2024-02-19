@@ -1,10 +1,10 @@
-import { getVelocity } from "./gameplay.angle";
-import { dissolveBubbles, getNearbyFields } from "./gameplay.grid-manager";
-import { trackBubbleShot } from "./gameplay.stat-tracker";
-import { Field } from "./i/gameplay.i.field";
-import { GameInstance } from "./i/gameplay.i.game-instance";
-import { Grid } from "./i/gameplay.i.grid";
-import { Coordinates } from "./i/gameplay.i.grid-coordinates";
+import { getVelocity } from "./game.logic.angle";
+import { dissolveBubbles, getNearbyFields } from "./game.logic.grid-manager";
+import { trackBubbleShot } from "./game.logic.stat-tracker";
+import { Field } from "../i/game.i.field";
+import { GameInstance } from "../i/game.i.game-instance";
+import { Grid } from "../i/game.i.grid";
+import { Coordinates } from "../i/game.i.grid-coordinates";
 
 export function shootBubble(game: GameInstance, angle: number): void {
     const grid = game.playGrid;

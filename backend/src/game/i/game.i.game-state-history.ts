@@ -1,4 +1,4 @@
-import { Bubble } from "./gameplay.i.bubble";
+import { Bubble } from "./game.i.bubble";
 
 export interface GameStateHistory {
     inputHistory: InputFrame[],

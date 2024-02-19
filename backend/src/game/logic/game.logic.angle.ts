@@ -1,5 +1,5 @@
-import { GameSettings } from './i/gameplay.i-game-settings';
-import { Coordinates } from './i/gameplay.i.grid-coordinates';
+import { GameSettings } from '../i/game.i.game-settings';
+import { Coordinates } from '../i/game.i.grid-coordinates';
 
 export function getVelocity(angle: number, settings: GameSettings): Coordinates {
     let cleanAngle = cleanUpAngle(angle, settings);

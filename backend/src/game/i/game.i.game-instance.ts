@@ -1,8 +1,8 @@
-import { GameSettings } from "./gameplay.i-game-settings";
-import { Bubble } from "./gameplay.i.bubble";
-import { GameStateHistory } from "./gameplay.i.game-state-history";
-import { Grid } from "./gameplay.i.grid";
-import { GAME_MODE, GameStats } from "./gameplay.i.stats";
+import { GameSettings } from "./game.i.game-settings";
+import { Bubble } from "./game.i.bubble";
+import { GameStateHistory } from "./game.i.game-state-history";
+import { Grid } from "./game.i.grid";
+import { GAME_MODE, GameStats } from "./game.i.stats";
 
 export interface GameInstance {
     playerID: string,

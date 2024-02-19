@@ -1,5 +1,5 @@
-import { GameInstance } from "./i/gameplay.i.game-instance";
-import { GAME_MODE } from "./i/gameplay.i.stats";
+import { GameInstance } from "../i/game.i.game-instance";
+import { GAME_MODE } from "../i/game.i.stats";
 
 export function trackBubbleShot(game: GameInstance, wallBounces: number, amountCleared: number): void {
     const gameStats = game.stats;

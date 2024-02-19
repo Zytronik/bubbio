@@ -1,15 +1,21 @@
-import { BooleanSetting } from "./gameplay.i-boolean-setting";
-import { NumberSetting } from "./gameplay.i-number-setting";
+import { BooleanSetting } from "./game.i.boolean-setting";
+import { NumberSetting } from "./game.i.number-setting";
 
 export interface GameSettings {
     gridWidth: NumberSetting,
     gridHeight: NumberSetting,
     gridExtraHeight: NumberSetting,
+
     minAngle: NumberSetting,
     maxAngle: NumberSetting,
+
     widthPrecisionUnits: NumberSetting,
     collisionDetectionFactor: NumberSetting,
-    dissolveFloatingBubbles: BooleanSetting
+
+    dissolveFloatingBubbles: BooleanSetting,
+
+    canUseHold: BooleanSetting,
+    queuePreviewSize: NumberSetting,
 
     //passtrough
     //combotable
