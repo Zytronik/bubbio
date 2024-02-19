@@ -87,14 +87,14 @@ export default defineComponent({
             if (userData.value && userData.value.bannerUrl) {
                 return userData.value ? getProfileBannerURL() + userData.value.bannerUrl : '';
             }
-            return getProfileBannerURL() + '/default/bannerPlaceholder.png';
+            return getProfileBannerURL() + 'default/bannerPlaceholder.png';
         });
 
         const profilePicImagePath = computed(() => {
             if (userData.value && userData.value.pbUrl) {
                 return userData.value ? getProfilePbURL() + userData.value.pbUrl : '';
             }
-            return getProfilePbURL() + '/default/pbPlaceholder.png';
+            return getProfilePbURL() + 'default/pbPlaceholder.png';
         });
 
         const flagImagePath = computed(() => {
