@@ -16,28 +16,26 @@ export function setupBubbleQueueAndCurrent(seed: number, currentBubble: Bubble, 
     return nextSeed;
 }
 
-export function holdFirstBubble(currentBubble: Bubble, heldBubble: Bubble, queue: Bubble[], seed: number): number {
-    heldBubble = currentBubble;
-    currentBubble = queue.shift();
-    let randomIndex = convertSeedToRandomNumber(0, allBubbles.length, seed);
-    queue.push(allBubbles[randomIndex]);
-    return getNextSeed(seed);
-}
-
-export function holdBubble(currentBubble: Bubble, heldBubble: Bubble): void {
-    let temp = currentBubble;
+export function holdBubble(currentBubble: Bubble, heldBubble: Bubble, queue: Bubble[], seed: number): number {
+    if (!heldBubble) {
+        heldBubble = currentBubble;
+        currentBubble = queue.shift();
+        const randomIndex = convertSeedToRandomNumber(0, allBubbles.length, seed);
+        queue.push(allBubbles[randomIndex]);
+        return getNextSeed(seed);
+    }
+    const temp = currentBubble;
     currentBubble = heldBubble;
     heldBubble = temp;
-
+    return seed;
 }
 
-export function updateCurrentBubble(currentBubble: Bubble, queue: Bubble[], seed: number): number {
+export function updateBubbleQueueAndCurrent(currentBubble: Bubble, queue: Bubble[], seed: number): number {
     currentBubble = queue.shift();
-    let randomIndex = convertSeedToRandomNumber(0, allBubbles.length, seed);
+    const randomIndex = convertSeedToRandomNumber(0, allBubbles.length, seed);
     queue.push(allBubbles[randomIndex]);
     return getNextSeed(seed);
 }
-
 
 const red: Bubble = {
     type: 0,

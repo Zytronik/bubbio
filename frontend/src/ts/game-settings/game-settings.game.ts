@@ -5,8 +5,8 @@ export const GRID_WIDTH: NumberSetting = {
     description: "How many bubbles fit in a row.",
     value: 8,
     defaultValue: 8,
-    min: 1,
-    max: 1,
+    min: 4,
+    max: 15,
 }
 
 export const GRID_HEIGHT: NumberSetting = {
@@ -14,8 +14,8 @@ export const GRID_HEIGHT: NumberSetting = {
     description: "How many bubbles fit in a column.",
     value: 15,
     defaultValue: 15,
-    min: 1,
-    max: 1,
+    min: 3,
+    max: 30,
 }
 
 export const GRID_EXTRA_HEIGHT: NumberSetting = {
@@ -24,5 +24,5 @@ export const GRID_EXTRA_HEIGHT: NumberSetting = {
     value: 3,
     defaultValue: 3,
     min: 1,
-    max: 1,
+    max: 5,
 }

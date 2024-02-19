@@ -1,64 +1,75 @@
 import { getVelocity } from "./gameplay.angle";
-import { getCurrentBubble, prepareNextBubble } from "./gameplay.bubble-manager";
-import { dissolveBubbles, getBubbleLauncherPosition, getBubbleRadius, getCollisionRangeSquared, getNearbyFields, getPlayGridRows, getVisualHeight, getVisualWidth } from "./gameplay.playgrid";
+import { dissolveBubbles, getNearbyFields } from "./gameplay.grid-manager";
 import { trackBubbleShot } from "./gameplay.stat-tracker";
 import { Field } from "./i/gameplay.i.field";
+import { GameInstance } from "./i/gameplay.i.game-instance";
+import { Grid } from "./i/gameplay.i.grid";
 import { Coordinates } from "./i/gameplay.i.grid-coordinates";
 
-function shootBubble(): void {
-    // const t1 = performance.now()
-    const bubbleCoords = { x: getBubbleLauncherPosition().x, y: getBubbleLauncherPosition().y };
-    let xDirection = getVelocity().x;
-    const yDirection = getVelocity().y;
+export function shootBubble(game: GameInstance, angle: number): void {
+    const grid = game.playGrid;
+    const bubble = game.currentBubble;
+    const bubbleCoords = { x: grid.bubbleLauncherPosition.x, y: grid.bubbleLauncherPosition.y };
+    let xDirection = getVelocity(angle, game.gameSettings).x;
+    const yDirection = getVelocity(angle, game.gameSettings).y;
     let bounceAmount = 0
-    while (!checkForCollision(bubbleCoords)) {
+    while (!checkForCollision(grid, bubbleCoords)) {
         bubbleCoords.x += xDirection;
         bubbleCoords.y += yDirection;
-        const hitLeftWall = bubbleCoords.x < getBubbleRadius();
-        const hitRightWall = bubbleCoords.x > getVisualWidth() - getBubbleRadius();
+        const hitLeftWall = bubbleCoords.x < grid.bubbleRadius;
+        const hitRightWall = bubbleCoords.x > grid.precisionWidth - grid.bubbleRadius;
         if (hitLeftWall || hitRightWall) {
             xDirection = -xDirection;
             bounceAmount++;
         }
     }
-    // console.log("bounceAmount", bounceAmount, "performance:", performance.now() - t1)
-    const gridField = snapToNextEmptyField(bubbleCoords);
-    if (getPlayGridRows()[gridField.coords.y].isInDeathZone) {
-        firePlayerDiedEvent();
+    const gridField = snapToNextEmptyField(grid, bubbleCoords);
+    gridField.bubble = bubble;
+    const bubblesCleared = dissolveBubbles(grid, gridField);
+    trackBubbleShot(game, bounceAmount, bubblesCleared);
+
+    if (bubblesCleared < 3 && grid.rows[gridField.coords.y].isInDeathZone) {
+        game.onGameDefeat();
     }
-    gridField.bubble = getCurrentBubble();
-    const bubblesCleared = dissolveBubbles(gridField);
-    trackBubbleShot(bounceAmount, bubblesCleared);
-    prepareNextBubble();
 }
 
-export function calculatePreview(): Coordinates {
-    const bubbleCoords = { x: getBubbleLauncherPosition().x, y: getBubbleLauncherPosition().y };
-    let xDirection = getVelocity().x;
-    const yDirection = getVelocity().y;
+export function calculatePreview(game: GameInstance, angle: number): void {
+    const grid = game.playGrid;
+    const bubble = game.currentBubble;
+    const bubbleCoords = { x: grid.bubbleLauncherPosition.x, y: grid.bubbleLauncherPosition.y };
+    let xDirection = getVelocity(angle, game.gameSettings).x;
+    const yDirection = getVelocity(angle, game.gameSettings).y;
     let bounceAmount = 0
-    while (!checkForCollision(bubbleCoords)) {
+    while (!checkForCollision(grid, bubbleCoords)) {
         bubbleCoords.x += xDirection;
         bubbleCoords.y += yDirection;
-        const hitLeftWall = bubbleCoords.x < getBubbleRadius();
-        const hitRightWall = bubbleCoords.x > getVisualWidth() - getBubbleRadius();
+        const hitLeftWall = bubbleCoords.x < grid.bubbleRadius;
+        const hitRightWall = bubbleCoords.x > grid.precisionWidth - grid.bubbleRadius;
         if (hitLeftWall || hitRightWall) {
             xDirection = -xDirection;
             bounceAmount++;
         }
     }
-    return snapToNextEmptyField(bubbleCoords).coords;
+    if (!grid.previewBubble) {
+        grid.previewBubble = {
+            type: bubble.type,
+            location: snapToNextEmptyField(grid, bubbleCoords).coords
+        }
+    } else {
+        grid.previewBubble.type = bubble.type;
+        grid.previewBubble.location = snapToNextEmptyField(grid, bubbleCoords).coords;
+    }
 }
 
-function checkForCollision(bubbleCenterCoords: Coordinates): boolean {
+function checkForCollision(grid: Grid, bubbleCenterCoords: Coordinates): boolean {
     let hasCollided = false;
-    if (bubbleCenterCoords.y < getBubbleRadius()) {
+    if (bubbleCenterCoords.y < grid.bubbleRadius) {
         return true;
     }
-    getNearbyFields(bubbleCenterCoords).forEach(field => {
+    getNearbyFields(grid, bubbleCenterCoords).forEach(field => {
         if (field.bubble) {
             const distance = getDistanceSquared(bubbleCenterCoords, field.centerPointCoords);
-            if (distance < getCollisionRangeSquared()) {
+            if (distance < grid.collisionRangeSquared) {
                 hasCollided = true;
             }
         }
@@ -66,7 +77,7 @@ function checkForCollision(bubbleCenterCoords: Coordinates): boolean {
     return hasCollided;
 }
 
-function snapToNextEmptyField(collisionCoords: Coordinates): Field {
+function snapToNextEmptyField(grid: Grid, collisionCoords: Coordinates): Field {
     let closestField: Field = {
         coords: {
             x: -1,
@@ -78,7 +89,7 @@ function snapToNextEmptyField(collisionCoords: Coordinates): Field {
         }
     }
     let closestDistance = Infinity;
-    getNearbyFields(collisionCoords).forEach(field => {
+    getNearbyFields(grid, collisionCoords).forEach(field => {
         if (!field.bubble) {
             const distance = getDistance(collisionCoords, field.centerPointCoords);
             if (distance < closestDistance) {

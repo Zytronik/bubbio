@@ -1,7 +1,21 @@
+import { GameSettings } from './i/gameplay.i-game-settings';
 import { Coordinates } from './i/gameplay.i.grid-coordinates';
 
-export function getVelocity(angle: number): Coordinates {
-    return { x: cosTable[angle * 10], y: -sinTable[angle * 10] };
+export function getVelocity(angle: number, settings: GameSettings): Coordinates {
+    let cleanAngle = cleanUpAngle(angle, settings);
+    return { x: cosTable[cleanAngle * 10], y: -sinTable[cleanAngle * 10] };
+}
+
+function cleanUpAngle(angle: number, settings: GameSettings): number {
+    if (angle < settings.minAngle.value) {
+        return settings.minAngle.value;
+    }
+    else if (angle > settings.maxAngle.value) {
+        return settings.maxAngle.value;
+    }
+    else {
+        return Number(angle.toFixed(1));
+    }
 }
 
 const cosTable: number[] = [

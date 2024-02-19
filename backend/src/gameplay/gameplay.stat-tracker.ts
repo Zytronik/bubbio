@@ -1,6 +1,8 @@
-import { GAME_MODE, GameStats } from "./i/gameplay.i.stats";
+import { GameInstance } from "./i/gameplay.i.game-instance";
+import { GAME_MODE } from "./i/gameplay.i.stats";
 
-export function trackBubbleShot(gameStats: GameStats, wallBounces: number, amountCleared: number): void {
+export function trackBubbleShot(game: GameInstance, wallBounces: number, amountCleared: number): void {
+    const gameStats = game.stats;
     gameStats.bubblesShot++;
     gameStats.wallBounces += wallBounces;
 
@@ -10,21 +12,21 @@ export function trackBubbleShot(gameStats: GameStats, wallBounces: number, amoun
         breakCombo();
     }
 
-    if (getSelectedGameMode() === GAME_MODE.SPRINT && gameStats.bubblesCleared >= gameStats.bubbleClearToWin) {
-        fireGameWinEvent();
+    if (game.gameMode === GAME_MODE.SPRINT && gameStats.bubblesCleared >= gameStats.bubbleClearToWin) {
+        game.onGameVictory();
     }
 
     function trackClearedBubbles(wallBounces: number, amountCleared: number) {
         gameStats.currentCombo++;
         gameStats.bubblesCleared += amountCleared;
         gameStats.highestBubbleClear = (gameStats.highestBubbleClear > amountCleared) ? gameStats.highestBubbleClear : amountCleared;
-        
+
         let clearStatIndex = amountCleared;
         if (wallBounces > 0) {
             gameStats.wallBounceClears++;
             clearStatIndex = -1 * clearStatIndex;
-        } 
-        
+        }
+
         if (!gameStats.bubbleClearStats[clearStatIndex]) {
             gameStats.bubbleClearStats[clearStatIndex] = 1;
         } else {

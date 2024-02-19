@@ -1,3 +1,4 @@
+import { GameSettings } from "./gameplay.i-game-settings";
 import { Bubble } from "./gameplay.i.bubble";
 import { GameStateHistory } from "./gameplay.i.game-state-history";
 import { Grid } from "./gameplay.i.grid";
@@ -8,16 +9,19 @@ export interface GameInstance {
     roomID: string,
     opponents: string[],
     gameMode: GAME_MODE,
-    gameSettings: string,
+    gameSettings: GameSettings,
     initialSeed: number,
 
     currentSeed: number,
     currentBubble: Bubble,
-    heldBubble: Bubble,
+    heldBubble?: Bubble,
     previewQueue: Bubble[],
     playGrid: Grid,
     stats: GameStats,
 
     gameStateHistory: GameStateHistory,
     isProcessingInputs: boolean,
+
+    onGameVictory: () => void,
+    onGameDefeat: () => void,
 }
