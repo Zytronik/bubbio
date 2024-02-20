@@ -1,5 +1,5 @@
 <template>
-  <div class="overlay">
+  <div class="overlay login-overlay">
     <div class="login-container">
       <transition name="fade" mode="out-in">
         <div :key="currentFormKey">
@@ -126,6 +126,10 @@ export default defineComponent({
 
   
 <style scoped>
+.login-overlay{
+  align-items: center;
+}
+
 form {
   display: flex;
   flex-direction: column;

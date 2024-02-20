@@ -136,45 +136,16 @@ export default defineComponent({
     },
 });
 </script>
-<style>
+<style scoped>
 .user-profile-overlay {
     z-index: 15;
     background: rgba(0, 0, 0, 0.0) !important;
 }
 
 .user-profile-wrapper {
-    height: 80vh;
+    height: 90vh;
     width: 100vw;
     background-color: black;
-}
-
-button.goBackButton {
-    position: absolute;
-    left: 0;
-    top: 0;
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5vw;
-    height: 2.5vw;
-    border: none;
-    background-color: rgb(28, 28, 28);
-    color: white;
-    cursor: pointer;
-    border-radius: 50%;
-    padding: 0;
-    margin-top: unset;
-    margin: 10px;
-    transition: 200ms;
-}
-
-button.goBackButton:hover,
-button.goBackButton:focus {
-    background-color: #363636;
-    outline: none;
 }
 
 .profile-banner {

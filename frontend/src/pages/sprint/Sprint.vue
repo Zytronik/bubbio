@@ -197,7 +197,7 @@ export default {
 
         intervalId.value = setInterval(() => {
           fetchSprintData();
-        }, 20000); // Fetch data every 20 seconds
+        }, 30000);
       } else {
         clearInterval(intervalId.value);
       }
@@ -242,7 +242,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 ul {
   list-style-type: none;
 }

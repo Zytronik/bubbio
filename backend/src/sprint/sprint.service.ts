@@ -73,6 +73,10 @@ export class SprintService {
             ],
             take: 3,
         });
-    }    
+    }
+
+    async getTotalGamesPlayed(): Promise<number> {
+        return this.prisma.sprint.count();
+    }
 
 }

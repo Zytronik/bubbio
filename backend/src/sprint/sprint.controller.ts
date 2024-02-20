@@ -13,6 +13,11 @@ export class SprintController {
     return await this.sprintService.saveGameStats(req.user.userId, gameStatsDto);
   }
 
+  @Get('totalGames')
+  async getTotalGamesPlayed(){
+    return await this.sprintService.getTotalGamesPlayed();
+  }
+
   @Get('leaderboard')
   async getLeaderboard() {
     return await this.sprintService.getLeaderboard();

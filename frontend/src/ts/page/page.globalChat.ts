@@ -5,6 +5,7 @@ import state, { addSocketConnectListener } from '@/ts/networking/networking.clie
 interface GlobalChatMessage {
     username: string;
     text: string;
+    timestamp: string;
 }
 
 const chatState = reactive({
