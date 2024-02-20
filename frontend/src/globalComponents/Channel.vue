@@ -18,19 +18,19 @@
             <div v-if="currentTab === 'Dashboard'" class="tab-content dashoboard-tab">
               <div class="stats">
                 <div class="stat">
-                  <span>{{ stats.peopleOnline }}</span>
+                  <span ref="peopleOnlineRef">{{ stats.peopleOnline }}</span>
                   <p>People Online</p>
                 </div>
                 <div class="stat">
-                  <span>{{ stats.activeLobbies }}</span>
+                  <span ref="activeLobbiesRef">{{ stats.activeLobbies }}</span>
                   <p>Active Lobbies</p>
                 </div>
                 <div class="stat">
-                  <span>{{ stats.registeredUsers }}</span>
+                  <span ref="registeredUsersRef">{{ stats.registeredUsers }}</span>
                   <p>Registered Users</p>
                 </div>
                 <div class="stat">
-                  <span>{{ stats.gamesPlayed }}</span>
+                  <span ref="gamesPlayedRef">{{ stats.gamesPlayed }}</span>
                   <p>Games Played</p>
                 </div>
               </div>
@@ -125,6 +125,7 @@ import UserProfileOverlay from './UserProfileOverlay.vue';
 import state from '@/ts/networking/networking.client-websocket';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 import useChatStore from '@/ts/page/page.globalChat';
+import { CountUp } from 'countup.js';
 
 interface User {
   id: number;
@@ -151,6 +152,10 @@ export default {
       registeredUsers: 0,
       gamesPlayed: 0,
     });
+    const peopleOnlineRef = ref(null);
+    const activeLobbiesRef = ref(null);
+    const registeredUsersRef = ref(null);
+    const gamesPlayedRef = ref(null);
     const messagesContainer: Ref<HTMLElement | null> = ref(null);
     let intervalId = 0;
     const { messages } = useChatStore();
@@ -174,6 +179,15 @@ export default {
         }
       }
     }, 300);
+
+    function animateStat(element: HTMLElement | null, endVal: number) {
+      if (element) {
+        const countUp = new CountUp(element, endVal);
+        if (!countUp.error) {
+          countUp.start();
+        }
+      }
+    }
 
     watchEffect(() => {
       fetchSearchResults(searchQuery.value);
@@ -235,12 +249,14 @@ export default {
       });
     }, { deep: true });
 
-    onMounted(() => {
+    onMounted(async() => {
       showUserPageFromURL();
-      fetchStats();
+      await fetchStats();
       intervalId = setInterval(fetchStats, 30000);
-
-
+      animateStat(peopleOnlineRef.value, stats.value.peopleOnline);
+      animateStat(activeLobbiesRef.value, stats.value.activeLobbies);
+      animateStat(registeredUsersRef.value, stats.value.registeredUsers);
+      animateStat(gamesPlayedRef.value, stats.value.gamesPlayed);
     });
 
     onUnmounted(() => {
@@ -263,6 +279,10 @@ export default {
       isAuthenticated,
       messages,
       messagesContainer,
+      peopleOnlineRef,
+      activeLobbiesRef,
+      registeredUsersRef,
+      gamesPlayedRef,
     };
   },
 }
@@ -284,12 +304,13 @@ export default {
   list-style-type: none;
   padding: 15px 0;
   margin: unset;
+  overflow: hidden;
   max-height: 0;
-  transition: max-height 0.4s ease-out;
+  transition: all 0.3s ease; 
 }
 
 .player-search ul.expanded {
-  max-height: 100%;
+  max-height: 500px;
 }
 
 .player-search li {
@@ -386,6 +407,7 @@ h3 {
 h2 {
   margin: unset;
   margin-bottom: 15px;
+  font-size: 30px;
 }
 
 .friend-listing {
@@ -486,6 +508,7 @@ h2 {
 
 .dashboard-bottom>div {
   width: 50%;
+  box-sizing: border-box;
   padding: 15px;
   display: flex;
   flex-direction: column;

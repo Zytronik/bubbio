@@ -1,5 +1,13 @@
 <template>
   <article id="app">
+    <div class="topbar">
+      <div class="profile-wrapper">
+        <div class="profile-content">
+          <p>{{ userData?.username.toUpperCase() }}</p>
+        </div>
+        <img class="profile-pic" :src="profilePicImagePath" alt="Profile Picture">
+      </div>
+    </div>
     <button @click="openChannelOverlay" style="position:  absolute; left: 50%; transform: translateX(-50%); z-index: 5; position: relative;">Channel</button>
     <InfoMessages ref="infoMessageRef" />
     <LoginOverlay v-if="showLogin" @login="handleLogin" @checkUsername="handleCheckUsername" @register="handleRegister"
@@ -22,6 +30,8 @@ import Channel from './globalComponents/Channel.vue';
 import { PAGE_STATE } from './ts/page/page.e-page-state';
 import { checkIfUsernameIsTaken, checkUserAuthentication, clearClientState, login, loginAsGuest, logUserOut, register, showLoginForm } from './ts/networking/networking.auth';
 import eventBus from './ts/page/page.event-bus';
+import { httpClient } from './ts/networking/networking.http-client';
+import { getProfilePbURL } from './ts/networking/paths';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -150,11 +160,40 @@ export default {
       document.title = `${document.title.split('|')[0]} | ${pages[currentPageIndex.value].title}`;
     });
 
+    /* Profile */
+    interface UserData {
+      username: string;
+      countryCode: string;
+      country: string;
+      pbUrl: string;
+    }
+
+    const userData = ref<UserData | null>(null);
+    const username = ref<string>("");
+
+    const profilePicImagePath = computed(() => {
+      if (userData.value && userData.value.pbUrl) {
+        return userData.value ? getProfilePbURL() + userData.value.pbUrl : '';
+      }
+      return getProfilePbURL() + 'default/pbPlaceholder.png';
+    });
+
+    async function fetchUserData() {
+      const token = localStorage.getItem('authToken');
+      const response = await httpClient.get('/users/me', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    }
+
     /* General */
-    onMounted(() => {
+    onMounted(async() => {
       setupTransitionFunctions();
       initializeGlobalSocket();
       if (checkUserAuthentication()) {
+        userData.value = await fetchUserData();
         joinRoomFromHash();
       } else {
         clearClientState();
@@ -189,9 +228,48 @@ export default {
       handlePlayAsGuest,
       isChannelOpen,
       openChannelOverlay,
+      userData,
+      profilePicImagePath,
     };
   },
 }
 
 
 </script>
+<style scoped>
+.topbar{
+  width: 100vw;
+  height: 10vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.profile-wrapper{
+  height: 100%;
+  margin-right: 30px;
+  width: 15vw;
+  background-color: rgb(53, 53, 53);
+  display: flex;
+  flex-direction: row;
+}
+
+.profile-content{
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 15px;
+}
+
+.profile-content p{
+  margin: unset;
+  font-size: 20px;
+}
+
+.profile-wrapper img {
+  height: 100%;
+  width: 10vh;
+  object-fit: cover;
+}
+</style>

@@ -22,11 +22,11 @@
                     <h3>Sprint</h3>
                     <div v-if="userData.sprintStats.rank">
                         <p>Leaderboard Rank: {{ userData.sprintStats.rank }}</p>
-                        <p>Average Bubbles Cleared: {{ userData.sprintStats.averageBubblesCleared }}</p>
-                        <p>Average Bubbles Per Second: {{ userData.sprintStats.averageBubblesPerSecond }}</p>
-                        <p>Average Bubbles Shot: {{ userData.sprintStats.averageBubblesShot }}</p>
-                        <p>Average Sprint Time: {{ userData.sprintStats.averageSprintTime }}</p>
-                        <p>Games Played: {{ userData.sprintStats.sprintGamesPlayed }}</p>
+                        <p>Average Bubbles Cleared: {{ Math.round(userData.sprintStats.averageBubblesCleared * 100) / 100 }}</p>
+                        <p>Average Bubbles Per Second: {{ Math.round(userData.sprintStats.averageBubblesPerSecond * 100) / 100 }}</p>
+                        <p>Average Bubbles Shot: {{ Math.round(userData.sprintStats.averageBubblesShot * 100) / 100 }}</p>
+                        <p>Average Sprint Time: {{ Math.round(userData.sprintStats.averageSprintTime * 100) / 100 }}</p>
+                        <p>Games Played: {{ Math.round(userData.sprintStats.sprintGamesPlayed * 100) / 100 }}</p>
                     </div>
                     <div v-else>
                         <p>This User has never played Sprint.</p>
