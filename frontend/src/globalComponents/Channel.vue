@@ -264,11 +264,15 @@ export default {
       });
     }
 
+    function scollGlobalChatToBottom(){
+      if (messagesContainer.value) {
+        messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+      }
+    }
+
     watch(messages, () => {
       nextTick(() => {
-        if (messagesContainer.value) {
-          messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
-        }
+        scollGlobalChatToBottom();
       });
     }, { deep: true });
 
@@ -281,6 +285,7 @@ export default {
       animateStat(activeLobbiesRef.value, stats.value.activeLobbies);
       animateStat(registeredUsersRef.value, stats.value.registeredUsers);
       animateStat(gamesPlayedRef.value, stats.value.gamesPlayed);
+      scollGlobalChatToBottom();
     });
 
     onUnmounted(() => {
