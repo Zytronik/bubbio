@@ -247,7 +247,6 @@ export default {
 
 .profile-wrapper{
   height: 100%;
-  margin-right: 30px;
   width: 15vw;
   background-color: rgb(53, 53, 53);
   display: flex;
