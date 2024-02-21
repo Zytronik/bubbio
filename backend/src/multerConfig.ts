@@ -24,5 +24,16 @@ export function generateMulterOptions(pathFolder: string) {
     },
   });
 
-  return { storage };
+  const fileFilter = (req, file, cb) => {
+    // Check the file type
+    if (!file.mimetype.match(/^(image\/jpeg|image\/png)$/)) {
+      // Reject the file. You can also pass an error message as the first argument to cb().
+      cb(null, false);
+    } else {
+      // Accept the file
+      cb(null, true);
+    }
+  };
+
+  return { storage, fileFilter };
 }

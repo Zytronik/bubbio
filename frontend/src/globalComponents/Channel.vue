@@ -234,7 +234,7 @@ export default {
       const path = window.location.pathname;
       const match = path.match(/^\/user\/(.+)$/);
       if (match) {
-        const username = match[1];
+        const username = match[1].toLowerCase();
         openUserProfile(username);
       }
     }

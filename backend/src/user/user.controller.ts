@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
@@ -34,6 +34,10 @@ export class UserController {
   @Post('updateProfilePic')
   @UseInterceptors(FileInterceptor('profilePic', generateMulterOptions('pb')))
   async updateProfilePicture(@UploadedFile() file, @Req() req: AuthenticatedRequest) {
+    if (!file) {
+      // If file is undefined, it means Multer rejected the file upload.
+      throw new HttpException('Invalid file type. Only JPEG and PNG are allowed.', HttpStatus.BAD_REQUEST);
+    }
     const userId = req.user.userId;
     await this.userService.updateProfileImgs(userId, file, "pb");
     return { message: 'Profile picture updated successfully.' };
@@ -43,6 +47,9 @@ export class UserController {
   @Post('updateProfileBanner')
   @UseInterceptors(FileInterceptor('profileBanner', generateMulterOptions('banner')))
   async updateProfileBanner(@UploadedFile() file, @Req() req: AuthenticatedRequest) {
+    if (!file) {
+      throw new HttpException('Invalid file type. Only JPEG and PNG are allowed.', HttpStatus.BAD_REQUEST);
+    }
     const userId = req.user.userId;
     await this.userService.updateProfileImgs(userId, file, "banner");
     return { message: 'Banner updated successfully.' };

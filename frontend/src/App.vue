@@ -1,7 +1,7 @@
 <template>
   <article id="app">
     <div class="topbar">
-      <div v-if="isAuthenticated" class="profile-wrapper">
+      <div v-if="isAuthenticated" @click="showMyProfile" class="profile-wrapper">
         <div class="profile-content">
           <p>{{ userData?.username.toUpperCase() }}</p>
         </div>
@@ -215,6 +215,18 @@ export default {
       }
     }
 
+    function showMyProfile() {
+      let isGuest = sessionStorage.getItem('isGuest');
+      if (isAuthenticated.value && !isGuest && userData.value && userData.value.username) {
+        openProfile(userData.value.username);
+      }
+    }
+
+    function openProfile(username:string){
+      history.pushState(null, '', `/user/${username}`);
+      showUserPageFromURL();
+    }
+
     async function fetchUserData() {
       const token = localStorage.getItem('authToken');
       const response = await httpClient.get('/users/me', {
@@ -238,7 +250,7 @@ export default {
         clearClientState();
         showLoginForm();
       }
-
+      updateProfileData();
       showUserPageFromURL();
       addSocketConnectListener(initOnIsUserInRoomAlready);
       window.addEventListener('beforeunload', clearGuestCookies);
@@ -270,6 +282,7 @@ export default {
       userData,
       isAuthenticated,
       updateProfileData,
+      showMyProfile,
     };
   },
 }
@@ -291,6 +304,7 @@ export default {
   background-color: rgb(53, 53, 53);
   display: flex;
   flex-direction: row;
+  cursor: pointer;
 }
 
 .profile-content {
