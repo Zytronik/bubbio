@@ -113,18 +113,23 @@ export class UserService {
     }
 
     async getUserProfileByUsername(username: string): Promise<any> {
-        const user = await this.prisma.user.findUnique({
-            where: { username },
-            select: {
-                id: true,
-                username: true,
-                createdAt: true,
-                countryCode: true,
-                country: true,
-                pbUrl: true,
-                bannerUrl: true,
+        const user = await this.prisma.user.findFirst({
+            where: {
+              username: {
+                equals: username,
+                mode: 'insensitive',
+              },
             },
-        });
+            select: {
+              id: true,
+              username: true,
+              createdAt: true,
+              countryCode: true,
+              country: true,
+              pbUrl: true,
+              bannerUrl: true,
+            },
+          });
 
         if (!user) {
             throw new NotFoundException(`User with username ${username} not found`);
