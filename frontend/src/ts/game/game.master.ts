@@ -1,53 +1,112 @@
-import { InputReader } from "../input/input.input-reader";
-import { StartGameEvent } from "./e/game.e.start-game";
-import { PlayerAbortedEvent } from "./e/game.e.player-aborted";
-import { PlayerDiedEvent } from "./e/game.e.player-died";
-import { PlayerWinEvent } from "./e/game.e.player-win";
-import { disableAngleControls, enableAngleControls, resetAngle, setupAngleControls } from "./logic/game.logic.angle";
-import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, stopASCIIAnimation } from "./visuals/game.logic.visuals.ascii";
-import { getBubbleQueue } from "./logic/game.logic.bubble-manager";
-import { setupGrid } from "./logic/game.logic.playgrid";
-import { disableShootControls, enableShootControls, setupShootControls } from "./logic/game.logic.shoot";
+import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, stopASCIIAnimation } from "./visuals/game.visuals.ascii";
+import { setupGrid } from "./logic/game.logic.grid-manager";
+import { GAME_MODE, GameStats } from "./i/game.i.stats";
+import { PlayerGameInstance } from "./i/game.i.game-instance-player";
+import { CAN_USE_HOLD, COLLISION_DETECTION_FACTOR, DISSOLVE_FLOATING_BUBBLES, GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH, MAX_ANGLE, MIN_ANGLE, QUEUE_PREVIEW_SIZE, WIDTH_PRECISION_UNITS } from "../settings/settings.game";
+import { Bubble } from "./i/game.i.bubble";
+import { Grid } from "./i/game.i.grid";
+import { GameSettings } from "./i/game.i.game-settings";
+import { disableGameInputs, enableGameInputs, setupGameControls } from "../input/input.input-manager";
+import { calculatePreview } from "./logic/game.logic.shoot";
 import { startStatTracking, stopStatTracking, submitGametoDB } from "./logic/game.logic.stat-tracker";
-import { GAME_MODE } from "./i/game.i.stats";
+import { center } from "./logic/game.logic.angle";
+import { setupBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
 
-let selectedGameMode: GAME_MODE = GAME_MODE.NONE;
-const startGameEvent: StartGameEvent = {
-    fire: () => { console.error("startGameEvent has not been initialized yet!"); },
-};
-const playerDiedEvent: PlayerDiedEvent = {
-    fire: () => { console.error("playerDiedEvent has not been initialized yet!"); },
-};
-const playerWinEvent: PlayerWinEvent = {
-    fire: () => { console.error("playerWinEvent has not been initialized yet!"); },
-};
-const playerAbortedEvent: PlayerAbortedEvent = {
-    fire: () => { console.error("playerAbortedEvent has not been initialized yet!"); },
-};
-
-function setupGameEssentials(): void {
-    new InputReader();
-    setupAngleControls();
-    setupShootControls();
+const playerGameInstance: PlayerGameInstance = {
+    gameMode: GAME_MODE.NONE,
+    gameSettings: {
+        gridWidth: GRID_WIDTH,
+        gridHeight: GRID_HEIGHT,
+        gridExtraHeight: GRID_EXTRA_HEIGHT,
+        minAngle: MIN_ANGLE,
+        maxAngle: MAX_ANGLE,
+        widthPrecisionUnits: WIDTH_PRECISION_UNITS,
+        collisionDetectionFactor: COLLISION_DETECTION_FACTOR,
+        dissolveFloatingBubbles: DISSOLVE_FLOATING_BUBBLES,
+        canUseHold: CAN_USE_HOLD,
+        queuePreviewSize: QUEUE_PREVIEW_SIZE
+    },
+    initialSeed: 0,
+    currentSeed: 0,
+    angle: 90,
+    currentBubble: {
+        color: "",
+        ascii: "",
+        type: 0
+    },
+    previewQueue: [],
+    playGrid: {
+        precisionWidth: 0,
+        precisionHeight: 0,
+        precisionRowHeight: 0,
+        gridWidth: 0,
+        gridHeight: 0,
+        extraGridHeight: 0,
+        rows: [],
+        bubbleRadius: 0,
+        bubbleLauncherPosition: { x: 0, y: 0 },
+        collisionRangeSquared: 0,
+        dissolveFloatingBubbles: false
+    },
+    stats: {
+        gameStartTime: 0,
+        gameEndTime: 0,
+        currentTime: 0,
+        formattedCurrentTime: "",
+        bubbleClearToWin: 0,
+        bubblesCleared: 0,
+        bubblesLeftToClear: 0,
+        bubblesShot: 0,
+        bubblesPerSecond: 0,
+        bubbleClearStats: [],
+        highestBubbleClear: 0,
+        wallBounces: 0,
+        wallBounceClears: 0,
+        currentCombo: 0,
+        highestCombo: 0,
+        keysPressed: 0,
+        keysPerSecond: 0,
+        keysPerBubble: 0,
+        angleChanged: 0,
+        angleChangePerBubble: 0,
+        holds: 0
+    },
+    gameStateHistory: {
+        inputHistory: [],
+        boardHistory: [],
+        bubbleQueueHistory: [],
+        angleHistory: []
+    },
+    onGameStart: function (): void {
+        throw new Error("Function not implemented.");
+    },
+    onGameAbort: function (): void {
+        throw new Error("Function not implemented.");
+    },
+    onGameVictory: function (): void {
+        throw new Error("Function not implemented.");
+    },
+    onGameDefeat: function (): void {
+        throw new Error("Function not implemented.");
+    }
 }
 
 export function startGame(): void {
-    startGameEvent.fire();
+    playerGameInstance.onGameStart();
 }
 
 export function leaveGame(): void {
-    disableGameInputs();
-    playerAbortedEvent.fire();
+    playerGameInstance.onGameAbort();
 }
 
 export function setupSprintGame(): void {
-    selectedGameMode = GAME_MODE.SPRINT;
-    setupGameEssentials();
-    startGameEvent.fire = startSprint;
-    playerDiedEvent.fire = sprintDeath;
-    playerWinEvent.fire = sprintVictory;
-    playerAbortedEvent.fire = cancelSprint;
-    
+    playerGameInstance.gameMode = GAME_MODE.SPRINT;
+    setupGameControls();
+    playerGameInstance.onGameStart = startSprint;
+    playerGameInstance.onGameAbort = cancelSprint;
+    playerGameInstance.onGameVictory = sprintVictory;
+    playerGameInstance.onGameDefeat = sprintDeath;
+
     function startSprint(): void {
         /*
             stop animations
@@ -60,18 +119,18 @@ export function setupSprintGame(): void {
             */
         stopASCIIAnimation();
         stopStatTracking();
-        setupGrid();
-        resetAngle();
-        getBubbleQueue();
+        playerGameInstance.playGrid = setupGrid();
+        center();
+        setupBubbleQueueAndCurrent();
         startASCIIAnimation();
         startStatTracking();
         enableGameInputs();
     }
-    function sprintDeath(): void {
+    function cancelSprint(): void {
         disableGameInputs();
+        //TODO enable menu controls
         stopASCIIAnimation();
         stopStatTracking();
-        showASCIIDefeat();
     }
     function sprintVictory(): void {
         disableGameInputs();
@@ -80,32 +139,74 @@ export function setupSprintGame(): void {
         showASCIIVictory();
         submitGametoDB();
     }
-    function cancelSprint(): void {
+    function sprintDeath(): void {
         disableGameInputs();
-        //TODO enable menu controls
         stopASCIIAnimation();
         stopStatTracking();
+        showASCIIDefeat();
     }
 }
 
 export function fireGameWinEvent(): void {
-    playerWinEvent.fire();
+    playerGameInstance.onGameVictory();
 }
 
 export function firePlayerDiedEvent(): void {
-    playerDiedEvent.fire();
+    playerGameInstance.onGameDefeat();
 }
 
-function disableGameInputs(): void {
-    disableAngleControls();
-    disableShootControls();
+export function getCurrentSeed(): number {
+    return playerGameInstance.currentSeed;
 }
 
-function enableGameInputs(): void {
-    enableAngleControls();
-    enableShootControls();
+export function getCurrentBubble(): Bubble {
+    return playerGameInstance.currentBubble;
+}
+
+export function setCurrentBubble(bubbleToSet: Bubble): void {
+    playerGameInstance.currentBubble = bubbleToSet;
+}
+
+export function getHeldBubble(): Bubble | undefined {
+    return playerGameInstance.heldBubble;
+}
+
+export function setHeldBubble(bubbleToSet: Bubble): void {
+    playerGameInstance.heldBubble = bubbleToSet;
+}
+
+export function getBubbleQueue(): Bubble[] {
+    return playerGameInstance.previewQueue;
+}
+
+export function updatePreviewBubble(): void {
+    calculatePreview();
+}
+
+export function getPlayGrid(): Grid {
+    return playerGameInstance.playGrid;
+}
+
+export function getAngle(): number {
+    return playerGameInstance.angle;
+}
+
+export function setAngle(angleToSet: number): void {
+    playerGameInstance.angle = angleToSet;
 }
 
 export function getSelectedGameMode(): GAME_MODE {
-    return selectedGameMode;
+    return playerGameInstance.gameMode;
+}
+
+export function getGameSettings(): GameSettings {
+    return playerGameInstance.gameSettings;
+}
+
+export function getGameStats(): GameStats {
+    return playerGameInstance.stats;
+}
+
+export function triggerGameLost(): void {
+    playerGameInstance.onGameDefeat();
 }

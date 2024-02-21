@@ -1,111 +1,51 @@
-import { centerCursorInput, changeAPSInput, angleLeftInput, angleRightInput } from '@/ts/input/input.possible-inputs';
-import { Ref, ref } from 'vue';
+import { angleLeftInput, angleRightInput } from '@/ts/input/input.possible-inputs';
 import { Coordinates } from '../i/game.i.grid-coordinates';
 import { APS, APS2 } from '@/ts/settings/settings.handling';
+import { getAngle, getGameSettings, setAngle } from '../game.master';
 
-export const angle: Ref<number> = ref(90);
 let currentAPS: number = APS.value;
 
-export function setupAngleControls(): void {
-    angleLeftInput.fire = left;
-    angleRightInput.fire = right;
-    centerCursorInput.fire = center;
-    changeAPSInput.fire = changeAPS;
-    changeAPSInput.release = revertAPS;
+export function getVelocity(angle: number): Coordinates {
+    let cleanAngle = cleanUpAngle(angle);
+    return { x: cosTable[cleanAngle * 10], y: -sinTable[cleanAngle * 10] };
 }
 
-export function enableAngleControls(): void {
-    angleLeftInput.enabled = true;
-    angleRightInput.enabled = true;
-    centerCursorInput.enabled = true;
-    changeAPSInput.enabled = true;
-}
-
-export function disableAngleControls(): void {
-    angleLeftInput.enabled = false;
-    angleRightInput.enabled = false;
-    centerCursorInput.enabled = false;
-    changeAPSInput.enabled = false;
-}
-
-export function getVelocity(): Coordinates {
-    return { x: cosTable[angle.value * 10], y: -sinTable[angle.value * 10] };
-}
-
-export function resetAngle(): void {
-    angle.value = 90;
-}
-
-function left(): void {
+export function left(): void {
     const timePassed = performance.now() - angleLeftInput.lastFiredAtTime
     const leftAmount = currentAPS * timePassed / 1000
-    angle.value = cleanUpAngle(angle.value - leftAmount);
+    setAngle(cleanUpAngle(getAngle() - leftAmount));
 }
 
-function right(): void {
+export function right(): void {
     const timePassed = performance.now() - angleRightInput.lastFiredAtTime
     const rightAmount = currentAPS * timePassed / 1000
-    angle.value = cleanUpAngle(angle.value + rightAmount);
+    setAngle(cleanUpAngle(getAngle() + rightAmount));
 }
 
-function center(): void {
-    angle.value = 90;
+export function center(): void {
+    setAngle(90);
 }
 
-function changeAPS(): void {
+export function changeAPS(): void {
     currentAPS = APS2.value;
 }
 
-function revertAPS(): void {
+export function revertAPS(): void {
     currentAPS = APS.value;
 }
 
 function cleanUpAngle(angle: number): number {
-    if (angle < 12) {
-        return 12;
+    const settings = getGameSettings();
+    if (angle < settings.minAngle.value) {
+        return settings.minAngle.value;
     }
-    else if (angle > 168) {
-        return 168;
+    else if (angle > settings.maxAngle.value) {
+        return settings.maxAngle.value;
     }
     else {
         return Number(angle.toFixed(1));
     }
 }
-
-
-
-// const generateCosTable: number[] = [];
-// const generateSinTable: number[] = [];
-// export function setupLookupTable10k() {
-//     for (let angle = 0; angle <= 1800; angle += 1) {
-//         const radians = (cleanUpAngle(angle/10) * Math.PI) / 180;
-//         generateCosTable[angle] = -(Math.round(Math.cos(radians) * 10000));
-//         generateSinTable[angle] = (Math.round(Math.sin(radians) * 10000));
-//     }
-//     // console.log(generateCosTable)
-//     // console.log(generateSinTable)
-// }
-
-// export function testLookupTable() {
-//     let trues = 0;
-//     let falses = 0;
-//     for (let angle = 0; angle <= 180; angle += 0.1) {
-//         const cleanedUpAngle = cleanUpAngle(angle)
-//         const radians = (cleanedUpAngle * Math.PI) / 180;
-//         const fromTable = getXY(cleanedUpAngle)
-//         if (-(Math.round(Math.cos(radians) * 10000)) === fromTable[0]) {
-//             trues++;
-//         } else {
-//             falses++;
-//         }
-//         if ((Math.round(Math.sin(radians) * 10000)) === fromTable[1]) {
-//             trues++;
-//         } else {
-//             falses++;
-//         }
-//     }
-//     console.log("trues: ", trues, "falses: ", falses);
-// }
 
 const cosTable: number[] = [
     -10000,

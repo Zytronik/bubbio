@@ -1,8 +1,6 @@
 import { Ref, ref } from "vue";
-import { getPlayGridRows } from "../logic/game.logic.playgrid";
-import { getCurrentBubble } from "../logic/game.logic.bubble-manager";
-import { calculatePreview } from "../logic/game.logic.shoot";
-import { angle } from "../logic/game.logic.angle";
+import { getAngle, getCurrentBubble, getPlayGrid, updatePreviewBubble } from "../game.master";
+import { Coordinates } from "../i/game.i.grid-coordinates";
 
 export const playGridASCII: Ref<string> = ref("");
 
@@ -43,10 +41,16 @@ export function showASCIIDefeat(): void {
 }
 
 function asciiBoardAnimation(): void {
-    const previewPosition = calculatePreview();
+    updatePreviewBubble();
+    const playGrid = getPlayGrid();
+    const previewPosition: Coordinates = { x: -1, y: -1 };
+    if (playGrid.previewBubble) {
+        previewPosition.x = playGrid.previewBubble.location.x;
+        previewPosition.y = playGrid.previewBubble.location.y;
+    }
     let boardText = "___________________________________\n";
     let once = true;
-    getPlayGridRows().forEach(row => {
+    playGrid.rows.forEach(row => {
         if (row.isInDeathZone && once) {
             boardText += "|–––––––––––––––––––––––––––––––––|\n"
             once = false;
@@ -85,7 +89,7 @@ function asciiBoardAnimation(): void {
 }
 
 function getASCIIArrow(): string {
-    const currentAngle = angle.value;
+    const currentAngle = getAngle();
     if (currentAngle < 22.5) {
         return "←"
     }

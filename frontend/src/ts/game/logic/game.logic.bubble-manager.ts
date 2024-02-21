@@ -1,26 +1,60 @@
-import { XORShift32 } from "./game.logic.random";
+import { getBubbleQueue, getCurrentBubble, getCurrentSeed, getGameSettings, getHeldBubble, setCurrentBubble } from "../game.master";
 import { Bubble } from "../i/game.i.bubble";
+import { convertSeedToRandomNumber, getNextSeed } from "./game.logic.random";
 
 export function getBubbleByType(typeCode: number): Bubble {
     return allBubbles[typeCode];
 }
 
-export function getBubbleQueue(): void {
-    //TODO RNG from backend
-    prepareNextBubble();
+export function setupBubbleQueueAndCurrent(): number {
+    const seed = getCurrentSeed();
+    const queue = getBubbleQueue();
+    const queueLength = getGameSettings().queuePreviewSize.value;
+    
+    let randomIndex = convertSeedToRandomNumber(0, allBubbles.length, seed);
+    setCurrentBubble(allBubbles[randomIndex]);
+
+    let nextSeed = seed;
+    for (let i = 0; i < queueLength; i++) {
+        nextSeed = getNextSeed(nextSeed);
+        randomIndex = convertSeedToRandomNumber(0, allBubbles.length, nextSeed);
+        queue.push(allBubbles[randomIndex]);
+    }
+
+    nextSeed = getNextSeed(nextSeed);
+    return nextSeed;
 }
 
-const random = new XORShift32();
-export function getRandomBubble(): Bubble {
-    return allBubbles[random.randomInt(0, allBubbles.length)];
+export function holdBubble(): number {
+    const seed = getCurrentSeed();
+    let currentBubble = getCurrentBubble();
+    let heldBubble = getHeldBubble();
+    const queue = getBubbleQueue();
+    
+    if (!heldBubble && queue.length > 0) {
+        const randomIndex = convertSeedToRandomNumber(0, allBubbles.length, seed);
+        queue.push(allBubbles[randomIndex]);
+        heldBubble = currentBubble;
+        currentBubble = queue.shift() as Bubble;
+        return getNextSeed(seed);
+    }
+    const temp = currentBubble;
+    currentBubble = heldBubble as Bubble;
+    heldBubble = temp;
+    return seed;
 }
-let currentBubble: Bubble;
-export function getCurrentBubble(): Bubble {
-    return currentBubble;
+
+export function updateBubbleQueueAndCurrent(): number {
+    const seed = getCurrentSeed();
+    let currentBubble = getCurrentBubble();
+    const queue = getBubbleQueue();
+
+    const randomIndex = convertSeedToRandomNumber(0, allBubbles.length, seed);
+    queue.push(allBubbles[randomIndex]);
+    currentBubble = queue.shift() as Bubble;
+    return getNextSeed(seed);
 }
-export function prepareNextBubble(): void {
-    currentBubble = getRandomBubble();
-}
+
 
 const red: Bubble = {
     color: "rgb(255, 0, 0)",

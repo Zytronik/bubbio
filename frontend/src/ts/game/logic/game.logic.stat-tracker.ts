@@ -1,5 +1,5 @@
 import { Ref, ref } from "vue";
-import { fireGameWinEvent, getSelectedGameMode } from "../game.master";
+import { fireGameWinEvent, getGameStats, getSelectedGameMode } from "../game.master";
 import { GAME_MODE, GameStats } from "../i/game.i.stats";
 
 export const formattedCurrentTime: Ref<string> = ref("");
@@ -12,30 +12,6 @@ export const bubblesPerSecond: Ref<number> = ref(0);
 let trackingFrameId: number | null = null;
 let statTrackingRunning = false;
 
-const gameStats: GameStats = {
-    gameStartTime: 0,
-    gameEndTime: 0,
-    currentTime: 0,
-    formattedCurrentTime: "00:00.00",
-    bubbleClearToWin: Infinity,
-    bubblesCleared: 0,
-    bubblesLeftToClear: 0,
-    bubblesShot: 0,
-    bubblesPerSecond: 0,
-    bubbleClearStats: [],
-    highestBubbleClear: 0,
-    wallBounces: 0,
-    wallBounceClears: 0,
-    currentCombo: 0,
-    highestCombo: 0,
-    keysPressed: 0,
-    keysPerSecond: 0,
-    keysPerBubble: 0,
-    angleChanged: 0,
-    angleChangePerBubble: 0,
-    holds: 0
-}
-
 export function startStatTracking(): void {
     if (!statTrackingRunning) {
         statTrackingRunning = true;
@@ -45,6 +21,7 @@ export function startStatTracking(): void {
 }
 
 export function stopStatTracking(): void {
+    const gameStats = getGameStats();
     if (gameStats.gameEndTime === 0) {
         gameStats.gameEndTime = performance.now()
     }
@@ -56,6 +33,7 @@ export function stopStatTracking(): void {
 }
 
 function resetGameStats(): void {
+    const gameStats = getGameStats();
     gameStats.gameStartTime = performance.now();
     gameStats.gameEndTime = 0;
     gameStats.currentTime = 0;
@@ -80,6 +58,7 @@ function resetGameStats(): void {
 }
 
 function updateStats(): void {
+    const gameStats = getGameStats();
     gameStats.currentTime = performance.now() - gameStats.gameStartTime;
     gameStats.formattedCurrentTime = formatTimeNumberToString(gameStats.currentTime);
 
@@ -118,6 +97,7 @@ function formatTimeNumberToString(milliseconds: number): string {
 }
 
 export function trackBubbleShot(wallBounces: number, amountCleared: number): void {
+    const gameStats = getGameStats();
     gameStats.bubblesShot++;
     gameStats.wallBounces += wallBounces;
 

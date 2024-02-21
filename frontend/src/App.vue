@@ -22,6 +22,7 @@ import Channel from './globalComponents/Channel.vue';
 import { PAGE_STATE } from './ts/page/page.e-page-state';
 import { checkIfUsernameIsTaken, checkUserAuthentication, clearClientState, login, loginAsGuest, logUserOut, register, showLoginForm } from './ts/networking/networking.auth';
 import eventBus from './ts/page/page.event-bus';
+import { attachInputReader } from './ts/input/input.input-reader';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -31,6 +32,8 @@ export default {
   name: 'App',
   components: { LoginOverlay, InfoMessages, Channel },
   setup() {
+    attachInputReader();
+
     /* Channel */
     const isChannelOpen = isChannelActive();
 

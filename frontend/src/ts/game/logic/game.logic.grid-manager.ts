@@ -2,33 +2,28 @@ import { Field } from "../i/game.i.field";
 import { Grid } from "../i/game.i.grid";
 import { Row } from "../i/game.i.row";
 import { Coordinates } from "../i/game.i.grid-coordinates";
-import { GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH } from "@/ts/settings/settings.game";
+import { getGameSettings } from "../game.master";
 
-const playGrid: Grid = {
-    visualWidth: 0,
-    visualHeight: 0,
-    gridWidth: 0,
-    gridHeight: 0,
-    extraGridHeight: 0,
-    rowHeight: 0,
-    rows: [],
-    bubbleRadius: 0,
-    bubbleLauncherPosition: { x: 0, y: 0, },
-    collisionRangeSquared: 0,
-}
-
-export function setupGrid(): void {
-    const WIDTH_UNITS = 10000000;
-    playGrid.visualWidth = WIDTH_UNITS;
-    playGrid.gridWidth = GRID_WIDTH.value;
-    playGrid.bubbleRadius = WIDTH_UNITS / (2 * playGrid.gridWidth);
-    playGrid.collisionRangeSquared = ((playGrid.bubbleRadius * 2) ** 2) * 0.3;
-    playGrid.rowHeight = Math.floor(playGrid.bubbleRadius * Math.sqrt(3));
-    playGrid.visualHeight = playGrid.rowHeight * (GRID_HEIGHT.value + GRID_EXTRA_HEIGHT.value);
-    playGrid.gridHeight = GRID_HEIGHT.value;
-    playGrid.extraGridHeight = GRID_EXTRA_HEIGHT.value;
-    playGrid.bubbleLauncherPosition = { x: WIDTH_UNITS / 2, y: playGrid.visualHeight - playGrid.bubbleRadius };
-    playGrid.rows = [];
+export function setupGrid(): Grid {
+    const settings = getGameSettings();
+    const precisionWidth = settings.widthPrecisionUnits.value;
+    const bubbleRadius = precisionWidth / (2 * settings.gridWidth.value);
+    const bubbleDiameter = bubbleRadius * 2;
+    const precisionRowHeight = Math.floor(bubbleRadius * Math.sqrt(3));
+    const precisionHeight = precisionRowHeight * (settings.gridHeight.value + settings.gridExtraHeight.value)
+    const playGrid: Grid = {
+        precisionWidth: precisionWidth,
+        precisionHeight: precisionHeight,
+        precisionRowHeight: precisionRowHeight,
+        gridWidth: settings.gridWidth.value,
+        gridHeight: settings.gridHeight.value,
+        extraGridHeight: settings.gridExtraHeight.value,
+        rows: [],
+        bubbleRadius: bubbleRadius,
+        bubbleLauncherPosition: { x: precisionWidth / 2, y: precisionHeight - bubbleRadius },
+        collisionRangeSquared: ((bubbleRadius * 2) ** 2) * settings.collisionDetectionFactor.value,
+        dissolveFloatingBubbles: settings.dissolveFloatingBubbles.value,
+    }
     for (let h = 0; h < playGrid.gridHeight + playGrid.extraGridHeight; h++) {
         const isEvenRow = (h % 2 === 0);
         const row: Row = {
@@ -38,31 +33,29 @@ export function setupGrid(): void {
             isInDeathZone: h >= playGrid.gridHeight,
         }
         for (let w = 0; w < row.size; w++) {
-            const bubbleRadius = playGrid.bubbleRadius
-            const bubbleDiameter = playGrid.bubbleRadius * 2;
-            const rowHeight = playGrid.rowHeight;
             const field: Field = {
                 coords: { x: w, y: h, },
                 centerPointCoords: {
                     x: w * bubbleDiameter + (isEvenRow ? bubbleRadius : bubbleDiameter),
-                    y: rowHeight * h + playGrid.bubbleRadius,
+                    y: precisionRowHeight * h + bubbleRadius,
                 },
             };
             row.fields.push(field)
         }
         playGrid.rows.push(row);
     }
+    return playGrid;
 }
 
-export function getNearbyFields(pointPosition: Coordinates): Field[] {
+export function getNearbyFields(playGrid: Grid, pointPosition: Coordinates): Field[] {
     const bubbleRadius = playGrid.bubbleRadius;
     const bubbleDiameter = playGrid.bubbleRadius * 2;
-    const row = Math.round((pointPosition.y - bubbleRadius) / playGrid.rowHeight);
+    const row = Math.round((pointPosition.y - bubbleRadius) / playGrid.precisionRowHeight);
     const isEvenRow = playGrid.rows[row].isEvenRow;
     const xOffSet = (isEvenRow ? bubbleRadius : bubbleDiameter)
     const column = Math.round((pointPosition.x - xOffSet) / bubbleDiameter);
     const nearbyFields: Field[] = []
-    getAdjacentFieldVectors({ x: column, y: row }).forEach(fieldVector => {
+    getAdjacentFieldVectors(playGrid, { x: column, y: row }).forEach(fieldVector => {
         const x = column + fieldVector.x;
         const y = row + fieldVector.y;
         if (playGrid.rows[y] && playGrid.rows[y].fields[x]) {
@@ -72,7 +65,7 @@ export function getNearbyFields(pointPosition: Coordinates): Field[] {
     return nearbyFields;
 }
 
-export function dissolveBubbles(collidedAtField: Field): number {
+export function dissolveBubbles(playGrid: Grid, collidedAtField: Field): number {
     let dissolvedBubblesAmount = 0;
     const komma = ','
     const x = collidedAtField.coords.x;
@@ -89,14 +82,15 @@ export function dissolveBubbles(collidedAtField: Field): number {
         })
         dissolvedBubblesAmount += result.size;
     }
-    const unconnected = getFreeFloatingBubbles();
-    console.log(unconnected)
-    unconnected.forEach(xyString => {
-        const x = parseInt(xyString.split(komma)[0]);
-        const y = parseInt(xyString.split(komma)[1]);
-        getField(x, y).bubble = undefined;
-        dissolvedBubblesAmount++;
-    })
+    if (playGrid.dissolveFloatingBubbles) {
+        const unconnected = getFreeFloatingBubbles();
+        unconnected.forEach(xyString => {
+            const x = parseInt(xyString.split(komma)[0]);
+            const y = parseInt(xyString.split(komma)[1]);
+            getField(x, y).bubble = undefined;
+            dissolvedBubblesAmount++;
+        })
+    }
     return dissolvedBubblesAmount;
 
     function findAdjacentBubbles(x: number, y: number, colorToCheck: number, visited: Set<string>, result: Set<string>): void {
@@ -114,7 +108,7 @@ export function dissolveBubbles(collidedAtField: Field): number {
 
         result.add(`${x}${komma}${y}`);
 
-        getAdjacentFieldVectors({ x: x, y: y }).forEach(fieldVector => {
+        getAdjacentFieldVectors(playGrid, { x: x, y: y }).forEach(fieldVector => {
             const nextX = x + fieldVector.x;
             const nextY = y + fieldVector.y;
             findAdjacentBubbles(nextX, nextY, colorToCheck, visited, result);
@@ -147,7 +141,7 @@ export function dissolveBubbles(collidedAtField: Field): number {
 
             connected.add(`${x}${komma}${y}`);
 
-            getAdjacentFieldVectors({ x: x, y: y }).forEach(fieldVector => {
+            getAdjacentFieldVectors(playGrid, { x: x, y: y }).forEach(fieldVector => {
                 const nextX = x + fieldVector.x;
                 const nextY = y + fieldVector.y;
                 findBubblesConnectoToTop(nextX, nextY, connected);
@@ -160,7 +154,7 @@ export function dissolveBubbles(collidedAtField: Field): number {
     }
 }
 
-function getAdjacentFieldVectors(gridPosition: Coordinates): Coordinates[] {
+function getAdjacentFieldVectors(playGrid: Grid, gridPosition: Coordinates): Coordinates[] {
     const hexagonalShift = playGrid.rows[gridPosition.y].isEvenRow ? -1 : 1;
     const adjacentFieldVectors: Coordinates[] = [
         { x: 0, y: 0, },
@@ -173,32 +167,3 @@ function getAdjacentFieldVectors(gridPosition: Coordinates): Coordinates[] {
     ]
     return adjacentFieldVectors;
 }
-
-// function addGarbage(): void {
-
-// }
-
-export function getPlayGridRows(): Row[] {
-    return playGrid.rows;
-}
-
-export function getBubbleRadius(): number {
-    return playGrid.bubbleRadius;
-}
-
-export function getBubbleLauncherPosition(): Coordinates {
-    return playGrid.bubbleLauncherPosition;
-}
-
-export function getVisualWidth(): number {
-    return playGrid.visualWidth;
-}
-
-export function getVisualHeight(): number {
-    return playGrid.visualHeight;
-}
-
-export function getCollisionRangeSquared(): number {
-    return playGrid.collisionRangeSquared;
-}
-
