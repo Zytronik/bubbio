@@ -1,8 +1,7 @@
 <template>
   <section id="startmenu" class="page">
-    <button @click="logUserOut">Log Out (Temp)</button>
     <h1>StartMenu</h1>
-    <button class="m-btn">Play Ranked (TODO)</button>
+    <!-- <button class="m-btn">Play Ranked (TODO)</button> -->
     <button class="m-btn" @click="goToState(PAGE_STATE.sprintPage)">Sprint</button>
     <button class="m-btn" @click="goToState(PAGE_STATE.roomListing)">Room Listing</button>
     <button class="m-btn" @click="goToState(PAGE_STATE.settingsPage)">Config Page</button>
@@ -10,7 +9,6 @@
 </template>
 
 <script lang="ts">
-import { logUserOut } from '@/ts/networking/networking.auth';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { goToState } from '@/ts/page/page.page-manager';
 import { onMounted } from 'vue';
@@ -26,7 +24,6 @@ export default {
     return {
       goToState,
       PAGE_STATE,
-      logUserOut,
     }
   }
 };

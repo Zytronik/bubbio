@@ -1,26 +1,26 @@
 <template>
   <article id="app">
     <div class="topbar">
-      <div class="profile-wrapper">
+      <div v-if="isAuthenticated" class="profile-wrapper">
         <div class="profile-content">
           <p>{{ userData?.username.toUpperCase() }}</p>
         </div>
-        <img class="profile-pic" :src="profilePicImagePath" alt="Profile Picture">
+        <img class="profile-pic" :src="userData?.pbUrl" alt="Profile Picture">
       </div>
     </div>
-    <button @click="openChannelOverlay" style="position:  absolute; left: 50%; transform: translateX(-50%); z-index: 5; position: relative;">Channel</button>
+    <button @click="openChannelOverlay" class="openChannelButton">Channel</button>
     <InfoMessages ref="infoMessageRef" />
     <LoginOverlay v-if="showLogin" @login="handleLogin" @checkUsername="handleCheckUsername" @register="handleRegister"
-      @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" @playAsGuest="handlePlayAsGuest"/>
-    <Channel v-if="isChannelOpen"/>
+      @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" @playAsGuest="handlePlayAsGuest" />
+    <Channel v-if="isChannelOpen" />
     <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom"
-      @showInfoMessage="showInfoMessage">
+      @showInfoMessage="showInfoMessage" @updateProfileData="updateProfileData">
     </component>
   </article>
 </template>
 
 <script lang="ts">
-import { ref, computed, watchEffect, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watchEffect, onMounted, onUnmounted, watch } from 'vue';
 import state, { addSocketConnectListener, disconnectGlobalSocket, initializeGlobalSocket, reconnectGlobalSocket } from './ts/networking/networking.client-websocket';
 import { currentPageState, goToState, isChannelActive, openChannelOverlay, pages, setupTransitionFunctions } from './ts/page/page.page-manager';
 import LoginOverlay from './globalComponents/LoginOverlay.vue';
@@ -31,7 +31,7 @@ import { PAGE_STATE } from './ts/page/page.e-page-state';
 import { checkIfUsernameIsTaken, checkUserAuthentication, clearClientState, login, loginAsGuest, logUserOut, register, showLoginForm } from './ts/networking/networking.auth';
 import eventBus from './ts/page/page.event-bus';
 import { httpClient } from './ts/networking/networking.http-client';
-import { getProfilePbURL } from './ts/networking/paths';
+import { getDefaultProfilePbURL, getProfilePbURL } from './ts/networking/paths';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -44,7 +44,7 @@ export default {
     /* Channel */
     const isChannelOpen = isChannelActive();
 
-    function showUserPageFromURL(){
+    function showUserPageFromURL() {
       const path = window.location.pathname;
       const match = path.match(/^\/user\/(.+)$/);
       if (match) {
@@ -66,6 +66,11 @@ export default {
     /* Login Component */
     const showLogin = computed(() => eventBus.state.showLogin);
     const errorMessage = ref<string>('');
+    const isAuthenticated = ref<boolean>(false);
+
+    watch(() => eventBus.state.showLogin, () => {
+      onShowLoginForm();
+    });
 
     async function handleLogin(username: string, password: string) {
       const { success, error } = await login(username, password);
@@ -73,6 +78,7 @@ export default {
         eventBus.setShowLogin(false);
         reconnectGlobalSocket();
         joinRoomFromHash();
+        isAuthenticated.value = checkUserAuthentication();
       } else {
         errorMessage.value = error;
       }
@@ -100,15 +106,20 @@ export default {
       reconnectGlobalSocket();
       eventBus.setShowLogin(false);
       joinRoomFromHash();
+      isAuthenticated.value = checkUserAuthentication();
     }
 
     function clearErrorMessage() {
       errorMessage.value = '';
     }
 
-    function clearGuestCookies(){
+    function clearGuestCookies() {
       sessionStorage.removeItem('isGuest');
       sessionStorage.removeItem('guestUsername');
+    }
+
+    function onShowLoginForm() {
+      isAuthenticated.value = checkUserAuthentication();
     }
 
     /* Room Component */
@@ -160,23 +171,49 @@ export default {
       document.title = `${document.title.split('|')[0]} | ${pages[currentPageIndex.value].title}`;
     });
 
+    watch(() => currentPageState.value, () => {
+      onPageChange();
+    });
+
+    function onPageChange() {
+      isAuthenticated.value = checkUserAuthentication();
+    }
+
     /* Profile */
     interface UserData {
       username: string;
-      countryCode: string;
-      country: string;
+      countryCode?: string;
+      country?: string;
       pbUrl: string;
     }
 
     const userData = ref<UserData | null>(null);
-    const username = ref<string>("");
 
-    const profilePicImagePath = computed(() => {
-      if (userData.value && userData.value.pbUrl) {
-        return userData.value ? getProfilePbURL() + userData.value.pbUrl : '';
-      }
-      return getProfilePbURL() + 'default/pbPlaceholder.png';
+    watch(() => isAuthenticated.value, () => {
+      updateProfileData();
     });
+
+    function updateProfileData(){
+      if (isAuthenticated.value) {
+        let isGuest = sessionStorage.getItem('isGuest');
+        if (isGuest) {
+          userData.value = {
+            username: "Guest-" + (sessionStorage.getItem('guestUsername') || 'Guest'),
+            pbUrl: getDefaultProfilePbURL(),
+          };
+        } else {
+          fetchUserData().then((data) => {
+            if (data) {
+              const updatedPbUrl = data.pbUrl ? getProfilePbURL() + data.pbUrl : getDefaultProfilePbURL();
+              userData.value = {
+                ...data,
+                pbUrl: updatedPbUrl,
+              };
+            }
+          });
+        }
+      }
+    }
 
     async function fetchUserData() {
       const token = localStorage.getItem('authToken');
@@ -189,10 +226,12 @@ export default {
     }
 
     /* General */
-    onMounted(async() => {
+
+    onMounted(async () => {
       setupTransitionFunctions();
       initializeGlobalSocket();
-      if (checkUserAuthentication()) {
+      isAuthenticated.value = checkUserAuthentication();
+      if (isAuthenticated.value) {
         userData.value = await fetchUserData();
         joinRoomFromHash();
       } else {
@@ -229,7 +268,8 @@ export default {
       isChannelOpen,
       openChannelOverlay,
       userData,
-      profilePicImagePath,
+      isAuthenticated,
+      updateProfileData,
     };
   },
 }
@@ -237,7 +277,7 @@ export default {
 
 </script>
 <style scoped>
-.topbar{
+.topbar {
   width: 100vw;
   height: 10vh;
   display: flex;
@@ -245,15 +285,15 @@ export default {
   justify-content: flex-end;
 }
 
-.profile-wrapper{
+.profile-wrapper {
   height: 100%;
-  width: 15vw;
+  width: 20vw;
   background-color: rgb(53, 53, 53);
   display: flex;
   flex-direction: row;
 }
 
-.profile-content{
+.profile-content {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -261,7 +301,7 @@ export default {
   padding: 0 15px;
 }
 
-.profile-content p{
+.profile-content p {
   margin: unset;
   font-size: 20px;
 }
@@ -270,5 +310,14 @@ export default {
   height: 100%;
   width: 10vh;
   object-fit: cover;
+}
+
+.openChannelButton {
+  bottom: 0;
+  z-index: 5;
+}
+
+.openChannelButton:hover {
+  background-color: rgb(55, 55, 55);
 }
 </style>

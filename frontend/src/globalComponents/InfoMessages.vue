@@ -41,6 +41,7 @@ export default defineComponent({
 <style scoped>
 .message {
   position: fixed;
+  z-index: 1000;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);

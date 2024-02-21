@@ -245,6 +245,7 @@ export default {
 <style scoped>
 ul {
   list-style-type: none;
+  padding: unset;
 }
 
 .loading-animation {
@@ -270,11 +271,15 @@ ul li span {
 ul li {
   display: flex;
   flex-direction: row;
-  justify-content: center;
   gap: 2%;
 }
 
 ul li span.sp {
   min-width: 5%;
+}
+
+.inGame ,
+.inGame > div{
+  text-align: center;
 }
 </style>

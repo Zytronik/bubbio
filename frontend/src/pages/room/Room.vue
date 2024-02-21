@@ -17,14 +17,12 @@
         placeholder="Type your message" />
     </div>
     <button @click="$emit('leftRoom')">Leave Room</button>
-    <button @click="startGame">Start Game</button>
-    <Game v-if="gameOnGoing" />
+    <button @click="startGame">Start Game (TODO)</button>
   </div>
 </template>
 
 <script lang="ts">
 import { ref, onMounted, onUnmounted, defineComponent, SetupContext } from 'vue';
-import Game from '../game/Game.vue';
 import state from '@/ts/networking/networking.client-websocket';
 
 interface Message {
@@ -39,7 +37,7 @@ interface User {
 
 export default defineComponent({
   name: 'RoomPage',
-  components: { Game },
+  components: {  },
   props: {
     roomId: {
       type: String
@@ -49,7 +47,6 @@ export default defineComponent({
     const chatMessages = ref<Message[]>([]);
     const messageInputField = ref('');
     const roomUserList = ref<User[]>([]);
-    const gameOnGoing = ref(false);
 
     if (state.socket) {
 
@@ -112,7 +109,7 @@ export default defineComponent({
     }
 
     function startGame() {
-      gameOnGoing.value = true;
+      console.log("startGame");
     }
 
     onUnmounted(() => {
@@ -124,7 +121,7 @@ export default defineComponent({
       joinRoom();
     });
 
-    return { chatMessages, messageInputField, roomUserList, sendMessage, gameOnGoing, startGame, leaveRoom };
+    return { chatMessages, messageInputField, roomUserList, sendMessage, startGame, leaveRoom };
   },
 });
 </script>

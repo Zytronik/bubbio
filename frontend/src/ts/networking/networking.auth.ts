@@ -100,7 +100,7 @@ export async function checkIfUsernameIsTaken(username: string): Promise<boolean>
   }
 }
 
-export function checkUserAuthentication() {
+export function checkUserAuthentication(): boolean {
   const token = localStorage.getItem('authToken');
   const isGuest = sessionStorage.getItem('isGuest') === 'true';
   if (token) {

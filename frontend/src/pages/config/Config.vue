@@ -5,18 +5,21 @@
     <h2>Input Settings</h2>
     <div v-if="isAuthenticated">
       <h2>Accounts Settings</h2>
-      <p>Change Profile Picture:</p>
-      <button>
-        <label for="pb-upload" class="custom-file-upload">Change Picture</label>
-      </button>
-      <input id="pb-upload" type="file" @change="handleFileChange('pb', $event)" accept="image/png, image/jpeg"
-        style="display: none;" />
-      <p>Change Profile Banner:</p>
-      <button>
-        <label for="banner-upload" class="custom-file-upload">Change Banner</label>
-      </button>
-      <input id="banner-upload" type="file" @change="handleFileChange('banner', $event)" accept="image/png, image/jpeg"
-        style="display: none;" />
+      <button @click="logOut">Log Out</button>
+      <div v-if="isLoggedIn">
+        <p>Change Profile Picture:</p>
+        <button>
+          <label for="pb-upload" class="custom-file-upload">Change Picture</label>
+        </button>
+        <input id="pb-upload" type="file" @change="handleFileChange('pb', $event)" accept="image/png, image/jpeg"
+          style="display: none;" />
+        <p>Change Profile Banner:</p>
+        <button>
+          <label for="banner-upload" class="custom-file-upload">Change Banner</label>
+        </button>
+        <input id="banner-upload" type="file" @change="handleFileChange('banner', $event)" accept="image/png, image/jpeg"
+          style="display: none;" />
+      </div>
     </div>
   </section>
 </template>
@@ -26,13 +29,14 @@ import { goToState } from '@/ts/page/page.page-manager';
 import { Ref, SetupContext, computed, onMounted, ref } from 'vue';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { httpClient } from '@/ts/networking/networking.http-client';
-import { checkUserAuthentication } from '@/ts/networking/networking.auth';
+import { checkUserAuthentication, logUserOut } from '@/ts/networking/networking.auth';
 
 export default {
   name: 'ConfigPage',
   setup(_: unknown, { emit }: SetupContext) {
     const selectedFile: Ref<File | null> = ref(null);
     const isAuthenticated = computed(() => checkUserAuthentication());
+    const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
 
     onMounted(() => {
       console.log('Vue app mounted | Config Page');
@@ -80,17 +84,26 @@ export default {
             'Authorization': `Bearer ${token}`,
           }
         });
+        emit('updateProfileData');
         emit('showInfoMessage', 'Image uploaded successfully.', 'success');
       } catch (error) {
         emit('showInfoMessage', 'Failed to upload image.', 'error');
       }
     }
 
+    function logOut(){
+      goToState(PAGE_STATE.mainMenu);
+      logUserOut();
+    }
+
     return {
       PAGE_STATE,
       goToState,
       handleFileChange,
-      isAuthenticated
+      isLoggedIn,
+      logUserOut,
+      logOut,
+      isAuthenticated,
     }
   }
 }

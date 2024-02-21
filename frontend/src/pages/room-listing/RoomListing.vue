@@ -1,11 +1,11 @@
 <template id="roomListing" class="page">
   <div class="room-listing">
     <div class="room-actions">
+      <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
       <input v-model="roomId" placeholder="Room ID" />
       <button @click="joinRoom(roomId)">Join Room</button>
       <p>- or -</p>
       <button @click="createRoom()">Create & Join New Room</button>
-      <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
     </div>
     <div class="active-rooms">
       <h2>Active Rooms</h2>
@@ -105,6 +105,7 @@ export default {
 
 .active-rooms h2 {
   margin-bottom: 10px;
+  text-align: center;
 }
 
 .active-rooms ul {

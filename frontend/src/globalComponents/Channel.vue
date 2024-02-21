@@ -1,118 +1,122 @@
 <template>
-  <UserProfileOverlay v-if="showUserProfileOverlay && selectedUsername" :username="selectedUsername"
-    @close-overlay="closeUserProfileOverlay" />
-  <div class="overlay channel-overlay">
-    <div class="channel-container">
-      <button class="goBackButton" @click="closeChannelOverlay">X</button>
-      <div class="channel-content">
-        <div class="channel-centerContent">
-          <div class="channel-topbar">
-            <h2>Welcome to the Blubbiunity</h2>
-            <div class="tabs">
-              <button v-for="tab in tabs" :key="tab" :class="{ active: currentTab === tab }" @click="currentTab = tab">
-                {{ tab }}
-              </button>
-            </div>
-          </div>
-          <div class="channel-main">
-            <div v-if="currentTab === 'Dashboard'" class="tab-content dashoboard-tab">
-              <div class="stats">
-                <div class="stat">
-                  <span ref="peopleOnlineRef">{{ stats.peopleOnline }}</span>
-                  <p>People Online</p>
-                </div>
-                <div class="stat">
-                  <span ref="activeLobbiesRef">{{ stats.activeLobbies }}</span>
-                  <p>Active Lobbies</p>
-                </div>
-                <div class="stat">
-                  <span ref="registeredUsersRef">{{ stats.registeredUsers }}</span>
-                  <p>Registered Users</p>
-                </div>
-                <div class="stat">
-                  <span ref="gamesPlayedRef">{{ stats.gamesPlayed }}</span>
-                  <p>Games Played</p>
-                </div>
+  <transition name="slide-in">
+    <div class="overlay channel-overlay" v-if="isVisible" @click.self="slideOverlayOut">
+      <button class="openChannelButton">Channel</button>
+      <div class="channel-container">
+        <div class="channel-content">
+          <div class="channel-centerContent">
+            <div class="channel-topbar">
+              <h2>Welcome to blubb.io</h2>
+              <div class="tabs">
+                <button v-for="tab in tabs" :key="tab" :class="{ active: currentTab === tab }" @click="currentTab = tab">
+                  {{ tab }}
+                </button>
               </div>
-              <div class="dashboard-bottom">
-                <div class="channel-global-chat">
-                  <h3>Global Chat</h3>
-                  <div class="messages" ref="messagesContainer">
-                    <div v-for="(msg, i) in messages" :key="i">{{ msg.timestamp }} {{ msg.username }}: {{ msg.text }}</div>
+            </div>
+            <div class="channel-main">
+              <div v-if="currentTab === 'Dashboard'" class="tab-content dashoboard-tab">
+                <div class="stats">
+                  <div class="stat">
+                    <span ref="peopleOnlineRef">{{ stats.peopleOnline }}</span>
+                    <p>People Online</p>
                   </div>
-                  <div v-if="isAuthenticated" class="chat-inputs">
-                    <input v-model="chatInput" placeholder="Type a message..."
-                      @keyup.enter="sendChatMessage" />
-                    <button @click="sendChatMessage">Send</button>
+                  <div class="stat">
+                    <span ref="activeLobbiesRef">{{ stats.activeLobbies }}</span>
+                    <p>Active Lobbies</p>
+                  </div>
+                  <div class="stat">
+                    <span ref="registeredUsersRef">{{ stats.registeredUsers }}</span>
+                    <p>Registered Users</p>
+                  </div>
+                  <div class="stat">
+                    <span ref="gamesPlayedRef">{{ stats.gamesPlayed }}</span>
+                    <p>Games Played</p>
                   </div>
                 </div>
-                <div class="news">
-                  <h3>News (TODO)</h3>
-                  <div class="news-wrapper">
-                    <div>blablabla</div>
-                    <div>blablabla</div>
-                    <div>blablabla</div>
+                <div class="dashboard-bottom">
+                  <div class="channel-global-chat">
+                    <h3>Global Chat</h3>
+                    <div class="messages" ref="messagesContainer">
+                      <div v-for="(msg, i) in messages" :key="i">{{ msg.timestamp }} {{ msg.username }}: {{ msg.text }}
+                      </div>
+                    </div>
+                    <div v-if="isAuthenticated" class="chat-inputs">
+                      <input v-model="chatInput" placeholder="Type a message..." @keyup.enter="sendChatMessage" />
+                      <button @click="sendChatMessage">Send</button>
+                    </div>
+                  </div>
+                  <div class="news">
+                    <h3>News (TODO)</h3>
+                    <div class="news-wrapper">
+                      <div>blablabla</div>
+                      <div>blablabla</div>
+                      <div>blablabla</div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div v-if="currentTab === 'Leaderboards'" class="tab-content">
-              <p>TODO</p>
-            </div>
-            <div v-if="currentTab === 'Spectate'" class="tab-content">
-              <p>TODO</p>
-            </div>
-          </div>
-        </div>
-        <div class="channel-sidebar">
-          <div class="player-search">
-            <h3>Find Players</h3>
-            <input type="text" placeholder="Search user..." v-model="searchQuery" />
-            <ul :class="{ 'expanded': searchResults.length > 0 }">
-              <li v-for="user in searchResults" :key="user.id" @click="openUserProfile(user.username)">
-                {{ user.username.toUpperCase() }}
-              </li>
-            </ul>
-          </div>
-          <div class="friend-listing">
-            <h3 v-if="isAuthenticated">Friend Listing (TODO)</h3>
-            <div class="friend">
-              <p>Friend 1</p>
-              <div>
-                <span>Invite</span>
-                <span>Spectate</span>
-                <span>Message</span>
+              <div v-if="currentTab === 'Leaderboards'" class="tab-content">
+                <p>TODO</p>
               </div>
-            </div>
-            <div class="friend">
-              <p>Friend 2</p>
-              <div>
-                <span>Invite</span>
-                <span>Spectate</span>
-                <span>Message</span>
-              </div>
-            </div>
-            <div class="friend">
-              <p>Friend 3</p>
-              <div>
-                <span>Invite</span>
-                <span>Spectate</span>
-                <span>Message</span>
-              </div>
-            </div>
-            <div class="friend">
-              <p>Friend 4</p>
-              <div>
-                <span>Invite</span>
-                <span>Spectate</span>
-                <span>Message</span>
+              <div v-if="currentTab === 'Spectate'" class="tab-content">
+                <p>TODO</p>
               </div>
             </div>
           </div>
+          <div class="channel-sidebar">
+            <div class="player-search">
+              <h3>Find Players</h3>
+              <input type="text" placeholder="Search user..." v-model="searchQuery" />
+              <ul :class="{ 'expanded': searchResults.length > 0 }">
+                <li v-for="user in searchResults" :key="user.id" @click="openUserProfile(user.username)">
+                  {{ user.username.toUpperCase() }}
+                </li>
+              </ul>
+            </div>
+            <div class="friend-listing">
+              <h3 v-if="isAuthenticated">Friend Listing (TODO)</h3>
+              <div class="friend">
+                <p>Friend 1</p>
+                <div>
+                  <span>Invite</span>
+                  <span>Spectate</span>
+                  <span>Message</span>
+                </div>
+              </div>
+              <div class="friend">
+                <p>Friend 2</p>
+                <div>
+                  <span>Invite</span>
+                  <span>Spectate</span>
+                  <span>Message</span>
+                </div>
+              </div>
+              <div class="friend">
+                <p>Friend 3</p>
+                <div>
+                  <span>Invite</span>
+                  <span>Spectate</span>
+                  <span>Message</span>
+                </div>
+              </div>
+              <div class="friend">
+                <p>Friend 4</p>
+                <div>
+                  <span>Invite</span>
+                  <span>Spectate</span>
+                  <span>Message</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <transition name="fade-in">
+            <UserProfileOverlay v-if="showUserProfileOverlay && selectedUsername" :username="selectedUsername"
+              @close-overlay="closeUserProfileOverlay" />
+          </transition>
         </div>
       </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script lang="ts">
@@ -162,6 +166,18 @@ export default {
     const chatInput = ref('');
 
     const isAuthenticated = computed(() => checkUserAuthentication());
+    const isVisible = ref(false);
+
+    function slideOverlayIn() {
+      isVisible.value = true;
+    }
+
+    function slideOverlayOut() {
+      isVisible.value = false;
+      setTimeout(() => {
+        closeChannelOverlay();
+      }, 400);
+    }
 
     const fetchSearchResults = debounce(async (query) => {
       if (query.trim() === '') {
@@ -194,10 +210,17 @@ export default {
     });
 
     function openUserProfile(username: string) {
-      searchQuery.value = "";
-      selectedUsername.value = username;
-      showUserProfileOverlay.value = true;
-      history.pushState(null, '', `/user/${username}`);
+      let delay = 0;
+      if (showUserProfileOverlay.value == true) {
+        closeUserProfileOverlay();
+        delay = 200;
+      }
+      setTimeout(() => {
+        searchQuery.value = "";
+        selectedUsername.value = username;
+        showUserProfileOverlay.value = true;
+        history.pushState(null, '', `/user/${username}`);
+      }, delay);
     }
 
     function closeUserProfileOverlay() {
@@ -249,7 +272,8 @@ export default {
       });
     }, { deep: true });
 
-    onMounted(async() => {
+    onMounted(async () => {
+      slideOverlayIn();
       showUserPageFromURL();
       await fetchStats();
       intervalId = setInterval(fetchStats, 30000);
@@ -283,6 +307,8 @@ export default {
       activeLobbiesRef,
       registeredUsersRef,
       gamesPlayedRef,
+      isVisible,
+      slideOverlayOut,
     };
   },
 }
@@ -306,7 +332,7 @@ export default {
   margin: unset;
   overflow: hidden;
   max-height: 0;
-  transition: all 0.3s ease; 
+  transition: all 0.3s ease;
 }
 
 .player-search ul.expanded {
@@ -329,7 +355,7 @@ export default {
   margin-bottom: 5px;
 }
 
-.channel-global-chat .messages > div  {
+.channel-global-chat .messages>div {
   padding: 2px 0;
 }
 
@@ -377,11 +403,14 @@ export default {
   height: 100%;
   background-color: rgb(53, 53, 53);
   padding: 15px;
+  z-index: 1;
+  box-sizing: border-box;
 }
 
 .channel-centerContent {
   width: 80%;
   padding: 0 30px;
+  box-sizing: border-box;
 }
 
 .player-search {
@@ -535,5 +564,81 @@ h2 {
 .news-wrapper>div {
   background-color: rgb(53, 53, 53);
   padding: 5px 15px;
+}
+
+.openChannelButton {
+  bottom: 90vh;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+.fade-in-enter-active, .fade-in-leave-active {
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+  transition-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
+  transform-origin: 30% 50%;
+}
+
+.fade-in-enter-active {
+  animation-name: fadeIn;
+}
+
+.fade-in-leave-active {
+  animation-name: fadeOut;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.slide-in-enter-active,
+.slide-in-leave-active {
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+  transition-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
+}
+
+.slide-in-enter-active {
+  animation-name: slideIn;
+}
+
+.slide-in-leave-active {
+  animation-name: slideOut;
 }
 </style>

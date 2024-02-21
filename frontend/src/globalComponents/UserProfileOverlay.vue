@@ -1,5 +1,5 @@
 <template>
-    <div class="overlay user-profile-overlay">
+    <div class="overlay user-profile-overlay" @click.self="closeUserProfile">
         <div class="user-profile-wrapper">
             <button class="goBackButton" title="Back" @click="closeUserProfile">X</button>
             <div v-if="userError" class="user-error-message">
@@ -40,7 +40,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
-import { getProfileBannerURL, getProfilePbURL } from '@/ts/networking/paths';
+import { getDefaultProfileBannerURL, getDefaultProfilePbURL, getProfileBannerURL, getProfilePbURL } from '@/ts/networking/paths';
 
 interface UserData {
     username: string;
@@ -87,14 +87,14 @@ export default defineComponent({
             if (userData.value && userData.value.bannerUrl) {
                 return userData.value ? getProfileBannerURL() + userData.value.bannerUrl : '';
             }
-            return getProfileBannerURL() + 'default/bannerPlaceholder.png';
+            return getDefaultProfileBannerURL();
         });
 
         const profilePicImagePath = computed(() => {
             if (userData.value && userData.value.pbUrl) {
                 return userData.value ? getProfilePbURL() + userData.value.pbUrl : '';
             }
-            return getProfilePbURL() + 'default/pbPlaceholder.png';
+            return getDefaultProfilePbURL();
         });
 
         const flagImagePath = computed(() => {
@@ -138,13 +138,13 @@ export default defineComponent({
 </script>
 <style scoped>
 .user-profile-overlay {
-    z-index: 15;
     background: rgba(0, 0, 0, 0.0) !important;
+    justify-content: flex-start;
 }
 
 .user-profile-wrapper {
     height: 90vh;
-    width: 100vw;
+    width: 80vw;
     background-color: black;
 }
 
@@ -218,4 +218,10 @@ h3 {
     margin: unset;
     font-size: 20px;
 }
+
+button.goBackButton {
+    top: 10vh;
+    right: 20vw;
+}
+
 </style>

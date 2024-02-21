@@ -24,3 +24,11 @@ export function getProfilePbURL(){
 export function getProfileBannerURL(){
     return backendURL + "userData/banner/";
 }
+
+export function getDefaultProfilePbURL(){
+    return require(`@/img/default/pbPlaceholder.png`);
+}
+
+export function getDefaultProfileBannerURL(){
+    return require(`@/img/default/bannerPlaceholder.png`);
+}

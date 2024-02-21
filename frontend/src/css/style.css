@@ -21,13 +21,30 @@ section.page {
     padding: 0 15px;
 }
 
+.openChannelButton{
+    position: absolute;
+    font-size: 30px;
+    left: 50%; 
+    transform: translateX(-50%); 
+    outline: none;
+    border: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 10px 30px 5px;
+    cursor: pointer;
+    transition: 200ms;
+    color: white;
+    margin-top: unset;
+    background-color: rgb(30, 30, 30);
+}
+
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -35,8 +52,6 @@ section.page {
 
 button.goBackButton {
     position: absolute;
-    left: 0;
-    top: 0;
     font-size: 24px;
     font-weight: bold;
     line-height: 1;
@@ -46,8 +61,8 @@ button.goBackButton {
     width: 2.5vw;
     height: 2.5vw;
     border: none;
-    background-color: rgb(28, 28, 28);
-    color: white;
+    background-color: white;
+    color: black;
     cursor: pointer;
     border-radius: 50%;
     padding: 0;
@@ -58,6 +73,6 @@ button.goBackButton {
 
 button.goBackButton:hover,
 button.goBackButton:focus {
-    background-color: #363636;
+    background-color: #cdcdcd;
     outline: none;
 }

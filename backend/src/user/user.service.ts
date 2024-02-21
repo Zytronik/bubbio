@@ -187,31 +187,31 @@ export class UserService {
 
     async updateProfileImgs(userId: number, file, imgType: "pb" | "banner"): Promise<void> {
         const user = await this.prisma.user.findUnique({
-          where: { id: userId },
+            where: { id: userId },
         });
-      
-        // Determine the field to update and the previous file to delete
+
         const fieldToUpdate = imgType === "pb" ? "pbUrl" : "bannerUrl";
         const oldFilename = user[fieldToUpdate];
-      
-        // Define the upload path
-        const uploadPath = path.join(__dirname, '..', '..', 'uploads', imgType);
+        const uploadPath = path.join(__dirname, '..', '..', '..', 'uploads', imgType);
         const newFilename = file.filename;
-      
-        // Update the database
+
+        // Update the database first
         await this.prisma.user.update({
-          where: { id: userId },
-          data: { [fieldToUpdate]: newFilename },
+            where: { id: userId },
+            data: { [fieldToUpdate]: newFilename },
         });
-      
-        // Delete the old file, if necessary
+
+        // Then attempt to delete the old file if it's different from the new one
         if (oldFilename && oldFilename !== newFilename) {
-          const oldFilePath = path.join(uploadPath, oldFilename);
-          if (fs.existsSync(oldFilePath)) {
-            fs.unlinkSync(oldFilePath);
-          }
+            const oldFilePath = path.join(uploadPath, oldFilename);
+            fs.unlink(oldFilePath, (err) => {
+                if (err) {
+                    // Log the error or handle it according to your application's needs
+                    console.error(`Failed to delete old file: ${oldFilePath}`, err.message);
+                }
+            });
         }
-      }
-      
-      
+    }
+
+
 }
