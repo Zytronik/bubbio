@@ -180,6 +180,8 @@ export class UserService {
             select: {
                 id: true,
                 username: true,
+                countryCode: true,
+                country: true,
                 // Specify any other fields you want to include here
             },
         });

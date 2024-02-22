@@ -7,18 +7,24 @@
       <h2>Accounts Settings</h2>
       <button @click="logOut">Log Out</button>
       <div v-if="isLoggedIn">
-        <p>Change Profile Picture:</p>
-        <button>
-          <label for="pb-upload" class="custom-file-upload">Change Picture</label>
-        </button>
-        <input id="pb-upload" type="file" @change="handleFileChange('pb', $event)" accept="image/png, image/jpeg"
-          style="display: none;" />
-        <p>Change Profile Banner:</p>
-        <button>
-          <label for="banner-upload" class="custom-file-upload">Change Banner</label>
-        </button>
-        <input id="banner-upload" type="file" @change="handleFileChange('banner', $event)" accept="image/png, image/jpeg"
-          style="display: none;" />
+        <div class="account-setting">
+          <h3>Change Profile Picture:</h3>
+          <p>The img must be less then 2MB and in jpg or png format.</p>
+          <button>
+            <label for="pb-upload" class="custom-file-upload">Change Picture</label>
+          </button>
+          <input id="pb-upload" type="file" @change="handleFileChange('pb', $event)" accept="image/png, image/jpeg"
+            style="display: none;" />
+        </div>
+        <div class="account-setting">
+          <h3>Change Profile Banner:</h3>
+          <p>We recommend the following img dimensions: 1920px x 170px</p>
+          <button>
+            <label for="banner-upload" class="custom-file-upload">Change Banner</label>
+          </button>
+          <input id="banner-upload" type="file" @change="handleFileChange('banner', $event)"
+            accept="image/png, image/jpeg" style="display: none;" />
+        </div>
       </div>
     </div>
   </section>
@@ -91,7 +97,7 @@ export default {
       }
     }
 
-    function logOut(){
+    function logOut() {
       goToState(PAGE_STATE.mainMenu);
       logUserOut();
     }
@@ -109,4 +115,12 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.account-setting{
+  margin: 30px 0;
+}
+
+.account-setting p {
+  margin: unset;
+}
+</style>

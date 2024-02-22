@@ -14,53 +14,59 @@
               </div>
             </div>
             <div class="channel-main">
-              <div v-if="currentTab === 'Dashboard'" class="tab-content dashoboard-tab">
-                <div class="stats">
-                  <div class="stat">
-                    <span ref="peopleOnlineRef">{{ stats.peopleOnline }}</span>
-                    <p>People Online</p>
+              <transition name="fade">
+                <div v-if="currentTab === 'Dashboard'" class="tab-content dashoboard-tab">
+                  <div class="stats">
+                    <div class="stat">
+                      <span ref="peopleOnlineRef">{{ stats.peopleOnline }}</span>
+                      <p>People Online</p>
+                    </div>
+                    <div class="stat">
+                      <span ref="activeLobbiesRef">{{ stats.activeLobbies }}</span>
+                      <p>Active Lobbies</p>
+                    </div>
+                    <div class="stat">
+                      <span ref="registeredUsersRef">{{ stats.registeredUsers }}</span>
+                      <p>Registered Users</p>
+                    </div>
+                    <div class="stat">
+                      <span ref="gamesPlayedRef">{{ stats.gamesPlayed }}</span>
+                      <p>Games Played</p>
+                    </div>
                   </div>
-                  <div class="stat">
-                    <span ref="activeLobbiesRef">{{ stats.activeLobbies }}</span>
-                    <p>Active Lobbies</p>
-                  </div>
-                  <div class="stat">
-                    <span ref="registeredUsersRef">{{ stats.registeredUsers }}</span>
-                    <p>Registered Users</p>
-                  </div>
-                  <div class="stat">
-                    <span ref="gamesPlayedRef">{{ stats.gamesPlayed }}</span>
-                    <p>Games Played</p>
-                  </div>
-                </div>
-                <div class="dashboard-bottom">
-                  <div class="channel-global-chat">
-                    <h3>Global Chat</h3>
-                    <div class="messages" ref="messagesContainer">
-                      <div v-for="(msg, i) in messages" :key="i">{{ msg.timestamp }} {{ msg.username }}: {{ msg.text }}
+                  <div class="dashboard-bottom">
+                    <div class="channel-global-chat">
+                      <h3>Global Chat</h3>
+                      <div class="messages" ref="messagesContainer">
+                        <div v-for="(msg, i) in messages" :key="i">{{ msg.timestamp }} {{ msg.username }}: {{ msg.text }}
+                        </div>
+                      </div>
+                      <div v-if="isAuthenticated" class="chat-inputs">
+                        <input v-model="chatInput" placeholder="Type a message..." @keyup.enter="sendChatMessage" />
+                        <button @click="sendChatMessage">Send</button>
                       </div>
                     </div>
-                    <div v-if="isAuthenticated" class="chat-inputs">
-                      <input v-model="chatInput" placeholder="Type a message..." @keyup.enter="sendChatMessage" />
-                      <button @click="sendChatMessage">Send</button>
-                    </div>
-                  </div>
-                  <div class="news">
-                    <h3>News (TODO)</h3>
-                    <div class="news-wrapper">
-                      <div>blablabla</div>
-                      <div>blablabla</div>
-                      <div>blablabla</div>
+                    <div class="news">
+                      <h3>News (TODO)</h3>
+                      <div class="news-wrapper">
+                        <div>blablabla</div>
+                        <div>blablabla</div>
+                        <div>blablabla</div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div v-if="currentTab === 'Leaderboards'" class="tab-content">
-                <p>TODO</p>
-              </div>
-              <div v-if="currentTab === 'Spectate'" class="tab-content">
-                <p>TODO</p>
-              </div>
+              </transition>
+              <transition name="fade">
+                <div v-if="currentTab === 'Leaderboards'" class="tab-content">
+                  <p>TODO</p>
+                </div>
+              </transition>
+              <transition name="fade">
+                <div v-if="currentTab === 'Spectate'" class="tab-content">
+                  <p>TODO</p>
+                </div>
+              </transition>
             </div>
           </div>
           <div class="channel-sidebar">
@@ -69,7 +75,7 @@
               <input type="text" placeholder="Search user..." v-model="searchQuery" />
               <ul :class="{ 'expanded': searchResults.length > 0 }">
                 <li v-for="user in searchResults" :key="user.id" @click="openUserProfile(user.username)">
-                  {{ user.username.toUpperCase() }}
+                  <img v-if="user.countryCode" :src="getFlagImagePath(user.countryCode)" :alt="`${user.country}`"><span>{{ user.username.toUpperCase() }}</span>
                 </li>
               </ul>
             </div>
@@ -109,7 +115,7 @@
               </div>
             </div>
           </div>
-          <transition name="fade-in">
+          <transition name="fade-scale">
             <UserProfileOverlay v-if="showUserProfileOverlay && selectedUsername" :username="selectedUsername"
               @close-overlay="closeUserProfileOverlay" />
           </transition>
@@ -134,6 +140,8 @@ import { CountUp } from 'countup.js';
 interface User {
   id: number;
   username: string;
+  countryCode: string,
+  country: string,
 }
 
 export default {
@@ -177,6 +185,12 @@ export default {
       setTimeout(() => {
         closeChannelOverlay();
       }, 400);
+    }
+
+    function getFlagImagePath(countryCode: string) {
+      if (countryCode) {
+        return require(`@/img/countryFlags/${countryCode.toLowerCase()}.svg`);
+      }
     }
 
     const fetchSearchResults = debounce(async (query) => {
@@ -314,6 +328,7 @@ export default {
       gamesPlayedRef,
       isVisible,
       slideOverlayOut,
+      getFlagImagePath,
     };
   },
 }
@@ -347,10 +362,23 @@ export default {
 .player-search li {
   cursor: pointer;
   margin-bottom: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  background-color: black;
+  transition: 200ms;
+}
+
+.player-search li img {
+  max-width: 30px;
+  height: 20px;
+  margin-right: 10px;
+  object-fit: contain;
 }
 
 .player-search li:hover {
-  opacity: 0.5;
+  background-color: rgb(34, 34, 34);
 }
 
 .channel-global-chat .messages {
@@ -575,7 +603,7 @@ h2 {
   bottom: 90vh;
 }
 
-@keyframes fadeIn {
+@keyframes fadeScaleIn {
   from {
     opacity: 0;
     transform: scale(0.9);
@@ -586,7 +614,7 @@ h2 {
   }
 }
 
-@keyframes fadeOut {
+@keyframes fadeScaleOut {
   from {
     opacity: 1;
     transform: scale(1);
@@ -597,19 +625,19 @@ h2 {
   }
 }
 
-.fade-in-enter-active, .fade-in-leave-active {
+.fade-scale-enter-active, .fade-scale-leave-active {
   animation-duration: 0.2s;
   animation-fill-mode: both;
   transition-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
   transform-origin: 30% 50%;
 }
 
-.fade-in-enter-active {
-  animation-name: fadeIn;
+.fade-scale-enter-active {
+  animation-name: fadeScaleIn;
 }
 
-.fade-in-leave-active {
-  animation-name: fadeOut;
+.fade-scale-leave-active {
+  animation-name: fadeScaleOut;
 }
 
 @keyframes slideIn {
@@ -646,4 +674,37 @@ h2 {
 .slide-in-leave-active {
   animation-name: slideOut;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-enter-active, .fade-leave-active {
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+  transition-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
+}
+
+.fade-enter-active {
+  animation-name: fadeIn;
+}
+
+.fade-leave-active {
+  animation-name: fadeOut;
+}
+
 </style>

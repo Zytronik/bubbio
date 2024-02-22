@@ -11,7 +11,9 @@
                     <div class="user-profile-meta">
                         <img class="profile-pic" :src="profilePicImagePath" alt="Profile Picture">
                         <h2>{{ userData.username.toUpperCase() }}</h2>
-                        <p>Joined: {{ formattedDate }}</p>
+                        <p v-if="userData.id < 4">Since the Beginning</p>
+                        <p v-else>Joined: {{ formattedDate }}</p>
+                        <p>Last seen: TODO</p>
                         <div class="user-country">
                             <p v-if="userData.country">{{ userData.country }}</p>
                             <img class="user-flag" v-if="userData.countryCode && userData.country" :src="flagImagePath"
@@ -43,6 +45,7 @@ import { httpClient } from '@/ts/networking/networking.http-client';
 import { getDefaultProfileBannerURL, getDefaultProfilePbURL } from '@/ts/networking/paths';
 
 interface UserData {
+    id: number;
     username: string;
     createdAt: string;
     countryCode: string;
