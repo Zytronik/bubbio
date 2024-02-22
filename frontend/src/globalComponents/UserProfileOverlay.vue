@@ -108,8 +108,13 @@ export default defineComponent({
         });
 
         onMounted(async () => {
+            console.log('Vue app mounted | User Profile Overlay');
             if (props.username) {
                 userData.value = await fetchUserData(props.username);
+                console.log("got user data");
+            }else{
+                console.log("no username");
+                console.log(userData.value);
             }
         });
 
