@@ -10,7 +10,7 @@
                 <div class="user-profile-inner-container">
                     <div class="user-profile-meta">
                         <img class="profile-pic" :src="profilePicImagePath" alt="Profile Picture">
-                        <h2>{{ userData.username.toUpperCase() }}</h2>
+                        <h2>{{ userData.username.toUpperCase() }}<span class="online-status" :title="isUserOnline !== 'notFound' ? 'Online' : ''" :class="{ 'online': isUserOnline !== 'notFound' }">{{}}</span></h2>
                         <p v-if="userData.id < 4">Since the Beginning</p>
                         <p v-else>Joined: {{ formattedDate }}</p>
                         <p>Last seen: TODO</p>
@@ -44,6 +44,7 @@ import { computed, defineComponent, onMounted, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { getDefaultProfileBannerURL, getDefaultProfilePbURL } from '@/ts/networking/paths';
 import { formatTimeNumberToString } from '@/ts/gameplay/gameplay.stat-tracker';
+import state from '@/ts/networking/networking.client-websocket';
 
 interface UserData {
     id: number;
@@ -75,6 +76,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const userData = ref<UserData | null>(null);
         const userError = ref<string | null>(null);
+        const isUserOnline = ref<string>("false");
 
         const formattedDate = computed(() => {
             if (userData.value && userData.value.createdAt) {
@@ -111,8 +113,22 @@ export default defineComponent({
         onMounted(async () => {
             if (props.username) {
                 userData.value = await fetchUserData(props.username);
+                getUserOnlineStatus(props.username);
             }
+        
         });
+
+        function getUserOnlineStatus(username: string): void {
+            if (state.socket) {
+                state.socket.emit('getUserOnlineStatus', username);
+            }
+        }
+
+        if (state.socket) {
+            state.socket.on('getUserOnlineStatus', (status: string) => {
+                isUserOnline.value = status;
+            });
+        }
 
         async function fetchUserData(username: string) {
             try {
@@ -137,6 +153,7 @@ export default defineComponent({
             profilePicImagePath,
             profileBannerImagePath,
             formatTimeNumberToString,
+            isUserOnline,
         };
     },
 });
@@ -199,6 +216,9 @@ export default defineComponent({
     margin-bottom: 1.5%;
     margin-top: 1%;
     font-size: 30px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .user-profile-meta p {
@@ -227,6 +247,18 @@ h3 {
 button.goBackButton {
     top: 10vh;
     right: 20vw;
+}
+
+.online-status {
+  height: 15px;
+  width: 15px;
+  display: block;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+.online-status.online {
+    background-color: green;
 }
 
 </style>

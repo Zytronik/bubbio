@@ -113,6 +113,12 @@ export class LobbyGateway implements OnGatewayConnection {
     });
   }
 
+  @SubscribeMessage('getUserOnlineStatus')
+  handleGetUserOnlineStatus(@MessageBody() username, @ConnectedSocket() client: Socket) {
+    const status = this.lobbyData.checkUserStatus(username);
+    client.emit('getUserOnlineStatus', status);
+  }
+
   @SubscribeMessage('isUserInRoomAlready')
   async handleIsUserInRoomAlready(@MessageBody() data, @ConnectedSocket() client: Socket) {
     const isAuthenticated = await this.authenticationPromises.get(client.id) ?? false;
