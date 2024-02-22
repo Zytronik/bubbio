@@ -27,7 +27,7 @@
                         <p>Average Bubbles Cleared: {{ Math.round(userData.sprintStats.averageBubblesCleared * 100) / 100 }}</p>
                         <p>Average Bubbles Per Second: {{ Math.round(userData.sprintStats.averageBubblesPerSecond * 100) / 100 }}</p>
                         <p>Average Bubbles Shot: {{ Math.round(userData.sprintStats.averageBubblesShot * 100) / 100 }}</p>
-                        <p>Average Sprint Time: {{ Math.round(userData.sprintStats.averageSprintTime * 100) / 100 }}</p>
+                        <p>Average Sprint Time: {{ formatTimeNumberToString(userData.sprintStats.averageSprintTime) }}</p>
                         <p>Games Played: {{ Math.round(userData.sprintStats.sprintGamesPlayed * 100) / 100 }}</p>
                     </div>
                     <div v-else>
@@ -43,6 +43,7 @@
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { getDefaultProfileBannerURL, getDefaultProfilePbURL } from '@/ts/networking/paths';
+import { formatTimeNumberToString } from '@/ts/gameplay/gameplay.stat-tracker';
 
 interface UserData {
     id: number;
@@ -135,6 +136,7 @@ export default defineComponent({
             formattedDate,
             profilePicImagePath,
             profileBannerImagePath,
+            formatTimeNumberToString,
         };
     },
 });
