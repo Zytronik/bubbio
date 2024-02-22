@@ -76,7 +76,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const userData = ref<UserData | null>(null);
         const userError = ref<string | null>(null);
-        const isUserOnline = ref<string>("false");
+        const isUserOnline = ref<string>("notFound");
 
         const formattedDate = computed(() => {
             if (userData.value && userData.value.createdAt) {
