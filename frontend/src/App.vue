@@ -31,7 +31,7 @@ import { PAGE_STATE } from './ts/page/page.e-page-state';
 import { checkIfUsernameIsTaken, checkUserAuthentication, clearClientState, login, loginAsGuest, logUserOut, register, showLoginForm } from './ts/networking/networking.auth';
 import eventBus from './ts/page/page.event-bus';
 import { httpClient } from './ts/networking/networking.http-client';
-import { getDefaultProfilePbURL, getProfilePbURL } from './ts/networking/paths';
+import { getDefaultProfilePbURL } from './ts/networking/paths';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -204,7 +204,7 @@ export default {
         } else {
           fetchUserData().then((data) => {
             if (data) {
-              const updatedPbUrl = data.pbUrl ? getProfilePbURL() + data.pbUrl : getDefaultProfilePbURL();
+              const updatedPbUrl = data.pbUrl ? data.pbUrl : getDefaultProfilePbURL();
               userData.value = {
                 ...data,
                 pbUrl: updatedPbUrl,

@@ -3,12 +3,11 @@ import { CreateUserDto } from 'src/auth/dto/auth.dto.createUser';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import axios from 'axios';
-import * as path from 'path';
-import * as fs from 'fs';
+import { FileStorageService } from './fileStorage.service';
 
 @Injectable()
 export class UserService {
-    constructor(private prisma: PrismaService) { }
+    constructor(private prisma: PrismaService, private fileStorageService: FileStorageService,) { }
 
     async createUser(createUserDto: CreateUserDto, clientIp: string): Promise<any> {
         // Fetch the country code using the client's IP address
@@ -190,31 +189,23 @@ export class UserService {
         return await this.prisma.user.count();
     }
 
-    async updateProfileImgs(userId: number, file, imgType: "pb" | "banner"): Promise<void> {
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-        });
-
+    async updateProfileImgs(userId: number, file: Express.Multer.File, imgType: "pb" | "banner"): Promise<void> {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
         const fieldToUpdate = imgType === "pb" ? "pbUrl" : "bannerUrl";
         const oldFilename = user[fieldToUpdate];
-        const uploadPath = path.join(__dirname, '..', '..', '..', 'uploads', imgType);
-        const newFilename = file.filename;
 
-        // Update the database first
+        // Upload the new file to DigitalOcean Spaces and get the URL
+        const fileUrl = await this.fileStorageService.uploadFile(file, imgType);
+
+        // Update the database with the new file URL
         await this.prisma.user.update({
             where: { id: userId },
-            data: { [fieldToUpdate]: newFilename },
+            data: { [fieldToUpdate]: fileUrl },
         });
 
-        // Then attempt to delete the old file if it's different from the new one
-        if (oldFilename && oldFilename !== newFilename) {
-            const oldFilePath = path.join(uploadPath, oldFilename);
-            fs.unlink(oldFilePath, (err) => {
-                if (err) {
-                    // Log the error or handle it according to your application's needs
-                    console.error(`Failed to delete old file: ${oldFilePath}`, err.message);
-                }
-            });
+        // Delete the old file from DigitalOcean Spaces if it's different from the new one
+        if (oldFilename && oldFilename !== fileUrl) {
+            await this.fileStorageService.deleteFile(oldFilename, imgType);
         }
     }
 

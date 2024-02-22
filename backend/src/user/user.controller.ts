@@ -1,9 +1,10 @@
-import { Controller, Get, HttpException, HttpStatus, Param, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { generateMulterOptions } from 'src/multerConfig';
+import { diskStorage } from 'multer';
+import { ValidateImagePipe } from './validateImgPipeline';
 
 @Controller('users')
 export class UserController {
@@ -30,13 +31,12 @@ export class UserController {
     return this.userService.getUserProfileByUsername(username);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('updateProfilePic')
-  @UseInterceptors(FileInterceptor('profilePic', generateMulterOptions('pb')))
-  async updateProfilePicture(@UploadedFile() file, @Req() req: AuthenticatedRequest) {
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('profilePic'))
+  async updateProfilePicture(@UploadedFile(new ValidateImagePipe()) file: Express.Multer.File, @Req() req: AuthenticatedRequest) {
     if (!file) {
-      // If file is undefined, it means Multer rejected the file upload.
-      throw new HttpException('Invalid file type. Only JPEG and PNG are allowed.', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('No file uploaded.');
     }
     const userId = req.user.userId;
     await this.userService.updateProfileImgs(userId, file, "pb");
@@ -45,10 +45,10 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('updateProfileBanner')
-  @UseInterceptors(FileInterceptor('profileBanner', generateMulterOptions('banner')))
-  async updateProfileBanner(@UploadedFile() file, @Req() req: AuthenticatedRequest) {
+  @UseInterceptors(FileInterceptor('profileBanner'))
+  async updateProfileBanner(@UploadedFile(new ValidateImagePipe()) file: Express.Multer.File, @Req() req: AuthenticatedRequest) {
     if (!file) {
-      throw new HttpException('Invalid file type. Only JPEG and PNG are allowed.', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('No file uploaded.');
     }
     const userId = req.user.userId;
     await this.userService.updateProfileImgs(userId, file, "banner");

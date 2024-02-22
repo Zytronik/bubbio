@@ -17,14 +17,6 @@ if (host === "localhost" || ipRegex.test(host)) {
     backendURL = "https://blubb.io/blubbio-backend/"
 }
 
-export function getProfilePbURL(){
-    return backendURL + "userData/pb/";
-}
-
-export function getProfileBannerURL(){
-    return backendURL + "userData/banner/";
-}
-
 export function getDefaultProfilePbURL(){
     return require(`@/img/default/pbPlaceholder.png`);
 }

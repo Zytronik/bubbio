@@ -40,7 +40,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
-import { getDefaultProfileBannerURL, getDefaultProfilePbURL, getProfileBannerURL, getProfilePbURL } from '@/ts/networking/paths';
+import { getDefaultProfileBannerURL, getDefaultProfilePbURL } from '@/ts/networking/paths';
 
 interface UserData {
     username: string;
@@ -85,14 +85,14 @@ export default defineComponent({
 
         const profileBannerImagePath = computed(() => {
             if (userData.value && userData.value.bannerUrl) {
-                return userData.value ? getProfileBannerURL() + userData.value.bannerUrl : '';
+                return userData.value.bannerUrl;
             }
             return getDefaultProfileBannerURL();
         });
 
         const profilePicImagePath = computed(() => {
             if (userData.value && userData.value.pbUrl) {
-                return userData.value ? getProfilePbURL() + userData.value.pbUrl : '';
+                return userData.value.pbUrl;
             }
             return getDefaultProfilePbURL();
         });
@@ -131,7 +131,7 @@ export default defineComponent({
             flagImagePath,
             formattedDate,
             profilePicImagePath,
-            profileBannerImagePath
+            profileBannerImagePath,
         };
     },
 });
