@@ -82,7 +82,14 @@ export class UserService {
     async getUserSprintRank(username: string): Promise<number | null> {
         // Step 1: Get the user's best sprint time
         const userBestTimeRecord = await this.prisma.sprint.findFirst({
-            where: { user: { username: username } },
+            where: { 
+                user: { 
+                    username: {
+                        equals: username,
+                        mode: 'insensitive', 
+                    } 
+                } 
+            },
             orderBy: { sprintTime: 'asc' },
             select: { sprintTime: true },
         });
