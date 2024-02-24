@@ -134,6 +134,7 @@ export class UserService {
               country: true,
               pbUrl: true,
               bannerUrl: true,
+              LastDisconnectedAt: true,
             },
           });
 
@@ -218,5 +219,11 @@ export class UserService {
         }
     }
 
+    async updateLastDisconnectedAt(username: string): Promise<void> {
+        await this.prisma.user.update({
+          where: { username },
+          data: { LastDisconnectedAt: new Date() },
+        });
+      }
 
 }

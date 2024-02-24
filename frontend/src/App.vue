@@ -228,6 +228,7 @@ export default {
     }
 
     async function fetchUserData() {
+      console.log("fetchUserData");
       const token = localStorage.getItem('authToken');
       const response = await httpClient.get('/users/me', {
         headers: {
@@ -238,21 +239,27 @@ export default {
     }
 
     /* General */
+    function initOnSocketDisconnect(){
+      if(state.socket){
+        state.socket.on('disconnect', () => {
+          //showInfoMessage('Disconnected from server. Reconnecting...', 'info');
+        });
+      }
+    }
 
     onMounted(async () => {
       setupTransitionFunctions();
       initializeGlobalSocket();
       isAuthenticated.value = checkUserAuthentication();
       if (isAuthenticated.value) {
-        userData.value = await fetchUserData();
         joinRoomFromHash();
       } else {
         clearClientState();
         showLoginForm();
       }
-      updateProfileData();
       showUserPageFromURL();
       addSocketConnectListener(initOnIsUserInRoomAlready);
+      addSocketConnectListener(initOnSocketDisconnect);
       window.addEventListener('beforeunload', clearGuestCookies);
     });
 

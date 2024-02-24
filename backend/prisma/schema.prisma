@@ -15,6 +15,7 @@ model User {
   country         String?
   pbUrl           String?         
   bannerUrl       String?
+  LastDisconnectedAt  DateTime?        
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @default(now()) @updatedAt
   tokenBlacklists TokenBlacklist[]

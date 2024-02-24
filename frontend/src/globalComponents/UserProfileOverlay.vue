@@ -10,10 +10,12 @@
                 <div class="user-profile-inner-container">
                     <div class="user-profile-meta">
                         <img class="profile-pic" :src="profilePicImagePath" alt="Profile Picture">
-                        <h2>{{ userData.username.toUpperCase() }}<span class="online-status" :title="isUserOnline !== 'notFound' ? 'Online' : ''" :class="{ 'online': isUserOnline !== 'notFound' }">{{}}</span></h2>
+                        <h2>{{ userData.username.toUpperCase() }}<span class="online-status"
+                                :title="isUserOnline !== 'notFound' ? 'Online' : ''"
+                                :class="{ 'online': isUserOnline !== 'notFound' }">{{}}</span></h2>
                         <p v-if="userData.id < 4">Since the Beginning</p>
                         <p v-else>Joined: {{ formattedDate }}</p>
-                        <p>Last seen: TODO</p>
+                        <p v-if="isUserOnline !== 'notFound' || userData.LastDisconnectedAt">Last seen: {{ getLastSeenText(userData.LastDisconnectedAt) }}</p>
                         <div class="user-country">
                             <p v-if="userData.country">{{ userData.country }}</p>
                             <img class="user-flag" v-if="userData.countryCode && userData.country" :src="flagImagePath"
@@ -24,8 +26,10 @@
                     <h3>Sprint</h3>
                     <div v-if="userData.sprintStats.rank">
                         <p>Leaderboard Rank: {{ userData.sprintStats.rank }}</p>
-                        <p>Average Bubbles Cleared: {{ Math.round(userData.sprintStats.averageBubblesCleared * 100) / 100 }}</p>
-                        <p>Average Bubbles Per Second: {{ Math.round(userData.sprintStats.averageBubblesPerSecond * 100) / 100 }}</p>
+                        <p>Average Bubbles Cleared: {{ Math.round(userData.sprintStats.averageBubblesCleared * 100) / 100 }}
+                        </p>
+                        <p>Average Bubbles Per Second: {{ Math.round(userData.sprintStats.averageBubblesPerSecond * 100) /
+                            100 }}</p>
                         <p>Average Bubbles Shot: {{ Math.round(userData.sprintStats.averageBubblesShot * 100) / 100 }}</p>
                         <p>Average Sprint Time: {{ formatTimeNumberToString(userData.sprintStats.averageSprintTime) }}</p>
                         <p>Games Played: {{ Math.round(userData.sprintStats.sprintGamesPlayed * 100) / 100 }}</p>
@@ -49,11 +53,12 @@ import state from '@/ts/networking/networking.client-websocket';
 interface UserData {
     id: number;
     username: string;
-    createdAt: string;
+    createdAt: Date;
     countryCode: string;
     country: string;
     pbUrl: string;
     bannerUrl: string;
+    LastDisconnectedAt: Date;
     sprintStats: SprintStats;
     // ... other user fields
 }
@@ -115,8 +120,45 @@ export default defineComponent({
                 userData.value = await fetchUserData(props.username);
                 getUserOnlineStatus(props.username);
             }
-        
+
         });
+
+        function getLastSeenText(LastDisconnectedAt: Date) {
+            if (isUserOnline.value !== "notFound") {
+                return 'Online';
+            }
+
+            if (!LastDisconnectedAt) {
+                return '';
+            }
+
+            const now = new Date();
+            const lastSeenDate = new Date(LastDisconnectedAt);
+            const seconds = Math.round((now.getTime() - lastSeenDate.getTime()) / 1000);
+            const minutes = Math.round(seconds / 60);
+            const hours = Math.round(minutes / 60);
+            const days = Math.round(hours / 24);
+            const weeks = Math.round(days / 7);
+            const months = Math.round(weeks / 4.345); // Average weeks per month
+            const years = Math.round(months / 12);
+
+            if (seconds < 60) {
+                return 'just now';
+            } else if (minutes < 60) {
+                return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            } else if (hours < 24) {
+                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            } else if (days < 7) {
+                return `${days} day${days > 1 ? 's' : ''} ago`;
+            } else if (weeks < 4.345) {
+                return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+            } else if (months < 12) {
+                return `${months} month${months > 1 ? 's' : ''} ago`;
+            } else {
+                return `${years} year${years > 1 ? 's' : ''} ago`;
+            }
+        }
+
 
         function getUserOnlineStatus(username: string): void {
             if (state.socket) {
@@ -154,6 +196,7 @@ export default defineComponent({
             profileBannerImagePath,
             formatTimeNumberToString,
             isUserOnline,
+            getLastSeenText,
         };
     },
 });
@@ -250,15 +293,14 @@ button.goBackButton {
 }
 
 .online-status {
-  height: 15px;
-  width: 15px;
-  display: block;
-  border-radius: 50%;
-  margin-left: 10px;
+    height: 15px;
+    width: 15px;
+    display: block;
+    border-radius: 50%;
+    margin-left: 10px;
 }
 
 .online-status.online {
     background-color: green;
 }
-
 </style>

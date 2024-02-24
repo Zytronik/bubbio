@@ -44,12 +44,11 @@ export class LobbyGateway implements OnGatewayConnection {
 
   @SubscribeMessage('disconnecting')
   handleDisconnecting(@ConnectedSocket() client: Socket) {
-    const roomId = this.lobbyData.getCurrentRoomId(client.id);
-    if (roomId) { //if user in room
-      this.sendLeaveMessage(client.id, roomId);
-      this.lobbyData.moveUserToNoRoom(client.id);
-      this.updateFrontendRoomUserList(roomId);
+    if (this.isClientLoggedIn(client)) {
+      console.log(client.data.user, client.data.user.username)
+      this.userService.updateLastDisconnectedAt(client.data.user.username);
     }
+    this.leaveRoom(client);
     this.removeUserAndLogDisconnection(client.id);
   }
 
@@ -72,16 +71,7 @@ export class LobbyGateway implements OnGatewayConnection {
 
   @SubscribeMessage('leaveRoom')
   handleLeaveRoom(@ConnectedSocket() client: Socket) {
-    const roomId = this.lobbyData.getCurrentRoomId(client.id);
-    if (roomId) {
-      this.sendLeaveMessage(client.id, roomId);
-      this.lobbyData.moveUserToNoRoom(client.id);
-      this.updateFrontendRoomUserList(roomId);
-      this.emitActiveRoomsUpdate();
-      this.lobbyData.logRoomsInformations('User left a room');
-    } else {
-      console.error(`Client Id: ${client.id} is trying to leave a room without being in one`);
-    }
+    this.leaveRoom(client);
   }
 
 
@@ -154,6 +144,23 @@ export class LobbyGateway implements OnGatewayConnection {
       return false;
     }
   }
+  
+  isClientLoggedIn(client: Socket): boolean {
+    return client.data.role === "User";
+  }
+
+  private leaveRoom(client: Socket){
+    const roomId = this.lobbyData.getCurrentRoomId(client.id);
+    if (roomId) {
+      this.sendLeaveMessage(client.id, roomId);
+      this.lobbyData.moveUserToNoRoom(client.id);
+      this.updateFrontendRoomUserList(roomId);
+      this.emitActiveRoomsUpdate();
+      this.lobbyData.logRoomsInformations('User left a room');
+    } else {
+      //console.error(`Client Id: ${client.id} is trying to leave a room without being in one`);
+    }
+  }
 
   private handleGuestConnection(client: Socket) {
     const guestUsername = "Guest-" + client.handshake.query.guestUsername || `Guest-${Math.random().toString(36).substring(2, 15)}`;
@@ -178,7 +185,7 @@ export class LobbyGateway implements OnGatewayConnection {
     this.lobbyData.logRoomsInformations('Message send');
   }
 
-  private addUserToNoRoom(client: any) {
+  private addUserToNoRoom(client: Socket) {
     this.lobbyData["noRoom"].push({
       clientId: client.id,
       username: client.data.user.username,

@@ -75,7 +75,8 @@
               <input type="text" placeholder="Search user..." v-model="searchQuery" />
               <ul :class="{ 'expanded': searchResults.length > 0 }">
                 <li v-for="user in searchResults" :key="user.id" @click="openUserProfile(user.username)">
-                  <img v-if="user.countryCode" :src="getFlagImagePath(user.countryCode)" :alt="`${user.country}`"><span>{{ user.username.toUpperCase() }}</span>
+                  <img v-if="user.countryCode" :src="getFlagImagePath(user.countryCode)" :alt="`${user.country}`"><span>{{
+                    user.username.toUpperCase() }}</span>
                 </li>
               </ul>
             </div>
@@ -153,39 +154,10 @@ export default {
       tabs: ['Dashboard', 'Leaderboards', 'Spectate'],
     };
   },
-  setup() {
+  setup() {       
+    /* Search Users */
     const searchQuery = ref('');
     const searchResults = ref<User[]>([]);
-    const selectedUsername = ref<string | null>(null);
-    const showUserProfileOverlay = ref<boolean>(false);
-    const stats = ref({
-      peopleOnline: 0,
-      activeLobbies: 0,
-      registeredUsers: 0,
-      gamesPlayed: 0,
-    });
-    const peopleOnlineRef = ref(null);
-    const activeLobbiesRef = ref(null);
-    const registeredUsersRef = ref(null);
-    const gamesPlayedRef = ref(null);
-    const messagesContainer: Ref<HTMLElement | null> = ref(null);
-    let intervalId = 0;
-    const { messages } = useChatStore();
-    const chatInput = ref('');
-
-    const isAuthenticated = computed(() => checkUserAuthentication());
-    const isVisible = ref(false);
-
-    function slideOverlayIn() {
-      isVisible.value = true;
-    }
-
-    function slideOverlayOut() {
-      isVisible.value = false;
-      setTimeout(() => {
-        closeChannelOverlay();
-      }, 400);
-    }
 
     function getFlagImagePath(countryCode: string) {
       if (countryCode) {
@@ -210,18 +182,14 @@ export default {
       }
     }, 300);
 
-    function animateStat(element: HTMLElement | null, endVal: number) {
-      if (element) {
-        const countUp = new CountUp(element, endVal);
-        if (!countUp.error) {
-          countUp.start();
-        }
-      }
-    }
-
     watchEffect(() => {
       fetchSearchResults(searchQuery.value);
     });
+
+    /* Overlay & URL */
+    const selectedUsername = ref<string | null>(null);
+    const showUserProfileOverlay = ref<boolean>(false);
+    const isVisible = ref(false);  
 
     function openUserProfile(username: string) {
       let delay = 0;
@@ -231,10 +199,21 @@ export default {
       }
       setTimeout(() => {
         searchQuery.value = "";
-        selectedUsername.value = username;
+        selectedUsername.value = username.toLocaleLowerCase();
         showUserProfileOverlay.value = true;
-        history.pushState(null, '', `/user/${username}`);
+        history.pushState(null, '', `/user/${selectedUsername.value}`);
       }, delay);
+    }
+
+    function slideOverlayIn() {
+      isVisible.value = true;
+    }
+
+    function slideOverlayOut() {
+      isVisible.value = false;
+      setTimeout(() => {
+        closeChannelOverlay();
+      }, 400);
     }
 
     function closeUserProfileOverlay() {
@@ -253,6 +232,11 @@ export default {
       }
     }
 
+    /* Messages */
+    const messagesContainer: Ref<HTMLElement | null> = ref(null);
+    const { messages } = useChatStore();
+    const chatInput = ref('');
+
     function sendChatMessage() {
       if (state.socket && chatInput.value.trim() !== '') {
         state.socket.emit('sendGlobalChatMessage', { text: chatInput.value });
@@ -260,25 +244,7 @@ export default {
       }
     }
 
-    async function fetchStats() {
-      if (state.socket) {
-        state.socket.emit('fetchGlobalStats');
-      }
-      try {
-        const response = await httpClient.get('/sprint/totalGames');
-        stats.value.gamesPlayed = response.data;
-      } catch (error) {
-        console.error('Failed to fetch total games played:', error);
-      }
-    }
-
-    if (state.socket) {
-      state.socket.on('fetchGlobalStats', (globalStats) => {
-        stats.value = globalStats;
-      });
-    }
-
-    function scollGlobalChatToBottom(){
+    function scollGlobalChatToBottom() {
       if (messagesContainer.value) {
         messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
       }
@@ -290,19 +256,87 @@ export default {
       });
     }, { deep: true });
 
+    /* Stats */
+    interface GlobalStats {
+      peopleOnline: number;
+      activeLobbies: number;
+      registeredUsers: number;
+      gamesPlayed?: number;
+    }
+
+    const stats = ref({
+      peopleOnline: 0,
+      activeLobbies: 0,
+      registeredUsers: 0,
+      gamesPlayed: 0,
+    });
+    const peopleOnlineRef = ref(null);
+    const activeLobbiesRef = ref(null);
+    const registeredUsersRef = ref(null);
+    const gamesPlayedRef = ref(null);
+    let intervalId = 0;
+    const initialAnimationDone = ref(false);
+
+    function handleGlobalStatsUpdate(globalStats: GlobalStats) {
+      stats.value = {
+        peopleOnline: globalStats.peopleOnline,
+        activeLobbies: globalStats.activeLobbies,
+        registeredUsers: globalStats.registeredUsers,
+        gamesPlayed: globalStats.gamesPlayed ?? stats.value.gamesPlayed,
+      };
+      if (!initialAnimationDone.value) {
+        animateStat(peopleOnlineRef.value, stats.value.peopleOnline);
+        animateStat(activeLobbiesRef.value, stats.value.activeLobbies);
+        animateStat(registeredUsersRef.value, stats.value.registeredUsers);
+        animateStat(gamesPlayedRef.value, stats.value.gamesPlayed);
+        initialAnimationDone.value = true;
+      }
+    }
+
+    function animateStat(element: HTMLElement | null, endVal: number) {
+      if (element) {
+        const countUp = new CountUp(element, endVal);
+        if (!countUp.error) {
+          countUp.start();
+        }
+      }
+    }
+
+    async function fetchStats() {
+      try {
+        const response = await httpClient.get('/sprint/totalGames');
+        stats.value.gamesPlayed = response.data;
+        if (state.socket) {
+          state.socket.emit('fetchGlobalStats');
+        }
+      } catch (error) {
+        console.error('Failed to fetch total games played:', error);
+      }
+    }
+
+    /* General */
+    const isAuthenticated = computed(() => checkUserAuthentication());
+
     onMounted(async () => {
       slideOverlayIn();
       showUserPageFromURL();
       await fetchStats();
-      intervalId = setInterval(fetchStats, 30000);
-      animateStat(peopleOnlineRef.value, stats.value.peopleOnline);
-      animateStat(activeLobbiesRef.value, stats.value.activeLobbies);
-      animateStat(registeredUsersRef.value, stats.value.registeredUsers);
-      animateStat(gamesPlayedRef.value, stats.value.gamesPlayed);
+      intervalId = setInterval(async () => {
+        await fetchStats();
+      }, 30000);
+      if (state.socket) {
+        state.socket.on('fetchGlobalStats', (globalStats: GlobalStats) => {
+          handleGlobalStatsUpdate(globalStats);
+        });
+      }
       scollGlobalChatToBottom();
     });
 
     onUnmounted(() => {
+      initialAnimationDone.value = false;
+      if (state.socket) {
+        state.socket.off('fetchGlobalStats', handleGlobalStatsUpdate);
+      }
       if (intervalId) {
         clearInterval(intervalId);
       }
@@ -608,6 +642,7 @@ h2 {
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -619,13 +654,15 @@ h2 {
     opacity: 1;
     transform: scale(1);
   }
+
   to {
     opacity: 0;
     transform: scale(0.9);
   }
 }
 
-.fade-scale-enter-active, .fade-scale-leave-active {
+.fade-scale-enter-active,
+.fade-scale-leave-active {
   animation-duration: 0.2s;
   animation-fill-mode: both;
   transition-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
@@ -679,6 +716,7 @@ h2 {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -688,12 +726,14 @@ h2 {
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   animation-duration: 0.2s;
   animation-fill-mode: both;
   transition-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
@@ -705,6 +745,4 @@ h2 {
 
 .fade-leave-active {
   animation-name: fadeOut;
-}
-
-</style>
+}</style>
