@@ -45,7 +45,6 @@ export class LobbyGateway implements OnGatewayConnection {
   @SubscribeMessage('disconnecting')
   handleDisconnecting(@ConnectedSocket() client: Socket) {
     if (this.isClientLoggedIn(client)) {
-      console.log(client.data.user, client.data.user.username)
       this.userService.updateLastDisconnectedAt(client.data.user.username);
     }
     this.leaveRoom(client);
