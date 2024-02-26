@@ -1,51 +1,22 @@
-import { angleLeftInput, angleRightInput } from '@/ts/input/input.possible-inputs';
+import { GameSettings } from '../../settings/i/settings.i.game-settings';
 import { Coordinates } from '../i/game.i.grid-coordinates';
-import { APS, APS2 } from '@/ts/settings/settings.handling';
-import { getAngle, getGameSettings, setAngle } from '../game.master';
 
-let currentAPS: number = APS.value;
-
-export function getVelocity(angle: number): Coordinates {
-    let cleanAngle = cleanUpAngle(angle);
+export function getVelocity(angle: number, settings: GameSettings): Coordinates {
+    let cleanAngle = cleanUpAngle(angle, settings);
     return { x: cosTable[cleanAngle * 10], y: -sinTable[cleanAngle * 10] };
 }
 
-export function left(): void {
-    const timePassed = performance.now() - angleLeftInput.lastFiredAtTime
-    const leftAmount = currentAPS * timePassed / 1000
-    setAngle(cleanUpAngle(getAngle() - leftAmount));
-}
-
-export function right(): void {
-    const timePassed = performance.now() - angleRightInput.lastFiredAtTime
-    const rightAmount = currentAPS * timePassed / 1000
-    setAngle(cleanUpAngle(getAngle() + rightAmount));
-}
-
-export function center(): void {
-    setAngle(90);
-}
-
-export function changeAPS(): void {
-    currentAPS = APS2.value;
-}
-
-export function revertAPS(): void {
-    currentAPS = APS.value;
-}
-
-function cleanUpAngle(angle: number): number {
-    const settings = getGameSettings();
-    if (angle < settings.minAngle.value) {
-        return settings.minAngle.value;
+export function cleanUpAngle(angle: number, settings: GameSettings): number {
+    if (angle < settings.minAngle.refValue.value) {
+        return settings.minAngle.refValue.value;
     }
-    else if (angle > settings.maxAngle.value) {
-        return settings.maxAngle.value;
+    else if (angle > settings.maxAngle.refValue.value) {
+        return settings.maxAngle.refValue.value;
     }
     else {
         return Number(angle.toFixed(1));
     }
-}
+} 
 
 const cosTable: number[] = [
     -10000,

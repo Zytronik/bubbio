@@ -18,10 +18,10 @@ export function setupBubbleQueueAndCurrent(seed: number, currentBubble: Bubble, 
 
 export function holdBubble(currentBubble: Bubble, heldBubble: Bubble, queue: Bubble[], seed: number): number {
     if (!heldBubble) {
-        heldBubble = currentBubble;
-        currentBubble = queue.shift();
         const randomIndex = convertSeedToRandomNumber(0, allBubbles.length, seed);
         queue.push(allBubbles[randomIndex]);
+        heldBubble = currentBubble;
+        currentBubble = queue.shift();
         return getNextSeed(seed);
     }
     const temp = currentBubble;
@@ -31,9 +31,9 @@ export function holdBubble(currentBubble: Bubble, heldBubble: Bubble, queue: Bub
 }
 
 export function updateBubbleQueueAndCurrent(currentBubble: Bubble, queue: Bubble[], seed: number): number {
-    currentBubble = queue.shift();
     const randomIndex = convertSeedToRandomNumber(0, allBubbles.length, seed);
     queue.push(allBubbles[randomIndex]);
+    currentBubble = queue.shift();
     return getNextSeed(seed);
 }
 

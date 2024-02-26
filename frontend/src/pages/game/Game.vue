@@ -1,16 +1,14 @@
 <template class="page" id="game">
   <div>
     <span class="monospace" v-html="playGridASCII"></span> <br>
-    <span>angle: {{ angle }}</span> <br>
-    <input type="range" v-model="angle" min="0" max="180" step="1">
+    <!-- <span>angle: {{ angle }}</span> <br> -->
   </div>
 </template>
 
 <script lang="ts">
 import { onUnmounted } from 'vue';
 import { leaveGame } from '@/ts/game/game.master';
-import { playGridASCII } from '@/ts/game/visuals/game.logic.visuals.ascii';
-import { angle } from '@/ts/game/logic/game.logic.angle';
+import { playGridASCII } from '@/ts/game/visuals/game.visuals.ascii';
 
 window.addEventListener('keydown', function (e) {
   if (e.keyCode == 32 && e.target == document.body) {
@@ -27,11 +25,9 @@ export default {
 
     return {
       playGridASCII,
-      angle,
     }
   },
 }
-
 </script>
 
 <style>

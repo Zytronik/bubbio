@@ -6,7 +6,8 @@ import { GameInstance } from "../i/game.i.game-instance";
 import { Grid } from "../i/game.i.grid";
 import { Coordinates } from "../i/game.i.grid-coordinates";
 
-export function shootBubble(game: GameInstance, angle: number): void {
+export function shootBubble(game: GameInstance): void {
+    const angle = game.angle;
     const grid = game.playGrid;
     const bubble = game.currentBubble;
     const bubbleCoords = { x: grid.bubbleLauncherPosition.x, y: grid.bubbleLauncherPosition.y };
@@ -33,7 +34,8 @@ export function shootBubble(game: GameInstance, angle: number): void {
     }
 }
 
-export function calculatePreview(game: GameInstance, angle: number): void {
+export function calculatePreview(game: GameInstance): void {
+    const angle = game.angle;
     const grid = game.playGrid;
     const bubble = game.currentBubble;
     const bubbleCoords = { x: grid.bubbleLauncherPosition.x, y: grid.bubbleLauncherPosition.y };

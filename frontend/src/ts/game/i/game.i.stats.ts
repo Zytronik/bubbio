@@ -1,6 +1,7 @@
 export interface GameStats {
     gameStartTime: number,
     gameEndTime: number,
+    gameDuration: number,
     currentTime: number,
     formattedCurrentTime: string,
 
@@ -35,9 +36,4 @@ export interface GameStats {
 
     // handlingsUsed: dont know yet xd
     // gameSubmittedAtTime: number
-}
-
-export enum GAME_MODE {
-    NONE = 'NONE',
-    SPRINT = 'SPRINT',
 }

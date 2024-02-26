@@ -1,18 +1,18 @@
 import { getVelocity } from "./game.logic.angle";
-import { Field } from "../i/game.i.field";
-import { Coordinates } from "../i/game.i.grid-coordinates";
 import { dissolveBubbles, getNearbyFields } from "./game.logic.grid-manager";
-import { Grid } from "../i/game.i.grid";
-import { getAngle, getCurrentBubble, getPlayGrid, triggerGameLost } from "../game.master";
 import { trackBubbleShot } from "./game.logic.stat-tracker";
+import { Field } from "../i/game.i.field";
+import { Grid } from "../i/game.i.grid";
+import { Coordinates } from "../i/game.i.grid-coordinates";
+import { GameInstance } from "../i/game.i.game-instance";
 
-export function shootBubble(): void {
-    const angle = getAngle();
-    const grid = getPlayGrid();
-    const bubble = getCurrentBubble();
+export function shootBubble(game: GameInstance): void {
+    const angle = game.angle;
+    const grid = game.playGrid;
+    const bubble = game.currentBubble;
     const bubbleCoords = { x: grid.bubbleLauncherPosition.x, y: grid.bubbleLauncherPosition.y };
-    let xDirection = getVelocity(angle).x;
-    const yDirection = getVelocity(angle).y;
+    let xDirection = getVelocity(angle, game.gameSettings).x;
+    const yDirection = getVelocity(angle, game.gameSettings).y;
     let bounceAmount = 0
     while (!checkForCollision(grid, bubbleCoords)) {
         bubbleCoords.x += xDirection;
@@ -27,20 +27,20 @@ export function shootBubble(): void {
     const gridField = snapToNextEmptyField(grid, bubbleCoords);
     gridField.bubble = bubble;
     const bubblesCleared = dissolveBubbles(grid, gridField);
-    trackBubbleShot(bounceAmount, bubblesCleared);
+    trackBubbleShot(game, bounceAmount, bubblesCleared);
 
     if (bubblesCleared < 3 && grid.rows[gridField.coords.y].isInDeathZone) {
-        triggerGameLost();
+        game.gameTransitions.onGameDefeat();
     }
 }
 
-export function calculatePreview(): void {
-    const angle = getAngle();
-    const grid = getPlayGrid();
-    const bubble = getCurrentBubble();
+export function calculatePreview(game: GameInstance): void {
+    const angle = game.angle;
+    const grid = game.playGrid;
+    const bubble = game.currentBubble;
     const bubbleCoords = { x: grid.bubbleLauncherPosition.x, y: grid.bubbleLauncherPosition.y };
-    let xDirection = getVelocity(angle).x;
-    const yDirection = getVelocity(angle).y;
+    let xDirection = getVelocity(angle, game.gameSettings).x;
+    const yDirection = getVelocity(angle, game.gameSettings).y;
     let bounceAmount = 0
     while (!checkForCollision(grid, bubbleCoords)) {
         bubbleCoords.x += xDirection;

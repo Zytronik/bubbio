@@ -42,11 +42,11 @@
 
 <script lang="ts">
 import Game from '../game/Game.vue';
-import { setupSprintGame, startGame, leaveGame } from '@/ts/gameplay/gameplay.game-master';
 import { goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesPerSecond, bubblesShot, formattedCurrentTime } from '@/ts/gameplay/gameplay.stat-tracker';
 import { ref } from 'vue';
+import { leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
+import { formattedCurrentTime, bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesShot, bubblesPerSecond, } from '@/ts/game/visuals/game.visuals.stat-display';
 
 export default {
   name: 'SprintPage',
@@ -56,17 +56,19 @@ export default {
     const isDasboard = ref<boolean>(true);
     setupSprintGame();
 
-    function showGameView(){
+    function showGameView() {
       startGame();
       isGaming.value = true;
       isDasboard.value = false;
     }
 
-    function showDashboard(){
+    function showDashboard() {
       isGaming.value = false;
       isDasboard.value = true;
       leaveGame();
     }
+
+    formattedCurrentTime
 
     return {
       formattedCurrentTime,

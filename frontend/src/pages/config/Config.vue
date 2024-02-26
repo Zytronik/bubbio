@@ -3,6 +3,9 @@
     <h1>Config</h1>
     <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
     <h2>Input Settings</h2>
+    <h2>Game Settings</h2>
+    <label></label>
+    <input type="range" v-model="allGameSettings.gridWidth.refValue" v-min="allGameSettings.gridWidth.min" v-max="allGameSettings.gridWidth.max" step="1">
     <h2>Accounts Settings</h2>
     <p>Change Profile Picture (TODO)</p>
     <input type="file" @change="handleFileChange" accept="image/png, image/jpeg" />
@@ -15,6 +18,7 @@
 import { goToState } from '@/ts/page/page.page-manager';
 import { Ref, onMounted, ref } from 'vue';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
+import { allGameSettings } from '@/ts/settings/settings.game';
 
 export default {
   name: 'ConfigPage',
@@ -65,6 +69,7 @@ export default {
       goToState,
       handleFileChange,
       uploadImage,
+      allGameSettings,
     }
   }
 }

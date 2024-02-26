@@ -1,27 +1,23 @@
+import { angleCenter, angleLeft, angleRight, changeAPS, revertAPS, triggerShoot } from "../game/game.master";
 import { angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, shootInput } from "./input.possible-inputs";
-import { center, changeAPS, left, revertAPS, right } from "../game/logic/game.logic.angle";
-import { shootBubble } from "../game/logic/game.logic.shoot";
 
-export function setupGameControls(): void {
+export function enableGameInputs(): void {
     setupAngleControls();
     setupShootControls();
+    enableAngleControls();
+    enableShootControls();
 
     function setupAngleControls(): void {
-        angleLeftInput.fire = left;
-        angleRightInput.fire = right;
-        centerCursorInput.fire = center;
+        angleLeftInput.fire = angleLeft;
+        angleRightInput.fire = angleRight;
+        centerCursorInput.fire = angleCenter;
         changeAPSInput.fire = changeAPS;
         changeAPSInput.release = revertAPS;
     }
 
     function setupShootControls(): void {
-        shootInput.fire = shootBubble;
+        shootInput.fire = triggerShoot;
     }
-}
-
-export function enableGameInputs(): void {
-    enableAngleControls();
-    enableShootControls();
 
     function enableAngleControls(): void {
         angleLeftInput.enabled = true;

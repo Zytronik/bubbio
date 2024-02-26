@@ -2,10 +2,9 @@ import { Field } from "../i/game.i.field";
 import { Grid } from "../i/game.i.grid";
 import { Row } from "../i/game.i.row";
 import { Coordinates } from "../i/game.i.grid-coordinates";
-import { getGameSettings } from "../game.master";
+import { GameSettings } from "../../settings/i/settings.i.game-settings";
 
-export function setupGrid(): Grid {
-    const settings = getGameSettings();
+export function setupGrid(settings: GameSettings): Grid {
     const precisionWidth = settings.widthPrecisionUnits.value;
     const bubbleRadius = precisionWidth / (2 * settings.gridWidth.value);
     const bubbleDiameter = bubbleRadius * 2;
@@ -45,6 +44,14 @@ export function setupGrid(): Grid {
         playGrid.rows.push(row);
     }
     return playGrid;
+}
+
+export function resetGrid(playGrid: Grid): void {
+    playGrid.rows.forEach(row => {
+        row.fields.forEach(field => {
+            field.bubble = undefined;
+        })
+    })
 }
 
 export function getNearbyFields(playGrid: Grid, pointPosition: Coordinates): Field[] {

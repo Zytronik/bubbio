@@ -1,8 +1,9 @@
-import { GameSettings } from "./game.i.game-settings";
+import { GAME_MODE, GameSettings } from "./game.i.game-settings";
 import { Bubble } from "./game.i.bubble";
 import { GameStateHistory } from "./game.i.game-state-history";
 import { Grid } from "./game.i.grid";
-import { GAME_MODE, GameStats } from "./game.i.stats";
+import { GameStats } from "./game.i.stats";
+import { GameTransitions } from "./game.i.game-transitions";
 
 export interface GameInstance {
     playerID: string,
@@ -13,6 +14,7 @@ export interface GameInstance {
     initialSeed: number,
 
     currentSeed: number,
+    angle: number,
     currentBubble: Bubble,
     heldBubble?: Bubble,
     previewQueue: Bubble[],
@@ -22,6 +24,5 @@ export interface GameInstance {
     gameStateHistory: GameStateHistory,
     isProcessingInputs: boolean,
 
-    onGameVictory: () => void,
-    onGameDefeat: () => void,
+    gameTransitions: GameTransitions,
 }
