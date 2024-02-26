@@ -1,5 +1,5 @@
-import { GAME_MODE } from "@/ts/settings/i/settings.i.game-modes";
-import state from "../../networking/networking.client-websocket";
+import { GAME_MODE } from "@/ts/game/settings/i/game.settings.i.game-modes";
+import state from "../networking/networking.client-websocket";
 
 export function setupGame(): void {
     if (state.socket) {

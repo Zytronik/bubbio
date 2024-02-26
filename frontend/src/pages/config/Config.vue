@@ -4,8 +4,10 @@
     <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
     <h2>Input Settings</h2>
     <h2>Game Settings</h2>
-    <label></label>
-    <input type="range" v-model="allGameSettings.gridWidth.refValue" v-min="allGameSettings.gridWidth.min" v-max="allGameSettings.gridWidth.max" step="1">
+    <span>{{allGameSettings.gridWidth.name}}: {{ allGameSettings.gridWidth.refValue }}</span>
+    <br>
+    <input type="range" v-model="allGameSettings.gridWidth.refValue" :min="allGameSettings.gridWidth.min" :max="allGameSettings.gridWidth.max" step="1">
+    <br>
     <h2>Accounts Settings</h2>
     <p>Change Profile Picture (TODO)</p>
     <input type="file" @change="handleFileChange" accept="image/png, image/jpeg" />
@@ -18,7 +20,7 @@
 import { goToState } from '@/ts/page/page.page-manager';
 import { Ref, onMounted, ref } from 'vue';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { allGameSettings } from '@/ts/settings/settings.game';
+import { allGameSettings } from '@/ts/game/settings/game.settings.game';
 
 export default {
   name: 'ConfigPage',
@@ -45,7 +47,7 @@ export default {
 
       selectedFile.value = file;
     }
-
+    
     async function uploadImage() {
       if (!selectedFile.value) {
         alert('No file selected');
@@ -63,7 +65,7 @@ export default {
         alert('Failed to upload image');
       }
     }
-
+    
     return {
       PAGE_STATE,
       goToState,
@@ -76,3 +78,4 @@ export default {
 </script>
 
 <style></style>
+@/ts/game/settings/settings.game

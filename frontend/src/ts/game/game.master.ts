@@ -6,25 +6,28 @@ import { angleLeftInput, angleRightInput } from "../input/input.possible-inputs"
 import { GameStats } from "./i/game.i.stats";
 import { Bubble } from "./i/game.i.bubble";
 import { Grid } from "./i/game.i.grid";
-import { calculatePreview } from "./logic/game.logic.shoot";
+import { calculatePreview, shootBubble } from "./logic/game.logic.shoot";
 import { startStatDisplay, stopStatDisplay } from "./visuals/game.visuals.stat-display";
 import { createGameInstance } from "./logic/game.logic.instance-creator";
-import { allGameSettings } from "../settings/settings.game";
-import { GAME_MODE } from "../settings/i/settings.i.game-modes";
-import { allHandlingSettings } from "../settings/settings.handling";
+import { allGameSettings } from "./settings/game.settings.game";
+import { GAME_MODE } from "./settings/i/game.settings.i.game-modes";
+import { allHandlingSettings } from "./settings/game.settings.handling";
 import { GameTransitions } from "./i/game.i.game-transitions";
+import { GameSettings } from "./settings/i/game.settings.i.game-settings";
+import { holdBubble, updateBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
 
 
 let playerGameInstance: GameInstance;
 export function setupSprintGame(): void {
     const transitions: GameTransitions = {
         onGameStart: startSprint,
-        onGameAbort: cancelSprint,
-        onGameVictory: sprintVictory,
         onGameReset: resetSprint,
-        onGameDefeat: sprintVictory
+        onGameAbort: cancelSprint,
+        onGameDefeat: sprintDeath,
+        onGameVictory: sprintVictory
     }
 
+    applyGameSettingsRefNumbers(allGameSettings);
     playerGameInstance = createGameInstance(allGameSettings, GAME_MODE.SPRINT, allHandlingSettings, transitions);
 
     function startSprint(): void {
@@ -57,6 +60,16 @@ export function setupSprintGame(): void {
         stopStatDisplay();
         showASCIIDefeat();
     }
+}
+
+function applyGameSettingsRefNumbers(gameSettings: GameSettings): void {
+    gameSettings.gridWidth.value = gameSettings.gridWidth.refValue;
+    gameSettings.gridHeight.value = gameSettings.gridHeight.refValue;
+    gameSettings.gridExtraHeight.value = gameSettings.gridExtraHeight.refValue;
+    gameSettings.minAngle.value = gameSettings.minAngle.refValue;
+    gameSettings.maxAngle.value = gameSettings.maxAngle.refValue;
+    gameSettings.widthPrecisionUnits.value = gameSettings.widthPrecisionUnits.refValue;
+    gameSettings.collisionDetectionFactor.value = gameSettings.collisionDetectionFactor.refValue;
 }
 
 export function startGame(): void {
@@ -99,11 +112,13 @@ export function revertAPS(): void {
     playerGameInstance.currentAPS = playerGameInstance.handlingSettings.defaultAPS.value;
 }
 export function triggerShoot(): void {
-    //todo
+    shootBubble(playerGameInstance);
+    updateBubbleQueueAndCurrent(playerGameInstance);
 }
 export function triggerHold(): void {
-    //todo
+    holdBubble(playerGameInstance);
 }
+
 
 //Exported visuals
 export function getGameStats(): GameStats {
@@ -114,6 +129,19 @@ export function getAngle(): number {
 }
 export function getCurrentBubble(): Bubble {
     return playerGameInstance.currentBubble;
+}
+export function getHoldBubble(): Bubble {
+    if (!playerGameInstance.holdBubble) {
+        return {
+            color: "",
+            ascii: "",
+            type: 0
+        }
+    }
+    return playerGameInstance.holdBubble as Bubble;
+}
+export function getBubbleQueue(): Bubble[] {
+    return playerGameInstance.bubbleQueue;
 }
 export function getPlayGrid(): Grid {
     return playerGameInstance.playGrid;

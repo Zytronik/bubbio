@@ -2,10 +2,8 @@ import { Bubble } from "./game.i.bubble";
 
 export interface GameStateHistory {
     inputHistory: InputFrame[],
-    receivedBoardHistory: BoardHistoryFrame[],
-    calculatedBoardHistory: BoardHistoryFrame[],
-    receivedBubbleQueueHistory: BubbleQueueFrame[],
-    calculatedBubbleQueueHistory: BubbleQueueFrame[],
+    boardHistory: BoardHistoryFrame[],
+    bubbleQueueHistory: BubbleQueueFrame[],
     angleHistory: AngleFrame[],
     //sentgarbagehistory
     //receivedgarbagehistory

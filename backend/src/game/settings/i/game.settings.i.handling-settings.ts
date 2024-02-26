@@ -1,4 +1,4 @@
-import { NumberSetting } from "@/ts/settings/i/settings.i.number-setting";
+import { NumberSetting } from "./game.settings.i.number-setting";
 
 export interface HandlingSettings {
     defaultAPS: NumberSetting,

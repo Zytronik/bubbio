@@ -68,10 +68,24 @@ export const shootInput: Input = {
     enabled: false,
 };
 
+export const holdInput: Input = {
+    name: "Hold Bubble",
+    defaultKeyCode: "ControlLeft",
+    isTrigger: true,
+    pressed: false,
+    lastFiredAtTime: 0,
+    releasedAtTime: 0,
+    fire: () => {
+        console.error("no fire event attached to keyCode: " + holdInput.name);
+    },
+    enabled: false,
+};
+
 export const allInputs: Input[] = [
     angleLeftInput, 
     angleRightInput, 
     changeAPSInput, 
     centerCursorInput, 
-    shootInput
+    shootInput,
+    holdInput,
 ]

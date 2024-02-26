@@ -1,6 +1,7 @@
 import { Ref, ref } from "vue";
-import { getAngle, getCurrentBubble, getPlayGrid, updatePreviewBubble } from "../game.master";
+import { getAngle, getBubbleQueue, getCurrentBubble, getHoldBubble, getPlayGrid, updatePreviewBubble } from "../game.master";
 import { Coordinates } from "../i/game.i.grid-coordinates";
+import { Field } from "../i/game.i.field";
 
 export const playGridASCII: Ref<string> = ref("");
 
@@ -48,44 +49,99 @@ function asciiBoardAnimation(): void {
         previewPosition.x = playGrid.previewBubble.location.x;
         previewPosition.y = playGrid.previewBubble.location.y;
     }
-    let boardText = "___________________________________\n";
+
+    const gridWidth = playGrid.rows[0].fields.length;
+    let boardText = ""
+    boardText += getHoldBubbleString();
+    boardText += getBubbleQueueString();
+    boardText += getUpperBoarderLineString(gridWidth);
     let once = true;
     playGrid.rows.forEach(row => {
         if (row.isInDeathZone && once) {
-            boardText += "|–––––––––––––––––––––––––––––––––|\n"
+            boardText += getDeathZoneLineString(gridWidth);
             once = false;
         }
-
-        if (!row.isEvenRow) {
-            boardText += "| . ";
-        } else {
-            boardText += "| ";
-        }
-
-        row.fields.forEach(field => {
-            if (previewPosition.x === field.coords.x && previewPosition.y === field.coords.y) {
-                boardText += `|${getCurrentBubble().ascii}| `;
-            } else {
-                const bubbleASCII = field.bubble ? field.bubble.ascii : "-";
-                if (bubbleASCII != "-") {
-                    boardText += `(${bubbleASCII}) `;
-                } else {
-                    boardText += `-${bubbleASCII}- `;
-                }
-            }
-        });
-
-        if (!row.isEvenRow) {
-            boardText += ". |\n";
-        } else {
-            boardText += "|\n";
-        }
+        boardText += getRegularRowString(row.fields, row.isEvenRow, previewPosition);
     });
-    boardText += `| . . . . . . . .${getASCIIArrow()}. . . . . . . . |\n`;
+    boardText += getArrowLineString(gridWidth);
+    boardText += getLowerBoarderLineString(gridWidth);
     playGridASCII.value = boardText;
     if (asciiAnimationRunning) {
         animationFrameId = requestAnimationFrame(() => asciiBoardAnimation());
     }
+}
+
+function getUpperBoarderLineString(gridWidth: number): string {
+    let boarderLine = "╭─";
+    for (let i = 0; i < gridWidth; i++) {
+        boarderLine += "────";
+    }
+    boarderLine += "╮\n";
+    return boarderLine;
+}
+
+function getLowerBoarderLineString(gridWidth: number): string {
+    let boarderLine = "╰─";
+    for (let i = 0; i < gridWidth; i++) {
+        boarderLine += "────";
+    }
+    boarderLine += "╯\n";
+    return boarderLine;
+}
+
+function getDeathZoneLineString(gridWidth: number): string {
+    let deathZoneLine = "├┅";
+    for (let i = 0; i < gridWidth; i++) {
+        deathZoneLine += "┅┅┅┅";
+    }
+    deathZoneLine += "┤\n";
+    return deathZoneLine;
+}
+
+function getRegularRowString(fields: Field[], isEvenRow: boolean, previewPosition: Coordinates): string {
+    let rowString = "";
+    rowString += isEvenRow ? "│ " : "│&nbsp;&nbsp;&nbsp;";
+
+    fields.forEach(field => {
+        if (previewPosition.x === field.coords.x && previewPosition.y === field.coords.y) {
+            rowString += `|${getCurrentBubble().ascii}| `;
+        } else {
+            rowString += field.bubble ? `(${field.bubble.ascii}) ` : "--- ";
+        }
+    });
+
+    rowString += isEvenRow ? "│\n" : "&nbsp;&nbsp;│\n";
+    return rowString;
+}
+
+function getArrowLineString(gridWidth: number): string {
+    let arrowLine = "│ ";
+    const isEvenRow = gridWidth % 2 === 0;
+
+    for (let i = 0; i < (gridWidth / 2) - 1; i++) {
+        arrowLine += "&nbsp;&nbsp;&nbsp;&nbsp;";
+    }
+    arrowLine += isEvenRow ? `&nbsp;&nbsp;&nbsp;${getASCIIArrow()}&nbsp;&nbsp;&nbsp;&nbsp;` : ` ${getASCIIArrow()}  `
+    for (let i = 0; i < (gridWidth / 2) - 1; i++) {
+        arrowLine += "&nbsp;&nbsp;&nbsp;&nbsp;";
+    }
+
+    arrowLine += "│\n";
+    return arrowLine;
+}
+
+function getHoldBubbleString(): string {
+    const holdBubble = getHoldBubble();
+    return `Hold: ${holdBubble ? `(${holdBubble.ascii})` : ""}` + "\n";
+}
+
+function getBubbleQueueString(): string {
+    const queue = getBubbleQueue();
+    let queueString = `Queue: (${queue[0].ascii}) |`;
+    for (let i = 1; i < queue.length; i++) {
+        queueString += ` (${queue[i].ascii}) `;
+    }
+    return queueString + "\n\n";
 }
 
 function getASCIIArrow(): string {

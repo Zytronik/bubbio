@@ -1,7 +1,7 @@
 export interface GameTransitions {
     onGameStart: () => void,
-    onGameAbort: () => void,
-    onGameVictory: () => void,
     onGameReset: () => void,
+    onGameAbort: () => void,
     onGameDefeat: () => void,
+    onGameVictory: () => void,
 }

@@ -2,9 +2,9 @@ import { getVelocity } from "./game.logic.angle";
 import { dissolveBubbles, getNearbyFields } from "./game.logic.grid-manager";
 import { trackBubbleShot } from "./game.logic.stat-tracker";
 import { Field } from "../i/game.i.field";
+import { GameInstance } from "../i/game.i.game-instance";
 import { Grid } from "../i/game.i.grid";
 import { Coordinates } from "../i/game.i.grid-coordinates";
-import { GameInstance } from "../i/game.i.game-instance";
 
 export function shootBubble(game: GameInstance): void {
     const angle = game.angle;
@@ -26,7 +26,7 @@ export function shootBubble(game: GameInstance): void {
     }
     const gridField = snapToNextEmptyField(grid, bubbleCoords);
     gridField.bubble = bubble;
-    const bubblesCleared = dissolveBubbles(grid, gridField);
+    const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type);
     trackBubbleShot(game, bounceAmount, bubblesCleared);
 
     if (bubblesCleared < 3 && grid.rows[gridField.coords.y].isInDeathZone) {
@@ -41,7 +41,6 @@ export function calculatePreview(game: GameInstance): void {
     const bubbleCoords = { x: grid.bubbleLauncherPosition.x, y: grid.bubbleLauncherPosition.y };
     let xDirection = getVelocity(angle, game.gameSettings).x;
     const yDirection = getVelocity(angle, game.gameSettings).y;
-    let bounceAmount = 0
     while (!checkForCollision(grid, bubbleCoords)) {
         bubbleCoords.x += xDirection;
         bubbleCoords.y += yDirection;
@@ -49,7 +48,6 @@ export function calculatePreview(game: GameInstance): void {
         const hitRightWall = bubbleCoords.x > grid.precisionWidth - grid.bubbleRadius;
         if (hitLeftWall || hitRightWall) {
             xDirection = -xDirection;
-            bounceAmount++;
         }
     }
     if (!grid.previewBubble) {

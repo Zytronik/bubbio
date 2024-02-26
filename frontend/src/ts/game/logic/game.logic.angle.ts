@@ -1,17 +1,17 @@
-import { GameSettings } from '../../settings/i/settings.i.game-settings';
+import { GameSettings } from '../settings/i/game.settings.i.game-settings';
 import { Coordinates } from '../i/game.i.grid-coordinates';
 
 export function getVelocity(angle: number, settings: GameSettings): Coordinates {
-    let cleanAngle = cleanUpAngle(angle, settings);
+    const cleanAngle = cleanUpAngle(angle, settings);
     return { x: cosTable[cleanAngle * 10], y: -sinTable[cleanAngle * 10] };
 }
 
 export function cleanUpAngle(angle: number, settings: GameSettings): number {
-    if (angle < settings.minAngle.refValue.value) {
-        return settings.minAngle.refValue.value;
+    if (angle < settings.minAngle.value) {
+        return settings.minAngle.value;
     }
-    else if (angle > settings.maxAngle.refValue.value) {
-        return settings.maxAngle.refValue.value;
+    else if (angle > settings.maxAngle.value) {
+        return settings.maxAngle.value;
     }
     else {
         return Number(angle.toFixed(1));

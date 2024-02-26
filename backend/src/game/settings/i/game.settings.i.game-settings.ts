@@ -1,5 +1,5 @@
-import { BooleanSetting } from "@/ts/settings/i/settings.i.boolean-setting";
-import { NumberSetting } from "@/ts/settings/i/settings.i.number-setting";
+import { BooleanSetting } from "./game.settings.i.boolean-setting";
+import { NumberSetting } from "./game.settings.i.number-setting";
 
 export interface GameSettings {
     gridWidth: NumberSetting,

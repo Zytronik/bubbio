@@ -1,7 +1,7 @@
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
+import { GAME_MODE } from './settings/i/game.settings.i.game-modes';
 import { GameInstance } from './i/game.i.game-instance';
-import { GAME_MODE } from './i/game.i.game-settings';
 
 const ongoingGames: GameInstance[] = []
 

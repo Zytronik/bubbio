@@ -1,11 +1,11 @@
-import { HandlingSettings } from "@/ts/settings/i/settings.i.handling-settings";
-import { GameSettings } from "../../settings/i/settings.i.game-settings";
+import { GAME_MODE } from "../settings/i/game.settings.i.game-modes";
+import { GameSettings } from "../settings/i/game.settings.i.game-settings";
+import { HandlingSettings } from "../settings/i/game.settings.i.handling-settings";
 import { Bubble } from "./game.i.bubble";
 import { GameStateHistory } from "./game.i.game-state-history";
+import { GameTransitions } from "./game.i.game-transitions";
 import { Grid } from "./game.i.grid";
 import { GameStats } from "./game.i.stats";
-import { GAME_MODE } from "@/ts/settings/i/settings.i.game-modes";
-import { GameTransitions } from "./game.i.game-transitions";
 
 export interface GameInstance {
     gameMode: GAME_MODE,
@@ -17,8 +17,8 @@ export interface GameInstance {
     angle: number,
     currentAPS: number,
     currentBubble: Bubble,
-    heldBubble?: Bubble,
-    previewQueue: Bubble[],
+    holdBubble?: Bubble,
+    bubbleQueue: Bubble[],
     playGrid: Grid,
     stats: GameStats,
 

@@ -2,7 +2,7 @@ import { Field } from "../i/game.i.field";
 import { Grid } from "../i/game.i.grid";
 import { Row } from "../i/game.i.row";
 import { Coordinates } from "../i/game.i.grid-coordinates";
-import { GameSettings } from "../i/game.i.game-settings";
+import { GameSettings } from "../settings/i/game.settings.i.game-settings";
 
 export function setupGrid(settings: GameSettings): Grid {
     const precisionWidth = settings.widthPrecisionUnits.value;
@@ -46,6 +46,14 @@ export function setupGrid(settings: GameSettings): Grid {
     return playGrid;
 }
 
+export function resetGrid(playGrid: Grid): void {
+    playGrid.rows.forEach(row => {
+        row.fields.forEach(field => {
+            field.bubble = undefined;
+        })
+    })
+}
+
 export function getNearbyFields(playGrid: Grid, pointPosition: Coordinates): Field[] {
     const bubbleRadius = playGrid.bubbleRadius;
     const bubbleDiameter = playGrid.bubbleRadius * 2;
@@ -64,12 +72,11 @@ export function getNearbyFields(playGrid: Grid, pointPosition: Coordinates): Fie
     return nearbyFields;
 }
 
-export function dissolveBubbles(playGrid: Grid, collidedAtField: Field): number {
+export function dissolveBubbles(playGrid: Grid, collidedAtField: Field, colorToCheck: number): number {
     let dissolvedBubblesAmount = 0;
     const komma = ','
     const x = collidedAtField.coords.x;
     const y = collidedAtField.coords.y;
-    const colorToCheck = collidedAtField.bubble!.type;
     const visited = new Set<string>();
     const result = new Set<string>();
     findAdjacentBubbles(x, y, colorToCheck, visited, result);
@@ -166,7 +173,3 @@ function getAdjacentFieldVectors(playGrid: Grid, gridPosition: Coordinates): Coo
     ]
     return adjacentFieldVectors;
 }
-
-// function addGarbage(): void {
-
-// }
