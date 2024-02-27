@@ -17,3 +17,11 @@ npm run build
 ```
 npm run start:dev
 ```
+## Db
+### User Docker or other local db service
+```
+npm run prisma:deploy
+```
+```
+npm run prisma:types
+```

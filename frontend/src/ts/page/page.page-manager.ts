@@ -55,8 +55,7 @@ export function goToState(destination: PAGE_STATE) {
             currentPageState.value = destination;
             result[0].transitionFunction();
         } else {
-            console.log("origin: " + currentPageState.value);
-            console.log("destination: " + destination);
+            console.log("origin: " + currentPageState.value + " | destination: " + destination);
             console.error("Illegaaaaaaaaaaaaaaal Page Transition");
         }
     }

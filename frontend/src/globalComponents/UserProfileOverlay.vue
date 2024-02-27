@@ -1,16 +1,43 @@
 <template>
-    <div class="overlay user-profile-overlay">
+    <div class="overlay user-profile-overlay" @click.self="closeUserProfile">
         <div class="user-profile-wrapper">
-            <button @click="closeUserProfile">Close</button>
+            <button class="goBackButton" title="Back" @click="closeUserProfile">X</button>
             <div v-if="userError" class="user-error-message">
                 {{ userError }}
             </div>
-            <div v-if="userData">
-                <h2>User Profile: {{ userData.username }}</h2>
-                <p>Account Created: {{ formattedDate }}</p> 
-                <p v-if="userData.country">Country: {{ userData.country }}</p>
-                <img v-if="userData.pbUrl" :src="profilePicImagePath" alt="Profile Picture">
-                <img v-if="userData.countryCode && userData.country" :src="flagImagePath" :title="userData.country" alt="Country Flag">
+            <div v-if="userData" class="user-profile-outer-container">
+                <div class="profile-banner" :style="{ backgroundImage: `url(${profileBannerImagePath})` }"></div>
+                <div class="user-profile-inner-container">
+                    <div class="user-profile-meta">
+                        <img class="profile-pic" :src="profilePicImagePath" alt="Profile Picture">
+                        <h2>{{ userData.username.toUpperCase() }}<span class="online-status"
+                                :title="isUserOnline !== 'notFound' ? 'Online' : ''"
+                                :class="{ 'online': isUserOnline !== 'notFound' }">{{}}</span></h2>
+                        <p v-if="userData.id < 4">Since the Beginning</p>
+                        <p v-else>Joined: {{ formattedDate }}</p>
+                        <p v-if="isUserOnline !== 'notFound' || userData.LastDisconnectedAt">Last seen: {{ getLastSeenText(userData.LastDisconnectedAt) }}</p>
+                        <div class="user-country">
+                            <p v-if="userData.country">{{ userData.country }}</p>
+                            <img class="user-flag" v-if="userData.countryCode && userData.country" :src="flagImagePath"
+                                :title="userData.country" alt="Country Flag">
+                        </div>
+                    </div>
+
+                    <h3>Sprint</h3>
+                    <div v-if="userData.sprintStats.rank">
+                        <p>Leaderboard Rank: {{ userData.sprintStats.rank }}</p>
+                        <p>Average Bubbles Cleared: {{ Math.round(userData.sprintStats.averageBubblesCleared * 100) / 100 }}
+                        </p>
+                        <p>Average Bubbles Per Second: {{ Math.round(userData.sprintStats.averageBubblesPerSecond * 100) /
+                            100 }}</p>
+                        <p>Average Bubbles Shot: {{ Math.round(userData.sprintStats.averageBubblesShot * 100) / 100 }}</p>
+                        <p>Average Sprint Time: {{ formatTimeNumberToString(userData.sprintStats.averageSprintTime) }}</p>
+                        <p>Games Played: {{ Math.round(userData.sprintStats.sprintGamesPlayed * 100) / 100 }}</p>
+                    </div>
+                    <div v-else>
+                        <p>This User has never played Sprint.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -19,15 +46,30 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
-import { getProfilePicURL } from '@/ts/networking/paths';
+import { getDefaultProfileBannerURL, getDefaultProfilePbURL } from '@/ts/networking/paths';
+import { formatTimeNumberToString } from '@/ts/gameplay/gameplay.stat-tracker';
+import state from '@/ts/networking/networking.client-websocket';
 
 interface UserData {
+    id: number;
     username: string;
-    createdAt: string;
+    createdAt: Date;
     countryCode: string;
     country: string;
     pbUrl: string;
+    bannerUrl: string;
+    LastDisconnectedAt: Date;
+    sprintStats: SprintStats;
     // ... other user fields
+}
+
+interface SprintStats {
+    averageBubblesCleared: number;
+    averageBubblesPerSecond: number;
+    averageBubblesShot: number;
+    averageSprintTime: number;
+    rank: number;
+    sprintGamesPlayed: number;
 }
 
 export default defineComponent({
@@ -39,6 +81,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const userData = ref<UserData | null>(null);
         const userError = ref<string | null>(null);
+        const isUserOnline = ref<string>("notFound");
 
         const formattedDate = computed(() => {
             if (userData.value && userData.value.createdAt) {
@@ -51,15 +94,22 @@ export default defineComponent({
             return "";
         });
 
-        const profilePicImagePath = computed(() => {
-            if(userData.value && userData.value.pbUrl){
-                return userData.value ? getProfilePicURL() + userData.value.pbUrl : '';
+        const profileBannerImagePath = computed(() => {
+            if (userData.value && userData.value.bannerUrl) {
+                return userData.value.bannerUrl;
             }
-            return "";
+            return getDefaultProfileBannerURL();
         });
-        
+
+        const profilePicImagePath = computed(() => {
+            if (userData.value && userData.value.pbUrl) {
+                return userData.value.pbUrl;
+            }
+            return getDefaultProfilePbURL();
+        });
+
         const flagImagePath = computed(() => {
-            if(userData.value && userData.value.countryCode){
+            if (userData.value && userData.value.countryCode) {
                 return userData.value ? require(`@/img/countryFlags/${userData.value.countryCode.toLowerCase()}.svg`) : '';
             }
             return "";
@@ -68,8 +118,59 @@ export default defineComponent({
         onMounted(async () => {
             if (props.username) {
                 userData.value = await fetchUserData(props.username);
+                getUserOnlineStatus(props.username);
             }
+
         });
+
+        function getLastSeenText(LastDisconnectedAt: Date) {
+            if (isUserOnline.value !== "notFound") {
+                return 'Online';
+            }
+
+            if (!LastDisconnectedAt) {
+                return '';
+            }
+
+            const now = new Date();
+            const lastSeenDate = new Date(LastDisconnectedAt);
+            const seconds = Math.round((now.getTime() - lastSeenDate.getTime()) / 1000);
+            const minutes = Math.round(seconds / 60);
+            const hours = Math.round(minutes / 60);
+            const days = Math.round(hours / 24);
+            const weeks = Math.round(days / 7);
+            const months = Math.round(weeks / 4.345); // Average weeks per month
+            const years = Math.round(months / 12);
+
+            if (seconds < 60) {
+                return 'just now';
+            } else if (minutes < 60) {
+                return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            } else if (hours < 24) {
+                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            } else if (days < 7) {
+                return `${days} day${days > 1 ? 's' : ''} ago`;
+            } else if (weeks < 4.345) {
+                return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+            } else if (months < 12) {
+                return `${months} month${months > 1 ? 's' : ''} ago`;
+            } else {
+                return `${years} year${years > 1 ? 's' : ''} ago`;
+            }
+        }
+
+
+        function getUserOnlineStatus(username: string): void {
+            if (state.socket) {
+                state.socket.emit('getUserOnlineStatus', username);
+            }
+        }
+
+        if (state.socket) {
+            state.socket.on('getUserOnlineStatus', (status: string) => {
+                isUserOnline.value = status;
+            });
+        }
 
         async function fetchUserData(username: string) {
             try {
@@ -91,24 +192,115 @@ export default defineComponent({
             userError,
             flagImagePath,
             formattedDate,
-            profilePicImagePath
+            profilePicImagePath,
+            profileBannerImagePath,
+            formatTimeNumberToString,
+            isUserOnline,
+            getLastSeenText,
         };
     },
 });
 </script>
-<style>
+<style scoped>
 .user-profile-overlay {
-    z-index: 5;
+    background: rgba(0, 0, 0, 0.0) !important;
+    justify-content: flex-start;
 }
 
 .user-profile-wrapper {
-    height: 100%;
-    width: 100%;
+    height: 90vh;
+    width: 80vw;
     background-color: black;
 }
 
-img {
-    width: 10%;
+.profile-banner {
+    width: 100vw;
+    height: 20%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.profile-pic {
+    position: absolute;
+    height: 10vw;
+    width: 10vw;
+    object-fit: cover;
+    left: 0;
+    border-radius: 20%;
+    top: -2vw;
+}
+
+.user-profile-outer-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.user-profile-inner-container {
+    width: 80%;
+    height: 80%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-profile-meta {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-left: calc(10vw + 30px);
+    font-size: 18px;
+    height: 10vw;
+}
+
+.user-profile-meta h2 {
+    margin-bottom: 1.5%;
+    margin-top: 1%;
+    font-size: 30px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.user-profile-meta p {
+    margin: unset;
+}
+
+.user-flag {
     object-fit: contain;
+    height: 80%;
+    border-radius: 20%;
+}
+
+.user-country {
+    margin-top: 10px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    height: 17%;
+}
+
+h3 {
+    margin: unset;
+    font-size: 20px;
+}
+
+button.goBackButton {
+    top: 10vh;
+    right: 20vw;
+}
+
+.online-status {
+    height: 15px;
+    width: 15px;
+    display: block;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+.online-status.online {
+    background-color: green;
 }
 </style>

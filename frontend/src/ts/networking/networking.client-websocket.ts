@@ -1,6 +1,6 @@
 import io, { ManagerOptions, SocketOptions, Socket } from 'socket.io-client';
 import { reactive } from 'vue';
-import { frontendURL, isLocal } from './paths';
+import { isLocal, socketIoHost } from './paths';
 
 interface StateType {
     socket: Socket | null;
@@ -47,7 +47,7 @@ function initializeSocket(): Socket {
         path: "/blubbio-backend/socket.io",
         query: {
             token: localStorage.getItem('authToken'),
-            isGuest: sessionStorage.getItem('isGuest') === 'true',
+            isGuest: sessionStorage.getItem('isGuest'),
             guestUsername: sessionStorage.getItem('guestUsername'),
         }
     };
@@ -57,7 +57,8 @@ function initializeSocket(): Socket {
     }
 
     console.log("Initializing socket connection");
-    const socket = io(frontendURL, ioOptions);
+    const socket = io(socketIoHost, ioOptions);
+    socket.connect();
 
     socket.on('connect', () => {
         console.log('Socket connected:', socket.id);
@@ -65,4 +66,12 @@ function initializeSocket(): Socket {
     });
 
     return socket;
+}
+
+export function reconnectGlobalSocket(): void {
+    // Disconnect existing socket
+    disconnectGlobalSocket();
+
+    // Reinitialize the socket with new parameters
+    state.socket = initializeSocket();
 }

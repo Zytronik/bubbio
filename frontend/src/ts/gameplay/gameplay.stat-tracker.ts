@@ -1,6 +1,7 @@
 import { Ref, ref } from "vue";
 import { fireGameWinEvent, getSelectedGameMode } from "./gameplay.game-master";
 import { GAME_MODE, GameStats } from "./i/gameplay.i.stats";
+import { httpClient } from "../networking/networking.http-client";
 
 export const formattedCurrentTime: Ref<string> = ref("");
 export const bubbleClearToWin: Ref<number> = ref(0);
@@ -106,7 +107,7 @@ function updateStats(): void {
     }
 }
 
-function formatTimeNumberToString(milliseconds: number): string {
+export function formatTimeNumberToString(milliseconds: number): string {
     const totalSeconds = Math.floor(milliseconds / 1000);
     const hundredths = Math.floor((milliseconds % 1000) / 10);
     const minutes = Math.floor(totalSeconds / 60);
@@ -155,6 +156,25 @@ export function trackBubbleShot(wallBounces: number, amountCleared: number): voi
     }
 }
 
-export function submitGametoDB(): void {
-    console.log("TODO OMAR")
+export async function submitGametoDB() {
+    const isGuest = sessionStorage.getItem('isGuest');
+    if(isGuest !== "true"){
+        const submitStats = {
+            "sprintTime": Math.floor(gameStats.currentTime),
+            "bubblesCleared": gameStats.bubblesCleared,
+            "bubblesShot": gameStats.bubblesShot,
+            "bubblesPerSecond": gameStats.bubblesPerSecond,
+        };
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await httpClient.post('/sprint/submit', submitStats, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+            });
+            console.log('Game stats submitted successfully:', response.data);
+        } catch (error) {
+            console.error('Error submitting game stats:', error);
+        }
+    }
 }

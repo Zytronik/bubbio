@@ -9,8 +9,9 @@ export class GlobalChatGateway {
     @SubscribeMessage('sendGlobalChatMessage')
     handleMessage(@MessageBody() data: { text: string }, @ConnectedSocket() client: Socket): void {
         const username = client.data.user?.username;
+        const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
         if(username){
-            this.server.emit('sendGlobalChatMessage', { username, text: data.text });
+            this.server.emit('sendGlobalChatMessage', { username, text: data.text, timestamp });
         }        
     }
 

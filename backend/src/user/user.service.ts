@@ -3,10 +3,11 @@ import { CreateUserDto } from 'src/auth/dto/auth.dto.createUser';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import axios from 'axios';
+import { FileStorageService } from './fileStorage.service';
 
 @Injectable()
 export class UserService {
-    constructor(private prisma: PrismaService) { }
+    constructor(private prisma: PrismaService, private fileStorageService: FileStorageService,) { }
 
     async createUser(createUserDto: CreateUserDto, clientIp: string): Promise<any> {
         // Fetch the country code using the client's IP address
@@ -46,20 +47,30 @@ export class UserService {
             return false;
         }
 
-        const user = await this.prisma.user.findUnique({
-            where: { username },
+        const user = await this.prisma.user.findFirst({
+            where: {
+                username: {
+                    equals: username,
+                    mode: 'insensitive',
+                },
+            },
         });
         return !!user;
     }
 
     async getUserByUsername(username: string): Promise<any> {
-        const user = await this.prisma.user.findUnique({
-            where: { username },
+        const user = await this.prisma.user.findFirst({
+            where: {
+                username: {
+                    equals: username,
+                    mode: 'insensitive',
+                },
+            },
         });
 
         if (!user) {
             throw new BadRequestException({
-                message: [`user with username ${username} not found`],
+                message: [`User with Username ${username} not found`],
                 error: 'Bad Request',
                 statusCode: 400,
             });
@@ -68,26 +79,101 @@ export class UserService {
         return user;
     }
 
+    async getUserSprintRank(username: string): Promise<number | null> {
+        // Step 1: Get the user's best sprint time
+        const userBestTimeRecord = await this.prisma.sprint.findFirst({
+            where: { 
+                user: { 
+                    username: {
+                        equals: username,
+                        mode: 'insensitive', 
+                    } 
+                } 
+            },
+            orderBy: { sprintTime: 'asc' },
+            select: { sprintTime: true },
+        });
 
-    async getUserProfileByUsername(username: string): Promise<any> {
-        const user = await this.prisma.user.findUnique({
-            where: { username },
-            select: {
-                username: true,
-                createdAt: true,
-                countryCode: true,
-                country: true,
-                pbUrl: true,
-                bannerUrl: true,
-                // Add other fields you want to return
+        if (!userBestTimeRecord) {
+            return null; // User has no sprint times
+        }
+
+        // Step 2: Get the best sprint time for each user and sort them
+        const bestTimes = await this.prisma.sprint.groupBy({
+            by: ['userId'],
+            _min: {
+                sprintTime: true,
+            },
+            orderBy: {
+                _min: {
+                    sprintTime: 'asc',
+                },
             },
         });
+
+        // Find the rank of the user's best time among these best times
+        // We count how many times have a better (lower) sprintTime than the user's best time
+        const rank = bestTimes.findIndex(time => time._min.sprintTime >= userBestTimeRecord.sprintTime) + 1;
+
+        return rank;
+    }
+
+    async getUserProfileByUsername(username: string): Promise<any> {
+        const user = await this.prisma.user.findFirst({
+            where: {
+              username: {
+                equals: username,
+                mode: 'insensitive',
+              },
+            },
+            select: {
+              id: true,
+              username: true,
+              createdAt: true,
+              countryCode: true,
+              country: true,
+              pbUrl: true,
+              bannerUrl: true,
+              LastDisconnectedAt: true,
+            },
+          });
 
         if (!user) {
             throw new NotFoundException(`User with username ${username} not found`);
         }
 
-        return user;
+        // Fetch average sprint statistics for this user
+        const sprintStats = await this.prisma.sprint.aggregate({
+            _avg: {
+                bubblesCleared: true,
+                bubblesPerSecond: true,
+                bubblesShot: true,
+                sprintTime: true,
+            },
+            where: {
+                userId: user.id,
+            },
+        });
+
+        const sprintGamesPlayed = await this.prisma.sprint.count({
+            where: {
+                userId: user.id,
+            },
+        });
+
+        const sprintRank = await this.getUserSprintRank(username);
+
+        return {
+            ...user,
+            sprintStats: {
+                averageBubblesCleared: sprintStats._avg.bubblesCleared,
+                averageBubblesPerSecond: sprintStats._avg.bubblesPerSecond,
+                averageBubblesShot: sprintStats._avg.bubblesShot,
+                averageSprintTime: sprintStats._avg.sprintTime,
+                sprintGamesPlayed: sprintGamesPlayed,
+                rank: sprintRank,
+            },
+        };
     }
 
     async searchUsers(query: string) {
@@ -102,6 +188,8 @@ export class UserService {
             select: {
                 id: true,
                 username: true,
+                countryCode: true,
+                country: true,
                 // Specify any other fields you want to include here
             },
         });
@@ -110,4 +198,32 @@ export class UserService {
     async getTotalRegisteredUsersCount(): Promise<number> {
         return await this.prisma.user.count();
     }
+
+    async updateProfileImgs(userId: number, file: Express.Multer.File, imgType: "pb" | "banner"): Promise<void> {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        const fieldToUpdate = imgType === "pb" ? "pbUrl" : "bannerUrl";
+        const oldFilename = user[fieldToUpdate];
+
+        // Upload the new file to DigitalOcean Spaces and get the URL
+        const fileUrl = await this.fileStorageService.uploadFile(file, imgType);
+
+        // Update the database with the new file URL
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { [fieldToUpdate]: fileUrl },
+        });
+
+        // Delete the old file from DigitalOcean Spaces if it's different from the new one
+        if (oldFilename && oldFilename !== fileUrl) {
+            await this.fileStorageService.deleteFile(oldFilename, imgType);
+        }
+    }
+
+    async updateLastDisconnectedAt(username: string): Promise<void> {
+        await this.prisma.user.update({
+          where: { username },
+          data: { LastDisconnectedAt: new Date() },
+        });
+      }
+
 }
