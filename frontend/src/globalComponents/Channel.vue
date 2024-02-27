@@ -470,7 +470,7 @@ export default {
   height: 100%;
   background-color: rgb(53, 53, 53);
   padding: 15px;
-  z-index: 1;
+  z-index: 2;
   box-sizing: border-box;
 }
 
@@ -540,6 +540,8 @@ h2 {
   opacity: 0.4;
   color: white;
   font-size: 20px;
+  z-index: 1;
+  position: relative;
 }
 
 .tabs button.active {
@@ -634,7 +636,8 @@ h2 {
 }
 
 .openChannelButton {
-  bottom: 90vh;
+  bottom: 85vh;
+  cursor: auto;
 }
 
 @keyframes fadeScaleIn {

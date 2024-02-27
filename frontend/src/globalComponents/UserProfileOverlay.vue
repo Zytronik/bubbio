@@ -205,6 +205,7 @@ export default defineComponent({
 .user-profile-overlay {
     background: rgba(0, 0, 0, 0.0) !important;
     justify-content: flex-start;
+    z-index: 1;
 }
 
 .user-profile-wrapper {

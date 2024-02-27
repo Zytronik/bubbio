@@ -1,7 +1,6 @@
 <template>
   <section id="template" class="page">
     <div v-if="!isGaming && isDashboard" class="sprintDashboard">
-      <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button><br>
       <h1>Sprint</h1>
       <h2>Leaderboards</h2>
       <ul>
@@ -77,6 +76,7 @@
       <p>Show Handlings (aps 1, aps 2)</p>
       <p>Date & Time</p>
     </div>
+    <MenuBackButtons :buttonData="backButtonData" />
   </section>
 </template>
 
@@ -88,6 +88,7 @@ import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/gameplay/gameplay.stat-tracker';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
+import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 
 interface LeaderboardEntry extends GameRecord {
   user: {
@@ -112,7 +113,7 @@ interface GameRecord {
 
 export default {
   name: 'SprintPage',
-  components: { Game },
+  components: { Game,MenuBackButtons },
   setup() {
     const isGaming = ref<boolean>(false);
     const isDashboard = ref<boolean>(true);
@@ -123,6 +124,9 @@ export default {
     const isLoading = ref<boolean>(true);
     const isGuestString = sessionStorage.getItem('isGuest');
     const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
+    const backButtonData = ref([
+      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/sprint.png') },
+    ]);
 
     setupSprintGame();
 
@@ -237,6 +241,7 @@ export default {
       formatTimeNumberToString,
       isLoading,
       isGuest,
+      backButtonData,
     };
   },
 };

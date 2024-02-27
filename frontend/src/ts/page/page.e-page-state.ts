@@ -1,9 +1,10 @@
 export enum PAGE_STATE {
     mainMenu = 'mainMenu',
-    settingsPage = 'settingsPage',
+    soloMenu='soloMenu',
+    multiMenu='multiMenu',
     roomListing = 'roomListing',
     roomPage = 'roomPage',
-    myPage = 'myPage',
+    settingsPage = 'settingsPage',
     gamePage = 'gamePage',
     sprintPage = 'sprintPage',
 }

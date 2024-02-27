@@ -128,6 +128,7 @@ export default defineComponent({
 <style scoped>
 .login-overlay{
   align-items: center;
+  z-index: 100;
 }
 
 form {

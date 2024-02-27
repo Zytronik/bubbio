@@ -1,7 +1,6 @@
 <template>
   <section id="config" class="page">
     <h1>Config</h1>
-    <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
     <h2>Input Settings</h2>
     <div v-if="isAuthenticated">
       <h2>Accounts Settings</h2>
@@ -27,6 +26,7 @@
         </div>
       </div>
     </div>
+    <MenuBackButtons :buttonData="backButtonData" />
   </section>
 </template>
 
@@ -36,13 +36,20 @@ import { Ref, SetupContext, computed, onMounted, ref } from 'vue';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { checkUserAuthentication, logUserOut } from '@/ts/networking/networking.auth';
+import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 
 export default {
   name: 'ConfigPage',
+  components: { MenuBackButtons },
   setup(_: unknown, { emit }: SetupContext) {
     const selectedFile: Ref<File | null> = ref(null);
     const isAuthenticated = computed(() => checkUserAuthentication());
     const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
+    const backButtonData = ref([
+      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/solo.png') },
+      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/multi.png') },
+      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/config.png') },
+    ]);
 
     onMounted(() => {
       console.log('Vue app mounted | Config Page');
@@ -110,6 +117,7 @@ export default {
       logUserOut,
       logOut,
       isAuthenticated,
+      backButtonData,
     }
   }
 }

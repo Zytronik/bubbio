@@ -1,7 +1,6 @@
-<template id="roomListing" class="page">
-  <div class="room-listing">
+<template>
+  <section id="roomListing" class="room-listing page">
     <div class="room-actions">
-      <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
       <input v-model="roomId" placeholder="Room ID" />
       <button @click="joinRoom(roomId)">Join Room</button>
       <p>- or -</p>
@@ -19,7 +18,8 @@
       </ul>
       <p v-else>No active rooms available.</p>
     </div>
-  </div>
+    <MenuBackButtons :buttonData="backButtonData" />
+  </section>
 </template>
 
 <script lang="ts">
@@ -27,6 +27,7 @@ import state from '@/ts/networking/networking.client-websocket';
 import { ref, SetupContext, onMounted } from 'vue';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { goToState } from '@/ts/page/page.page-manager';
+import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 
 interface ActiveRoomInfo {
   roomId: string;
@@ -35,9 +36,13 @@ interface ActiveRoomInfo {
 
 export default {
   name: 'RoomListing',
+  components: { MenuBackButtons },
   setup(_: unknown, { emit }: SetupContext) {
     const roomId = ref<string>('');
     const activeRooms = ref<ActiveRoomInfo[]>([]);
+    const backButtonData = ref([
+      { pageState: PAGE_STATE.multiMenu, iconSrc: require('@/img/icons/rooms.png') },
+    ]);
 
     function createRoom() {
       const newRoomId: string = Math.random().toString(36).substring(7);
@@ -71,17 +76,20 @@ export default {
       fetchActiveRooms();
     });
 
-    return { roomId, joinRoom, createRoom, activeRooms, goToState, PAGE_STATE };
+    return {
+      roomId,
+      joinRoom,
+      createRoom,
+      activeRooms,
+      goToState,
+      PAGE_STATE,
+      backButtonData,
+    };
   },
 };
 </script>
 
 <style scoped>
-.room-listing {
-  padding: 20px;
-  max-width: 600px;
-  margin: auto;
-}
 
 .room-actions {
   display: flex;
@@ -141,4 +149,5 @@ a {
 .active-rooms p {
   text-align: center;
 }
+
 </style>

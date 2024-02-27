@@ -1,10 +1,22 @@
 <template>
-  <section id="startmenu" class="page">
-    <h1>StartMenu</h1>
-    <!-- <button class="m-btn">Play Ranked (TODO)</button> -->
-    <button class="m-btn" @click="goToState(PAGE_STATE.sprintPage)">Sprint</button>
-    <button class="m-btn" @click="goToState(PAGE_STATE.roomListing)">Room Listing</button>
-    <button class="m-btn" @click="goToState(PAGE_STATE.settingsPage)">Config Page</button>
+  <section id="startmenu" class="menu page">
+    <div class="menu-wrapper">
+      <button class="menu-btn" @click="goToState(PAGE_STATE.soloMenu)">
+        <img src="@/img/icons/solo.png"/>
+        <p>Solo</p>
+        <p class="desc">Train yourself in different Modes</p>
+      </button>
+      <button class="menu-btn" @click="goToState(PAGE_STATE.multiMenu)">
+        <img src="@/img/icons/multi.png"/>
+        <p>Multi</p>
+        <p class="desc">Play with friends and foes</p>
+      </button>
+      <button class="menu-btn" @click="goToState(PAGE_STATE.settingsPage)">
+        <img src="@/img/icons/config.png"/>
+        <p>Config</p>
+        <p class="desc">Tweak & Customize your Game</p>
+      </button>
+    </div>
   </section>
 </template>
 
@@ -30,18 +42,4 @@ export default {
 </script>
 
 <style scoped>
-  #startmenu {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .m-btn {
-    width: 50%;
-    border: none;
-    border-radius: 10px;
-    font-size: 150%;
-    padding: 15px 0;
-    margin-bottom: 10px;
-  }
 </style>

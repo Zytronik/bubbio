@@ -2,20 +2,28 @@
   <article id="app">
     <div class="topbar">
       <div v-if="isAuthenticated" @click="showMyProfile" class="profile-wrapper">
-        <div class="profile-content">
-          <p>{{ userData?.username.toUpperCase() }}</p>
-        </div>
         <img class="profile-pic" :src="userData?.pbUrl" alt="Profile Picture">
+        <div class="profile-content">
+          <h3>{{ userData?.username.toUpperCase() }}</h3>
+          <div>
+            <p>Lv.420</p>
+            <p class="rank">PI-Rank</p>
+          </div>
+        </div>
       </div>
     </div>
-    <button @click="openChannelOverlay" class="openChannelButton">Channel</button>
     <InfoMessages ref="infoMessageRef" />
     <LoginOverlay v-if="showLogin" @login="handleLogin" @checkUsername="handleCheckUsername" @register="handleRegister"
       @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" @playAsGuest="handlePlayAsGuest" />
     <Channel v-if="isChannelOpen" />
-    <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom"
-      @showInfoMessage="showInfoMessage" @updateProfileData="updateProfileData">
-    </component>
+    <transition name="slide" mode="out-in">
+      <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom"
+        @showInfoMessage="showInfoMessage" @updateProfileData="updateProfileData" :key="currentComponentKey">
+      </component>
+    </transition>
+    <div class="bottomBar">
+      <button @click="openChannelOverlay" class="openChannelButton">Channel</button>
+    </div>
   </article>
 </template>
 
@@ -179,6 +187,10 @@ export default {
       isAuthenticated.value = checkUserAuthentication();
     }
 
+    const currentComponentKey = computed(() => {
+      return currentPageIndex.value;
+    });
+
     /* Profile */
     interface UserData {
       username: string;
@@ -290,6 +302,7 @@ export default {
       isAuthenticated,
       updateProfileData,
       showMyProfile,
+      currentComponentKey,
     };
   },
 }
@@ -299,10 +312,13 @@ export default {
 <style scoped>
 .topbar {
   width: 100vw;
-  height: 10vh;
+  height: 5vh;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  background-color: rgb(30, 30, 30);
+  z-index: 1;
+  position: relative;
 }
 
 .profile-wrapper {
@@ -312,6 +328,22 @@ export default {
   display: flex;
   flex-direction: row;
   cursor: pointer;
+  height: 10vh;
+  position: relative;
+}
+
+.profile-wrapper::before{
+  position: absolute;
+  content: '';
+  width: 0px;
+  height: 1px;
+  border-style: solid;
+  border-width: 5vh 10vh 5vh 0;
+  border-color: transparent rgb(30, 30, 30) transparent transparent;
+  display: inline-block;
+  vertical-align: middle;
+  right: 100%;
+  top: 0;
 }
 
 .profile-content {
@@ -319,12 +351,27 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0 15px;
+  padding: 0 30px 0 15px;
+}
+
+.profile-content > div {
+  display: flex;
+  flex-direction: row;
+  margin-top: 8px;
+  font-size: 20px;
+}
+
+.profile-content > div .rank {
+  margin-left: 30px;
+}
+
+.profile-content h3 {
+  margin: unset;
+  font-size: 20px;
 }
 
 .profile-content p {
   margin: unset;
-  font-size: 20px;
 }
 
 .profile-wrapper img {
@@ -341,4 +388,45 @@ export default {
 .openChannelButton:hover {
   background-color: rgb(55, 55, 55);
 }
+
+.bottomBar {
+  width: 100vw;
+  height: 5vh;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  background-color: rgb(30, 30, 30);
+}
+
+.slide-enter-active, .slide-leave-active {
+  transition: transform 0.2s ease;
+}
+
+.slide-enter-from, .slide-leave-to {
+  position: absolute;
+  width: 100%;
+}
+
+.slide-enter-from {
+  transform: translateX(100%);
+}
+
+.slide-enter-to {
+  transform: translateX(0);
+}
+
+.slide-leave-from {
+  transform: translateX(0);
+}
+
+.slide-leave-to {
+  transform: translateX(-100%);
+}
+
+
+
 </style>
