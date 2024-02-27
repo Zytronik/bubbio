@@ -15,6 +15,7 @@ import { allHandlingSettings } from "./settings/game.settings.handling";
 import { GameTransitions } from "./i/game.i.game-transitions";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { holdBubble, updateBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
+import { backendSetupGame } from "./game.network-commands";
 
 
 let playerGameInstance: GameInstance;
@@ -29,6 +30,7 @@ export function setupSprintGame(): void {
 
     applyGameSettingsRefNumbers(allGameSettings);
     playerGameInstance = createGameInstance(allGameSettings, GAME_MODE.SPRINT, allHandlingSettings, transitions);
+    backendSetupGame(GAME_MODE.SPRINT, allGameSettings, allHandlingSettings)
 
     function startSprint(): void {
         //TODO disable menu controls

@@ -6,10 +6,11 @@ import { setupBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 import { GameSettings } from "../settings/i/game.settings.i.game-settings";
 import { GAME_MODE } from "../settings/i/game.settings.i.game-modes";
 import { HandlingSettings } from "../settings/i/game.settings.i.handling-settings";
+import { getNextSeed } from "./game.logic.random";
 
 export function createGameInstance(
     gameSettings: GameSettings, gameMode: GAME_MODE, handlingSettings: HandlingSettings, gameTransitions: GameTransitions): GameInstance {
-    const startSeed = performance.now();
+    const startSeed = getNextSeed(Date.now());
     const gameInstance: GameInstance = {
         gameMode: gameMode,
         gameSettings: gameSettings,
@@ -24,10 +25,10 @@ export function createGameInstance(
             ascii: "",
             type: 0
         },
-        previewQueue: [],
+        bubbleQueue: [],
         playGrid: setupGrid(gameSettings),
         stats: getEmptyStats(gameSettings, gameMode),
-        
+
         gameStateHistory: {
             inputHistory: [],
             boardHistory: [],
@@ -37,8 +38,7 @@ export function createGameInstance(
         gameTransitions: gameTransitions,
     }
 
-    gameInstance.currentSeed = setupBubbleQueueAndCurrent(gameInstance.currentSeed, gameInstance.currentBubble, gameInstance.previewQueue, gameInstance.gameSettings.queuePreviewSize.value)
-
+    setupBubbleQueueAndCurrent(gameInstance);
     return gameInstance;
 }
 
@@ -53,10 +53,10 @@ export function resetGameInstance(gameInstance: GameInstance): void {
         ascii: "",
         type: 0
     };
-    gameInstance.previewQueue = [];
+    gameInstance.bubbleQueue = [];
     resetGrid(gameInstance.playGrid);
     gameInstance.stats = getEmptyStats(gameInstance.gameSettings, gameInstance.gameMode);
-    gameInstance.currentSeed = setupBubbleQueueAndCurrent(gameInstance.currentSeed, gameInstance.currentBubble, gameInstance.previewQueue, gameInstance.gameSettings.queuePreviewSize.value)
+    setupBubbleQueueAndCurrent(gameInstance);
 }
 
 function getEmptyStats(gameSettings: GameSettings, gameMode: GAME_MODE): GameStats {
