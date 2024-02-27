@@ -15,7 +15,7 @@ import { allHandlingSettings } from "./settings/game.settings.handling";
 import { GameTransitions } from "./i/game.i.game-transitions";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { holdBubble, updateBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
-import { backendSetupGame } from "./game.network-commands";
+import { backendSetupGame, submitGameToDB } from "./network/game.network-commands";
 
 
 let playerGameInstance: GameInstance;
@@ -68,7 +68,7 @@ export function setupSprintGame(): void {
         stopASCIIAnimation();
         stopStatDisplay();
         showASCIIVictory();
-        // submitGametoDB();
+        submitGameToDB(stats);
     }
     function sprintDeath(): void {
         disableGameInputs();

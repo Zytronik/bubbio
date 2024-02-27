@@ -84,9 +84,10 @@
 import Game from '../game/Game.vue';
 import { goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/gameplay/gameplay.stat-tracker';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
+import { leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
+import { bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 
 interface LeaderboardEntry extends GameRecord {
   user: {
@@ -102,15 +103,6 @@ interface GameRecord {
   bubblesShot: number;
   sprintTime: number;
 }
-
-/* interface DashboardData {
-  leaderboard: LeaderboardEntry[];
-  userHistory: GameRecord[];
-  personalBests: GameRecord[];
-} */
-import { ref } from 'vue';
-import { leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
-import { formattedCurrentTime, bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesShot, bubblesPerSecond, } from '@/ts/game/visuals/game.visuals.stat-display';
 
 export default {
   name: 'SprintPage',
@@ -128,7 +120,6 @@ export default {
 
     setupSprintGame();
 
-    function showGameView() {
     function showGameView() {
       startGame();
       isGaming.value = true;

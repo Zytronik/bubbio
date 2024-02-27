@@ -52,7 +52,7 @@ function updateStatDisplay(): void {
     }
 }
 
-function formatTimeNumberToString(milliseconds: number): string {
+export function formatTimeNumberToString(milliseconds: number): string {
     const totalSeconds = Math.floor(milliseconds / 1000);
     const hundredths = Math.floor((milliseconds % 1000) / 10);
     const minutes = Math.floor(totalSeconds / 60);
