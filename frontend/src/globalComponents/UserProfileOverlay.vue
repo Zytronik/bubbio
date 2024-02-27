@@ -47,8 +47,8 @@
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { getDefaultProfileBannerURL, getDefaultProfilePbURL } from '@/ts/networking/paths';
-import { formatTimeNumberToString } from '@/ts/gameplay/gameplay.stat-tracker';
 import state from '@/ts/networking/networking.client-websocket';
+import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
 
 interface UserData {
     id: number;

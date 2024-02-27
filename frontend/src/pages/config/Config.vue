@@ -2,6 +2,12 @@
   <section id="config" class="page">
     <h1>Config</h1>
     <h2>Input Settings</h2>
+    <h2>Game Settings</h2>
+    <span>{{ allGameSettings.gridWidth.name }}: {{ allGameSettings.gridWidth.refValue }}</span>
+    <br>
+    <input type="range" v-model="allGameSettings.gridWidth.refValue" :min="allGameSettings.gridWidth.min"
+      :max="allGameSettings.gridWidth.max" step="1">
+    <br>
     <div v-if="isAuthenticated">
       <h2>Accounts Settings</h2>
       <button @click="logOut">Log Out</button>
@@ -34,6 +40,7 @@
 import { goToState } from '@/ts/page/page.page-manager';
 import { Ref, SetupContext, computed, onMounted, ref } from 'vue';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
+import { allGameSettings } from '@/ts/game/settings/game.settings.game';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { checkUserAuthentication, logUserOut } from '@/ts/networking/networking.auth';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
@@ -117,6 +124,7 @@ export default {
       logUserOut,
       logOut,
       isAuthenticated,
+      allGameSettings,
       backButtonData,
     }
   }
@@ -124,7 +132,7 @@ export default {
 </script>
 
 <style scoped>
-.account-setting{
+.account-setting {
   margin: 30px 0;
 }
 
