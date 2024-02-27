@@ -8,74 +8,126 @@
     <br>
     <input type="range" v-model="allGameSettings.gridWidth.refValue" :min="allGameSettings.gridWidth.min" :max="allGameSettings.gridWidth.max" step="1">
     <br>
-    <h2>Accounts Settings</h2>
-    <p>Change Profile Picture (TODO)</p>
-    <input type="file" @change="handleFileChange" accept="image/png, image/jpeg" />
-    <button @click="uploadImage">Upload Image</button>
-    <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button>
+    <div v-if="isAuthenticated">
+      <h2>Accounts Settings</h2>
+      <button @click="logOut">Log Out</button>
+      <div v-if="isLoggedIn">
+        <div class="account-setting">
+          <h3>Change Profile Picture:</h3>
+          <p>The img must be less then 2MB and in jpg or png format.</p>
+          <button>
+            <label for="pb-upload" class="custom-file-upload">Change Picture</label>
+          </button>
+          <input id="pb-upload" type="file" @change="handleFileChange('pb', $event)" accept="image/png, image/jpeg"
+            style="display: none;" />
+        </div>
+        <div class="account-setting">
+          <h3>Change Profile Banner:</h3>
+          <p>We recommend the following img dimensions: 1920px x 170px</p>
+          <button>
+            <label for="banner-upload" class="custom-file-upload">Change Banner</label>
+          </button>
+          <input id="banner-upload" type="file" @change="handleFileChange('banner', $event)"
+            accept="image/png, image/jpeg" style="display: none;" />
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
 <script lang="ts">
 import { goToState } from '@/ts/page/page.page-manager';
-import { Ref, onMounted, ref } from 'vue';
+import { Ref, SetupContext, computed, onMounted, ref } from 'vue';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { allGameSettings } from '@/ts/game/settings/game.settings.game';
+import { httpClient } from '@/ts/networking/networking.http-client';
+import { checkUserAuthentication, logUserOut } from '@/ts/networking/networking.auth';
 
 export default {
   name: 'ConfigPage',
-  setup() {
+  setup(_: unknown, { emit }: SetupContext) {
     const selectedFile: Ref<File | null> = ref(null);
+    const isAuthenticated = computed(() => checkUserAuthentication());
+    const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
 
     onMounted(() => {
       console.log('Vue app mounted | Config Page');
     });
 
-    function handleFileChange(event: Event) {
+    async function handleFileChange(fileType: string, event: Event) {
       const input = event.target as HTMLInputElement;
       if (!input.files || input.files.length === 0) {
-        alert('No file selected');
+        emit('showInfoMessage', 'No file selected.', 'info');
         return;
       }
       const file = input.files[0];
 
-      // Check file size (e.g., max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        alert('File size should not exceed 2MB');
+        emit('showInfoMessage', 'File size should not exceed 2MB.', 'info');
+        return;
+      }
+
+      if (!file.type.match(/^(image\/jpeg|image\/png)$/)) {
+        emit('showInfoMessage', 'Invalid file type. Only JPEG and PNG are allowed.', 'info');
         return;
       }
 
       selectedFile.value = file;
+
+      await uploadImage(fileType);
     }
-    
-    async function uploadImage() {
+
+    async function uploadImage(fileType: string) {
       if (!selectedFile.value) {
+        emit('showInfoMessage', 'No file selected.', 'info');
         alert('No file selected');
         return;
       }
 
       const formData = new FormData();
-      formData.append('profilePic', selectedFile.value);
+      const formDataKey = fileType === 'pb' ? 'profilePic' : 'profileBanner';
+      formData.append(formDataKey, selectedFile.value);
 
       try {
-        //await httpClient.post('/api/user/updateProfilePic', formData);
-        alert('Image uploaded successfully');
+        const token = localStorage.getItem('authToken');
+        const url = fileType === 'pb' ? 'users/updateProfilePic' : 'users/updateProfileBanner';
+        await httpClient.post(url, formData, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+        emit('updateProfileData');
+        emit('showInfoMessage', 'Image uploaded successfully.', 'success');
       } catch (error) {
-        console.error('Failed to upload image', error);
-        alert('Failed to upload image');
+        emit('showInfoMessage', 'Failed to upload image.', 'error');
       }
     }
-    
+
+    function logOut() {
+      goToState(PAGE_STATE.mainMenu);
+      logUserOut();
+    }
+
     return {
       PAGE_STATE,
       goToState,
       handleFileChange,
-      uploadImage,
+      isLoggedIn,
+      logUserOut,
+      logOut,
+      isAuthenticated,
       allGameSettings,
     }
   }
 }
 </script>
 
-<style></style>
-@/ts/game/settings/settings.game
+<style scoped>
+.account-setting{
+  margin: 30px 0;
+}
+
+.account-setting p {
+  margin: unset;
+}
+</style>

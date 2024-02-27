@@ -18,37 +18,36 @@ export class LobbyGateway implements OnGatewayConnection {
   private lobbyData: LobbyData = new LobbyData();
 
   async handleConnection(client: Socket) {
-    const isGuest = client.handshake.query.isGuest === 'true';
     let authPromise;
-
-    if (isGuest) {
-      // Handle as guest immediately
-      this.handleGuestConnection(client);
-      // Guests are "authenticated" for the sake of proceeding
-      authPromise = Promise.resolve(true);
-    } else {
-      // Proceed with JWT authentication
-      authPromise = this.authenticateUser(client);
+    const { token, isGuest, guestUsername } = client.handshake.query;
+    if (token === "null" && isGuest === "null" && guestUsername === "null") {
+      client.data.role = "Spectator";
+      client.data.user = { username: "Spectator-" + client.id };
+    } else { 
+      if (isGuest === 'true') {
+        this.handleGuestConnection(client);
+        authPromise = Promise.resolve(true);
+      } else if (token) {
+        authPromise = this.authenticateUser(client);
+      }
+      this.authenticationPromises.set(client.id, authPromise);
+      const isAuthenticated = await authPromise;
+      if (!isAuthenticated && !isGuest) {
+        client.disconnect();
+        return;
+      }
     }
-    this.authenticationPromises.set(client.id, authPromise);
 
-    const isAuthenticated = await authPromise;
-    if (!isAuthenticated && !isGuest) {
-      client.disconnect();
-      return;
-    }
     this.addUserToNoRoom(client);
     this.lobbyData.logRoomsInformations('User connected');
   }
 
   @SubscribeMessage('disconnecting')
   handleDisconnecting(@ConnectedSocket() client: Socket) {
-    const roomId = this.lobbyData.getCurrentRoomId(client.id);
-    if (roomId) { //if user in room
-      this.sendLeaveMessage(client.id, roomId);
-      this.lobbyData.moveUserToNoRoom(client.id);
-      this.updateFrontendRoomUserList(roomId);
+    if (this.isClientLoggedIn(client)) {
+      this.userService.updateLastDisconnectedAt(client.data.user.username);
     }
+    this.leaveRoom(client);
     this.removeUserAndLogDisconnection(client.id);
   }
 
@@ -71,16 +70,7 @@ export class LobbyGateway implements OnGatewayConnection {
 
   @SubscribeMessage('leaveRoom')
   handleLeaveRoom(@ConnectedSocket() client: Socket) {
-    const roomId = this.lobbyData.getCurrentRoomId(client.id);
-    if (roomId) {
-      this.sendLeaveMessage(client.id, roomId);
-      this.lobbyData.moveUserToNoRoom(client.id);
-      this.updateFrontendRoomUserList(roomId);
-      this.emitActiveRoomsUpdate();
-      this.lobbyData.logRoomsInformations('User left a room');
-    } else {
-      console.error(`Client Id: ${client.id} is trying to leave a room without being in one`);
-    }
+    this.leaveRoom(client);
   }
 
 
@@ -112,6 +102,12 @@ export class LobbyGateway implements OnGatewayConnection {
     });
   }
 
+  @SubscribeMessage('getUserOnlineStatus')
+  handleGetUserOnlineStatus(@MessageBody() username, @ConnectedSocket() client: Socket) {
+    const status = this.lobbyData.checkUserStatus(username);
+    client.emit('getUserOnlineStatus', status);
+  }
+
   @SubscribeMessage('isUserInRoomAlready')
   async handleIsUserInRoomAlready(@MessageBody() data, @ConnectedSocket() client: Socket) {
     const isAuthenticated = await this.authenticationPromises.get(client.id) ?? false;
@@ -134,25 +130,41 @@ export class LobbyGateway implements OnGatewayConnection {
       if (!token) {
         throw new Error('Token not provided');
       }
-
       const payload = this.jwtService.verify(token, {
         secret: this.configService.get<string>('JWT_SECRET')
       });
 
       const userDetails = await this.userService.getUserByUsername(payload.username);
       client.data.user = userDetails;
-      client.data.isGuest = false;
+      client.data.role = "User";
       return true;
     } catch (error) {
       console.error('Authentication failed:', error);
       return false;
     }
   }
+  
+  isClientLoggedIn(client: Socket): boolean {
+    return client.data.role === "User";
+  }
+
+  private leaveRoom(client: Socket){
+    const roomId = this.lobbyData.getCurrentRoomId(client.id);
+    if (roomId) {
+      this.sendLeaveMessage(client.id, roomId);
+      this.lobbyData.moveUserToNoRoom(client.id);
+      this.updateFrontendRoomUserList(roomId);
+      this.emitActiveRoomsUpdate();
+      this.lobbyData.logRoomsInformations('User left a room');
+    } else {
+      //console.error(`Client Id: ${client.id} is trying to leave a room without being in one`);
+    }
+  }
 
   private handleGuestConnection(client: Socket) {
     const guestUsername = "Guest-" + client.handshake.query.guestUsername || `Guest-${Math.random().toString(36).substring(2, 15)}`;
     client.data.user = { username: guestUsername };
-    client.data.isGuest = true;
+    client.data.role = "Guest";
   }
 
   private emitActiveRoomsUpdate() {
@@ -172,7 +184,7 @@ export class LobbyGateway implements OnGatewayConnection {
     this.lobbyData.logRoomsInformations('Message send');
   }
 
-  private addUserToNoRoom(client: any) {
+  private addUserToNoRoom(client: Socket) {
     this.lobbyData["noRoom"].push({
       clientId: client.id,
       username: client.data.user.username,

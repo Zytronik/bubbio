@@ -6,6 +6,7 @@ import { GlobalChatGateway } from './globalChat/globalChat.gateway';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { GameGateway } from './game/game.main';
+import { SprintModule } from './sprint/sprint.module';
 
 @Module({
   imports: [
@@ -13,10 +14,15 @@ import { GameGateway } from './game/game.main';
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'src', 'img', 'pb'),
-      serveRoot: '/pb/',
+      rootPath: join(__dirname, '..', '..','uploads', 'pb'),
+      serveRoot: '/userData/pb/',
+    },
+    {
+      rootPath: join(__dirname, '..', '..','uploads', 'banner'),
+      serveRoot: '/userData/banner/',
     }),
     AuthModule,
+    SprintModule,
   ],
   providers: [LobbyGateway, GameGateway, GlobalChatGateway],
 })

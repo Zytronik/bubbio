@@ -1,10 +1,50 @@
 <template>
   <section id="template" class="page">
-    <div v-if="!isGaming && isDasboard" class="sprintDashboard">
+    <div v-if="!isGaming && isDashboard" class="sprintDashboard">
       <button @click="goToState(PAGE_STATE.mainMenu)">Go to Menu</button><br>
-      <h2>Leaderboards (TODO)</h2>
-      <h2>History (TODO)</h2>
-      <h2>Personal Stats (TODO)</h2>
+      <h1>Sprint</h1>
+      <h2>Leaderboards</h2>
+      <ul>
+        <li v-for="(entry, index) in leaderboard" :key="index">
+          <span class="sp">{{ index + 1 }}. {{ entry.user.username }}</span>
+          <span>Time: {{ formatTimeNumberToString(entry.sprintTime) }}</span>
+          <span>Bubbles Shot: {{ entry.bubblesShot }}</span>
+          <span>BPS: {{ entry.bubblesPerSecond }}</span>
+          <span>Bubbles Cleared: {{ entry.bubblesCleared }}</span>
+          <span>Date: {{ formatDateTime(new Date(entry.submittedAt)) }}</span>
+        </li>
+      </ul>
+      <div v-if="!isGuest">
+        <h2>History</h2>
+        <ul>
+          <li v-for="(record, index) in userHistory" :key="index">
+            <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
+            <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
+            <span>Bubbles Shot: {{ record.bubblesShot }}</span>
+            <span>BPS: {{ record.bubblesPerSecond }}</span>
+            <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
+          </li>
+        </ul>
+      </div>
+      <div v-if="!isGuest">
+        <h2>Personal Stats</h2>
+        <h3>Top 3 Runs</h3>
+        <ul>
+          <li v-for="(record, index) in personalBests" :key="index">
+            <span>{{ index + 1 }}.</span>
+            <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
+            <span>Bubbles Shot: {{ record.bubblesShot }}</span>
+            <span>BPS: {{ record.bubblesPerSecond }}</span>
+            <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
+            <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
+          </li>
+        </ul>
+      </div>
+      <h4 v-if="isGuest"><br>Log in for Stats and Submit Scores.</h4>
+      <div v-if="isLoading" class="loading-animation">
+        Loading...
+      </div>
+
       <button @click="showGameView()">Start Game</button>
     </div>
     <div v-if="isGaming" class="inGame">
@@ -18,7 +58,7 @@
       </div>
       <Game />
     </div>
-    <div v-if="!isGaming && !isDasboard" class="gameComplete">
+    <div v-if="!isGaming && !isDashboard" class="gameComplete">
       <button @click="showDashboard()">Back</button>
       <button @click="showGameView()">Try Again</button>
       <h2>More Stats</h2>
@@ -44,6 +84,30 @@
 import Game from '../game/Game.vue';
 import { goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
+import { bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/gameplay/gameplay.stat-tracker';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { httpClient } from '@/ts/networking/networking.http-client';
+
+interface LeaderboardEntry extends GameRecord {
+  user: {
+    username: string;
+  };
+  userId: number;
+}
+
+interface GameRecord {
+  submittedAt: Date | string;
+  bubblesCleared: number;
+  bubblesPerSecond: number;
+  bubblesShot: number;
+  sprintTime: number;
+}
+
+/* interface DashboardData {
+  leaderboard: LeaderboardEntry[];
+  userHistory: GameRecord[];
+  personalBests: GameRecord[];
+} */
 import { ref } from 'vue';
 import { leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { formattedCurrentTime, bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesShot, bubblesPerSecond, } from '@/ts/game/visuals/game.visuals.stat-display';
@@ -53,22 +117,107 @@ export default {
   components: { Game },
   setup() {
     const isGaming = ref<boolean>(false);
-    const isDasboard = ref<boolean>(true);
+    const isDashboard = ref<boolean>(true);
+    const intervalId = ref(0);
+    const userHistory = ref<GameRecord[]>([]);
+    const personalBests = ref<GameRecord[]>([]);
+    const leaderboard = ref<LeaderboardEntry[]>([]);
+    const isLoading = ref<boolean>(true);
+    const isGuestString = sessionStorage.getItem('isGuest');
+    const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
+
     setupSprintGame();
 
     function showGameView() {
+    function showGameView() {
       startGame();
       isGaming.value = true;
-      isDasboard.value = false;
+      isDashboard.value = false;
     }
 
-    function showDashboard() {
+    async function showDashboard() {
       isGaming.value = false;
-      isDasboard.value = true;
+      isDashboard.value = true;
       leaveGame();
     }
 
-    formattedCurrentTime
+    function formatDateTime(date: Date): string {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // January is 0!
+      const year = date.getFullYear().toString().substr(-2); // Get last two digits of year
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+
+      return `${day}.${month}.${year} ${hours}:${minutes}`;
+    }
+
+    async function fetchUserHistory() {
+      const token = localStorage.getItem('authToken');
+      if (!isGuest) {
+        const response = await httpClient.get('/sprint/userHistory', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        userHistory.value = response.data;
+      }
+    }
+
+    async function fetchPersonalBests() {
+      const token = localStorage.getItem('authToken');
+      if(!isGuest){
+        const response = await httpClient.get('/sprint/personalBests', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        personalBests.value = response.data;
+      }
+    }
+
+    async function fetchLeaderboard() {
+      const response = await httpClient.get<LeaderboardEntry[]>('/sprint/leaderboard');
+      leaderboard.value = response.data;
+    }
+
+    async function fetchSprintData() {
+      isLoading.value = true;
+      try {
+        await fetchUserHistory();
+        await fetchPersonalBests();
+        await fetchLeaderboard();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
+    function startDataFetchInterval() {
+      if (!isGaming.value && isDashboard.value) {
+        clearInterval(intervalId.value);
+        fetchSprintData();
+
+        intervalId.value = setInterval(() => {
+          fetchSprintData();
+        }, 30000);
+      } else {
+        clearInterval(intervalId.value);
+      }
+    }
+
+    watch([isGaming, isDashboard], () => {
+      startDataFetchInterval();
+    });
+
+
+    onMounted(() => {
+      startDataFetchInterval();
+    });
+
+    onUnmounted(() => {
+      clearInterval(intervalId.value);
+    });
 
     return {
       formattedCurrentTime,
@@ -81,12 +230,59 @@ export default {
       PAGE_STATE,
       showGameView,
       isGaming,
-      isDasboard,
+      isDashboard,
       startGame,
-      showDashboard
+      showDashboard,
+      userHistory,
+      leaderboard,
+      personalBests,
+      formatDateTime,
+      formatTimeNumberToString,
+      isLoading,
+      isGuest,
     };
   },
 };
 </script>
 
-<style></style>
+<style scoped>
+ul {
+  list-style-type: none;
+  padding: unset;
+}
+
+.loading-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 100;
+  font-size: 20px;
+  color: white;
+}
+
+ul li span {
+  text-align: left;
+  display: block;
+}
+
+ul li {
+  display: flex;
+  flex-direction: row;
+  gap: 2%;
+}
+
+ul li span.sp {
+  min-width: 5%;
+}
+
+.inGame ,
+.inGame > div{
+  text-align: center;
+}
+</style>

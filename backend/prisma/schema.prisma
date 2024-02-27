@@ -13,8 +13,9 @@ model User {
   password        String
   countryCode     String?
   country         String?
-  pbUrl           String          @default("pbPlaceholder.png")
+  pbUrl           String?         
   bannerUrl       String?
+  LastDisconnectedAt  DateTime?        
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @default(now()) @updatedAt
   tokenBlacklists TokenBlacklist[]

@@ -171,6 +171,25 @@ export class LobbyData {
         });
     }
 
+    checkUserStatus(username: string): 'noRoom' | 'inRoom' | string | 'notFound' {
+        // Check in noRoom first
+        const isInNoRoom = this.noRoom.some(user => user.username.toLowerCase() === username.toLowerCase());
+        if (isInNoRoom) {
+            return 'noRoom';
+        }
+
+        // Check if the user is in any room
+        for (const room of this.inRoom) {
+            const userInRoom = room.users.find(user => user.username.toLowerCase() === username.toLowerCase());
+            if (userInRoom) {
+                return room.roomId; // Return the roomId to indicate the user is inside this specific room
+            }
+        }
+
+        // If not found in noRoom or any inRoom, the user is not found
+        return 'notFound';
+    }
+
     logRoomsInformations(eventMsg: string) {
         console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         console.log(util.inspect(this, { showHidden: false, depth: null, colors: true }));
