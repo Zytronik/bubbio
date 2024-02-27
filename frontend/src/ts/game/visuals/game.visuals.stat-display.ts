@@ -13,20 +13,12 @@ let statTrackingRunning = false;
 
 export function startStatDisplay(): void {
     if (!statTrackingRunning) {
-        const gameStats = getGameStats();
         statTrackingRunning = true;
-        gameStats.gameStartTime = performance.now();
         updateStatDisplay();
     }
 }
 
 export function stopStatDisplay(): void {
-    const gameStats = getGameStats();
-    if (gameStats.gameEndTime === 0) {
-        gameStats.gameEndTime = performance.now();
-        gameStats.gameDuration = gameStats.gameEndTime - gameStats.gameStartTime;
-        gameStats.bubblesPerSecond = Number((gameStats.bubblesShot / gameStats.gameDuration * 1000).toFixed(2));
-    }
     if (statTrackingRunning && trackingFrameId !== null) {
         statTrackingRunning = false;
         cancelAnimationFrame(trackingFrameId);

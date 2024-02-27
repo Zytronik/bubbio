@@ -8,7 +8,7 @@ import { Bubble } from "./i/game.i.bubble";
 import { Grid } from "./i/game.i.grid";
 import { calculatePreview, shootBubble } from "./logic/game.logic.shoot";
 import { startStatDisplay, stopStatDisplay } from "./visuals/game.visuals.stat-display";
-import { createGameInstance } from "./logic/game.logic.instance-creator";
+import { createGameInstance, resetGameInstance } from "./logic/game.logic.instance-creator";
 import { allGameSettings } from "./settings/game.settings.game";
 import { GAME_MODE } from "./settings/i/game.settings.i.game-modes";
 import { allHandlingSettings } from "./settings/game.settings.handling";
@@ -31,23 +31,37 @@ export function setupSprintGame(): void {
     playerGameInstance = createGameInstance(allGameSettings, GAME_MODE.SPRINT, allHandlingSettings, transitions);
 
     function startSprint(): void {
-        stopASCIIAnimation();
-        stopStatDisplay();
+        //TODO disable menu controls
         startASCIIAnimation();
         startStatDisplay();
         enableGameInputs();
+        playerGameInstance.stats.gameStartTime = performance.now();
     }
     function resetSprint(): void {
         //todo
         //track reset amount?
-    }
-    function cancelSprint(): void {
         disableGameInputs();
-        //TODO enable menu controls
         stopASCIIAnimation();
         stopStatDisplay();
+        resetGameInstance(playerGameInstance);
+        startASCIIAnimation();
+        startStatDisplay();
+        enableGameInputs();
+        playerGameInstance.stats.gameStartTime = performance.now();
+    }
+    function cancelSprint(): void {
+        //TODO enable menu controls
+        disableGameInputs();
+        stopASCIIAnimation();
+        stopStatDisplay();
+        resetGameInstance(playerGameInstance);
     }
     function sprintVictory(): void {
+        const stats = playerGameInstance.stats;
+        stats.gameEndTime = performance.now();
+        stats.gameDuration = stats.gameEndTime - stats.gameStartTime;
+        stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
+
         disableGameInputs();
         stopASCIIAnimation();
         stopStatDisplay();
@@ -76,16 +90,17 @@ export function startGame(): void {
     playerGameInstance.gameTransitions.onGameStart();
 }
 export function resetGame(): void {
-    playerGameInstance.gameTransitions.onGameStart();
+    playerGameInstance.gameTransitions.onGameReset();
 }
 export function leaveGame(): void {
     playerGameInstance.gameTransitions.onGameAbort();
 }
+//not sure if this is needed
 export function triggerGameVictory(): void {
-    playerGameInstance.gameTransitions.onGameAbort();
+    playerGameInstance.gameTransitions.onGameDefeat();
 }
 export function triggerGameLost(): void {
-    playerGameInstance.gameTransitions.onGameAbort();
+    playerGameInstance.gameTransitions.onGameVictory();
 }
 
 

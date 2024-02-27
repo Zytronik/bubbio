@@ -1,5 +1,5 @@
-import { angleCenter, angleLeft, angleRight, changeAPS, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
-import { angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, holdInput, shootInput } from "./input.possible-inputs";
+import { angleCenter, angleLeft, angleRight, changeAPS, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
+import { angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, holdInput, resetInput, shootInput } from "./input.possible-inputs";
 
 export function enableGameInputs(): void {
     angleLeftInput.fire = angleLeft;
@@ -9,6 +9,7 @@ export function enableGameInputs(): void {
     changeAPSInput.release = revertAPS;
     shootInput.fire = triggerShoot;
     holdInput.fire = triggerHold;
+    resetInput.fire = resetGame;
 
     angleLeftInput.enabled = true;
     angleRightInput.enabled = true;
@@ -16,6 +17,7 @@ export function enableGameInputs(): void {
     changeAPSInput.enabled = true;
     shootInput.enabled = true;
     holdInput.enabled = true;
+    resetInput.enabled = true;
 }
 
 export function disableGameInputs(): void {
@@ -25,11 +27,13 @@ export function disableGameInputs(): void {
     changeAPSInput.enabled = false;
     shootInput.enabled = false;
     holdInput.enabled = false;
-    
+    resetInput.enabled = false;
+
     angleLeftInput.pressed = false;
     angleRightInput.pressed = false;
     centerCursorInput.pressed = false;
     changeAPSInput.pressed = false;
     shootInput.pressed = false;
     holdInput.pressed = false;
+    resetInput.pressed = false;
 }

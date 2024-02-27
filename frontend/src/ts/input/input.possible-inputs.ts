@@ -81,6 +81,20 @@ export const holdInput: Input = {
     enabled: false,
 };
 
+
+export const resetInput: Input = {
+    name: "Restart Game",
+    defaultKeyCode: "KeyR",
+    isTrigger: true,
+    pressed: false,
+    lastFiredAtTime: 0,
+    releasedAtTime: 0,
+    fire: () => {
+        console.error("no fire event attached to keyCode: " + holdInput.name);
+    },
+    enabled: false,
+};
+
 export const allInputs: Input[] = [
     angleLeftInput, 
     angleRightInput, 
@@ -88,4 +102,5 @@ export const allInputs: Input[] = [
     centerCursorInput, 
     shootInput,
     holdInput,
+    resetInput,
 ]

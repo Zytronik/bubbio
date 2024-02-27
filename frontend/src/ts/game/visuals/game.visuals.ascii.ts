@@ -121,7 +121,7 @@ function getArrowLineString(gridWidth: number): string {
     for (let i = 0; i < (gridWidth / 2) - 1; i++) {
         arrowLine += "&nbsp;&nbsp;&nbsp;&nbsp;";
     }
-    arrowLine += isEvenRow ? `&nbsp;&nbsp;&nbsp;${getASCIIArrow()}&nbsp;&nbsp;&nbsp;&nbsp;` : ` ${getASCIIArrow()}  `
+    arrowLine += isEvenRow ? `&nbsp;&nbsp;&nbsp;${getASCIIArrow()}&nbsp;&nbsp;&nbsp;&nbsp;` : ` ${getASCIIArrow()}&nbsp;&nbsp;`
     for (let i = 0; i < (gridWidth / 2) - 1; i++) {
         arrowLine += "&nbsp;&nbsp;&nbsp;&nbsp;";
     }
