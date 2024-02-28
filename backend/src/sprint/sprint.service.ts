@@ -1,17 +1,48 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { UserService } from 'src/user/user.service';
+import { NewsService } from 'src/news/news.service';
+import { GameStatsDto } from './dto/dto.game-stats';
 
 @Injectable()
 export class SprintService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private newsService: NewsService,
+        private userService: UserService,
+    ) { }
 
     async saveGameStats(userId: number, gameStatsDto: any): Promise<any> {
-        return this.prisma.sprint.create({
-            data: {
-                userId: userId,
-                ...gameStatsDto,
-            },
-        });
+        // Create Sprint
+        const newSprint = await this.createSprint(userId, gameStatsDto);
+        const sprintTime = gameStatsDto.sprintTime;
+
+        // Get User by ID
+        const user = await this.userService.getUserById(userId);
+
+        // Check if the new sprint time is in the top 5
+        const topTimes = await this.getLeaderboard();
+        const rank = topTimes.findIndex(time => time.userId === newSprint.userId && time.sprintTime === newSprint.sprintTime) + 1;
+
+        if (rank > 0 && rank <= 5 && user) {
+            await this.newsService.createNews('Sprint', userId, rank, sprintTime);
+            this.newsService.updateNews();
+        }
+
+        return newSprint;
+    }
+
+    async createSprint(userId: number, gameStatsDto: GameStatsDto): Promise<any> {
+        try {
+            return await this.prisma.sprint.create({
+                data: {
+                    userId: userId,
+                    ...gameStatsDto,
+                },
+            });
+        } catch (error) {
+            throw new Error('Unable to create sprint record.');
+        }
     }
 
     async getLeaderboard(): Promise<any> {
@@ -26,7 +57,7 @@ export class SprintService {
             },
             distinct: ['userId'],
         });
-    
+
         // Fetch the corresponding sprint records for these best times
         const leaderboardRecords = await Promise.all(
             bestTimes.map(async (time) => {
@@ -45,11 +76,11 @@ export class SprintService {
                 });
             })
         );
-    
+
         return leaderboardRecords.filter(record => record !== null);
     }
-    
-    
+
+
     async getUserHistory(userId: number): Promise<any> {
         return this.prisma.sprint.findMany({
             where: {
@@ -58,8 +89,10 @@ export class SprintService {
             orderBy: {
                 submittedAt: 'desc',
             },
+            take: 15,
         });
-    }    
+    }
+    
 
     async getPersonalBests(userId: number): Promise<any> {
         return this.prisma.sprint.findMany({

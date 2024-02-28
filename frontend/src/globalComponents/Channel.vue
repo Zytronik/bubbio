@@ -47,11 +47,19 @@
                       </div>
                     </div>
                     <div class="news">
-                      <h3>News (TODO)</h3>
+                      <h3>News</h3>
                       <div class="news-wrapper">
-                        <div>blablabla</div>
-                        <div>blablabla</div>
-                        <div>blablabla</div>
+                        <transition-group name="fade" >
+                          <div v-for="(item,i) in newsData" :key="i" class="news-item">
+                            <div>
+                              <img :src="item.userImg ? item.userImg : getDefaultProfilePbURL()" alt="User's profile picture">
+                              <p>
+                                <span>{{ item.username }}</span> achieved <span>#{{ item.rank }}</span> in <span>{{ item.type }}</span> with <span>{{ formatTimeNumberToString(item.value) }}</span>
+                              </p>
+                            </div>
+                            <p class="time">{{ formatRelativeTime(item.createdAt) }}</p>
+                          </div>
+                        </transition-group>
                       </div>
                     </div>
                   </div>
@@ -137,13 +145,8 @@ import state from '@/ts/networking/networking.client-websocket';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 import useChatStore from '@/ts/page/page.globalChat';
 import { CountUp } from 'countup.js';
-
-interface User {
-  id: number;
-  username: string;
-  countryCode: string,
-  country: string,
-}
+import { getDefaultProfilePbURL } from '@/ts/networking/paths';
+import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
 
 export default {
   name: "ChannelOverlay",
@@ -154,8 +157,15 @@ export default {
       tabs: ['Dashboard', 'Leaderboards', 'Spectate'],
     };
   },
-  setup() {       
+  setup() {
     /* Search Users */
+    interface User {
+      id: number;
+      username: string;
+      countryCode: string,
+      country: string,
+    }
+
     const searchQuery = ref('');
     const searchResults = ref<User[]>([]);
 
@@ -189,7 +199,7 @@ export default {
     /* Overlay & URL */
     const selectedUsername = ref<string | null>(null);
     const showUserProfileOverlay = ref<boolean>(false);
-    const isVisible = ref(false);  
+    const isVisible = ref(false);
 
     function openUserProfile(username: string) {
       let delay = 0;
@@ -314,21 +324,80 @@ export default {
       }
     }
 
+    /* News */
+    interface NewsData {
+      type: string;
+      rank: number;
+      value: number;
+      createdAt: Date;
+      username: string;
+      userImg: string;
+    }
+
+    const newsData = ref<NewsData[]>([]);
+
+    function fetchNews() {
+      if (state.socket) {
+        state.socket.emit('fetchNews');
+      }
+    }
+
+    function formatRelativeTime(date: Date | string) {
+      if (!date) {
+        return '';
+      }
+
+      const now = new Date();
+      const targetDate = new Date(date);
+      const seconds = Math.round((now.getTime() - targetDate.getTime()) / 1000);
+      const minutes = Math.round(seconds / 60);
+      const hours = Math.round(minutes / 60);
+      const days = Math.round(hours / 24);
+      const weeks = Math.round(days / 7);
+      const months = Math.round(days / 30.44); // More precise average days per month
+      const years = Math.round(months / 12);
+
+      if (seconds < 60) {
+        return 'just now';
+      } else if (minutes < 60) {
+        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+      } else if (hours < 24) {
+        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      } else if (days < 7) {
+        return `${days} day${days > 1 ? 's' : ''} ago`;
+      } else if (weeks < 4.345) { // Using the average number of weeks in a month
+        return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+      } else if (months < 12) {
+        return `${months} month${months > 1 ? 's' : ''} ago`;
+      } else {
+        return `${years} year${years > 1 ? 's' : ''} ago`;
+      }
+    }
+
+
     /* General */
     const isAuthenticated = computed(() => checkUserAuthentication());
 
     onMounted(async () => {
+      if (state.socket) {
+        state.socket.on('fetchGlobalStats', (globalStats: GlobalStats) => {
+          handleGlobalStatsUpdate(globalStats);
+        });
+        state.socket.on('updateNews', (data: NewsData[]) => {
+          newsData.value = data.map(item => ({
+            ...item,
+            createdAt: new Date(item.createdAt)
+          }));
+        });
+      }
+
+      fetchNews();
       slideOverlayIn();
       showUserPageFromURL();
       await fetchStats();
       intervalId = setInterval(async () => {
         await fetchStats();
       }, 30000);
-      if (state.socket) {
-        state.socket.on('fetchGlobalStats', (globalStats: GlobalStats) => {
-          handleGlobalStatsUpdate(globalStats);
-        });
-      }
       scollGlobalChatToBottom();
     });
 
@@ -363,6 +432,10 @@ export default {
       isVisible,
       slideOverlayOut,
       getFlagImagePath,
+      newsData,
+      formatRelativeTime,
+      getDefaultProfilePbURL,
+      formatTimeNumberToString,
     };
   },
 }
@@ -622,17 +695,42 @@ h2 {
   background-color: black;
 }
 
+.news-item p span {
+  font-weight: bold;
+}
+
+.news-item img {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+}
+
+.news-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.news-item > div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px
+}
+
 .news-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   gap: 15px;
   height: 100%;
+  overflow-y: scroll;
 }
 
 .news-wrapper>div {
-  background-color: rgb(53, 53, 53);
-  padding: 5px 15px;
+  background-color: rgb(30, 30, 30);
+  padding: 10px 15px;
 }
 
 .openChannelButton {
@@ -748,4 +846,5 @@ h2 {
 
 .fade-leave-active {
   animation-name: fadeOut;
-}</style>
+}
+</style>

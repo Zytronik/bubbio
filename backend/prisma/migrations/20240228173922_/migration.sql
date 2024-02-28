@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "News" ALTER COLUMN "value" SET DEFAULT 0;

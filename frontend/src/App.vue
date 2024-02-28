@@ -243,7 +243,6 @@ export default {
     }
 
     async function fetchUserData() {
-      console.log("fetchUserData");
       const token = localStorage.getItem('authToken');
       const response = await httpClient.get('/users/me', {
         headers: {

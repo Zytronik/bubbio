@@ -9,6 +9,6 @@ export class GameGateway {
 
   @SubscribeMessage('setupGame')
   setupGame(client: Socket, nd_GameSetup: nd_GameSetup): void {
-    console.log(nd_GameSetup);
+    //console.log(nd_GameSetup);
   }
 }

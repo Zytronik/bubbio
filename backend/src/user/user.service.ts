@@ -82,13 +82,13 @@ export class UserService {
     async getUserSprintRank(username: string): Promise<number | null> {
         // Step 1: Get the user's best sprint time
         const userBestTimeRecord = await this.prisma.sprint.findFirst({
-            where: { 
-                user: { 
+            where: {
+                user: {
                     username: {
                         equals: username,
-                        mode: 'insensitive', 
-                    } 
-                } 
+                        mode: 'insensitive',
+                    }
+                }
             },
             orderBy: { sprintTime: 'asc' },
             select: { sprintTime: true },
@@ -121,22 +121,22 @@ export class UserService {
     async getUserProfileByUsername(username: string): Promise<any> {
         const user = await this.prisma.user.findFirst({
             where: {
-              username: {
-                equals: username,
-                mode: 'insensitive',
-              },
+                username: {
+                    equals: username,
+                    mode: 'insensitive',
+                },
             },
             select: {
-              id: true,
-              username: true,
-              createdAt: true,
-              countryCode: true,
-              country: true,
-              pbUrl: true,
-              bannerUrl: true,
-              LastDisconnectedAt: true,
+                id: true,
+                username: true,
+                createdAt: true,
+                countryCode: true,
+                country: true,
+                pbUrl: true,
+                bannerUrl: true,
+                LastDisconnectedAt: true,
             },
-          });
+        });
 
         if (!user) {
             throw new NotFoundException(`User with username ${username} not found`);
@@ -221,9 +221,20 @@ export class UserService {
 
     async updateLastDisconnectedAt(username: string): Promise<void> {
         await this.prisma.user.update({
-          where: { username },
-          data: { LastDisconnectedAt: new Date() },
+            where: { username },
+            data: { LastDisconnectedAt: new Date() },
         });
-      }
+    }
+
+    async getUserById(userId: number): Promise<any> {
+        return this.prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+            select: {
+                username: true,
+            },
+        });
+    }
 
 }
