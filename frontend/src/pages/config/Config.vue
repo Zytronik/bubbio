@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { goToState } from '@/ts/page/page.page-manager';
+import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
 import { Ref, SetupContext, computed, onMounted, ref } from 'vue';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { allGameSettings } from '@/ts/game/settings/game.settings.game';
@@ -57,12 +57,13 @@ export default {
     const isAuthenticated = computed(() => checkUserAuthentication());
     const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
     const backButtonData = ref([
-      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/solo.png'), disabled: true},
-      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/multi.png'), disabled: true },
+      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/solo.png'), disabled: true},
+      { pageState: PAGE_STATE.multiMenu, iconSrc: require('@/img/icons/multi.png'), disabled: true },
       { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/config.png') , disabled: false},
     ]);
 
     onMounted(() => {
+      changeBackgroundTo('linear-gradient(45deg, rgba(69,51,59,1) 0%, rgba(24,193,169,1) 100%)');
       console.log('Vue app mounted | Config Page');
     });
 
@@ -130,15 +131,15 @@ export default {
       isAuthenticated,
       allGameSettings,
       backButtonData,
+      changeBackgroundTo,
     }
   }
 }
 </script>
 
 <style scoped>
-section .page-wrapper {
-  background: rgb(69,51,59);
-  background: linear-gradient(59deg, rgba(69,51,59,1) 0%, rgba(24,193,169,1) 100%); 
+.back-buttons::before  {
+  background: linear-gradient(45deg, rgba(181,43,221,1) 0%, rgba(198,63,63,1) 100%); 
 }
 
 .account-setting {

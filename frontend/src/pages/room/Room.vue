@@ -28,6 +28,7 @@
 <script lang="ts">
 import { ref, onMounted, onUnmounted, defineComponent, SetupContext } from 'vue';
 import state from '@/ts/networking/networking.client-websocket';
+import { changeBackgroundTo } from '@/ts/page/page.page-manager';
 
 interface Message {
   username: string;
@@ -121,21 +122,17 @@ export default defineComponent({
     });
 
     onMounted(() => {
+      changeBackgroundTo('linear-gradient(45deg, rgba(19, 20, 142, 1) 0%, rgba(97, 33, 33, 1) 100%)');
       console.log('Vue app mounted | Room');
       joinRoom();
     });
 
-    return { chatMessages, messageInputField, roomUserList, sendMessage, startGame, leaveRoom };
+    return { chatMessages, messageInputField, roomUserList, sendMessage, startGame, leaveRoom, changeBackgroundTo };
   },
 });
 </script>
 
 <style scoped>
-section .page-wrapper {
-  background: rgb(19, 20, 142);
-  background: linear-gradient(59deg, rgba(19, 20, 142, 1) 0%, rgba(97, 33, 33, 1) 100%);
-}
-
 input {
   padding: 5px;
   margin-top: 10px;

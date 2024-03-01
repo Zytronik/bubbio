@@ -39,6 +39,24 @@ export const settingsPageToMainMenuTransition: PageTransition = {
     }
 }
 
+export const settingsPageToSoloMenuTransition: PageTransition = {
+    name: "settingsPageToSoloMenuTransition",
+    origin: PAGE_STATE.settingsPage,
+    destination: PAGE_STATE.soloMenu,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + settingsPageToSoloMenuTransition.name);
+    }
+}
+
+export const settingsPageToMultiMenuTransition: PageTransition = {
+    name: "settingsPageToMultiMenuTransition",
+    origin: PAGE_STATE.settingsPage,
+    destination: PAGE_STATE.multiMenu,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + settingsPageToMultiMenuTransition.name);
+    }
+}
+
 /*  RoomListing */
 export const roomListingToMultiMenuTransition: PageTransition = {
     name: "roomListingToMultiMenuTransition",
@@ -115,6 +133,24 @@ export const soloMenuToSprintPageTransition: PageTransition = {
     }
 }
 
+export const soloMenuToMultiMenuTransition: PageTransition = {
+    name: "soloMenuToMultiMenuTransition",
+    origin: PAGE_STATE.soloMenu,
+    destination: PAGE_STATE.multiMenu,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + soloMenuToMultiMenuTransition.name);
+    }
+}
+
+export const soloMenuTosettingsPageTransition: PageTransition = {
+    name: "soloMenuTosettingsPageTransition",
+    origin: PAGE_STATE.soloMenu,
+    destination: PAGE_STATE.settingsPage,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + soloMenuTosettingsPageTransition.name);
+    }
+}
+
 /*  SprintPage */
 export const spintPageToSoloMenuTransition: PageTransition = {
     name: "spintPageToSoloMenuTransition",
@@ -144,12 +180,21 @@ export const multiMenuToMainMenuTransition: PageTransition = {
     }
 }
 
-export const multiMenuToRoomPageTransition: PageTransition = {
-    name: "multiMenuToRoomPageTransition",
+export const multiMenuToSettingsPageTransition: PageTransition = {
+    name: "multiMenuToSettingsPageTransition",
     origin: PAGE_STATE.multiMenu,
-    destination: PAGE_STATE.roomPage,
+    destination: PAGE_STATE.settingsPage,
     transitionFunction: () => {
-        console.error("transition not yet defined for " + multiMenuToRoomPageTransition.name);
+        console.error("transition not yet defined for " + multiMenuToSettingsPageTransition.name);
+    }
+}
+
+export const multiMenuToSoloMenuTransition: PageTransition = {
+    name: "multiMenuToSoloMenuTransition",
+    origin: PAGE_STATE.multiMenu,
+    destination: PAGE_STATE.soloMenu,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + multiMenuToSoloMenuTransition.name);
     }
 }
 
@@ -157,7 +202,7 @@ export const allPossibleTransitions: PageTransition[] = [
     mainMenuToSettingsPageTransition,
     multiMenuToRoomListingTransition,
     mainMenuToMultiMenuTransition,
-    multiMenuToRoomPageTransition,
+    multiMenuToSoloMenuTransition,
     settingsPageToMainMenuTransition,
     roomListingToMultiMenuTransition,
     roomListingToRoomPageTransition,
@@ -170,4 +215,9 @@ export const allPossibleTransitions: PageTransition[] = [
     mainMenuToSoloMenuTransition,
     soloMenuToMainMenuTransition,
     multiMenuToMainMenuTransition,
+    soloMenuToMultiMenuTransition,
+    soloMenuTosettingsPageTransition,
+    multiMenuToSettingsPageTransition,
+    settingsPageToSoloMenuTransition,
+    settingsPageToMultiMenuTransition,
 ];

@@ -1,6 +1,6 @@
 import { checkUserAuthentication, logUserOut } from "../networking/networking.auth";
 import { PAGE_STATE } from "./page.e-page-state";
-import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToMultiMenuTransition, roomListingToMultiMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, roomPageToMultiMenuTransition, multiMenuToRoomPageTransition, soloMenuToSprintPageTransition, spintPageToSoloMenuTransition, mainMenuToSoloMenuTransition, soloMenuToMainMenuTransition, multiMenuToRoomListingTransition, multiMenuToMainMenuTransition } from "./page.possible-transitions";
+import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToMultiMenuTransition, roomListingToMultiMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, roomPageToMultiMenuTransition, multiMenuToSoloMenuTransition, soloMenuToSprintPageTransition, spintPageToSoloMenuTransition, mainMenuToSoloMenuTransition, soloMenuToMainMenuTransition, multiMenuToRoomListingTransition, multiMenuToMainMenuTransition, soloMenuToMultiMenuTransition, soloMenuTosettingsPageTransition, multiMenuToSettingsPageTransition, settingsPageToMultiMenuTransition, settingsPageToSoloMenuTransition } from "./page.possible-transitions";
 import { Page } from "./page.i-page";
 import StartMenu from '../../pages/startmenu/StartMenu.vue';
 import Room from '../../pages/room/Room.vue';
@@ -30,7 +30,7 @@ export function setupTransitionFunctions() {
     multiMenuToRoomListingTransition.transitionFunction = multiMenuToRoomListing;
     mainMenuToMultiMenuTransition.transitionFunction = mainMenuToMultiMenu;
     mainMenuToSoloMenuTransition.transitionFunction = mainMenuToSoloMenu;
-    multiMenuToRoomPageTransition.transitionFunction = multiMenuToRoomPage;
+    multiMenuToSoloMenuTransition.transitionFunction = multiMenuToSoloMenu;
     settingsPageToMainMenuTransition.transitionFunction = settingsPageToMainMenu;
     roomListingToMultiMenuTransition.transitionFunction = roomListingToMultiMenu;
     roomListingToRoomPageTransition.transitionFunction = roomListingToRoomPage;
@@ -42,6 +42,11 @@ export function setupTransitionFunctions() {
     spintPageToSoloMenuTransition.transitionFunction = spintPageToSoloMenu;
     soloMenuToSprintPageTransition.transitionFunction = soloMenuToSprintPage;
     multiMenuToMainMenuTransition.transitionFunction = multiMenuToMainMenu;
+    soloMenuToMultiMenuTransition.transitionFunction = soloMenuToMultiMenu;
+    soloMenuTosettingsPageTransition.transitionFunction = soloMenuTosettingsPage;
+    multiMenuToSettingsPageTransition.transitionFunction = multiMenuToSettingsPage;
+    settingsPageToMultiMenuTransition.transitionFunction = settingsPageToMultiMenu;
+    settingsPageToSoloMenuTransition.transitionFunction = settingsPageToSoloMenu;
 }
 
 export const currentPageState = ref<PAGE_STATE>(PAGE_STATE.mainMenu);
@@ -58,8 +63,14 @@ export function goToState(destination: PAGE_STATE, isNavigatingForward = true) {
         );
         if (result.length > 0) {
             eventBus.setNavigationDirection(isNavigatingForward);
-            currentPageState.value = destination;
-            result[0].transitionFunction();
+            let waitBeforeTransition = 0;
+            if(!isNavigatingForward){
+                waitBeforeTransition = 400;
+            }
+            setTimeout(() => {
+                currentPageState.value = destination;
+                result[0].transitionFunction();
+            }, waitBeforeTransition);
         } else {
             console.log("origin: " + currentPageState.value + " | destination: " + destination);
             console.error("Illegaaaaaaaaaaaaaaal Page Transition");
@@ -85,7 +96,7 @@ function mainMenuToSoloMenu() {
     console.log("current page: " + currentPageState.value);
 }
 
-function multiMenuToRoomPage() {
+function multiMenuToSoloMenu() {
     console.log("current page: " + currentPageState.value);
 }
 
@@ -133,6 +144,26 @@ function multiMenuToMainMenu(){
     console.log("current page: " + currentPageState.value);
 }
 
+function soloMenuToMultiMenu(){
+    console.log("current page: " + currentPageState.value);
+}
+
+function soloMenuTosettingsPage(){
+    console.log("current page: " + currentPageState.value);
+}
+
+function multiMenuToSettingsPage(){
+    console.log("current page: " + currentPageState.value);
+}
+
+function settingsPageToMultiMenu(){
+    console.log("current page: " + currentPageState.value);
+}
+
+function settingsPageToSoloMenu(){
+    console.log("current page: " + currentPageState.value);
+}
+
 //overlay Transitions
 const isChannelOpen = ref(false);
 
@@ -146,4 +177,12 @@ export function closeChannelOverlay() {
 
 export function isChannelActive() {
     return isChannelOpen;
+}
+
+export function changeBackgroundTo(color: string) {
+    document.body.style.background = color;
+}
+
+export function resetBackground() {
+    document.body.style.background = "";
 }

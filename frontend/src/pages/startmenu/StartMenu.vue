@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { goToState } from '@/ts/page/page.page-manager';
+import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
 import { onMounted } from 'vue';
 
 export default {
@@ -32,21 +32,18 @@ export default {
 
   setup() {
     onMounted(() => {
+      changeBackgroundTo("linear-gradient(45deg, rgba(181,43,221,1) 0%, rgba(198,63,63,1) 100%)");
       console.log('Vue app mounted | MainMenu');
     });
 
     return {
       goToState,
       PAGE_STATE,
+      changeBackgroundTo,
     }
   }
 };
 </script>
 
 <style scoped>
-section .page-wrapper,
-body {
-  background: rgb(181,43,221);
-  background: linear-gradient(164deg, rgba(181,43,221,1) 0%, rgba(198,63,63,1) 100%);
-}
 </style>

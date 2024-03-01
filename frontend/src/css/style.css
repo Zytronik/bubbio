@@ -189,6 +189,7 @@ button.goBackButton:focus {
     background-color: black;
     z-index: 1;
     position: relative;
+    cursor: pointer;
 }
 
 .back-buttons::before {
@@ -198,7 +199,7 @@ button.goBackButton:focus {
     top: 0;
     bottom: 0;
     height: 100%;
-    width: 90vw;
+    width: 100vw;
 }
 
 @keyframes slideInBackButtons {
@@ -216,10 +217,23 @@ button.goBackButton:focus {
 }
 
 .back-buttons .menu-btn {
+    animation: fadeInBackButtons 0.4s ease forwards;
+    animation-delay: 0.2s;
     padding: 30px 15px;
     justify-content: flex-end;
     width: 120%;
+    opacity: 0;
     transform: translateX(0);
+}
+
+@keyframes fadeInBackButtons {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .back-buttons .menu-btn.disabled:hover {

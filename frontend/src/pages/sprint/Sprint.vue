@@ -86,7 +86,7 @@
 
 <script lang="ts">
 import Game from '../game/Game.vue';
-import { goToState } from '@/ts/page/page.page-manager';
+import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
@@ -211,6 +211,7 @@ export default {
 
 
     onMounted(() => {
+      changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
       startDataFetchInterval();
     });
 
@@ -240,15 +241,16 @@ export default {
       isLoading,
       isGuest,
       backButtonData,
+      changeBackgroundTo,
     };
   },
 };
 </script>
 
 <style scoped>
-section .page-wrapper {
-  background: rgb(43,156,221);
-  background: linear-gradient(59deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%); 
+
+.back-buttons::before  {
+  background: linear-gradient(45deg, rgba(96, 221, 43, 1) 0%, rgba(198, 63, 135, 1) 100%);
 }
 
 ul {

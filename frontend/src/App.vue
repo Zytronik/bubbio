@@ -414,38 +414,38 @@ export default {
 
 /* Existing slide-left transitions */
 .slide-left-enter-active, .slide-left-leave-active {
-  transition: transform 0.2s ease;
+  transition: transform 0.15s ease;
 }
 .slide-left-enter-from, .slide-left-leave-to {
   position: absolute;
-  width: 100%;
+  width: 100vw;
 }
 .slide-left-enter-from {
-  transform: translateX(100%);
+  transform: translateX(100vw);
 }
 .slide-left-enter-to, .slide-left-leave-from {
   transform: translateX(0);
 }
 .slide-left-leave-to {
-  transform: translateX(-100%);
+  transform: translateX(-100vw);
 }
 
 /* New slide-right transitions */
 .slide-right-enter-active, .slide-right-leave-active {
-  transition: transform 0.2s ease;
+  transition: transform 0.15s ease;
 }
 .slide-right-enter-from, .slide-right-leave-to {
   position: absolute;
-  width: 100%;
+  width: 100vw;
 }
 .slide-right-enter-from {
-  transform: translateX(-100%);
+  transform: translateX(-100vw);
 }
 .slide-right-enter-to, .slide-right-leave-from {
   transform: translateX(0);
 }
 .slide-right-leave-to {
-  transform: translateX(100%);
+  transform: translateX(93vw);
 }
 
 

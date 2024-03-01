@@ -30,7 +30,7 @@
 import state from '@/ts/networking/networking.client-websocket';
 import { ref, SetupContext, onMounted } from 'vue';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { goToState } from '@/ts/page/page.page-manager';
+import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 
 interface ActiveRoomInfo {
@@ -76,6 +76,7 @@ export default {
     }
 
     onMounted(() => {
+      changeBackgroundTo('linear-gradient(45deg, rgba(209, 25, 114, 1) 0%, rgba(45, 19, 19, 1) 100%)');
       console.log('Vue app mounted | Room Listing');
       fetchActiveRooms();
     });
@@ -88,15 +89,15 @@ export default {
       goToState,
       PAGE_STATE,
       backButtonData,
+      changeBackgroundTo,
     };
   },
 };
 </script>
 
 <style scoped>
-section .page-wrapper {
-  background: rgb(209, 25, 114);
-  background: linear-gradient(59deg, rgba(209, 25, 114, 1) 0%, rgba(45, 19, 19, 1) 100%);
+.back-buttons::before  {
+  background: linear-gradient(45deg, rgba(43,221,185,1) 0%, rgba(198,63,119,1) 100%); 
 }
 
 .room-actions {
