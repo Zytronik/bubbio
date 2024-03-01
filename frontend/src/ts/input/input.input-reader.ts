@@ -14,6 +14,13 @@ export function attachInputReader() {
 
 function handleKeyDown(event: KeyboardEvent): void {
     allInputs.forEach((input: Input) => {
+        input.customKeyMap.map.forEach((key: string) => {
+            if (event.code === key && !input.pressed && input.enabled) {
+                input.pressed = true;
+                input.lastFiredAtTime = performance.now();
+                input.fire();
+            }
+        });
         if (event.code === input.defaultKeyCode && !input.pressed && input.enabled) {
             input.pressed = true;
             input.lastFiredAtTime = performance.now();
@@ -24,6 +31,15 @@ function handleKeyDown(event: KeyboardEvent): void {
 
 function handleKeyUp(event: KeyboardEvent): void {
     allInputs.forEach((input: Input) => {
+        input.customKeyMap.map.forEach((key: string) => {
+            if (event.code === key && input.enabled) {
+                input.pressed = false;
+                input.releasedAtTime = performance.now();
+                if (input.release) {
+                    input.release();
+                }
+            }
+        });
         if (event.code === input.defaultKeyCode && input.enabled) {
             input.pressed = false;
             input.releasedAtTime = performance.now();
