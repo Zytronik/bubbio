@@ -16,7 +16,7 @@
     <LoginOverlay v-if="showLogin" @login="handleLogin" @checkUsername="handleCheckUsername" @register="handleRegister"
       @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" @playAsGuest="handlePlayAsGuest" />
     <Channel v-if="isChannelOpen" />
-    <transition name="slide" mode="out-in">
+    <transition :name="isNavigatingForward ? 'slide-left' : 'slide-right'" mode="out-in">
       <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom"
         @showInfoMessage="showInfoMessage" @updateProfileData="updateProfileData" :key="currentComponentKey">
       </component>
@@ -178,6 +178,12 @@ export default {
       return pages[index].component;
     });
 
+    const isNavigatingForward = ref(true);
+
+    const updateDirection = (direction: boolean) => {
+      isNavigatingForward.value = direction;
+    };
+
     watchEffect(() => {
       document.title = `${document.title.split('|')[0]} | ${pages[currentPageIndex.value].title}`;
     });
@@ -274,6 +280,7 @@ export default {
       showUserPageFromURL();
       addSocketConnectListener(initOnIsUserInRoomAlready);
       addSocketConnectListener(initOnSocketDisconnect);
+      eventBus.on('navigationDirectionChanged', updateDirection);
       window.addEventListener('beforeunload', clearGuestCookies);
     });
 
@@ -305,6 +312,7 @@ export default {
       updateProfileData,
       showMyProfile,
       currentComponentKey,
+      isNavigatingForward,
     };
   },
 }
@@ -404,30 +412,42 @@ export default {
   background-color: rgb(30, 30, 30);
 }
 
-.slide-enter-active, .slide-leave-active {
+/* Existing slide-left transitions */
+.slide-left-enter-active, .slide-left-leave-active {
   transition: transform 0.2s ease;
 }
-
-.slide-enter-from, .slide-leave-to {
+.slide-left-enter-from, .slide-left-leave-to {
   position: absolute;
   width: 100%;
 }
+.slide-left-enter-from {
+  transform: translateX(100%);
+}
+.slide-left-enter-to, .slide-left-leave-from {
+  transform: translateX(0);
+}
+.slide-left-leave-to {
+  transform: translateX(-100%);
+}
 
-.slide-enter-from {
+/* New slide-right transitions */
+.slide-right-enter-active, .slide-right-leave-active {
+  transition: transform 0.2s ease;
+}
+.slide-right-enter-from, .slide-right-leave-to {
+  position: absolute;
+  width: 100%;
+}
+.slide-right-enter-from {
+  transform: translateX(-100%);
+}
+.slide-right-enter-to, .slide-right-leave-from {
+  transform: translateX(0);
+}
+.slide-right-leave-to {
   transform: translateX(100%);
 }
 
-.slide-enter-to {
-  transform: translateX(0);
-}
-
-.slide-leave-from {
-  transform: translateX(0);
-}
-
-.slide-leave-to {
-  transform: translateX(-100%);
-}
 
 
 

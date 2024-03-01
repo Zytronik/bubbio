@@ -1,24 +1,28 @@
-<template id="room" class="page">
-  <div>
-    <h3>Users in Room: {{ roomId }}</h3>
-    <div>
-      <span v-for="user in roomUserList" :key="user.clientId">
-        {{ user.username }},
-      </span>
-    </div>
-    <h2>Chat</h2>
-    <div id="chat">
-      <div id="chatMessages">
-        <div v-for="(msg, i) in chatMessages" :key="i">
-          {{ msg.username }}: {{ msg.text }}
+<template>
+  <section id="room" class="page">
+    <div class="page-wrapper">
+      <div class="page-container">
+        <h3>Users in Room: {{ roomId }}</h3>
+        <div>
+          <span v-for="user in roomUserList" :key="user.clientId">
+            {{ user.username }},
+          </span>
         </div>
+        <h2>Chat</h2>
+        <div id="chat">
+          <div id="chatMessages">
+            <div v-for="(msg, i) in chatMessages" :key="i">
+              {{ msg.username }}: {{ msg.text }}
+            </div>
+          </div>
+          <input id="messageInputField" v-model="messageInputField" @keyup.enter="sendMessage(messageInputField)"
+            placeholder="Type your message" />
+        </div>
+        <button @click="$emit('leftRoom')">Leave Room</button>
+        <button @click="startGame">Start Game (TODO)</button>
       </div>
-      <input id="messageInputField" v-model="messageInputField" @keyup.enter="sendMessage(messageInputField)"
-        placeholder="Type your message" />
     </div>
-    <button @click="$emit('leftRoom')">Leave Room</button>
-    <button @click="startGame">Start Game (TODO)</button>
-  </div>
+  </section>
 </template>
 
 <script lang="ts">
@@ -37,7 +41,7 @@ interface User {
 
 export default defineComponent({
   name: 'RoomPage',
-  components: {  },
+  components: {},
   props: {
     roomId: {
       type: String
@@ -73,7 +77,7 @@ export default defineComponent({
     }
 
     function leaveRoom() {
-      if(state.socket){
+      if (state.socket) {
         state.socket.emit('leaveRoom');
         removeHashFromUrl();
         clearChat();
@@ -82,7 +86,7 @@ export default defineComponent({
 
     function sendMessage(msg: string) {
       if (msg.trim()) {
-        if(state.socket){
+        if (state.socket) {
           state.socket.emit('message', { text: msg });
           clearMessageInputField();
         }
@@ -93,7 +97,7 @@ export default defineComponent({
       clearChat();
       if (props.roomId?.trim()) {
         addHashToUrl(props.roomId);
-        if(state.socket){
+        if (state.socket) {
           state.socket.emit('joinRoom', { roomId: props.roomId });
         }
       }
@@ -126,7 +130,12 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
+section .page-wrapper {
+  background: rgb(19, 20, 142);
+  background: linear-gradient(59deg, rgba(19, 20, 142, 1) 0%, rgba(97, 33, 33, 1) 100%);
+}
+
 input {
   padding: 5px;
   margin-top: 10px;

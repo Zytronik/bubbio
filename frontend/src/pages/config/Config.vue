@@ -1,38 +1,42 @@
 <template>
   <section id="config" class="page">
-    <h1>Config</h1>
-    <h2>Input Settings</h2>
-    <h2>Game Settings</h2>
-    <span>{{ allGameSettings.gridWidth.name }}: {{ allGameSettings.gridWidth.refValue }}</span>
-    <br>
-    <input type="range" v-model="allGameSettings.gridWidth.refValue" :min="allGameSettings.gridWidth.min"
-      :max="allGameSettings.gridWidth.max" step="1">
-    <br>
-    <div v-if="isAuthenticated">
-      <h2>Accounts Settings</h2>
-      <button @click="logOut">Log Out</button>
-      <div v-if="isLoggedIn">
-        <div class="account-setting">
-          <h3>Change Profile Picture:</h3>
-          <p>The img must be less then 2MB and in jpg or png format.</p>
-          <button>
-            <label for="pb-upload" class="custom-file-upload">Change Picture</label>
-          </button>
-          <input id="pb-upload" type="file" @change="handleFileChange('pb', $event)" accept="image/png, image/jpeg"
-            style="display: none;" />
-        </div>
-        <div class="account-setting">
-          <h3>Change Profile Banner:</h3>
-          <p>We recommend the following img dimensions: 1920px x 170px</p>
-          <button>
-            <label for="banner-upload" class="custom-file-upload">Change Banner</label>
-          </button>
-          <input id="banner-upload" type="file" @change="handleFileChange('banner', $event)"
-            accept="image/png, image/jpeg" style="display: none;" />
+    <MenuBackButtons :buttonData="backButtonData" />
+    <div class="page-wrapper">
+      <div class="page-container">
+        <h1>Config</h1>
+        <h2>Input Settings</h2>
+        <h2>Game Settings</h2>
+        <span>{{ allGameSettings.gridWidth.name }}: {{ allGameSettings.gridWidth.refValue }}</span>
+        <br>
+        <input type="range" v-model="allGameSettings.gridWidth.refValue" :min="allGameSettings.gridWidth.min"
+          :max="allGameSettings.gridWidth.max" step="1">
+        <br>
+        <div v-if="isAuthenticated">
+          <h2>Accounts Settings</h2>
+          <button @click="logOut">Log Out</button>
+          <div v-if="isLoggedIn">
+            <div class="account-setting">
+              <h3>Change Profile Picture:</h3>
+              <p>The img must be less then 2MB and in jpg or png format.</p>
+              <button>
+                <label for="pb-upload" class="custom-file-upload">Change Picture</label>
+              </button>
+              <input id="pb-upload" type="file" @change="handleFileChange('pb', $event)" accept="image/png, image/jpeg"
+                style="display: none;" />
+            </div>
+            <div class="account-setting">
+              <h3>Change Profile Banner:</h3>
+              <p>We recommend the following img dimensions: 1920px x 170px</p>
+              <button>
+                <label for="banner-upload" class="custom-file-upload">Change Banner</label>
+              </button>
+              <input id="banner-upload" type="file" @change="handleFileChange('banner', $event)"
+                accept="image/png, image/jpeg" style="display: none;" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <MenuBackButtons :buttonData="backButtonData" />
   </section>
 </template>
 
@@ -53,9 +57,9 @@ export default {
     const isAuthenticated = computed(() => checkUserAuthentication());
     const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
     const backButtonData = ref([
-      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/solo.png') },
-      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/multi.png') },
-      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/config.png') },
+      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/solo.png'), disabled: true},
+      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/multi.png'), disabled: true },
+      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/config.png') , disabled: false},
     ]);
 
     onMounted(() => {
@@ -132,6 +136,11 @@ export default {
 </script>
 
 <style scoped>
+section .page-wrapper {
+  background: rgb(69,51,59);
+  background: linear-gradient(59deg, rgba(69,51,59,1) 0%, rgba(24,193,169,1) 100%); 
+}
+
 .account-setting {
   margin: 30px 0;
 }

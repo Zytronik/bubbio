@@ -11,6 +11,7 @@ import RoomListing from '../../pages/room-listing/RoomListing.vue';
 import SoloMenu from '../../pages/solomenu/SoloMenu.vue';
 import MultiMenu from '../../pages/multimenu/MultiMenu.vue';
 import { ref } from 'vue';
+import eventBus from "./page.event-bus";
 
 export const pages: Page[] = [
     { title: 'StartMenu', pageState: PAGE_STATE.mainMenu, component: StartMenu },
@@ -45,7 +46,7 @@ export function setupTransitionFunctions() {
 
 export const currentPageState = ref<PAGE_STATE>(PAGE_STATE.mainMenu);
 
-export function goToState(destination: PAGE_STATE) {
+export function goToState(destination: PAGE_STATE, isNavigatingForward = true) {
     if (destination !== currentPageState.value) {
         const isLoggedIn = checkUserAuthentication();
         if (!isLoggedIn) {
@@ -56,6 +57,7 @@ export function goToState(destination: PAGE_STATE) {
             transition.origin === currentPageState.value && transition.destination === destination
         );
         if (result.length > 0) {
+            eventBus.setNavigationDirection(isNavigatingForward);
             currentPageState.value = destination;
             result[0].transitionFunction();
         } else {

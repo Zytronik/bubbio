@@ -4,7 +4,8 @@
       v-for="(button, index) in buttonData"
       :key="index"
       class="menu-btn"
-      @click="goToState(button.pageState)"
+      :class="button.disabled ? 'disabled' : ''"
+      @click="goToState(button.pageState, false)"
     >
       <img :src="button.iconSrc" />
     </button>
@@ -19,6 +20,7 @@ import { goToState } from '@/ts/page/page.page-manager';
 interface ButtonData {
   iconSrc: string;
   pageState: PAGE_STATE;
+  disabled: boolean;
 }
 
 export default defineComponent({

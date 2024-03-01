@@ -1,82 +1,86 @@
 <template>
   <section id="template" class="page">
-    <div v-if="!isGaming && isDashboard" class="sprintDashboard">
-      <h1>Sprint</h1>
-      <h2>Leaderboards</h2>
-      <ul>
-        <li v-for="(entry, index) in leaderboard" :key="index">
-          <span class="sp">{{ index + 1 }}. {{ entry.user.username }}</span>
-          <span>Time: {{ formatTimeNumberToString(entry.sprintTime) }}</span>
-          <span>Bubbles Shot: {{ entry.bubblesShot }}</span>
-          <span>BPS: {{ entry.bubblesPerSecond }}</span>
-          <span>Bubbles Cleared: {{ entry.bubblesCleared }}</span>
-          <span>Date: {{ formatDateTime(new Date(entry.submittedAt)) }}</span>
-        </li>
-      </ul>
-      <div v-if="!isGuest">
-        <h2>History</h2>
-        <ul>
-          <li v-for="(record, index) in userHistory" :key="index">
-            <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
-            <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
-            <span>Bubbles Shot: {{ record.bubblesShot }}</span>
-            <span>BPS: {{ record.bubblesPerSecond }}</span>
-            <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
-          </li>
-        </ul>
-      </div>
-      <div v-if="!isGuest">
-        <h2>Personal Stats</h2>
-        <h3>Top 3 Runs</h3>
-        <ul>
-          <li v-for="(record, index) in personalBests" :key="index">
-            <span>{{ index + 1 }}.</span>
-            <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
-            <span>Bubbles Shot: {{ record.bubblesShot }}</span>
-            <span>BPS: {{ record.bubblesPerSecond }}</span>
-            <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
-            <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
-          </li>
-        </ul>
-      </div>
-      <h4 v-if="isGuest"><br>Log in for Stats and Submit Scores.</h4>
-      <div v-if="isLoading" class="loading-animation">
-        Loading...
-      </div>
-
-      <button @click="showGameView()">Start Game</button>
-    </div>
-    <div v-if="isGaming" class="inGame">
-      <button @click="startGame()">Retry</button>
-      <button @click="showDashboard()">Back</button>
-      <div>
-        <p>{{ formattedCurrentTime }}</p>
-        <p>{{ bubblesCleared }}/{{ bubbleClearToWin }}</p>
-        <p>{{ bubblesLeftToClear }}</p>
-        <p>{{ bubblesShot }} BPS: {{ bubblesPerSecond }}</p>
-      </div>
-      <Game />
-    </div>
-    <div v-if="!isGaming && !isDashboard" class="gameComplete">
-      <button @click="showDashboard()">Back</button>
-      <button @click="showGameView()">Try Again</button>
-      <h2>More Stats</h2>
-      <p>Bubbles Shot: 0</p>
-      <p>Wallbounce Clear Count: 0</p>
-      <p>Triple Clear Count: 0</p>
-      <p>Quad Clear Count: 0</p>
-      <p>Quint Clear Count: 0</p>
-      <p>Do this for every amount of Clear bigger then 3</p>
-      <p>Highest Bubble Clear Count: 0</p>
-      <p>Key pressed</p>
-      <p>Key per bubble</p>
-      <p>Key per Second</p>
-      <p>Holds</p>
-      <p>Max Combo</p>
-      <p>Show Handlings (aps 1, aps 2)</p>
-      <p>Date & Time</p>
-    </div>
     <MenuBackButtons :buttonData="backButtonData" />
+    <div class="page-wrapper">
+      <div class="page-container">
+        <div v-if="!isGaming && isDashboard" class="sprintDashboard">
+          <h1>Sprint</h1>
+          <h2>Leaderboards</h2>
+          <ul>
+            <li v-for="(entry, index) in leaderboard" :key="index">
+              <span class="sp">{{ index + 1 }}. {{ entry.user.username }}</span>
+              <span>Time: {{ formatTimeNumberToString(entry.sprintTime) }}</span>
+              <span>Bubbles Shot: {{ entry.bubblesShot }}</span>
+              <span>BPS: {{ entry.bubblesPerSecond }}</span>
+              <span>Bubbles Cleared: {{ entry.bubblesCleared }}</span>
+              <span>Date: {{ formatDateTime(new Date(entry.submittedAt)) }}</span>
+            </li>
+          </ul>
+          <div v-if="!isGuest">
+            <h2>History</h2>
+            <ul>
+              <li v-for="(record, index) in userHistory" :key="index">
+                <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
+                <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
+                <span>Bubbles Shot: {{ record.bubblesShot }}</span>
+                <span>BPS: {{ record.bubblesPerSecond }}</span>
+                <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
+              </li>
+            </ul>
+          </div>
+          <div v-if="!isGuest">
+            <h2>Personal Stats</h2>
+            <h3>Top 3 Runs</h3>
+            <ul>
+              <li v-for="(record, index) in personalBests" :key="index">
+                <span>{{ index + 1 }}.</span>
+                <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
+                <span>Bubbles Shot: {{ record.bubblesShot }}</span>
+                <span>BPS: {{ record.bubblesPerSecond }}</span>
+                <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
+                <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
+              </li>
+            </ul>
+          </div>
+          <h4 v-if="isGuest"><br>Log in for Stats and Submit Scores.</h4>
+          <div v-if="isLoading" class="loading-animation">
+            Loading...
+          </div>
+
+          <button @click="showGameView()">Start Game</button>
+        </div>
+        <div v-if="isGaming" class="inGame">
+          <button @click="startGame()">Retry</button>
+          <button @click="showDashboard()">Back</button>
+          <div>
+            <p>{{ formattedCurrentTime }}</p>
+            <p>{{ bubblesCleared }}/{{ bubbleClearToWin }}</p>
+            <p>{{ bubblesLeftToClear }}</p>
+            <p>{{ bubblesShot }} BPS: {{ bubblesPerSecond }}</p>
+          </div>
+          <Game />
+        </div>
+        <div v-if="!isGaming && !isDashboard" class="gameComplete">
+          <button @click="showDashboard()">Back</button>
+          <button @click="showGameView()">Try Again</button>
+          <h2>More Stats</h2>
+          <p>Bubbles Shot: 0</p>
+          <p>Wallbounce Clear Count: 0</p>
+          <p>Triple Clear Count: 0</p>
+          <p>Quad Clear Count: 0</p>
+          <p>Quint Clear Count: 0</p>
+          <p>Do this for every amount of Clear bigger then 3</p>
+          <p>Highest Bubble Clear Count: 0</p>
+          <p>Key pressed</p>
+          <p>Key per bubble</p>
+          <p>Key per Second</p>
+          <p>Holds</p>
+          <p>Max Combo</p>
+          <p>Show Handlings (aps 1, aps 2)</p>
+          <p>Date & Time</p>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -107,7 +111,7 @@ interface GameRecord {
 
 export default {
   name: 'SprintPage',
-  components: { Game,MenuBackButtons },
+  components: { Game, MenuBackButtons },
   setup() {
     const isGaming = ref<boolean>(false);
     const isDashboard = ref<boolean>(true);
@@ -119,7 +123,7 @@ export default {
     const isGuestString = sessionStorage.getItem('isGuest');
     const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
     const backButtonData = ref([
-      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/sprint.png') },
+      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/sprint.png'), disabled: false },
     ]);
 
     setupSprintGame();
@@ -160,7 +164,7 @@ export default {
 
     async function fetchPersonalBests() {
       const token = localStorage.getItem('authToken');
-      if(!isGuest){
+      if (!isGuest) {
         const response = await httpClient.get('/sprint/personalBests', {
           headers: {
             Authorization: `Bearer ${token}`
@@ -242,6 +246,11 @@ export default {
 </script>
 
 <style scoped>
+section .page-wrapper {
+  background: rgb(43,156,221);
+  background: linear-gradient(59deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%); 
+}
+
 ul {
   list-style-type: none;
   padding: unset;
@@ -277,8 +286,8 @@ ul li span.sp {
   min-width: 5%;
 }
 
-.inGame ,
-.inGame > div{
+.inGame,
+.inGame>div {
   text-align: center;
 }
 </style>

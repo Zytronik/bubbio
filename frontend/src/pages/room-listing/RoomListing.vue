@@ -1,24 +1,28 @@
 <template>
   <section id="roomListing" class="room-listing page">
-    <div class="room-actions">
-      <input v-model="roomId" placeholder="Room ID" />
-      <button @click="joinRoom(roomId)">Join Room</button>
-      <p>- or -</p>
-      <button @click="createRoom()">Create & Join New Room</button>
-    </div>
-    <div class="active-rooms">
-      <h2>Active Rooms</h2>
-      <ul v-if="activeRooms.length > 0">
-        <li v-for="room in activeRooms" :key="room.roomId">
-          <button @click="joinRoom(room.roomId)">
-            <span class="room-id">Room ID: {{ room.roomId }}</span>
-            <span class="user-count">Users: {{ room.userCount }}</span>
-          </button>
-        </li>
-      </ul>
-      <p v-else>No active rooms available.</p>
-    </div>
     <MenuBackButtons :buttonData="backButtonData" />
+    <div class="page-wrapper">
+      <div class="page-container">
+        <div class="room-actions">
+          <input v-model="roomId" placeholder="Room ID" />
+          <button @click="joinRoom(roomId)">Join Room</button>
+          <p>- or -</p>
+          <button @click="createRoom()">Create & Join New Room</button>
+        </div>
+        <div class="active-rooms">
+          <h2>Active Rooms</h2>
+          <ul v-if="activeRooms.length > 0">
+            <li v-for="room in activeRooms" :key="room.roomId">
+              <button @click="joinRoom(room.roomId)">
+                <span class="room-id">Room ID: {{ room.roomId }}</span>
+                <span class="user-count">Users: {{ room.userCount }}</span>
+              </button>
+            </li>
+          </ul>
+          <p v-else>No active rooms available.</p>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -41,7 +45,7 @@ export default {
     const roomId = ref<string>('');
     const activeRooms = ref<ActiveRoomInfo[]>([]);
     const backButtonData = ref([
-      { pageState: PAGE_STATE.multiMenu, iconSrc: require('@/img/icons/rooms.png') },
+      { pageState: PAGE_STATE.multiMenu, iconSrc: require('@/img/icons/rooms.png') , disabled: false},
     ]);
 
     function createRoom() {
@@ -90,6 +94,10 @@ export default {
 </script>
 
 <style scoped>
+section .page-wrapper {
+  background: rgb(209, 25, 114);
+  background: linear-gradient(59deg, rgba(209, 25, 114, 1) 0%, rgba(45, 19, 19, 1) 100%);
+}
 
 .room-actions {
   display: flex;
@@ -149,5 +157,4 @@ a {
 .active-rooms p {
   text-align: center;
 }
-
 </style>

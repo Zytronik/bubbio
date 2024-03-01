@@ -17,12 +17,70 @@ html body {
     margin-top: unset;
 }
 
+/* Page */
 section.page {
-    max-width: 80%;
-    margin: 0 auto;
-    padding: 0 15px;
+    width: 100vw;
+    padding-left: 0;
     height: 90vh;
+    /* overflow: hidden; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+}
+
+section .page-wrapper {
+    height: 100%;
+    position: relative;
+    width: 100vw;
     overflow: hidden;
+}
+
+section .page-container {
+    padding: 0 15px;
+    margin: 0 auto;
+    max-width: 90%;
+}
+
+/* Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+/* Buttons */
+button.goBackButton {
+    position: absolute;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5vw;
+    height: 2.5vw;
+    border: none;
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 0;
+    margin-top: unset;
+    margin: 10px;
+    transition: 200ms;
+}
+
+button.goBackButton:hover,
+button.goBackButton:focus {
+    background-color: #cdcdcd;
+    outline: none;
 }
 
 .openChannelButton {
@@ -70,45 +128,7 @@ section.page {
     top: 0;
 }
 
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-}
-
-button.goBackButton {
-    position: absolute;
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5vw;
-    height: 2.5vw;
-    border: none;
-    background-color: white;
-    color: black;
-    cursor: pointer;
-    border-radius: 50%;
-    padding: 0;
-    margin-top: unset;
-    margin: 10px;
-    transition: 200ms;
-}
-
-button.goBackButton:hover,
-button.goBackButton:focus {
-    background-color: #cdcdcd;
-    outline: none;
-}
-
+/* Menus */
 .menu-wrapper {
     position: absolute;
     right: 0;
@@ -161,36 +181,35 @@ button.goBackButton:focus {
     margin: 0;
 }
 
-.page.menu {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: unset;
-    max-width: 100%;
-    position: relative;
-}
 .back-buttons {
     height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 7vw;
-    transform: translateX(-100%);
-    opacity: 0;
-    animation: slideInBackButtons 0.2s ease forwards;
+    width: 0vw;
+    animation: slideInBackButtons 0.4s ease forwards;
     animation-delay: 0.2s;
+    background-color: black;
+    z-index: 1;
+    position: relative;
+}
+
+.back-buttons::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 90vw;
 }
 
 @keyframes slideInBackButtons {
     from {
-      transform: translateX(-100%);
-      opacity: 0;
+        width: 0vw;
     }
+
     to {
-      transform: translateX(0);
-      opacity: 1;
+        width: 7vw;
     }
-  }
+}
 
 .back-buttons .menu-btn img {
     position: static;
@@ -200,16 +219,13 @@ button.goBackButton:focus {
     padding: 30px 15px;
     justify-content: flex-end;
     width: 120%;
-    transform: translateX(-20%);
+    transform: translateX(0);
 }
 
-.back-buttons .menu-btn:hover {
-    transform: translateX(0%);
+.back-buttons .menu-btn.disabled:hover {
+    transform: translateX(-17%);
 }
 
 .menu-btn.disabled {
-/*     pointer-events: none;
-    visibility: hidden;
-    opacity: 0;
-    width: 0; */
+    transform: translateX(-60%);
 }

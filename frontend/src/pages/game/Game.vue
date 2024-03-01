@@ -30,7 +30,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .monospace {
   white-space: pre-line;
   font-family: 'Consolas', monospace;
@@ -52,9 +52,4 @@ html body {
   margin-top: 60px;
 }
 
-section.page {
-  max-width: 80%;
-  margin: 0 auto;
-  padding: 0 15px;
-}
-</style>@/ts/game/visuals/game.visuals.ascii
+</style>

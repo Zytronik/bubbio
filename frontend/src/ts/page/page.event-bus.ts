@@ -10,6 +10,7 @@ interface EventsRecord {
 
 interface EventBusState {
   showLogin: boolean;
+  isNavigatingForward: boolean;
 }
 
 // Define the EventBus interface with specific methods
@@ -19,10 +20,12 @@ interface EventBus {
   on<T = unknown>(event: string, callback: EventBusCallback<T>): void;
   off(event: string, callback?: EventBusCallback): void;
   setShowLogin(show: boolean): void;
+  setNavigationDirection(direction: boolean): void;
 }
 
 const state = reactive<EventBusState>({
   showLogin: false,
+  isNavigatingForward: true,
 });
 
 const events: EventsRecord = reactive({});
@@ -54,12 +57,18 @@ const setShowLogin: EventBus['setShowLogin'] = (show) => {
   state.showLogin = show;
 };
 
+const setNavigationDirection: EventBus['setNavigationDirection'] = (direction) => {
+  state.isNavigatingForward = direction;
+  emit('navigationDirectionChanged', direction);
+};
+
 const eventBus: EventBus = {
   state: readonly(state),
   emit,
   on,
   off,
   setShowLogin,
+  setNavigationDirection,
 };
 
 export default eventBus;
