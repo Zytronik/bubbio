@@ -3,19 +3,30 @@
     <MenuBackButtons :buttonData="backButtonData" />
     <div class="page-wrapper">
       <div class="page-container">
-        <h1>Config</h1>
         <h2>Input Settings</h2>
-        <h2>Game Settings</h2>
-        <span>{{ allGameSettings.gridWidth.name }}: {{ allGameSettings.gridWidth.refValue }}</span>
-        <br>
-        <input type="range" v-model="allGameSettings.gridWidth.refValue" :min="allGameSettings.gridWidth.min"
-          :max="allGameSettings.gridWidth.max" step="1">
-        <br>
+        <div class="input-settings" v-if="allInputs && allInputs.length > 0">
+          <div v-for="(input, index) in allInputs" :key="index" class="input-setting setting">
+            <div class="desc">
+              <h3>{{ input.name }}</h3>
+              <p>{{ input.description }}</p>
+            </div>
+            <div class="keys">
+              <div class="defaultKey">
+                <p>{{ input.defaultKeyCode }}</p>
+              </div>
+              <div v-if="input.customKeyMap.map" class="customKeys">
+                <div v-for="(key, keyIndex) in input.customKeyMap.map" :key="`key-${keyIndex}`">
+                  <p>{{ key || 'Not Set' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div v-if="isAuthenticated">
           <h2>Accounts Settings</h2>
           <button @click="logOut">Log Out</button>
-          <div v-if="isLoggedIn">
-            <div class="account-setting">
+          <div v-if="isLoggedIn" class="account-settings">
+            <div class="account-setting setting">
               <h3>Change Profile Picture:</h3>
               <p>The img must be less then 2MB and in jpg or png format.</p>
               <button>
@@ -24,7 +35,7 @@
               <input id="pb-upload" type="file" @change="handleFileChange('pb', $event)" accept="image/png, image/jpeg"
                 style="display: none;" />
             </div>
-            <div class="account-setting">
+            <div class="account-setting setting">
               <h3>Change Profile Banner:</h3>
               <p>We recommend the following img dimensions: 1920px x 170px</p>
               <button>
@@ -48,6 +59,7 @@ import { allGameSettings } from '@/ts/game/settings/game.settings.game';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { checkUserAuthentication, logUserOut } from '@/ts/networking/networking.auth';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
+import { allInputs } from '@/ts/input/input.possible-inputs';
 
 export default {
   name: 'ConfigPage',
@@ -57,9 +69,9 @@ export default {
     const isAuthenticated = computed(() => checkUserAuthentication());
     const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
     const backButtonData = ref([
-      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/solo.png'), disabled: true},
+      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/solo.png'), disabled: true },
       { pageState: PAGE_STATE.multiMenu, iconSrc: require('@/img/icons/multi.png'), disabled: true },
-      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/config.png') , disabled: false},
+      { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/config.png'), disabled: false },
     ]);
 
     onMounted(() => {
@@ -132,21 +144,54 @@ export default {
       allGameSettings,
       backButtonData,
       changeBackgroundTo,
+      allInputs
     }
   }
 }
 </script>
 
 <style scoped>
-.back-buttons::before  {
-  background: linear-gradient(45deg, rgba(181,43,221,1) 0%, rgba(198,63,63,1) 100%); 
+.back-buttons::before {
+  background: linear-gradient(45deg, rgba(181, 43, 221, 1) 0%, rgba(198, 63, 63, 1) 100%);
 }
 
-.account-setting {
-  margin: 30px 0;
+.setting {
+  margin: 15px 0;
 }
 
-.account-setting p {
+.setting p {
   margin: unset;
+}
+
+.input-setting{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.input-setting .desc {
+  width: 30%;
+}
+
+.input-setting .keys{
+  width: 70%;
+  display: flex;
+  flex-direction: row;
+}
+
+.input-setting .keys{
+  display: flex;
+  flex-direction: row;
+}
+
+.input-setting .keys .defaultKey {
+  width: 30%;
+}
+.input-setting .keys .customKeys {
+  width: 70%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 30px;
 }
 </style>

@@ -567,18 +567,6 @@ export default {
   padding: 0 0 10px 0;
 }
 
-h3 {
-  margin: unset;
-  margin-bottom: 10px;
-  font-size: 20px;
-}
-
-h2 {
-  margin: unset;
-  margin-bottom: 15px;
-  font-size: 30px;
-}
-
 .friend-listing {
   max-height: 90%;
   height: 90%;

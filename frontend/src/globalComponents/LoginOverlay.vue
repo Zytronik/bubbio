@@ -159,11 +159,6 @@ button {
   cursor: pointer;
 }
 
-h2 {
-  margin-top: unset;
-  margin-bottom: 12px;
-}
-
 p {
   margin-top: unset;
   margin-bottom: 10px;

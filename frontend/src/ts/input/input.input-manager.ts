@@ -1,5 +1,5 @@
 import { angleCenter, angleLeft, angleRight, changeAPS, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
-import { angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, holdInput, resetInput, shootInput } from "./input.possible-inputs";
+import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, holdInput, resetInput, shootInput } from "./input.possible-inputs";
 
 export function enableGameInputs(): void {
     angleLeftInput.fire = angleLeft;
@@ -36,4 +36,13 @@ export function disableGameInputs(): void {
     shootInput.pressed = false;
     holdInput.pressed = false;
     resetInput.pressed = false;
+}
+
+
+export function applySettingsFromDB(): void {   
+
+/* 
+    allInputs.forEach(input => {  
+    });
+     */
 }

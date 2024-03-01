@@ -2,6 +2,8 @@ import { Input } from "./input.i-input";
 
 export const angleLeftInput: Input = {
     name: "Angle Left",
+    description: "Move the angle of the cannon to the left",
+    customKeyMap: {map: ["","",""]},
     defaultKeyCode: "ArrowLeft",
     isTrigger: false,
     pressed: false,
@@ -15,6 +17,8 @@ export const angleLeftInput: Input = {
 
 export const angleRightInput: Input = {
     name: "Angle Right",
+    description: "Move the angle of the cannon to the right",
+    customKeyMap: {map: ["","",""]},
     defaultKeyCode: "ArrowRight",
     isTrigger: false,
     pressed: false,
@@ -28,6 +32,8 @@ export const angleRightInput: Input = {
 
 export const changeAPSInput: Input = {
     name: "Change APS",
+    description: "Change the angle per second of the cannon",
+    customKeyMap: {map: ["","",""]},
     defaultKeyCode: "ShiftLeft",
     isTrigger: false,
     pressed: false,
@@ -44,6 +50,8 @@ export const changeAPSInput: Input = {
 
 export const centerCursorInput: Input = {
     name: "Set Cursor to 90°",
+    description: "Set the angle of the cannon to 90°",
+    customKeyMap: {map: ["","",""]},
     defaultKeyCode: "ArrowUp",
     isTrigger: true,
     pressed: false,
@@ -57,6 +65,8 @@ export const centerCursorInput: Input = {
 
 export const shootInput: Input = {
     name: "Shoot",
+    description: "Shoot a bubble",
+    customKeyMap: {map: ["","",""]},
     defaultKeyCode: "Space",
     isTrigger: true,
     pressed: false,
@@ -70,6 +80,8 @@ export const shootInput: Input = {
 
 export const holdInput: Input = {
     name: "Hold Bubble",
+    description: "Hold a bubble",
+    customKeyMap: {map: ["","",""]},
     defaultKeyCode: "ControlLeft",
     isTrigger: true,
     pressed: false,
@@ -84,6 +96,8 @@ export const holdInput: Input = {
 
 export const resetInput: Input = {
     name: "Restart Game",
+    description: "Restart the game",
+    customKeyMap: {map: ["","",""]},
     defaultKeyCode: "KeyR",
     isTrigger: true,
     pressed: false,

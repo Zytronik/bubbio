@@ -254,12 +254,10 @@ export default defineComponent({
     padding-left: calc(10vw + 30px);
     font-size: 18px;
     height: 10vw;
+    padding-top: 1%;
 }
 
 .user-profile-meta h2 {
-    margin-bottom: 1.5%;
-    margin-top: 1%;
-    font-size: 30px;
     display: flex;
     flex-direction: row;
     align-items: center;

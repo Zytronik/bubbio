@@ -121,7 +121,6 @@ export default {
 }
 
 .active-rooms h2 {
-  margin-bottom: 10px;
   text-align: center;
 }
 
