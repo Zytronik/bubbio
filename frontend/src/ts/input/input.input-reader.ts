@@ -14,14 +14,18 @@ export function attachInputReader() {
 
 function handleKeyDown(event: KeyboardEvent): void {
     allInputs.forEach((input: Input) => {
-        input.customKeyMap.map.forEach((key: string) => {
-            if (event.code === key && !input.pressed && input.enabled) {
+        let hasCustomCode = false;
+        input.customKeyMap.map.forEach((customCode: string) => {
+            if (event.code === customCode && !input.pressed && input.enabled) {
                 input.pressed = true;
                 input.lastFiredAtTime = performance.now();
                 input.fire();
             }
+            if (customCode != "") {
+                hasCustomCode = true;
+            }
         });
-        if (event.code === input.defaultKeyCode && !input.pressed && input.enabled) {
+        if (!hasCustomCode && event.code === input.defaultKeyCode && !input.pressed && input.enabled) {
             input.pressed = true;
             input.lastFiredAtTime = performance.now();
             input.fire();
