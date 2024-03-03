@@ -50,7 +50,6 @@
           <button @click="showGameView()">Start Game</button>
         </div>
         <div v-if="isGaming" class="inGame">
-          <button @click="startGame()">Retry</button>
           <button @click="showDashboard()">Back</button>
           <div>
             <p>{{ formattedCurrentTime }}</p>
