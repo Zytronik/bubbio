@@ -14,7 +14,8 @@ model User {
   countryCode     String?
   country         String?
   pbUrl           String?         
-  bannerUrl       String?
+  bannerUrl       String?          
+  inputSettings   String?
   LastDisconnectedAt  DateTime?        
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @default(now()) @updatedAt

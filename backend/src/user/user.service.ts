@@ -237,4 +237,18 @@ export class UserService {
         });
     }
 
+    async updateUserInputSettings(userId: number, inputSettings: string): Promise<void> {
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { inputSettings },
+        });
+    }
+
+    async getInputSettings(userId: number) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { inputSettings: true },
+        });
+        return user?.inputSettings;
+    }
 }

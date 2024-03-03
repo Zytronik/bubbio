@@ -1,4 +1,7 @@
 import { angleCenter, angleLeft, angleRight, changeAPS, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
+import { checkUserAuthentication } from "../networking/networking.auth";
+import { httpClient } from "../networking/networking.http-client";
+import { Input } from "./input.i-input";
 import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, holdInput, resetInput, shootInput } from "./input.possible-inputs";
 
 export function enableGameInputs(): void {
@@ -39,10 +42,58 @@ export function disableGameInputs(): void {
 }
 
 
-export function applySettingsFromDB(): void {   
+export async function applySavedInputSettings(): Promise<void> {
+    let settings = null;
+    const defaultCustomKeyMap = { map: ["", "", ""] };
 
-/* 
-    allInputs.forEach(input => {  
+    allInputs.forEach(input => {
+        input.customKeyMap = { ...defaultCustomKeyMap };
     });
-     */
+
+    if (checkUserAuthentication() && !sessionStorage.getItem('isGuest')) {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await httpClient.get('/users/settings/inputs', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            settings = response.data;
+        } catch (error) {
+            console.error('Error fetching input settings:', error);
+        }
+    } else {
+        const savedSettings = localStorage.getItem('userInputSettings');
+        if (savedSettings) {
+            settings = JSON.parse(savedSettings);
+        }
+    }
+
+    if (Array.isArray(settings)) {
+        settings.forEach(savedSetting => {
+            const input = allInputs.find(input => input.name === savedSetting.name);
+            if (input && savedSetting.customKeyMap) {
+                input.customKeyMap = savedSetting.customKeyMap;
+            }
+        });
+    }
+}
+
+export async function saveInputs() {
+    if (checkUserAuthentication() && !sessionStorage.getItem('isGuest')) { //if is logged in
+        try {
+            const token = localStorage.getItem('authToken');
+            const payload = JSON.stringify({ inputSettings: JSON.stringify(allInputs) });
+            await httpClient.post('/users/updateInputSettings', payload, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+        } catch (error) {
+            console.error('Error submitting input Settings:', error);
+        }
+    } else {
+        localStorage.setItem('userInputSettings', JSON.stringify(allInputs));
+    }
 }

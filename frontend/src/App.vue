@@ -41,6 +41,7 @@ import eventBus from './ts/page/page.event-bus';
 import { attachInputReader } from './ts/input/input.input-reader';
 import { httpClient } from './ts/networking/networking.http-client';
 import { getDefaultProfilePbURL } from './ts/networking/paths';
+import { applySavedInputSettings } from './ts/input/input.input-manager';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -130,6 +131,7 @@ export default {
     }
 
     function onShowLoginForm() {
+      clearErrorMessage();
       isAuthenticated.value = checkUserAuthentication();
     }
 
@@ -212,6 +214,7 @@ export default {
 
     watch(() => isAuthenticated.value, () => {
       updateProfileData();
+      applySavedInputSettings();
     });
 
     function updateProfileData(){

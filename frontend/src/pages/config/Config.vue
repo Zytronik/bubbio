@@ -90,6 +90,7 @@ import { checkUserAuthentication, logUserOut } from '@/ts/networking/networking.
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import { allInputs } from '@/ts/input/input.possible-inputs';
 import { Input } from '@/ts/input/input.i-input';
+import { saveInputs } from '@/ts/input/input.input-manager';
 
 export default {
   name: 'ConfigPage',
@@ -124,6 +125,7 @@ export default {
           const inputIndex = allInputs.findIndex(item => item === input);
           if (inputIndex !== -1 && allInputs[inputIndex].customKeyMap && Array.isArray(allInputs[inputIndex].customKeyMap.map)) {
             allInputs[inputIndex].customKeyMap.map[keyIndex] = inputEvent.code;
+            saveInputs();
           }
         }
       }
@@ -138,6 +140,7 @@ export default {
       if (inputIndex !== -1 && allInputs[inputIndex].customKeyMap && Array.isArray(allInputs[inputIndex].customKeyMap.map)) {
         // Set the custom key code to an empty string
         allInputs[inputIndex].customKeyMap.map[keyIndex] = "";
+        saveInputs();
 
         // Update text to "Not Set"
         const clickedDiv = event.currentTarget as HTMLElement;

@@ -23,9 +23,7 @@ export async function logUserOut() {
 }
 
 export function clearClientState() {
-  // Delete the authentication cookie
-  document.cookie = 'authToken=; Max-Age=0; path=/; domain=yourdomain.com';
-  localStorage.clear();
+  localStorage.removeItem('authToken');
   sessionStorage.clear();
 }
 
