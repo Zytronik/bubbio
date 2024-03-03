@@ -334,7 +334,7 @@ export default {
 .profile-wrapper {
   height: 100%;
   width: 20vw;
-  background-color: rgb(53, 53, 53);
+  background-color: rgb(30, 30, 30);
   display: flex;
   flex-direction: row;
   cursor: pointer;
