@@ -22,7 +22,7 @@
                   </div>
                   <div v-if="input.customKeyMap.map" class="customKeys">
                     <div v-for="(key, keyIndex) in input.customKeyMap.map" :key="`key-${keyIndex}`"
-                      @click="handleCustomKey($event, keyIndex, input)"
+                      @click="handleCustomKey($event, keyIndex, index)"
                       @contextmenu.prevent="handleResetCustomKey($event, keyIndex, input)">
                       <p>{{ key || 'Not Set' }}</p>
                     </div>
@@ -111,7 +111,7 @@ export default {
       { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/config.png'), disabled: false },
     ]);
 
-    function handleCustomKey(event: MouseEvent, keyIndex: number, originalInput: Input) {
+    function handleCustomKey(event: MouseEvent, keyIndex: number, inputIndex: number) {
       const clickedDiv = event.currentTarget as HTMLElement;
       if (!clickedDiv) return;
       const paragraphElement = clickedDiv.querySelector('p');
@@ -122,19 +122,12 @@ export default {
         window.removeEventListener('keydown', captureInput);
         if (paragraphElement) {
           paragraphElement.innerText = inputEvent.code;
-          // Deep clone the input to ensure no shared references
-          const inputIndex = allInputs.findIndex(item => item === originalInput);
-          if (inputIndex !== -1) {
-            const inputClone = JSON.parse(JSON.stringify(allInputs[inputIndex]));
-            if (inputClone.customKeyMap && Array.isArray(inputClone.customKeyMap.map)) {
-              inputClone.customKeyMap.map[keyIndex] = inputEvent.code;
-              // Update the allInputs array with the modified clone
-              allInputs[inputIndex] = inputClone;
-              saveInputs();
-            }
-          }
+          allInputs[inputIndex].customKeyMap.map[keyIndex] = inputEvent.code;
+          console.log(allInputs, inputIndex, keyIndex, allInputs[inputIndex]);
+          saveInputs();
         }
       }
+
       window.addEventListener('keydown', captureInput);
     }
 

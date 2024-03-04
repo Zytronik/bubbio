@@ -1,7 +1,6 @@
 import { angleCenter, angleLeft, angleRight, changeAPS, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
 import { checkUserAuthentication } from "../networking/networking.auth";
 import { httpClient } from "../networking/networking.http-client";
-import { Input } from "./input.i-input";
 import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, holdInput, resetInput, shootInput } from "./input.possible-inputs";
 
 export function enableGameInputs(): void {
@@ -44,10 +43,9 @@ export function disableGameInputs(): void {
 
 export async function applySavedInputSettings(): Promise<void> {
     let settings = null;
-    const defaultCustomKeyMap = { map: ["", "", ""] };
 
     allInputs.forEach(input => {
-        input.customKeyMap = { ...defaultCustomKeyMap };
+        input.customKeyMap = { map: ["", "", ""] };
     });
 
     if (checkUserAuthentication() && !sessionStorage.getItem('isGuest')) {
