@@ -12,16 +12,16 @@ export class SprintService {
         private userService: UserService,
     ) { }
 
-    async saveGameStats(userId: number, gameStatsDto: any): Promise<any> {
+    async saveGameStats(userId: number, gameStatsDto: GameStatsDto): Promise<any> {
         // Create Sprint
         const newSprint = await this.createSprint(userId, gameStatsDto);
-        const sprintTime = gameStatsDto.sprintTime;
+        const sprintTime = gameStatsDto.gameDuration;
 
         // Get User by ID
         const user = await this.userService.getUserById(userId);
 
         // Check if the new sprint time is in the top 5
-        const topTimes = await this.getLeaderboard();
+        const topTimes = await this.getSprintRank(5);
         const rank = topTimes.findIndex(time => time.userId === newSprint.userId && time.sprintTime === newSprint.sprintTime) + 1;
 
         if (rank > 0 && rank <= 5 && user) {
@@ -31,6 +31,27 @@ export class SprintService {
 
         return newSprint;
     }
+
+    async getSprintRank(take: number): Promise<any> {
+        const leaderboardRecords = await this.prisma.sprint.findMany({
+            orderBy: {
+                gameDuration: 'asc',
+            },
+            take: take,
+            distinct: ['userId'],
+            include: {
+                user: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
+        });
+    
+        return leaderboardRecords;
+    }
+
+
 
     async createSprint(userId: number, gameStatsDto: GameStatsDto): Promise<any> {
         try {
@@ -43,68 +64,36 @@ export class SprintService {
         } catch (error) {
             throw new Error('Unable to create sprint record.');
         }
-    }
+    }  
 
-    async getLeaderboard(): Promise<any> {
-        // Find the best sprintTime for each user
-        const bestTimes = await this.prisma.sprint.findMany({
-            select: {
-                userId: true,
-                sprintTime: true,
-            },
-            orderBy: {
-                sprintTime: 'asc',
-            },
-            distinct: ['userId'],
-        });
-
-        // Fetch the corresponding sprint records for these best times
-        const leaderboardRecords = await Promise.all(
-            bestTimes.map(async (time) => {
-                return this.prisma.sprint.findFirst({
-                    where: {
-                        userId: time.userId,
-                        sprintTime: time.sprintTime,
-                    },
-                    include: {
-                        user: {
-                            select: {
-                                username: true,
-                            },
-                        },
-                    },
-                });
-            })
-        );
-
-        return leaderboardRecords.filter(record => record !== null);
-    }
-
-
-    async getUserHistory(userId: number): Promise<any> {
+    async getHistory(params: { userId: number, sortBy: string, sortDirection: string, limit: number }): Promise<any> {
+        const { userId, sortBy, sortDirection, limit } = params;
+        const orderByField = sortBy ? sortBy : 'submittedAt';
+        const isSortDirectionValid = sortDirection === 'asc' || sortDirection === 'desc';
+        const orderDirection = isSortDirectionValid ? sortDirection : 'desc';
+    
         return this.prisma.sprint.findMany({
             where: {
                 userId: userId,
             },
             orderBy: {
-                submittedAt: 'desc',
+                [orderByField]: orderDirection,
             },
-            take: 15,
+            take: limit,
         });
     }
-    
 
-    async getPersonalBests(userId: number): Promise<any> {
+    async getPersonalBest(userId: number): Promise<any> {
         return this.prisma.sprint.findMany({
             where: {
                 userId: userId,
             },
             orderBy: [
                 {
-                    sprintTime: 'asc',
+                    gameDuration: 'asc',
                 },
             ],
-            take: 3,
+            take: 1,
         });
     }
 

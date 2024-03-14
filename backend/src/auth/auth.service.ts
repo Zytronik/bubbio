@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
+import { MailerService } from '@nestjs-modules/mailer';
 import { UserService } from 'src/user/user.service';
 import { Request } from 'express';
 
@@ -16,10 +17,11 @@ export class AuthService {
         private jwtService: JwtService,
         private configService: ConfigService,
         private userService: UserService,
+        private mailerService: MailerService,
     ) { }
 
     async register(registerDto: RegisterDto, clientIp: string): Promise<any> {
-        return this.userService.createUser(registerDto, clientIp); 
+        return this.userService.createUser(registerDto, clientIp);
     }
 
     getClientIp(req: Request): string {
@@ -32,9 +34,9 @@ export class AuthService {
             // Fallback to the direct IP address of the request.
             ip = req.socket.remoteAddress;
         }
-    
+
         console.log(`Client IP: ${ip}`);
-    
+
         return ip;
     }
 
@@ -62,7 +64,7 @@ export class AuthService {
 
         const payload = {
             username: user.username,
-            sub: user.id, 
+            sub: user.id,
             jti: jti
         };
         const secret = this.configService.get<string>('JWT_SECRET');
@@ -119,4 +121,119 @@ export class AuthService {
         }
     }
 
+    async forgotPassword(email: string): Promise<void> {
+        const user = await this.userService.findByEmail(email);
+        if (!user) {
+            throw new BadRequestException({
+                message: ['Email does not exist'],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
+        }
+
+        const resetToken = this.generateResetToken();
+
+        await this.saveResetToken(user.id, resetToken);
+
+        try {
+            await this.sendResetEmail(email, resetToken);
+        } catch (error) {
+            console.error('Error sending reset email:', error);
+
+            throw new BadRequestException({
+                message: ['Unable to send reset email at this time. Please try again later.'],
+                error: 'Service Unavailable',
+                statusCode: 503,
+            });
+        }
+    }
+
+    async sendResetEmail(email: string, token: string): Promise<void> {
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+        await this.mailerService.sendMail({
+            to: email,
+            subject: 'blubb.io | Password Reset',
+            template: 'password-reset', // Name of the template file without extension
+            context: { // Data to be passed to the template
+                resetLink,
+            },
+        });
+    }
+
+
+    private generateResetToken(): string {
+        return crypto.randomBytes(20).toString('hex');
+    }
+
+    private async saveResetToken(userId: number, token: string): Promise<void> {
+        const expirationTime = new Date();
+        expirationTime.setHours(expirationTime.getHours() + 1); // Token expires in 1 hour
+
+        await this.prisma.passwordResetToken.create({
+            data: {
+                userId: userId,
+                token: token,
+                expiresAt: expirationTime,
+            },
+        });
+    }
+
+    async verifyToken(token: string): Promise<any> {
+        const resetToken = await this.prisma.passwordResetToken.findUnique({
+            where: { token },
+        });
+
+        if (!resetToken) {
+            throw new BadRequestException({
+                message: ['Invalid Token'],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
+        }
+
+        const now = new Date();
+        if (resetToken.expiresAt < now) {
+            throw new BadRequestException({
+                message: ['Token has expired'],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
+        }
+
+        return { message: 'Token is valid', userId: resetToken.userId };
+    }
+
+    async changePassword(token: string, newPassword: string): Promise<void> {
+        const passwordResetEntry = await this.prisma.passwordResetToken.findUnique({
+            where: { token },
+        });
+
+        if (!passwordResetEntry) {
+            throw new BadRequestException({
+                message: ['Invalid or expired token'],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
+        }
+
+        const now = new Date();
+        if (passwordResetEntry.expiresAt < now) {
+            throw new BadRequestException({
+                message: ['Token has expired'],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await this.prisma.user.update({
+            where: { id: passwordResetEntry.userId },
+            data: { password: hashedPassword },
+        });
+
+        await this.prisma.passwordResetToken.delete({
+            where: { token },
+        });
+    }
 }

@@ -8,6 +8,7 @@ import { JwtStrategy } from './jwt/auth.jwt.strategy';
 import { PrismaModule } from '../prisma/prisma.module';
 import { JwtAuthGuard } from './jwt/auth.jwt.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TokensCleanupService } from './auth.tokensCleanupService';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard, TokensCleanupService],
   controllers: [AuthController],
   exports: [AuthService, JwtModule, UsersModule],
 })

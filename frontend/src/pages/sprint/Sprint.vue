@@ -3,38 +3,28 @@
     <MenuBackButtons :buttonData="backButtonData" />
     <div class="page-wrapper">
       <div class="page-container">
+
         <div v-if="!isGaming && isDashboard" class="sprintDashboard">
-          <h1>Sprint</h1>
-          <h2>Leaderboards</h2>
-          <ul>
-            <li v-for="(entry, index) in leaderboard" :key="index">
-              <span class="sp">{{ index + 1 }}. {{ entry.user.username }}</span>
-              <span>Time: {{ formatTimeNumberToString(entry.sprintTime) }}</span>
-              <span>Bubbles Shot: {{ entry.bubblesShot }}</span>
-              <span>BPS: {{ entry.bubblesPerSecond }}</span>
-              <span>Bubbles Cleared: {{ entry.bubblesCleared }}</span>
-              <span>Date: {{ formatDateTime(new Date(entry.submittedAt)) }}</span>
-            </li>
-          </ul>
+          <Leaderboard
+          :gameMode="GameMode.Sprint"
+          :fields="['gameDuration', 'bubblesShot', 'bubblesPerSecond', 'bubblesCleared', 'submittedAt']"
+          :sortBy="'gameDuration'"
+          :sortDirection="SortDirection.Asc"
+          :leaderboardCategory="LeaderboardCategory.Global"
+          :limit="10"/>
+
           <div v-if="!isGuest">
-            <h2>History</h2>
-            <ul>
-              <li v-for="(record, index) in userHistory" :key="index">
-                <span>Date: {{ formatDateTime(new Date(record.submittedAt)) }}</span>
-                <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
-                <span>Bubbles Shot: {{ record.bubblesShot }}</span>
-                <span>BPS: {{ record.bubblesPerSecond }}</span>
-                <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
-              </li>
-            </ul>
-          </div>
-          <div v-if="!isGuest">
-            <h2>Personal Stats</h2>
-            <h3>Top 3 Runs</h3>
+            <History 
+            :gameMode="GameMode.Sprint"
+            :fields="['gameDuration', 'bubblesShot', 'bubblesPerSecond', 'bubblesCleared', 'submittedAt']"
+            :sortBy="'submittedAt'"
+            :sortDirection="SortDirection.Desc"
+            :limit="10" />
+            <h3>Personal Best</h3>
             <ul>
               <li v-for="(record, index) in personalBests" :key="index">
                 <span>{{ index + 1 }}.</span>
-                <span>Time: {{ formatTimeNumberToString(record.sprintTime) }}</span>
+                <span>Time: {{ formatTimeNumberToString(record.gameDuration) }}</span>
                 <span>Bubbles Shot: {{ record.bubblesShot }}</span>
                 <span>BPS: {{ record.bubblesPerSecond }}</span>
                 <span>Bubbles Cleared: {{ record.bubblesCleared }}</span>
@@ -42,13 +32,11 @@
               </li>
             </ul>
           </div>
+          
           <h4 v-if="isGuest"><br>Log in for Stats and Submit Scores.</h4>
-          <div v-if="isLoading" class="loading-animation">
-            Loading...
-          </div>
-
           <button @click="showGameView()">Start Game</button>
         </div>
+
         <div v-if="isGaming" class="inGame">
           <button @click="showDashboard()">Back</button>
           <div>
@@ -59,6 +47,7 @@
           </div>
           <Game />
         </div>
+
         <div v-if="!isGaming && !isDashboard" class="gameComplete">
           <button @click="showDashboard()">Back</button>
           <button @click="showGameView()">Try Again</button>
@@ -78,6 +67,7 @@
           <p>Show Handlings (aps 1, aps 2)</p>
           <p>Date & Time</p>
         </div>
+
       </div>
     </div>
   </section>
@@ -85,40 +75,32 @@
 
 <script lang="ts">
 import Game from '../game/Game.vue';
-import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
+import { changeBackgroundTo, formatDateTime, goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { bubbleClearToWin, bubblesCleared, bubblesLeftToClear, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
-
-interface LeaderboardEntry extends GameRecord {
-  user: {
-    username: string;
-  };
-  userId: number;
-}
+import Leaderboard from '@/globalComponents/Leaderboard.vue';
+import History from '@/globalComponents/History.vue';
+import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-leaderboard';
 
 interface GameRecord {
   submittedAt: Date | string;
   bubblesCleared: number;
   bubblesPerSecond: number;
   bubblesShot: number;
-  sprintTime: number;
+  gameDuration: number;
 }
 
 export default {
   name: 'SprintPage',
-  components: { Game, MenuBackButtons },
+  components: { Game, MenuBackButtons, Leaderboard, History },
   setup() {
     const isGaming = ref<boolean>(false);
     const isDashboard = ref<boolean>(true);
-    const intervalId = ref(0);
-    const userHistory = ref<GameRecord[]>([]);
     const personalBests = ref<GameRecord[]>([]);
-    const leaderboard = ref<LeaderboardEntry[]>([]);
-    const isLoading = ref<boolean>(true);
     const isGuestString = sessionStorage.getItem('isGuest');
     const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
     const backButtonData = ref([
@@ -139,32 +121,10 @@ export default {
       leaveGame();
     }
 
-    function formatDateTime(date: Date): string {
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // January is 0!
-      const year = date.getFullYear().toString().substr(-2); // Get last two digits of year
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-
-      return `${day}.${month}.${year} ${hours}:${minutes}`;
-    }
-
-    async function fetchUserHistory() {
-      const token = localStorage.getItem('authToken');
-      if (!isGuest) {
-        const response = await httpClient.get('/sprint/userHistory', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        userHistory.value = response.data;
-      }
-    }
-
     async function fetchPersonalBests() {
       const token = localStorage.getItem('authToken');
       if (!isGuest) {
-        const response = await httpClient.get('/sprint/personalBests', {
+        const response = await httpClient.get('/sprint/personalBest', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -173,49 +133,17 @@ export default {
       }
     }
 
-    async function fetchLeaderboard() {
-      const response = await httpClient.get<LeaderboardEntry[]>('/sprint/leaderboard');
-      leaderboard.value = response.data;
-    }
-
     async function fetchSprintData() {
-      isLoading.value = true;
       try {
-        await fetchUserHistory();
         await fetchPersonalBests();
-        await fetchLeaderboard();
       } catch (error) {
         console.error("Error fetching data:", error);
-      } finally {
-        isLoading.value = false;
       }
     }
-
-    function startDataFetchInterval() {
-      if (!isGaming.value && isDashboard.value) {
-        clearInterval(intervalId.value);
-        fetchSprintData();
-
-        intervalId.value = setInterval(() => {
-          fetchSprintData();
-        }, 30000);
-      } else {
-        clearInterval(intervalId.value);
-      }
-    }
-
-    watch([isGaming, isDashboard], () => {
-      startDataFetchInterval();
-    });
-
 
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
-      startDataFetchInterval();
-    });
-
-    onUnmounted(() => {
-      clearInterval(intervalId.value);
+      fetchSprintData();
     });
 
     return {
@@ -232,44 +160,28 @@ export default {
       isDashboard,
       startGame,
       showDashboard,
-      userHistory,
-      leaderboard,
       personalBests,
       formatDateTime,
       formatTimeNumberToString,
-      isLoading,
       isGuest,
       backButtonData,
       changeBackgroundTo,
+      GameMode,
+      LeaderboardCategory,
+      SortDirection,
     };
   },
 };
 </script>
 
 <style scoped>
-
-.back-buttons::before  {
+.back-buttons::before {
   background: linear-gradient(45deg, rgba(96, 221, 43, 1) 0%, rgba(198, 63, 135, 1) 100%);
 }
 
 ul {
   list-style-type: none;
   padding: unset;
-}
-
-.loading-animation {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.8);
-  z-index: 100;
-  font-size: 20px;
-  color: white;
 }
 
 ul li span {

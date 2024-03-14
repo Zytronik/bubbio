@@ -1,4 +1,5 @@
-import { reactive, readonly } from 'vue';
+import { reactive, readonly, toRaw } from 'vue';
+import { UserData } from './page.i-userData';
 
 // Define a generic callback type with a flexible argument list
 type EventBusCallback<T = unknown> = (...args: T[]) => void;
@@ -11,6 +12,7 @@ interface EventsRecord {
 interface EventBusState {
   showLogin: boolean;
   isNavigatingForward: boolean;
+  userData: UserData | null;
 }
 
 // Define the EventBus interface with specific methods
@@ -21,11 +23,17 @@ interface EventBus {
   off(event: string, callback?: EventBusCallback): void;
   setShowLogin(show: boolean): void;
   setNavigationDirection(direction: boolean): void;
+  setUserData(data: UserData | null): void;
+  getUserData(): UserData | null;
 }
 
 const state = reactive<EventBusState>({
   showLogin: false,
   isNavigatingForward: true,
+  userData: {
+    username: '',
+    pbUrl: ''
+  },
 });
 
 const events: EventsRecord = reactive({});
@@ -62,6 +70,14 @@ const setNavigationDirection: EventBus['setNavigationDirection'] = (direction) =
   emit('navigationDirectionChanged', direction);
 };
 
+const setUserData: EventBus['setUserData'] = (data: UserData | null) => {
+  state.userData = data;
+};
+
+const getUserData: EventBus['getUserData'] = () => {
+  return toRaw(state.userData);
+};
+
 const eventBus: EventBus = {
   state: readonly(state),
   emit,
@@ -69,6 +85,8 @@ const eventBus: EventBus = {
   off,
   setShowLogin,
   setNavigationDirection,
+  setUserData,
+  getUserData,
 };
 
 export default eventBus;

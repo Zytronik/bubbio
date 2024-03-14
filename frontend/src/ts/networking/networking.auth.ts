@@ -53,13 +53,13 @@ export async function login(username: string, password: string): Promise<{succes
   }
 }
 
-export async function register(username: string, password: string, passwordAgain: string): Promise<{success: boolean, error: string}> {
+export async function register(username: string, email: string, password: string, passwordAgain: string): Promise<{success: boolean, error: string}> {
   if (password !== passwordAgain) {
     return { success: false, error: 'Passwords do not match' };
   }
 
   try {
-    await httpClient.post('/auth/register', { username, password });
+    await httpClient.post('/auth/register', { username, email, password });
     return { success: true, error: '' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -68,6 +68,43 @@ export async function register(username: string, password: string, passwordAgain
       return { success: false, error: 'An unknown error occurred' };
     }
   }
+}
+
+export async function forgotPw(email: string): Promise<{success: boolean, error: string}> {
+  try {
+    await httpClient.post('/auth/forgot-password', { email });
+    return { success: true, error: '' };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return { success: false, error: error.response?.data?.message[0] || 'Request failed' };
+    } else {
+      return { success: false, error: 'An unknown error occurred' };
+    }
+  }
+}
+
+export async function changePw(token:string, password: string, passwordAgain: string): Promise<{success: boolean, error: string}> {
+  if (password !== passwordAgain) {
+    return { success: false, error: 'Passwords do not match' };
+  }
+  try {
+    await httpClient.post('/auth/change-password', {
+      token,
+      password,
+    });
+    return { success: true, error: '' };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return { success: false, error: error.response?.data?.message[0] || 'Request failed' };
+    } else {
+      return { success: false, error: 'An unknown error occurred' };
+    }
+  }
+}
+
+export function clearGuestCookies() {
+  sessionStorage.removeItem('isGuest');
+  sessionStorage.removeItem('guestUsername');
 }
 
 export async function loginAsGuest(username: string) {
@@ -88,13 +125,16 @@ function generateRandomString(length: number): string {
   return result;
 }
 
-export async function checkIfUsernameIsTaken(username: string): Promise<boolean> {
-  const response = await httpClient.get('/users/userExists', { params: { username } });
-
-  if (response.data) {
-    return true;
-  } else {
-    return false;
+export async function checkIfUsernameIsTakenAndValid(username: string): Promise<{success: boolean, error: string}> {
+  try {
+    const resp = await httpClient.get('/users/userExists', { params: { username } });
+    return { success: resp.data, error: '' };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return { success: false, error: error.response?.data?.message[0] || 'Registration failed' };
+    } else {
+      return { success: false, error: 'An unknown error occurred' };
+    }
   }
 }
 

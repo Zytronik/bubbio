@@ -137,7 +137,7 @@
 <script lang="ts">
 import { Ref, computed, nextTick, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import debounce from 'debounce';
-import { closeChannelOverlay } from '@/ts/page/page.page-manager';
+import { closeChannelOverlay, getFlagImagePath } from '@/ts/page/page.page-manager';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import axios from 'axios';
 import UserProfileOverlay from './UserProfileOverlay.vue';
@@ -168,12 +168,6 @@ export default {
 
     const searchQuery = ref('');
     const searchResults = ref<User[]>([]);
-
-    function getFlagImagePath(countryCode: string) {
-      if (countryCode) {
-        return require(`@/img/countryFlags/${countryCode.toLowerCase()}.svg`);
-      }
-    }
 
     const fetchSearchResults = debounce(async (query) => {
       if (query.trim() === '') {

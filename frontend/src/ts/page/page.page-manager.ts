@@ -22,7 +22,7 @@ export const pages: Page[] = [
     { title: 'Config', pageState: PAGE_STATE.settingsPage, component: Config },
     { title: 'Game', pageState: PAGE_STATE.gamePage, component: Game },
     { title: 'Sprint', pageState: PAGE_STATE.sprintPage, component: Sprint },
-    
+
 ];
 
 export function setupTransitionFunctions() {
@@ -64,7 +64,7 @@ export function goToState(destination: PAGE_STATE, isNavigatingForward = true) {
         if (result.length > 0) {
             eventBus.setNavigationDirection(isNavigatingForward);
             let waitBeforeTransition = 0;
-            if(!isNavigatingForward){
+            if (!isNavigatingForward) {
                 waitBeforeTransition = 400;
             }
             setTimeout(() => {
@@ -140,27 +140,27 @@ function soloMenuToSprintPage() {
     console.log("current page: " + currentPageState.value);
 }
 
-function multiMenuToMainMenu(){
+function multiMenuToMainMenu() {
     console.log("current page: " + currentPageState.value);
 }
 
-function soloMenuToMultiMenu(){
+function soloMenuToMultiMenu() {
     console.log("current page: " + currentPageState.value);
 }
 
-function soloMenuTosettingsPage(){
+function soloMenuTosettingsPage() {
     console.log("current page: " + currentPageState.value);
 }
 
-function multiMenuToSettingsPage(){
+function multiMenuToSettingsPage() {
     console.log("current page: " + currentPageState.value);
 }
 
-function settingsPageToMultiMenu(){
+function settingsPageToMultiMenu() {
     console.log("current page: " + currentPageState.value);
 }
 
-function settingsPageToSoloMenu(){
+function settingsPageToSoloMenu() {
     console.log("current page: " + currentPageState.value);
 }
 
@@ -185,4 +185,23 @@ export function changeBackgroundTo(color: string) {
 
 export function resetBackground() {
     document.body.style.background = "";
+}
+
+export function getFlagImagePath(countryCode: string) {
+    if (countryCode) {
+        return require(`@/img/countryFlags/${countryCode.toLowerCase()}.svg`);
+    }
+}
+
+export function formatDateTime(date: Date): string {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString().substr(-2);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    /* return `${day}.${month}.${year} ${hours}:${minutes}`; */
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+
+    return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
 }

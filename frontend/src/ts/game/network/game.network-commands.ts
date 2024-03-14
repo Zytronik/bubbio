@@ -3,7 +3,7 @@ import state from "../../networking/networking.client-websocket";
 import { GameSettings } from "../settings/i/game.settings.i.game-settings";
 import { HandlingSettings } from "../settings/i/game.settings.i.handling-settings";
 import { httpClient } from "../../networking/networking.http-client";
-import { GameStats } from "../i/game.i.stats";
+import { GameStats } from "../i/game.i.game-stats";
 import { nd_GameSetup } from "./i/game.network.i.game-setup-data";
 
 export function backendSetupGame(gameMode: GAME_MODE, gameSettings: GameSettings, handlingSettings: HandlingSettings): void {
@@ -23,10 +23,22 @@ export async function submitGameToDB(gameStats: GameStats) {
     const isGuest = sessionStorage.getItem('isGuest');
     if(isGuest !== "true"){
         const submitStats = {
-            "sprintTime": Math.floor(gameStats.currentTime),
+            "bubbleClearToWin": gameStats.bubbleClearToWin,
+            "bubbleClearStats": JSON.stringify(gameStats.bubbleClearStats),
             "bubblesCleared": gameStats.bubblesCleared,
             "bubblesShot": gameStats.bubblesShot,
             "bubblesPerSecond": gameStats.bubblesPerSecond,
+            "gameDuration": Math.floor(gameStats.gameDuration),
+            "highestBubbleClear": gameStats.highestBubbleClear,
+            "wallBounces": gameStats.wallBounces,
+            "wallBounceClears": gameStats.wallBounceClears,
+            "highestCombo": gameStats.highestCombo,
+            "keysPressed": gameStats.keysPressed,
+            "keysPerSecond": gameStats.keysPerSecond,
+            "keysPerBubble": gameStats.keysPerBubble,
+            "angleChanged": gameStats.angleChanged,
+            "angleChangePerBubble": gameStats.angleChangePerBubble,
+            "holds": gameStats.holds
         };
         try {
             const token = localStorage.getItem('authToken');

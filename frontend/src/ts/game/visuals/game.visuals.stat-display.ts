@@ -28,9 +28,9 @@ export function stopStatDisplay(): void {
 
 function updateStatDisplay(): void {
     const gameStats = getGameStats();
-    gameStats.currentTime = performance.now() - gameStats.gameStartTime;
-    gameStats.formattedCurrentTime = formatTimeNumberToString(gameStats.currentTime);
-    gameStats.bubblesPerSecond = Number((gameStats.bubblesShot / gameStats.currentTime * 1000).toFixed(2));
+    const currentTime = performance.now() - gameStats.gameStartTime;
+    const formattedCurrentTimeString = formatTimeNumberToString(currentTime);
+    gameStats.bubblesPerSecond = Number((gameStats.bubblesShot / currentTime * 1000).toFixed(2));
     //keysPressed
     //keysPerSecond
     //keysPerBubble
@@ -40,7 +40,7 @@ function updateStatDisplay(): void {
 
     //holds
 
-    formattedCurrentTime.value = gameStats.formattedCurrentTime;
+    formattedCurrentTime.value = formattedCurrentTimeString;
     bubbleClearToWin.value = gameStats.bubbleClearToWin;
     bubblesCleared.value = gameStats.bubblesCleared;
     bubblesLeftToClear.value = gameStats.bubblesLeftToClear;

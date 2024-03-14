@@ -24,7 +24,21 @@ export class UserService {
         // Check if a user with the given username already exists
         const existingUser = await this.userExists(createUserDto.username);
         if (existingUser) {
-            throw new BadRequestException('username already exists');
+            throw new BadRequestException({
+                message: ['Username already taken'],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
+        }
+
+        // Check if a user with the given email already exists
+        const existingEmail = await this.emailExists(createUserDto.email);
+        if (existingEmail) {
+            throw new BadRequestException({
+                message: ['Email already taken'],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
         }
 
         // If no existing user, proceed with creating a new user
@@ -32,6 +46,7 @@ export class UserService {
         const user = await this.prisma.user.create({
             data: {
                 username: createUserDto.username,
+                email: createUserDto.email,
                 password: hashedPassword,
                 countryCode,
                 country,
@@ -51,6 +66,22 @@ export class UserService {
             where: {
                 username: {
                     equals: username,
+                    mode: 'insensitive',
+                },
+            },
+        });
+        return !!user;
+    }
+
+    async emailExists(email: string): Promise<boolean> {
+        if (!email || email.trim() === '') {
+            return false;
+        }
+
+        const user = await this.prisma.user.findFirst({
+            where: {
+                email: {
+                    equals: email,
                     mode: 'insensitive',
                 },
             },
@@ -90,8 +121,8 @@ export class UserService {
                     }
                 }
             },
-            orderBy: { sprintTime: 'asc' },
-            select: { sprintTime: true },
+            orderBy: { gameDuration: 'asc' },
+            select: { gameDuration: true },
         });
 
         if (!userBestTimeRecord) {
@@ -102,18 +133,18 @@ export class UserService {
         const bestTimes = await this.prisma.sprint.groupBy({
             by: ['userId'],
             _min: {
-                sprintTime: true,
+                gameDuration: true,
             },
             orderBy: {
                 _min: {
-                    sprintTime: 'asc',
+                    gameDuration: 'asc',
                 },
             },
         });
 
         // Find the rank of the user's best time among these best times
         // We count how many times have a better (lower) sprintTime than the user's best time
-        const rank = bestTimes.findIndex(time => time._min.sprintTime >= userBestTimeRecord.sprintTime) + 1;
+        const rank = bestTimes.findIndex(time => time._min.gameDuration >= userBestTimeRecord.gameDuration) + 1;
 
         return rank;
     }
@@ -148,7 +179,7 @@ export class UserService {
                 bubblesCleared: true,
                 bubblesPerSecond: true,
                 bubblesShot: true,
-                sprintTime: true,
+                gameDuration: true,
             },
             where: {
                 userId: user.id,
@@ -169,7 +200,7 @@ export class UserService {
                 averageBubblesCleared: sprintStats._avg.bubblesCleared,
                 averageBubblesPerSecond: sprintStats._avg.bubblesPerSecond,
                 averageBubblesShot: sprintStats._avg.bubblesShot,
-                averageSprintTime: sprintStats._avg.sprintTime,
+                averageSprintTime: sprintStats._avg.gameDuration,
                 sprintGamesPlayed: sprintGamesPlayed,
                 rank: sprintRank,
             },
@@ -250,5 +281,21 @@ export class UserService {
             select: { inputSettings: true },
         });
         return user?.inputSettings;
+    }
+
+    async getUserCountry(userId: number) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { country: true },
+        });
+        return user?.country;
+    }
+
+    async findByEmail(email: string): Promise<any | null> {
+        return await this.prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+        });
     }
 }

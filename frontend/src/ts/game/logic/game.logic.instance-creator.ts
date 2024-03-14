@@ -1,6 +1,6 @@
 import { GameInstance } from "../i/game.i.game-instance";
 import { resetGrid, setupGrid } from "./game.logic.grid-manager";
-import { GameStats } from "../i/game.i.stats";
+import { GameStats } from "../i/game.i.game-stats";
 import { GameTransitions } from "../i/game.i.game-transitions";
 import { setupBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 import { GameSettings } from "../settings/i/game.settings.i.game-settings";
@@ -65,8 +65,6 @@ function getEmptyStats(gameSettings: GameSettings, gameMode: GAME_MODE): GameSta
         gameStartTime: 0,
         gameEndTime: 0,
         gameDuration: 0,
-        currentTime: 0,
-        formattedCurrentTime: "00:00.00",
         bubbleClearToWin: bubbleCountToWin,
         bubblesCleared: 0,
         bubblesLeftToClear: bubbleCountToWin,

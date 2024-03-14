@@ -1,7 +1,7 @@
 <template>
   <article id="app">
     <div class="topbar">
-      <div v-if="isAuthenticated" @click="showMyProfile" class="profile-wrapper">
+      <div v-if="isAuthenticated && userData" @click="showMyProfile" class="profile-wrapper">
         <img class="profile-pic" :src="userData?.pbUrl" alt="Profile Picture">
         <div class="profile-content">
           <h3>{{ userData?.username.toUpperCase() }}</h3>
@@ -13,8 +13,7 @@
       </div>
     </div>
     <InfoMessages ref="infoMessageRef" />
-    <LoginOverlay v-if="showLogin" @login="handleLogin" @checkUsername="handleCheckUsername" @register="handleRegister"
-      @switchToUsernameForm="clearErrorMessage" :error-message="errorMessage" @playAsGuest="handlePlayAsGuest" />
+    <LoginOverlay v-if="showLogin" @joinRoomFromHash="joinRoomFromHash" @updateAuthenticatedState="updateAuthenticatedState" @showInfoMessage="showInfoMessage" />
     <Channel v-if="isChannelOpen" />
     <transition :name="isNavigatingForward ? 'slide-left' : 'slide-right'" mode="out-in">
       <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom"
@@ -29,14 +28,14 @@
 
 <script lang="ts">
 import { ref, computed, watchEffect, onMounted, onUnmounted, watch } from 'vue';
-import state, { addSocketConnectListener, disconnectGlobalSocket, initializeGlobalSocket, reconnectGlobalSocket } from './ts/networking/networking.client-websocket';
+import state, { addSocketConnectListener, disconnectGlobalSocket, initializeGlobalSocket } from './ts/networking/networking.client-websocket';
 import { currentPageState, goToState, isChannelActive, openChannelOverlay, pages, setupTransitionFunctions } from './ts/page/page.page-manager';
 import LoginOverlay from './globalComponents/LoginOverlay.vue';
 import InfoMessages from './globalComponents/InfoMessages.vue';
 import Channel from './globalComponents/Channel.vue';
 
 import { PAGE_STATE } from './ts/page/page.e-page-state';
-import { checkIfUsernameIsTaken, checkUserAuthentication, clearClientState, login, loginAsGuest, logUserOut, register, showLoginForm } from './ts/networking/networking.auth';
+import { checkUserAuthentication, clearClientState, clearGuestCookies, logUserOut, showLoginForm } from './ts/networking/networking.auth';
 import eventBus from './ts/page/page.event-bus';
 import { attachInputReader } from './ts/input/input.input-reader';
 import { httpClient } from './ts/networking/networking.http-client';
@@ -80,58 +79,7 @@ export default {
     const errorMessage = ref<string>('');
     const isAuthenticated = ref<boolean>(false);
 
-    watch(() => eventBus.state.showLogin, () => {
-      onShowLoginForm();
-    });
-
-    async function handleLogin(username: string, password: string) {
-      const { success, error } = await login(username, password);
-      if (success) {
-        eventBus.setShowLogin(false);
-        reconnectGlobalSocket();
-        joinRoomFromHash();
-        isAuthenticated.value = checkUserAuthentication();
-      } else {
-        errorMessage.value = error;
-      }
-    }
-
-    async function handleCheckUsername(username: string,) {
-      if (await checkIfUsernameIsTaken(username)) {
-        eventBus.emit('navigateToLogin');
-      } else {
-        eventBus.emit('navigateToRegister');
-      }
-    }
-
-    async function handleRegister(username: string, password: string, passwordAgain: string) {
-      const { success, error } = await register(username, password, passwordAgain);
-      if (success) {
-        handleLogin(username, password);
-      } else {
-        errorMessage.value = error;
-      }
-    }
-
-    async function handlePlayAsGuest(username: string) {
-      loginAsGuest(username);
-      reconnectGlobalSocket();
-      eventBus.setShowLogin(false);
-      joinRoomFromHash();
-      isAuthenticated.value = checkUserAuthentication();
-    }
-
-    function clearErrorMessage() {
-      errorMessage.value = '';
-    }
-
-    function clearGuestCookies() {
-      sessionStorage.removeItem('isGuest');
-      sessionStorage.removeItem('guestUsername');
-    }
-
-    function onShowLoginForm() {
-      clearErrorMessage();
+    function updateAuthenticatedState() {
       isAuthenticated.value = checkUserAuthentication();
     }
 
@@ -217,7 +165,7 @@ export default {
       applySavedInputSettings();
     });
 
-    function updateProfileData(){
+    async function updateProfileData() {
       if (isAuthenticated.value) {
         let isGuest = sessionStorage.getItem('isGuest');
         if (isGuest) {
@@ -226,16 +174,16 @@ export default {
             pbUrl: getDefaultProfilePbURL(),
           };
         } else {
-          fetchUserData().then((data) => {
-            if (data) {
-              const updatedPbUrl = data.pbUrl ? data.pbUrl : getDefaultProfilePbURL();
-              userData.value = {
-                ...data,
-                pbUrl: updatedPbUrl,
-              };
-            }
-          });
+          const data = await fetchUserData()
+          if (data) {
+            const updatedPbUrl = data.pbUrl ? data.pbUrl : getDefaultProfilePbURL();
+            userData.value = {
+              ...data,
+              pbUrl: updatedPbUrl,
+            };
+          }
         }
+        eventBus.setUserData(userData.value);
       }
     }
 
@@ -253,12 +201,17 @@ export default {
 
     async function fetchUserData() {
       const token = localStorage.getItem('authToken');
-      const response = await httpClient.get('/users/me', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      return response.data;
+      try {
+        const response = await httpClient.get('/users/me', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        return response.data;
+      } catch (error) {
+        logUserOut();
+      }
+      return;
     }
 
     /* General */
@@ -300,14 +253,9 @@ export default {
       roomId,
       handleJoinRoom,
       handleLeaveRoom,
-      handleLogin,
-      handleCheckUsername,
-      handleRegister,
-      clearErrorMessage,
       logUserOut,
       showInfoMessage,
       infoMessageRef,
-      handlePlayAsGuest,
       isChannelOpen,
       openChannelOverlay,
       userData,
@@ -316,6 +264,8 @@ export default {
       showMyProfile,
       currentComponentKey,
       isNavigatingForward,
+      joinRoomFromHash,
+      updateAuthenticatedState,
     };
   },
 }

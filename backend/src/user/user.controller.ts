@@ -6,6 +6,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ValidateImagePipe } from './validateImgPipeline';
 import { UpdateInputSettingsDto } from './dto/user.dto.inputSettings';
+import { AuthenticatedRequest } from 'src/auth/auth.e-authRequest';
+import { CheckUsernameDto } from 'src/auth/dto/auth.dto.checkUsername';
 
 @Controller('users')
 export class UserController {
@@ -18,8 +20,8 @@ export class UserController {
   }
 
   @Get('userExists')
-  async checkUsernameExists(@Query('username') username: string) {
-    return await this.userService.userExists(username);
+  async checkUsernameExists(@Query() checkUsernameDto: CheckUsernameDto) {
+    return await this.userService.userExists(checkUsernameDto.username);
   }
 
   @Get('search')
@@ -70,11 +72,4 @@ export class UserController {
     return this.userService.getInputSettings(userId);
   }
 
-}
-
-export interface AuthenticatedRequest extends Request {
-  user: {
-    userId: number;
-    username: string;
-  };
 }

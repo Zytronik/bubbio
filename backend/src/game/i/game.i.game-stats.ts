@@ -2,8 +2,6 @@ export interface GameStats {
     gameStartTime: number,
     gameEndTime: number,
     gameDuration: number,
-    currentTime: number,
-    formattedCurrentTime: string,
 
     //timeLeft: number,
     //score: number,

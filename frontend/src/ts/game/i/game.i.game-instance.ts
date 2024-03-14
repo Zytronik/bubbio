@@ -5,7 +5,7 @@ import { Bubble } from "./game.i.bubble";
 import { GameStateHistory } from "./game.i.game-state-history";
 import { GameTransitions } from "./game.i.game-transitions";
 import { Grid } from "./game.i.grid";
-import { GameStats } from "./game.i.stats";
+import { GameStats } from "./game.i.game-stats";
 
 export interface GameInstance {
     gameMode: GAME_MODE,

@@ -6,6 +6,8 @@ import { GlobalChatGateway } from './globalChat/globalChat.gateway';
 import { GameGateway } from './game/game.main';
 import { SprintModule } from './sprint/sprint.module';
 import { NewsModule } from './news/news.module';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { MailModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { NewsModule } from './news/news.module';
     AuthModule,
     SprintModule,
     NewsModule,
+    LeaderboardModule,
+    MailModule,
   ],
   providers: [LobbyGateway, GameGateway, GlobalChatGateway],
 })

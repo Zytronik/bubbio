@@ -20,6 +20,7 @@ export class LobbyGateway implements OnGatewayConnection {
   async handleConnection(client: Socket) {
     let authPromise;
     const { token, isGuest, guestUsername } = client.handshake.query;
+
     if (token === "null" && isGuest === "null" && guestUsername === "null") {
       client.data.role = "Spectator";
       client.data.user = { username: "Spectator-" + client.id };
@@ -185,10 +186,12 @@ export class LobbyGateway implements OnGatewayConnection {
   }
 
   private addUserToNoRoom(client: Socket) {
-    this.lobbyData["noRoom"].push({
-      clientId: client.id,
-      username: client.data.user.username,
-    });
+    if(client.data.user){
+      this.lobbyData["noRoom"].push({
+        clientId: client.id,
+        username: client.data.user.username,
+      });
+    }
   }
 
   private sendLeaveMessage(clientId: string, roomId: string) {
