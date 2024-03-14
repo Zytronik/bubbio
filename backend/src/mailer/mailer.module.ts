@@ -5,15 +5,19 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 
 const templatesDir = join(__dirname, '..', '..', process.env.NODE_ENV === 'development' ? 'src' : 'dist', 'mailer', 'templates');
-console.log(templatesDir);
+
+function toBoolean(envVarValue: string): boolean {
+  return envVarValue === 'true'; // Returns true if envVarValue is exactly the string 'true'
+}
+
 @Module({
   imports: [
     MailerModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
         transport: {
           host: configService.get<string>('MAIL_HOST'),
-          port: configService.get<string>('MAIL_PORT'),
-          secure: false,// true for 465, false for other ports
+          port: configService.get<number>('MAIL_PORT'),
+          secure: toBoolean(configService.get<string>('MAIL_SECURE')), // true for 465, false for other ports 
           auth: {
             user: configService.get<string>('MAIL_USER'),
             pass: configService.get<string>('MAIL_PASS'), 
