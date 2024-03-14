@@ -4,6 +4,6 @@ export interface BooleanSetting {
     name: string,
     description: string,
     value: boolean,
-    refValue: Ref<boolean>,
+    refValue: boolean,
     defaultValue: boolean,
 }

@@ -93,7 +93,6 @@ export const holdInput: Input = {
     enabled: false,
 };
 
-
 export const resetInput: Input = {
     name: "Restart Game",
     description: "Restart the game",
@@ -104,7 +103,22 @@ export const resetInput: Input = {
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
-        console.error("no fire event attached to keyCode: " + holdInput.name);
+        console.error("no fire event attached to keyCode: " + resetInput.name);
+    },
+    enabled: false,
+};
+
+export const debugTriggerGarbageInput: Input = {
+    name: "Trigger Garbage",
+    description: "Adds Garbage to the grid",
+    customKeyMap: {map: ["","",""]},
+    defaultKeyCode: "KeyU",
+    isTrigger: true,
+    pressed: false,
+    lastFiredAtTime: 0,
+    releasedAtTime: 0,
+    fire: () => {
+        console.error("no fire event attached to keyCode: " + debugTriggerGarbageInput.name);
     },
     enabled: false,
 };
@@ -117,4 +131,5 @@ export const allInputs: Input[] = [
     shootInput,
     holdInput,
     resetInput,
+    debugTriggerGarbageInput,
 ]

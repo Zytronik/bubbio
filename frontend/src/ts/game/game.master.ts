@@ -14,7 +14,7 @@ import { GAME_MODE } from "./settings/i/game.settings.i.game-modes";
 import { allHandlingSettings } from "./settings/game.settings.handling";
 import { GameTransitions } from "./i/game.i.game-transitions";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
-import { holdBubble, updateBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
+import { checkForGarbage, holdBubble, updateBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
 import { backendSetupGame, submitGameToDB } from "./network/game.network-commands";
 
 
@@ -130,10 +130,14 @@ export function revertAPS(): void {
 }
 export function triggerShoot(): void {
     shootBubble(playerGameInstance);
+    checkForGarbage(playerGameInstance);
     updateBubbleQueueAndCurrent(playerGameInstance);
 }
 export function triggerHold(): void {
     holdBubble(playerGameInstance);
+}
+export function debugTriggerGarbage(): void {
+    playerGameInstance.queuedGarbage += 1;
 }
 
 
@@ -165,4 +169,7 @@ export function getPlayGrid(): Grid {
 }
 export function updatePreviewBubble(): void {
     calculatePreview(playerGameInstance);
+}
+export function getIncomingGarbageAmount(): number {
+    return playerGameInstance.queuedGarbage;
 }

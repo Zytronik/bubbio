@@ -13,13 +13,15 @@ export interface GameInstance {
     handlingSettings: HandlingSettings,
     initialSeed: number,
 
-    currentSeed: number,
+    bubbleSeed: number,
+    garbageSeed: number,
     angle: number,
     currentAPS: number,
     currentBubble: Bubble,
     holdBubble?: Bubble,
     bubbleQueue: Bubble[],
     playGrid: Grid,
+    queuedGarbage: number,
     stats: GameStats,
 
     gameStateHistory: GameStateHistory,

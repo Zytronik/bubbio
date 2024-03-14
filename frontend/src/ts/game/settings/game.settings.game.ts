@@ -1,4 +1,3 @@
-import { ref } from "vue"
 import { BooleanSetting } from "./i/game.settings.i.boolean-setting"
 import { NumberSetting } from "./i/game.settings.i.number-setting"
 import { GameSettings } from "./i/game.settings.i.game-settings"
@@ -9,7 +8,7 @@ const GRID_WIDTH: NumberSetting = {
     value: 8,
     refValue: 8,
     defaultValue: 8,
-    min: 4,
+    min: 5,
     max: 15,
 }
 const GRID_HEIGHT: NumberSetting = {
@@ -70,14 +69,7 @@ const DISSOLVE_FLOATING_BUBBLES: BooleanSetting = {
     name: "Dissolve Floating Bubbles",
     description: "If floating bubbles should dissolve.",
     value: true,
-    refValue: ref(true),
-    defaultValue: true,
-}
-const CAN_USE_HOLD: BooleanSetting = {
-    name: "Can Use Hold",
-    description: "If the player can use the hold feature.",
-    value: true,
-    refValue: ref(true),
+    refValue: true,
     defaultValue: true,
 }
 const QUEUE_PREVIEW_SIZE: NumberSetting = {
@@ -88,6 +80,42 @@ const QUEUE_PREVIEW_SIZE: NumberSetting = {
     defaultValue: 5,
     min: 0,
     max: 10,
+}
+const BUBBLE_BAG_SIZE: NumberSetting = {
+    name: "Bubble Bag Size",
+    description: "How many unique bubbles are put in a bag-system, before they repeat.",
+    value: 7,
+    refValue: 7,
+    defaultValue: 7,
+    min: 1,
+    max: 14,
+}
+const MAX_GARBAGE_AT_ONCE: NumberSetting = {
+    name: "Max garbage at once",
+    description: "Maximum amount of garbage to be received at once.",
+    value: 3,
+    refValue: 3,
+    defaultValue: 3,
+    min: 1,
+    max: 4,
+}
+const CLEAN_GARBAGE_AMOUNT: NumberSetting = {
+    name: "Clean Garbage Amount",
+    description: "How many of the same bubbles should be guaranteed to be adjacent in a garbage row.",
+    value: 3,
+    refValue: 3,
+    defaultValue: 3,
+    min: 1,
+    max: 4,
+}
+const GARBAGE_COLOR_AMOUNT: NumberSetting = {
+    name: "Garbage Color Amount",
+    description: "How many different colors garbage can have.",
+    value: 3,
+    refValue: 3,
+    defaultValue: 3,
+    min: 2,
+    max: 7,
 }
 const SPRINT_CLEAR_AMOUNT: NumberSetting = {
     name: "Sprint Clear Amount",
@@ -107,7 +135,10 @@ export const allGameSettings: GameSettings = {
     widthPrecisionUnits: WIDTH_PRECISION_UNITS,
     collisionDetectionFactor: COLLISION_DETECTION_FACTOR,
     dissolveFloatingBubbles: DISSOLVE_FLOATING_BUBBLES,
-    canUseHold: CAN_USE_HOLD,
     queuePreviewSize: QUEUE_PREVIEW_SIZE,
+    bubbleBagSize: BUBBLE_BAG_SIZE,
+    garbageMaxAtOnce: MAX_GARBAGE_AT_ONCE,
+    garbageCleanAmount: CLEAN_GARBAGE_AMOUNT,
+    garbageColorAmount: GARBAGE_COLOR_AMOUNT,
     sprintClearAmount: SPRINT_CLEAR_AMOUNT,
 }

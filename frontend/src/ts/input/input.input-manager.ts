@@ -1,7 +1,7 @@
-import { angleCenter, angleLeft, angleRight, changeAPS, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
+import { angleCenter, angleLeft, angleRight, changeAPS, debugTriggerGarbage, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
 import { checkUserAuthentication } from "../networking/networking.auth";
 import { httpClient } from "../networking/networking.http-client";
-import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, holdInput, resetInput, shootInput } from "./input.possible-inputs";
+import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, debugTriggerGarbageInput, holdInput, resetInput, shootInput } from "./input.possible-inputs";
 
 export function enableGameInputs(): void {
     angleLeftInput.fire = angleLeft;
@@ -12,6 +12,7 @@ export function enableGameInputs(): void {
     shootInput.fire = triggerShoot;
     holdInput.fire = triggerHold;
     resetInput.fire = resetGame;
+    debugTriggerGarbageInput.fire = debugTriggerGarbage;
 
     angleLeftInput.enabled = true;
     angleRightInput.enabled = true;
@@ -20,6 +21,7 @@ export function enableGameInputs(): void {
     shootInput.enabled = true;
     holdInput.enabled = true;
     resetInput.enabled = true;
+    debugTriggerGarbageInput.enabled = true;
 }
 
 export function disableGameInputs(): void {
@@ -30,6 +32,7 @@ export function disableGameInputs(): void {
     shootInput.enabled = false;
     holdInput.enabled = false;
     resetInput.enabled = false;
+    debugTriggerGarbageInput.enabled = false;
 
     angleLeftInput.pressed = false;
     angleRightInput.pressed = false;
@@ -38,6 +41,7 @@ export function disableGameInputs(): void {
     shootInput.pressed = false;
     holdInput.pressed = false;
     resetInput.pressed = false;
+    debugTriggerGarbageInput.pressed = false;
 }
 
 

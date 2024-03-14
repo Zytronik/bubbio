@@ -3,6 +3,7 @@ import { Grid } from "../i/game.i.grid";
 import { Row } from "../i/game.i.row";
 import { Coordinates } from "../i/game.i.grid-coordinates";
 import { GameSettings } from "../settings/i/game.settings.i.game-settings";
+import { Bubble } from "../i/game.i.bubble";
 
 export function setupGrid(settings: GameSettings): Grid {
     const precisionWidth = settings.widthPrecisionUnits.value;
@@ -24,18 +25,18 @@ export function setupGrid(settings: GameSettings): Grid {
         dissolveFloatingBubbles: settings.dissolveFloatingBubbles.value,
     }
     for (let h = 0; h < playGrid.gridHeight + playGrid.extraGridHeight; h++) {
-        const isEvenRow = (h % 2 === 0);
+        const isBiggerRow = (h % 2 === 0);
         const row: Row = {
             fields: [],
-            size: playGrid.gridWidth - (isEvenRow ? 0 : 1),
-            isEvenRow: h % 2 === 0,
+            size: playGrid.gridWidth - (isBiggerRow ? 0 : 1),
+            isSmallerRow: h % 2 === 1,
             isInDeathZone: h >= playGrid.gridHeight,
         }
         for (let w = 0; w < row.size; w++) {
             const field: Field = {
                 coords: { x: w, y: h, },
                 centerPointCoords: {
-                    x: w * bubbleDiameter + (isEvenRow ? bubbleRadius : bubbleDiameter),
+                    x: w * bubbleDiameter + (isBiggerRow ? bubbleRadius : bubbleDiameter),
                     y: precisionRowHeight * h + bubbleRadius,
                 },
             };
@@ -47,18 +48,37 @@ export function setupGrid(settings: GameSettings): Grid {
 }
 
 export function resetGrid(playGrid: Grid): void {
-    playGrid.rows.forEach(row => {
-        row.fields.forEach(field => {
-            field.bubble = undefined;
-        })
-    })
+    const bubbleRadius = playGrid.bubbleRadius;
+    const bubbleDiameter = bubbleRadius * 2;
+    const precisionRowHeight = playGrid.precisionRowHeight;
+    playGrid.rows = [];
+    for (let h = 0; h < playGrid.gridHeight + playGrid.extraGridHeight; h++) {
+        const isBiggerRow = (h % 2 === 0);
+        const row: Row = {
+            fields: [],
+            size: playGrid.gridWidth - (isBiggerRow ? 0 : 1),
+            isSmallerRow: h % 2 === 1,
+            isInDeathZone: h >= playGrid.gridHeight,
+        }
+        for (let w = 0; w < row.size; w++) {
+            const field: Field = {
+                coords: { x: w, y: h, },
+                centerPointCoords: {
+                    x: w * bubbleDiameter + (isBiggerRow ? bubbleRadius : bubbleDiameter),
+                    y: precisionRowHeight * h + bubbleRadius,
+                },
+            };
+            row.fields.push(field)
+        }
+        playGrid.rows.push(row);
+    }
 }
 
 export function getNearbyFields(playGrid: Grid, pointPosition: Coordinates): Field[] {
     const bubbleRadius = playGrid.bubbleRadius;
     const bubbleDiameter = playGrid.bubbleRadius * 2;
     const row = Math.round((pointPosition.y - bubbleRadius) / playGrid.precisionRowHeight);
-    const isEvenRow = playGrid.rows[row].isEvenRow;
+    const isEvenRow = playGrid.rows[row].isSmallerRow;
     const xOffSet = (isEvenRow ? bubbleRadius : bubbleDiameter)
     const column = Math.round((pointPosition.x - xOffSet) / bubbleDiameter);
     const nearbyFields: Field[] = []
@@ -160,8 +180,54 @@ export function dissolveBubbles(playGrid: Grid, collidedAtField: Field, colorToC
     }
 }
 
+export function addGarbageToGrid(garbage: Bubble[], grid: Grid): void {
+    for (let h = grid.rows.length - 1; h > 0; h--) {
+        for (let w = 0; w < grid.gridWidth - 1; w++) {
+            const field = grid.rows[h].fields[w];
+            field.bubble = grid.rows[h - 1].fields[field.coords.x].bubble;
+            field.centerPointCoords.x = grid.rows[h - 1].fields[field.coords.x].centerPointCoords.x;
+        }
+        if (grid.rows[h].isSmallerRow) {
+            const lastIndex = grid.gridWidth - 1;
+            const centerPointX = grid.rows[h - 1].fields[lastIndex].centerPointCoords.x;
+            const centerPointY = grid.rows[h].fields[0].centerPointCoords.y;
+            const field: Field = {
+                coords: { x: lastIndex - 1, y: h, },
+                centerPointCoords: { x: centerPointX, y: centerPointY, },
+                bubble: grid.rows[h - 1].fields[lastIndex].bubble,
+            }
+            grid.rows[h].fields.push(field);
+        } else {
+            grid.rows[h].fields.pop();
+        }
+        grid.rows[h].isSmallerRow = grid.rows[h - 1].isSmallerRow;
+        grid.rows[h].size = grid.rows[h - 1].size;
+    }
+
+    for (let w = 0; w < grid.rows[0].fields.length - 1; w++) {
+        const field = grid.rows[0].fields[w];
+        field.bubble = garbage[w];
+        field.centerPointCoords.x = grid.rows[2].fields[w].centerPointCoords.x;
+    }
+    if (grid.rows[0].isSmallerRow) {
+        const lastIndex = grid.gridWidth - 1;
+        const centerPointX = grid.rows[2].fields[lastIndex].centerPointCoords.x;
+        const centerPointY = grid.rows[2].fields[0].centerPointCoords.y;
+        const field: Field = {
+            coords: { x: lastIndex - 1, y: 0, },
+            centerPointCoords: { x: centerPointX, y: centerPointY, },
+            bubble: garbage[lastIndex],
+        }
+        grid.rows[0].fields.push(field);
+    } else {
+        grid.rows[0].fields.pop();
+    }
+    grid.rows[0].isSmallerRow = grid.rows[2].isSmallerRow;
+    grid.rows[0].size = grid.rows[2].size;
+}
+
 function getAdjacentFieldVectors(playGrid: Grid, gridPosition: Coordinates): Coordinates[] {
-    const hexagonalShift = playGrid.rows[gridPosition.y].isEvenRow ? -1 : 1;
+    const hexagonalShift = playGrid.rows[gridPosition.y].isSmallerRow ? -1 : 1;
     const adjacentFieldVectors: Coordinates[] = [
         { x: 0, y: 0, },
         { x: -1, y: 0, },

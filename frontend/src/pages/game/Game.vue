@@ -1,5 +1,6 @@
 <template class="page" id="game">
   <div>
+    <span class="monospace" v-html="incomingGarbage"></span> <br>
     <span class="monospace" v-html="playGridASCII"></span> <br>
     <!-- <span>angle: {{ angle }}</span> <br> -->
   </div>
@@ -8,7 +9,7 @@
 <script lang="ts">
 import { onUnmounted } from 'vue';
 import { leaveGame } from '@/ts/game/game.master';
-import { playGridASCII } from '@/ts/game/visuals/game.visuals.ascii';
+import { incomingGarbage, playGridASCII } from '@/ts/game/visuals/game.visuals.ascii';
 
 window.addEventListener('keydown', function (e) {
   if (e.keyCode == 32 && e.target == document.body) {
@@ -22,9 +23,9 @@ export default {
     onUnmounted(() => {
       leaveGame();
     })
-
     return {
       playGridASCII,
+      incomingGarbage,
     }
   },
 }

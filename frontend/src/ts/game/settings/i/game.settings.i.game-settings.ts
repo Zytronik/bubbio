@@ -14,8 +14,12 @@ export interface GameSettings {
 
     dissolveFloatingBubbles: BooleanSetting,
 
-    canUseHold: BooleanSetting,
     queuePreviewSize: NumberSetting,
+    bubbleBagSize: NumberSetting,
+
+    garbageMaxAtOnce: NumberSetting,
+    garbageCleanAmount: NumberSetting,
+    garbageColorAmount: NumberSetting,
 
     sprintClearAmount: NumberSetting,
 

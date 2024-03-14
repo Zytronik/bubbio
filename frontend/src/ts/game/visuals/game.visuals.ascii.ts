@@ -1,9 +1,11 @@
 import { Ref, ref } from "vue";
-import { getAngle, getBubbleQueue, getCurrentBubble, getHoldBubble, getPlayGrid, updatePreviewBubble } from "../game.master";
+import { getAngle, getBubbleQueue, getCurrentBubble, getHoldBubble, getIncomingGarbageAmount, getPlayGrid, updatePreviewBubble } from "../game.master";
 import { Coordinates } from "../i/game.i.grid-coordinates";
 import { Field } from "../i/game.i.field";
+import { allGameSettings } from "../settings/game.settings.game";
 
 export const playGridASCII: Ref<string> = ref("");
+export const incomingGarbage: Ref<number> = ref(0);
 
 let animationFrameId: number | null = null;
 let asciiAnimationRunning = false;
@@ -50,7 +52,7 @@ function asciiBoardAnimation(): void {
         previewPosition.y = playGrid.previewBubble.location.y;
     }
 
-    const gridWidth = playGrid.rows[0].fields.length;
+    const gridWidth = playGrid.gridWidth;
     let boardText = ""
     boardText += getHoldBubbleString();
     boardText += getBubbleQueueString();
@@ -61,11 +63,12 @@ function asciiBoardAnimation(): void {
             boardText += getDeathZoneLineString(gridWidth);
             once = false;
         }
-        boardText += getRegularRowString(row.fields, row.isEvenRow, previewPosition);
+        boardText += getRegularRowString(row.fields, row.isSmallerRow, previewPosition);
     });
     boardText += getArrowLineString(gridWidth);
     boardText += getLowerBoarderLineString(gridWidth);
     playGridASCII.value = boardText;
+    incomingGarbage.value = getIncomingGarbageAmount();
     if (asciiAnimationRunning) {
         animationFrameId = requestAnimationFrame(() => asciiBoardAnimation());
     }
@@ -98,9 +101,9 @@ function getDeathZoneLineString(gridWidth: number): string {
     return deathZoneLine;
 }
 
-function getRegularRowString(fields: Field[], isEvenRow: boolean, previewPosition: Coordinates): string {
+function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosition: Coordinates): string {
     let rowString = "";
-    rowString += isEvenRow ? "│ " : "│&nbsp;&nbsp;&nbsp;";
+    rowString += isSmallerRow ? "│&nbsp;&nbsp;&nbsp;" : "│ ";
 
     fields.forEach(field => {
         if (previewPosition.x === field.coords.x && previewPosition.y === field.coords.y) {
@@ -110,7 +113,7 @@ function getRegularRowString(fields: Field[], isEvenRow: boolean, previewPositio
         }
     });
 
-    rowString += isEvenRow ? "│\n" : "&nbsp;&nbsp;│\n";
+    rowString += isSmallerRow ? "&nbsp;&nbsp;│\n" : "│\n";
     return rowString;
 }
 
@@ -137,8 +140,9 @@ function getHoldBubbleString(): string {
 
 function getBubbleQueueString(): string {
     const queue = getBubbleQueue();
-    let queueString = `Queue: (${queue[0].ascii}) |`;
-    for (let i = 1; i < queue.length; i++) {
+    const current = getCurrentBubble();
+    let queueString = `Queue: (${current.ascii}) |`;
+    for (let i = 0; i < allGameSettings.queuePreviewSize.value; i++) {
         queueString += ` (${queue[i].ascii}) `;
     }
     return queueString + "\n\n";

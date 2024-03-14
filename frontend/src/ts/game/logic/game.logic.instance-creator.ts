@@ -2,7 +2,7 @@ import { GameInstance } from "../i/game.i.game-instance";
 import { resetGrid, setupGrid } from "./game.logic.grid-manager";
 import { GameStats } from "../i/game.i.game-stats";
 import { GameTransitions } from "../i/game.i.game-transitions";
-import { setupBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
+import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 import { GameSettings } from "../settings/i/game.settings.i.game-settings";
 import { GAME_MODE } from "../settings/i/game.settings.i.game-modes";
 import { HandlingSettings } from "../settings/i/game.settings.i.handling-settings";
@@ -17,7 +17,8 @@ export function createGameInstance(
         handlingSettings: handlingSettings,
         initialSeed: startSeed,
 
-        currentSeed: startSeed,
+        bubbleSeed: startSeed,
+        garbageSeed: startSeed,
         angle: 90,
         currentAPS: handlingSettings.defaultAPS.value,
         currentBubble: {
@@ -27,6 +28,7 @@ export function createGameInstance(
         },
         bubbleQueue: [],
         playGrid: setupGrid(gameSettings),
+        queuedGarbage: 0,
         stats: getEmptyStats(gameSettings, gameMode),
 
         gameStateHistory: {
@@ -38,14 +40,14 @@ export function createGameInstance(
         gameTransitions: gameTransitions,
     }
 
-    setupBubbleQueueAndCurrent(gameInstance);
+    updateBubbleQueueAndCurrent(gameInstance);
     return gameInstance;
 }
 
 export function resetGameInstance(gameInstance: GameInstance): void {
     const seed = performance.now();
     gameInstance.initialSeed = seed;
-    gameInstance.currentSeed = seed;
+    gameInstance.bubbleSeed = seed;
     gameInstance.angle = 90;
     gameInstance.currentAPS = gameInstance.handlingSettings.defaultAPS.value;
     gameInstance.currentBubble = {
@@ -56,7 +58,7 @@ export function resetGameInstance(gameInstance: GameInstance): void {
     gameInstance.bubbleQueue = [];
     resetGrid(gameInstance.playGrid);
     gameInstance.stats = getEmptyStats(gameInstance.gameSettings, gameInstance.gameMode);
-    setupBubbleQueueAndCurrent(gameInstance);
+    updateBubbleQueueAndCurrent(gameInstance);
 }
 
 function getEmptyStats(gameSettings: GameSettings, gameMode: GAME_MODE): GameStats {
