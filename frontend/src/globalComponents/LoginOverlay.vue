@@ -200,6 +200,7 @@ export default defineComponent({
       if (success) {
         token.value = "";
         emit('showInfoMessage', 'Password was changed successfully.', 'success');
+        history.replaceState(null, '', '/');
         toUsernameForm();
       } else {
         errorMessage.value = error;
@@ -255,8 +256,7 @@ export default defineComponent({
 
     async function verifyResetToken(token: string) {
       try {
-        const response = await httpClient.post('/auth/verify-token', { token: token });
-        console.log('Token verification response:', response.data);
+        await httpClient.post('/auth/verify-token', { token: token });
         toChangePwForm();
       } catch (error) {
         let e = 'An unknown error occurred';
