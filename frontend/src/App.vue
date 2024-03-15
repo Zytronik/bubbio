@@ -6,7 +6,7 @@
         <div class="profile-content">
           <h3>{{ userData?.username.toUpperCase() }}</h3>
           <div>
-            <p>Lv.420</p>
+            <p>Lv.727</p>
             <p class="rank">PI-Rank</p>
           </div>
         </div>

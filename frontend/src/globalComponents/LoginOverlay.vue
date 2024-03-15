@@ -12,13 +12,13 @@
             <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
 
             <button type="submit">Join</button>
-            <button type="button" @click="handlePlayAsGuest">Play as Guest (experimental)</button>
+            <button type="button" @click="handlePlayAsGuest">Play as Guest</button>
           </form>
 
           <form @submit.prevent="handleRegister" v-show="showRegister" key="register-form">
             <h2>Want to join?</h2>
             <p>The username <strong>{{ formData.username }}</strong> hasn't been registered. Claim it now!</p>
-            <input type="email" id="email" placeholder="Email" v-model="formData.email" required />
+            <input type="email" id="email" placeholder="Email (Only used for PW reset)" v-model="formData.email" required />
             <input type="password" id="passwordRegister" placeholder="Password" v-model="formData.password" required />
             <input type="password" id="passwordRegisterAgain" placeholder="Repeat Password"
               v-model="formData.passwordAgain" required />
