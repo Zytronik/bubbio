@@ -26,7 +26,7 @@
             <p>#{{ index + 1 }}</p>
           </div>
           <div class="cell">
-            <div class="user-info">
+            <div class="user-info" @click="openProfile(entry.user.username)">
               <img :src="entry.user.pbUrl ? entry.user.pbUrl : getDefaultProfilePbURL()" alt="flag" width="30"
                 height="30" />
               <p>{{ entry.user.username }}</p>
@@ -52,6 +52,7 @@ import { UserData } from '@/ts/page/page.i-userData';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { getDefaultProfilePbURL } from '@/ts/networking/paths';
 import { formatFieldValue, getFullName } from '@/ts/page/page.i.stat-display';
+import { openProfile } from '@/ts/page/page.page-manager';
 
 interface LeaderboardEntry extends GameStats {
   user: {
@@ -153,6 +154,7 @@ export default defineComponent({
       formatFieldValue,
       getFullName,
       noEntries,
+      openProfile,
     };
   },
 });
@@ -213,7 +215,6 @@ p {
   border-top: 1px solid white;
 }
 
-
 .cell {
   flex: 1;
   padding: 10px 0px;
@@ -226,5 +227,14 @@ p {
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
+}
+
+.user-info:hover p {
+  transition: 200ms;
+}
+
+.user-info:hover p {
+  opacity: 0.7;
 }
 </style>
