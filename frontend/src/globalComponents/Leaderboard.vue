@@ -197,6 +197,23 @@ p {
   flex: 1.5;
 }
 
+.row:nth-of-type(1) .cell:first-of-type p {
+  color: gold;
+}
+
+.row:nth-of-type(2) .cell:first-of-type p {
+  color: silver;
+}
+
+.row:nth-of-type(3) .cell:first-of-type p {
+  color: #CD7F32;
+}
+
+.row:nth-of-type(4)  {
+  border-top: 1px solid white;
+}
+
+
 .cell {
   flex: 1;
   padding: 10px 0px;
