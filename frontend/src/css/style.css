@@ -275,7 +275,7 @@ button.goBackButton:focus {
 }
 
 .loader {
-    width: 20%;
+    width: 80px;
     aspect-ratio: 2;
     --_g: no-repeat radial-gradient(circle closest-side, #ffffff 90%, #ffffff00);
     background:
