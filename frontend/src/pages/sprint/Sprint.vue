@@ -9,10 +9,10 @@
           <div class="left-content">
             <div class="cat-wrapper">
               <button class="cat" :class="{ 'active': isDissolveActive }" @click="toggleDissolve">
-                Dissolve Floating Bubbles
+                Dissolve Floating Bubbles (TODO)
               </button>
               <button class="cat" :class="{ 'active': isPrefilledActive }" @click="togglePrefilled">
-                Prefilled Board
+                Prefilled Board (TODO)
               </button>
             </div>
             <button class="playButton" @click="showGameView()">Play!</button>
