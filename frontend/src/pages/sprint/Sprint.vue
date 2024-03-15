@@ -35,12 +35,12 @@
             <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
               <Leaderboard :gameMode="GameMode.Sprint" :fields="['gameDuration', 'bubblesPerSecond']"
                 :sortBy="'gameDuration'" :sortDirection="SortDirection.Asc"
-                :leaderboardCategory="LeaderboardCategory.Global" :limit="10" />
+                :leaderboardCategory="LeaderboardCategory.Global" :limit="30" />
             </div>
             <div v-if="currentLeaderboard === 'National'" class="l-tab national-tab">
               <Leaderboard :gameMode="GameMode.Sprint" :fields="['gameDuration', 'bubblesPerSecond']"
                 :sortBy="'gameDuration'" :sortDirection="SortDirection.Asc"
-                :leaderboardCategory="LeaderboardCategory.National" :limit="10" />
+                :leaderboardCategory="LeaderboardCategory.National" :limit="30" />
             </div>
           </div>
 

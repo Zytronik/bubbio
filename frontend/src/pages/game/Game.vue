@@ -41,6 +41,7 @@ export default {
 .gameUI-wrapper{
   display: flex;
   flex-direction: column;
+  min-width: 390px;
 }
 
 html body {
