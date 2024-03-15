@@ -1,43 +1,44 @@
 <template>
   <div class="leaderboard-wrapper">
-    <h3>Leaderboard</h3>
     <div v-if="loading" class="loader"></div>
-    <p>
+    <!-- <p>
       <span>Game Mode: {{ gameMode }} | </span>
       <span v-if="!isLoggedIn && !country">Category: global | </span>
       <span v-else>Category: {{ leaderboardCategory }} | </span>
       <span v-if="country">Country: {{ country }} | </span>
       <span v-else-if="isLoggedIn">Country: auto | </span>
       <span>Sorted By: {{ orderedFields[0] }} </span>
-    </p>
-    <table v-if="leaderboard.length">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Username</th>
-          <th v-for="field in orderedFields" :key="field">
+    </p> -->
+    <div class="leaderboard" v-if="leaderboard.length">
+      <div class="head">
+        <div class="row">
+          <div class="cell"></div>
+          <div class="cell">Username</div>
+          <div class="cell" v-for="field in orderedFields" :key="field">
             <span>{{ getFullName(field) }}</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(entry, index) in leaderboard" :key="index" :class="{ 'me': entry.userId === userData?.id }">
-          <td>
-            <p>{{ index + 1 }}</p>
-          </td>
-          <td>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="row" v-for="(entry, index) in leaderboard" :key="index"
+          :class="{ 'me': entry.userId === userData?.id }">
+          <div class="cell">
+            <p>#{{ index + 1 }}</p>
+          </div>
+          <div class="cell">
             <div class="user-info">
-              <img :src="entry.user.pbUrl ? entry.user.pbUrl : getDefaultProfilePbURL()" alt="flag" width="30" height="30" />
+              <img :src="entry.user.pbUrl ? entry.user.pbUrl : getDefaultProfilePbURL()" alt="flag" width="30"
+                height="30" />
               <p>{{ entry.user.username }}</p>
             </div>
-          </td>
-          <td v-for="field in orderedFields" :key="field">
+          </div>
+          <div class="cell" v-for="field in orderedFields" :key="field">
             <p>{{ formatFieldValue(entry[field], field) }}</p>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <p v-else>No entries found.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p v-if="noEntries">No entries found.</p>
   </div>
 </template>
 
@@ -103,7 +104,8 @@ export default defineComponent({
   },
   setup(props) {
     const leaderboard = ref<LeaderboardEntry[]>([]);
-    const loading = ref(true);
+    const loading = ref<boolean>(true);
+    const noEntries = ref<boolean>(false);
     const userData: UserData | null = eventBus.getUserData();
     const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
     const orderedFields = computed(() => {
@@ -129,7 +131,9 @@ export default defineComponent({
 
         leaderboard.value = response.data;
         loading.value = false;
+        noEntries.value = !leaderboard.value.length;
       } catch (error) {
+        noEntries.value = true;
         console.error("Failed to fetch leaderboard data: ", error);
         loading.value = false;
       }
@@ -148,71 +152,62 @@ export default defineComponent({
       userData,
       formatFieldValue,
       getFullName,
+      noEntries,
     };
   },
 });
 </script>
 
 <style scoped>
-table {
-  margin: 15px 0;
+.leaderboard {
+  height: 100%;
   width: 100%;
-  border-collapse: collapse;
 }
 
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
+.leaderboard-wrapper {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-tr.me {
-  background-color: rgba(30, 30, 30, 0.3);
-}
-
-td img {
-  vertical-align: middle;
-}
-
-td p {
-  vertical-align: middle;
+p {
   margin: unset;
+}
+
+.me {
+  background-color: rgba(149, 149, 149, 0.3);
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.head {
+  display: none;
+}
+
+.row .cell:first-of-type {
+  flex: 0.3;
+  padding: 0 10px;
+}
+
+.row .cell:nth-of-type(2) {
+  flex: 1.5;
+}
+
+.cell {
+  flex: 1;
+  padding: 10px 0px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
 .user-info {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.loader {
-  width: 30px;
-  aspect-ratio: 2;
-  --_g: no-repeat radial-gradient(circle closest-side, #ffffff 90%, #ffffff00);
-  background:
-    var(--_g) 0% 50%,
-    var(--_g) 50% 50%,
-    var(--_g) 100% 50%;
-  background-size: calc(100%/3) 50%;
-  animation: l3 1s infinite linear;
-}
-
-@keyframes l3 {
-  20% {
-    background-position: 0% 0%, 50% 50%, 100% 50%
-  }
-
-  40% {
-    background-position: 0% 100%, 50% 0%, 100% 50%
-  }
-
-  60% {
-    background-position: 0% 50%, 50% 100%, 100% 0%
-  }
-
-  80% {
-    background-position: 0% 50%, 50% 50%, 100% 100%
-  }
 }
 </style>

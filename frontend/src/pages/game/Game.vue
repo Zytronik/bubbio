@@ -1,7 +1,7 @@
 <template class="page" id="game">
-  <div>
-    <span class="monospace" v-html="incomingGarbage"></span> <br>
-    <span class="monospace" v-html="playGridASCII"></span> <br>
+  <div class="gameUI-wrapper">
+    <span class="monospace" v-html="incomingGarbage"></span>
+    <span class="monospace" v-html="playGridASCII"></span>
     <!-- <span>angle: {{ angle }}</span> <br> -->
   </div>
 </template>
@@ -35,6 +35,12 @@ export default {
 .monospace {
   white-space: pre-line;
   font-family: 'Consolas', monospace;
+  font-size: 20px;
+}
+
+.gameUI-wrapper{
+  display: flex;
+  flex-direction: column;
 }
 
 html body {

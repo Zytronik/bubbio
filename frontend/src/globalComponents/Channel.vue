@@ -57,7 +57,7 @@
                                 <span>{{ item.username }}</span> achieved <span>#{{ item.rank }}</span> in <span>{{ item.type }}</span> with <span>{{ formatTimeNumberToString(item.value) }}</span>
                               </p>
                             </div>
-                            <p class="time">{{ formatRelativeTime(item.createdAt) }}</p>
+                            <p class="time">{{ formatDateToAgoText(item.createdAt) }}</p>
                           </div>
                         </transition-group>
                       </div>
@@ -137,7 +137,7 @@
 <script lang="ts">
 import { Ref, computed, nextTick, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import debounce from 'debounce';
-import { closeChannelOverlay, getFlagImagePath } from '@/ts/page/page.page-manager';
+import { closeChannelOverlay, formatDateToAgoText, getFlagImagePath } from '@/ts/page/page.page-manager';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import axios from 'axios';
 import UserProfileOverlay from './UserProfileOverlay.vue';
@@ -336,39 +336,6 @@ export default {
       }
     }
 
-    function formatRelativeTime(date: Date | string) {
-      if (!date) {
-        return '';
-      }
-
-      const now = new Date();
-      const targetDate = new Date(date);
-      const seconds = Math.round((now.getTime() - targetDate.getTime()) / 1000);
-      const minutes = Math.round(seconds / 60);
-      const hours = Math.round(minutes / 60);
-      const days = Math.round(hours / 24);
-      const weeks = Math.round(days / 7);
-      const months = Math.round(days / 30.44); // More precise average days per month
-      const years = Math.round(months / 12);
-
-      if (seconds < 60) {
-        return 'just now';
-      } else if (minutes < 60) {
-        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-      } else if (hours < 24) {
-        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-      } else if (days < 7) {
-        return `${days} day${days > 1 ? 's' : ''} ago`;
-      } else if (weeks < 4.345) { // Using the average number of weeks in a month
-        return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-      } else if (months < 12) {
-        return `${months} month${months > 1 ? 's' : ''} ago`;
-      } else {
-        return `${years} year${years > 1 ? 's' : ''} ago`;
-      }
-    }
-
-
     /* General */
     const isAuthenticated = computed(() => checkUserAuthentication());
 
@@ -427,7 +394,7 @@ export default {
       slideOverlayOut,
       getFlagImagePath,
       newsData,
-      formatRelativeTime,
+      formatDateToAgoText,
       getDefaultProfilePbURL,
       formatTimeNumberToString,
     };

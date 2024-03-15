@@ -1,8 +1,7 @@
 <template>
   <div class="history-wrapper">
-    <h3>History</h3>
     <div v-if="loading" class="loader"></div>
-    <table v-if="historyData.length > 0">
+    <table v-if="historyData.length > 0" class="history">
       <thead>
         <tr>
           <th v-for="field in orderedFields" :key="field" @click="updateSort(field)">
@@ -135,9 +134,9 @@ export default defineComponent({
 
 <style scoped>
 table {
-  margin: 15px 0;
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 th {
@@ -156,33 +155,13 @@ td p {
   margin: unset;
 }
 
-.loader {
-  width: 30px;
-  aspect-ratio: 2;
-  --_g: no-repeat radial-gradient(circle closest-side, #ffffff 90%, #ffffff00);
-  background:
-    var(--_g) 0% 50%,
-    var(--_g) 50% 50%,
-    var(--_g) 100% 50%;
-  background-size: calc(100%/3) 50%;
-  animation: l3 1s infinite linear;
+.history {
+  width: 100%;
 }
 
-@keyframes l3 {
-  20% {
-    background-position: 0% 0%, 50% 50%, 100% 50%
-  }
-
-  40% {
-    background-position: 0% 100%, 50% 0%, 100% 50%
-  }
-
-  60% {
-    background-position: 0% 50%, 50% 100%, 100% 0%
-  }
-
-  80% {
-    background-position: 0% 50%, 50% 50%, 100% 100%
-  }
+.history-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 </style>
