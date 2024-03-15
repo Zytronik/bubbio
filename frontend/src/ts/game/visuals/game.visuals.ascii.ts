@@ -5,7 +5,7 @@ import { Field } from "../i/game.i.field";
 import { allGameSettings } from "../settings/game.settings.game";
 
 export const playGridASCII: Ref<string> = ref("");
-export const incomingGarbage: Ref<number> = ref(0);
+export const incomingGarbage: Ref<string> = ref("");
 
 let animationFrameId: number | null = null;
 let asciiAnimationRunning = false;
@@ -68,7 +68,7 @@ function asciiBoardAnimation(): void {
     boardText += getArrowLineString(gridWidth);
     boardText += getLowerBoarderLineString(gridWidth);
     playGridASCII.value = boardText;
-    incomingGarbage.value = getIncomingGarbageAmount();
+    incomingGarbage.value = "Incoming Garbage: " + getIncomingGarbageAmount();
     if (asciiAnimationRunning) {
         animationFrameId = requestAnimationFrame(() => asciiBoardAnimation());
     }
