@@ -353,10 +353,10 @@ export default {
           handleGlobalStatsUpdate(globalStats);
         });
         state.socket.on('updateNews', (data: NewsData[]) => {
-          /* newsData.value = data.map(item => ({
+          newsData.value = data.map(item => ({
             ...item,
             createdAt: new Date(item.createdAt)
-          })); */
+          }));
         });
       }
 
