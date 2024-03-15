@@ -8,7 +8,8 @@
             <div class="channel-topbar">
               <h2>Welcome to blubb.io</h2>
               <div class="tabs">
-                <button v-for="tab in tabs" :key="tab" :class="{ active: currentTab === tab }" @click="currentTab = tab">
+                <button v-for="tab in tabs" :key="tab" :class="{ active: currentTab === tab }"
+                  @click="currentTab = tab">
                   {{ tab }}
                 </button>
               </div>
@@ -38,7 +39,8 @@
                     <div class="channel-global-chat">
                       <h3>Global Chat</h3>
                       <div class="messages" ref="messagesContainer">
-                        <div v-for="(msg, i) in messages" :key="i">{{ msg.timestamp }} {{ msg.username }}: {{ msg.text }}
+                        <div v-for="(msg, i) in messages" :key="i">{{ msg.timestamp }} {{ msg.username }}: {{ msg.text
+                          }}
                         </div>
                       </div>
                       <div v-if="isAuthenticated" class="chat-inputs">
@@ -49,15 +51,20 @@
                     <div class="news">
                       <h3>News</h3>
                       <div class="news-wrapper">
-                        <transition-group name="fade" >
+                        <transition-group name="fade">
                           <div v-for="(item,i) in newsData" :key="i" class="news-item">
                             <div>
-                              <img :src="item.userImg ? item.userImg : getDefaultProfilePbURL()" alt="User's profile picture">
+                              <img :src="item.userImg ? item.userImg : getDefaultProfilePbURL()"
+                                alt="User's profile picture">
                               <p>
-                                <span>{{ item.username }}</span> achieved <span>#{{ item.rank }}</span> in <span>{{ item.type }}</span> with <span>{{ formatTimeNumberToString(item.value) }}</span>
+                                <span>{{ item.username }}</span> achieved <span>#{{ item.rank }}</span> in <span>{{
+                                  item.type }}</span> with <span>{{ formatTimeNumberToString(item.value) }}</span>
                               </p>
                             </div>
                             <p class="time">{{ formatDateToAgoText(item.createdAt) }}</p>
+                          </div>
+                          <div v-if="newsData.length === 0" key="no-news" class="no-news-message">
+                            <p>No news to display.</p>
                           </div>
                         </transition-group>
                       </div>
@@ -83,7 +90,8 @@
               <input type="text" placeholder="Search user..." v-model="searchQuery" />
               <ul :class="{ 'expanded': searchResults.length > 0 }">
                 <li v-for="user in searchResults" :key="user.id" @click="openUserProfile(user.username)">
-                  <img v-if="user.countryCode" :src="getFlagImagePath(user.countryCode)" :alt="`${user.country}`"><span>{{
+                  <img v-if="user.countryCode" :src="getFlagImagePath(user.countryCode)"
+                    :alt="`${user.country}`"><span>{{
                     user.username.toUpperCase() }}</span>
                 </li>
               </ul>
@@ -345,10 +353,10 @@ export default {
           handleGlobalStatsUpdate(globalStats);
         });
         state.socket.on('updateNews', (data: NewsData[]) => {
-          newsData.value = data.map(item => ({
+          /* newsData.value = data.map(item => ({
             ...item,
             createdAt: new Date(item.createdAt)
-          }));
+          })); */
         });
       }
 
@@ -677,7 +685,7 @@ export default {
   overflow-y: scroll;
 }
 
-.news-wrapper>div {
+.news-wrapper>div:not(.no-news-message) {
   background-color: rgb(30, 30, 30);
   padding: 10px 15px;
 }
