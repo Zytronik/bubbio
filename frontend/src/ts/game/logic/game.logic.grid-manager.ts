@@ -204,7 +204,7 @@ export function addGarbageToGrid(garbage: Bubble[], grid: Grid): void {
         grid.rows[h].size = grid.rows[h - 1].size;
     }
 
-    for (let w = 0; w < grid.rows[0].fields.length - 1; w++) {
+    for (let w = 0; w < grid.gridWidth - 1; w++) {
         const field = grid.rows[0].fields[w];
         field.bubble = garbage[w];
         field.centerPointCoords.x = grid.rows[2].fields[w].centerPointCoords.x;
@@ -212,9 +212,9 @@ export function addGarbageToGrid(garbage: Bubble[], grid: Grid): void {
     if (grid.rows[0].isSmallerRow) {
         const lastIndex = grid.gridWidth - 1;
         const centerPointX = grid.rows[2].fields[lastIndex].centerPointCoords.x;
-        const centerPointY = grid.rows[2].fields[0].centerPointCoords.y;
+        const centerPointY = grid.rows[0].fields[0].centerPointCoords.y;
         const field: Field = {
-            coords: { x: lastIndex - 1, y: 0, },
+            coords: { x: lastIndex, y: 0, },
             centerPointCoords: { x: centerPointX, y: centerPointY, },
             bubble: garbage[lastIndex],
         }

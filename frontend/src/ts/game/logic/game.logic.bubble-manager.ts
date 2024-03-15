@@ -25,8 +25,22 @@ export function updateBubbleQueueAndCurrent(gameInstance: GameInstance): void {
     gameInstance.currentBubble = gameInstance.bubbleQueue.shift() as Bubble;
 }
 
-export function checkForGarbage(gameInstance: GameInstance): void {
+export function receiveGarbage(gameInstance: GameInstance): void {
     if (gameInstance.queuedGarbage > 0) {
+        const colors = selectColors();
+        const maxAtOnce = gameInstance.gameSettings.garbageMaxAtOnce.value;
+        for (let i = 0; i < maxAtOnce; i++) {
+            const garbage = generateGarbage(colors);
+            addGarbageToGrid(garbage, gameInstance.playGrid);
+            gameInstance.queuedGarbage--;
+            checkIfGarbageKills(gameInstance);
+            if (gameInstance.queuedGarbage === 0) {
+                break;
+            }
+        }
+    }
+
+    function selectColors(): Bubble[] {
         const colorAmount = gameInstance.gameSettings.garbageColorAmount.value;
         const leftOverBubbles = [...allBubbles];
         const chosenColors: Bubble[] = [];
@@ -36,36 +50,48 @@ export function checkForGarbage(gameInstance: GameInstance): void {
             chosenColors.push(leftOverBubbles.splice(randomIndex, 1)[0]);
         }
 
-        const maxAtOnce = gameInstance.gameSettings.garbageMaxAtOnce.value;
-        const cleanAmount = gameInstance.gameSettings.garbageCleanAmount.value;
-        for (let i = 0; i < maxAtOnce; i++) {
-            const garbageRow: Bubble[] = [];
-            const garbageIsSmallRow = !gameInstance.playGrid.rows[0].isSmallerRow
-            const rowLength = gameInstance.playGrid.gridWidth - (garbageIsSmallRow ? 1 : 0);
-            const cleanColorLocation = convertSeedToRandomNumber(0, rowLength-cleanAmount, gameInstance.garbageSeed);
-            gameInstance.garbageSeed = getNextSeed(gameInstance.garbageSeed);
-            const randomCleanColorIndex = convertSeedToRandomNumber(0, chosenColors.length, gameInstance.garbageSeed);
-            gameInstance.garbageSeed = getNextSeed(gameInstance.garbageSeed);
-            const cleanColor = chosenColors.splice(randomCleanColorIndex, 1)[0];
+        return chosenColors;
+    }
 
-            for (let j = 0; j <= rowLength-cleanAmount; j++) {
-                console.log(j)
-                if (cleanColorLocation === j) {
-                    for (let k = 0; k < cleanAmount; k++) {
-                        garbageRow.push(cleanColor);
-                    }
-                } else {
-                    const randomColorIndex = convertSeedToRandomNumber(0, chosenColors.length, gameInstance.garbageSeed);
-                    gameInstance.garbageSeed = getNextSeed(gameInstance.garbageSeed);
-                    garbageRow.push(chosenColors[randomColorIndex]);
+    function generateGarbage(colorSelection: Bubble[]): Bubble[] {
+        const garbageRow: Bubble[] = [];
+        const garbageIsSmallRow = !gameInstance.playGrid.rows[0].isSmallerRow
+        const rowLength = gameInstance.playGrid.gridWidth - (garbageIsSmallRow ? 1 : 0);
+
+        const cleanAmount = gameInstance.gameSettings.garbageCleanAmount.value;
+        const cleanColorLocation = convertSeedToRandomNumber(0, rowLength-cleanAmount+1, gameInstance.garbageSeed);
+        gameInstance.garbageSeed = getNextSeed(gameInstance.garbageSeed);
+        const randomCleanColorIndex = convertSeedToRandomNumber(0, colorSelection.length, gameInstance.garbageSeed);
+        gameInstance.garbageSeed = getNextSeed(gameInstance.garbageSeed);
+        const cleanColor = colorSelection.splice(randomCleanColorIndex, 1)[0];
+        console.log("cleanColor.ascii", cleanColor.ascii)
+        for (let j = 0; j <= rowLength-cleanAmount; j++) {
+            if (cleanColorLocation === j) {
+                console.log("cleanColorLocation", cleanColorLocation)
+                for (let k = 0; k < cleanAmount; k++) {
+                    garbageRow.push(cleanColor);
                 }
+            } else {
+                const randomColorIndex = convertSeedToRandomNumber(0, colorSelection.length, gameInstance.garbageSeed);
+                gameInstance.garbageSeed = getNextSeed(gameInstance.garbageSeed);
+                garbageRow.push(colorSelection[randomColorIndex]);
             }
-            chosenColors.push(cleanColor);
-            addGarbageToGrid(garbageRow, gameInstance.playGrid);
-            gameInstance.queuedGarbage--;
-            if (gameInstance.queuedGarbage === 0) {
-                break;
+        }
+        console.log("garbageRow", garbageRow)
+        colorSelection.push(cleanColor);
+        return garbageRow;
+    }
+
+    function checkIfGarbageKills(gameInstance: GameInstance): void {
+        const lastNonDeathRow = gameInstance.playGrid.rows[gameInstance.playGrid.rows.length - 1 - gameInstance.playGrid.extraGridHeight];
+        let dead = true;
+        lastNonDeathRow.fields.forEach(field => {
+            if (field.bubble === undefined) {
+                dead = false;
             }
+        });
+        if (dead) {
+            gameInstance.gameTransitions.onGameDefeat();
         }
     }
 }

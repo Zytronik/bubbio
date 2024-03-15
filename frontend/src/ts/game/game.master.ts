@@ -14,7 +14,7 @@ import { GAME_MODE } from "./settings/i/game.settings.i.game-modes";
 import { allHandlingSettings } from "./settings/game.settings.handling";
 import { GameTransitions } from "./i/game.i.game-transitions";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
-import { checkForGarbage, holdBubble, updateBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
+import { receiveGarbage, holdBubble, updateBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
 import { backendSetupGame, submitGameToDB } from "./network/game.network-commands";
 
 
@@ -130,7 +130,7 @@ export function revertAPS(): void {
 }
 export function triggerShoot(): void {
     shootBubble(playerGameInstance);
-    checkForGarbage(playerGameInstance);
+    receiveGarbage(playerGameInstance);
     updateBubbleQueueAndCurrent(playerGameInstance);
 }
 export function triggerHold(): void {

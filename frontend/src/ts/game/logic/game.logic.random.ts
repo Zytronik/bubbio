@@ -6,6 +6,7 @@ export function getNextSeed(seed: number): number {
     return nextSeed;
 }
 
+//max is not included: [min, max[
 export function convertSeedToRandomNumber(min: number, max: number, seed: number): number {
     min = Math.floor(min);
     max = Math.ceil(max);
