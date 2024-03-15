@@ -25,18 +25,18 @@ export function setupGrid(settings: GameSettings): Grid {
         dissolveFloatingBubbles: settings.dissolveFloatingBubbles.value,
     }
     for (let h = 0; h < playGrid.gridHeight + playGrid.extraGridHeight; h++) {
-        const isBiggerRow = (h % 2 === 0);
+        const isSmallRow = (h % 2 === 1);
         const row: Row = {
             fields: [],
-            size: playGrid.gridWidth - (isBiggerRow ? 0 : 1),
-            isSmallerRow: h % 2 === 1,
+            size: playGrid.gridWidth - (isSmallRow ? 1 : 0),
+            isSmallerRow: isSmallRow,
             isInDeathZone: h >= playGrid.gridHeight,
         }
         for (let w = 0; w < row.size; w++) {
             const field: Field = {
                 coords: { x: w, y: h, },
                 centerPointCoords: {
-                    x: w * bubbleDiameter + (isBiggerRow ? bubbleRadius : bubbleDiameter),
+                    x: w * bubbleDiameter + (isSmallRow ? bubbleDiameter : bubbleRadius),
                     y: precisionRowHeight * h + bubbleRadius,
                 },
             };
@@ -53,18 +53,18 @@ export function resetGrid(playGrid: Grid): void {
     const precisionRowHeight = playGrid.precisionRowHeight;
     playGrid.rows = [];
     for (let h = 0; h < playGrid.gridHeight + playGrid.extraGridHeight; h++) {
-        const isBiggerRow = (h % 2 === 0);
+        const isSmallRow = (h % 2 === 1);
         const row: Row = {
             fields: [],
-            size: playGrid.gridWidth - (isBiggerRow ? 0 : 1),
-            isSmallerRow: h % 2 === 1,
+            size: playGrid.gridWidth - (isSmallRow ? 1 : 0),
+            isSmallerRow: isSmallRow,
             isInDeathZone: h >= playGrid.gridHeight,
         }
         for (let w = 0; w < row.size; w++) {
             const field: Field = {
                 coords: { x: w, y: h, },
                 centerPointCoords: {
-                    x: w * bubbleDiameter + (isBiggerRow ? bubbleRadius : bubbleDiameter),
+                    x: w * bubbleDiameter + (isSmallRow ? bubbleDiameter : bubbleRadius),
                     y: precisionRowHeight * h + bubbleRadius,
                 },
             };
@@ -78,8 +78,8 @@ export function getNearbyFields(playGrid: Grid, pointPosition: Coordinates): Fie
     const bubbleRadius = playGrid.bubbleRadius;
     const bubbleDiameter = playGrid.bubbleRadius * 2;
     const row = Math.round((pointPosition.y - bubbleRadius) / playGrid.precisionRowHeight);
-    const isEvenRow = playGrid.rows[row].isSmallerRow;
-    const xOffSet = (isEvenRow ? bubbleRadius : bubbleDiameter)
+    const isSmallerRow = playGrid.rows[row].isSmallerRow;
+    const xOffSet = (isSmallerRow ? bubbleDiameter : bubbleRadius)
     const column = Math.round((pointPosition.x - xOffSet) / bubbleDiameter);
     const nearbyFields: Field[] = []
     getAdjacentFieldVectors(playGrid, { x: column, y: row }).forEach(fieldVector => {
@@ -192,7 +192,7 @@ export function addGarbageToGrid(garbage: Bubble[], grid: Grid): void {
             const centerPointX = grid.rows[h - 1].fields[lastIndex].centerPointCoords.x;
             const centerPointY = grid.rows[h].fields[0].centerPointCoords.y;
             const field: Field = {
-                coords: { x: lastIndex - 1, y: h, },
+                coords: { x: lastIndex, y: h, },
                 centerPointCoords: { x: centerPointX, y: centerPointY, },
                 bubble: grid.rows[h - 1].fields[lastIndex].bubble,
             }
@@ -227,7 +227,7 @@ export function addGarbageToGrid(garbage: Bubble[], grid: Grid): void {
 }
 
 function getAdjacentFieldVectors(playGrid: Grid, gridPosition: Coordinates): Coordinates[] {
-    const hexagonalShift = playGrid.rows[gridPosition.y].isSmallerRow ? -1 : 1;
+    const hexagonalShift = playGrid.rows[gridPosition.y].isSmallerRow ? 1 : -1;
     const adjacentFieldVectors: Coordinates[] = [
         { x: 0, y: 0, },
         { x: -1, y: 0, },
