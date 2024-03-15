@@ -194,7 +194,7 @@ p {
 }
 
 .row .cell:nth-of-type(2) {
-  flex: 1.5;
+  flex: 1.8;
 }
 
 .row:nth-of-type(1) .cell:first-of-type p {

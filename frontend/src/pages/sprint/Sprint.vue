@@ -197,11 +197,11 @@ export default {
 }
 
 .left-content {
-  width: 75%;
+  width: 72%;
 }
 
 .right-content {
-  width: 25%;
+  width: 28%;
 }
 
 .l-tab {
