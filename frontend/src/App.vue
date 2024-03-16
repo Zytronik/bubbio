@@ -6,7 +6,7 @@
         <div class="profile-content">
           <h3>{{ userData?.username.toUpperCase() }}</h3>
           <div>
-            <p>Lv.420</p>
+            <p>Lv.727</p>
             <p class="rank">PI-Rank</p>
           </div>
         </div>
@@ -29,7 +29,7 @@
 <script lang="ts">
 import { ref, computed, watchEffect, onMounted, onUnmounted, watch } from 'vue';
 import state, { addSocketConnectListener, disconnectGlobalSocket, initializeGlobalSocket } from './ts/networking/networking.client-websocket';
-import { currentPageState, goToState, isChannelActive, openChannelOverlay, pages, setupTransitionFunctions } from './ts/page/page.page-manager';
+import { currentPageState, goToState, isChannelActive, openChannelOverlay, openProfile, pages, setupTransitionFunctions, showUserPageFromURL } from './ts/page/page.page-manager';
 import LoginOverlay from './globalComponents/LoginOverlay.vue';
 import InfoMessages from './globalComponents/InfoMessages.vue';
 import Channel from './globalComponents/Channel.vue';
@@ -51,17 +51,8 @@ export default {
   components: { LoginOverlay, InfoMessages, Channel },
   setup() {
     attachInputReader();
-
     /* Channel */
     const isChannelOpen = isChannelActive();
-
-    function showUserPageFromURL() {
-      const path = window.location.pathname;
-      const match = path.match(/^\/user\/(.+)$/);
-      if (match) {
-        isChannelOpen.value = true;
-      }
-    }
 
     /* Message Component */
     const infoMessageRef = ref<InfoMessageComponent | null>(null);
@@ -192,11 +183,6 @@ export default {
       if (isAuthenticated.value && !isGuest && userData.value && userData.value.username) {
         openProfile(userData.value.username);
       }
-    }
-
-    function openProfile(username:string){
-      history.pushState(null, '', `/user/${username}`);
-      showUserPageFromURL();
     }
 
     async function fetchUserData() {

@@ -1,5 +1,5 @@
 import { formatTimeNumberToString } from "../game/visuals/game.visuals.stat-display";
-import { formatDateTime } from "./page.page-manager";
+import { formatDateToAgoText } from "./page.page-manager";
 
 export interface StatDisplay {
     fullName: string;
@@ -104,7 +104,8 @@ export function formatFieldValue(value: string | number, fieldName: string): str
     }
 
     if (statDisplay && statDisplay.isTime && fieldName === 'submittedAt') {
-        formattedValue = formatDateTime(new Date(value));
+        //formattedValue = formatDateTime(new Date(value));
+        formattedValue = formatDateToAgoText(new Date(value));
     }
 
     if (statDisplay && statDisplay.shortName) {

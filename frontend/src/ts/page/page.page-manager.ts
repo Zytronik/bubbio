@@ -205,3 +205,48 @@ export function formatDateTime(date: Date): string {
 
     return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
 }
+
+export function formatDateToAgoText(date: Date | string) {
+    if (!date) {
+        return '';
+    }
+
+    const now = new Date();
+    const targetDate = new Date(date);
+    const seconds = Math.round((now.getTime() - targetDate.getTime()) / 1000);
+    const minutes = Math.round(seconds / 60);
+    const hours = Math.round(minutes / 60);
+    const days = Math.round(hours / 24);
+    const weeks = Math.round(days / 7);
+    const months = Math.round(days / 30.44); // More precise average days per month
+    const years = Math.round(months / 12);
+
+    if (seconds < 60) {
+        return 'just now';
+    } else if (minutes < 60) {
+        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    } else if (hours < 24) {
+        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    } else if (days < 7) {
+        return `${days} day${days > 1 ? 's' : ''} ago`;
+    } else if (weeks < 4.345) { // Using the average number of weeks in a month
+        return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+    } else if (months < 12) {
+        return `${months} month${months > 1 ? 's' : ''} ago`;
+    } else {
+        return `${years} year${years > 1 ? 's' : ''} ago`;
+    }
+}
+
+export function showUserPageFromURL() {
+    const path = window.location.pathname;
+    const match = path.match(/^\/user\/(.+)$/);
+    if (match) {
+        isChannelOpen.value = true;
+    }
+}
+
+export function openProfile(username: string) {
+    history.pushState(null, '', `/user/${username}`);
+    showUserPageFromURL();
+}
