@@ -8,11 +8,11 @@
 
           <div class="left-content">
             <div class="cat-wrapper">
-              <button class="cat" :class="{ 'active': isDissolveActive }" @click="toggleDissolve">
-                Dissolve Floating Bubbles (TODO)
+              <button class="cat" :class="{ 'active': clearFloatingBubbles }" @click="toggleDissolve">
+                Dissolve Floating Bubbles
               </button>
-              <button class="cat" :class="{ 'active': isPrefilledActive }" @click="togglePrefilled">
-                Prefilled Board (TODO)
+              <button class="cat" :class="{ 'active': prefillBoard }" @click="togglePrefilled">
+                Prefilled Board
               </button>
             </div>
             <button class="playButton" @click="showGameView()">Play!</button>
@@ -88,7 +88,7 @@ import Game from '../game/Game.vue';
 import { changeBackgroundTo, formatDateTime, goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { onMounted, ref } from 'vue';
-import { leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
+import { clearFloatingBubbles, leaveGame, prefillBoard, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { bubbleClearToWin, bubblesCleared, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import Leaderboard from '@/globalComponents/Leaderboard.vue';
@@ -111,8 +111,6 @@ export default {
   setup() {
     const isGaming = ref<boolean>(false);
     const isDashboard = ref<boolean>(true);
-    const isDissolveActive = ref<boolean>(true);
-    const isPrefilledActive = ref<boolean>(true);
     const userData: UserData | null = eventBus.getUserData();
     const isGuestString = sessionStorage.getItem('isGuest');
     const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
@@ -124,12 +122,12 @@ export default {
     backInput.fire = showDashboard;
     enableBackInputs();
 
-    function toggleDissolve() {
-      isDissolveActive.value = !isDissolveActive.value;
+    function toggleFloatingClear() {
+      clearFloatingBubbles.value = !clearFloatingBubbles.value;
     }
 
-    function togglePrefilled() {
-      isPrefilledActive.value = !isPrefilledActive.value;
+    function togglePrefilledBoard() {
+      prefillBoard.value = !prefillBoard.value;
     }
 
     function showGameView() {
@@ -169,10 +167,10 @@ export default {
       GameMode,
       LeaderboardCategory,
       SortDirection,
-      toggleDissolve,
-      togglePrefilled,
-      isDissolveActive,
-      isPrefilledActive,
+      toggleDissolve: toggleFloatingClear,
+      togglePrefilled: togglePrefilledBoard,
+      clearFloatingBubbles,
+      prefillBoard,
       userData,
     };
   },
