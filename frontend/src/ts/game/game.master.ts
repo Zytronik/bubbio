@@ -1,8 +1,8 @@
-import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, stopASCIIAnimation } from "./visuals/game.visuals.ascii";
+import { showASCIIDefeat, startASCIIAnimation, stopASCIIAnimation } from "./visuals/game.visuals.ascii";
 import { GameInstance } from "./i/game.i.game-instance";
-import { disableGameInputs, enableGameInputs } from "../input/input.input-manager";
+import { disableGameInputs, disableResetInput, enableGameInputs, enableResetInput } from "../input/input.input-manager";
 import { cleanUpAngle } from "./logic/game.logic.angle";
-import { angleLeftInput, angleRightInput } from "../input/input.possible-inputs";
+import { angleLeftInput, angleRightInput, backInput } from "../input/input.possible-inputs";
 import { GameStats } from "./i/game.i.game-stats";
 import { Bubble } from "./i/game.i.bubble";
 import { Grid } from "./i/game.i.grid";
@@ -16,64 +16,45 @@ import { GameTransitions } from "./i/game.i.game-transitions";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { receiveGarbage, holdBubble, updateBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
 import { backendSetupGame, submitGameToDB } from "./network/game.network-commands";
+import { Ref, ref } from "vue";
 
+export const clearFloatingBubbles: Ref<boolean> = ref(false);
+export const prefillBoard: Ref<boolean> = ref(false);
 
 let playerGameInstance: GameInstance;
 export function setupSprintGame(): void {
+    const sprintType = getSprintGameMode();
     const transitions: GameTransitions = {
         onGameStart: startSprint,
         onGameReset: resetSprint,
-        onGameAbort: cancelSprint,
+        onGameAbort: leaveSprint,
         onGameDefeat: sprintDeath,
         onGameVictory: sprintVictory
     }
 
     applyGameSettingsRefNumbers(allGameSettings);
-    playerGameInstance = createGameInstance(allGameSettings, GAME_MODE.SPRINT, allHandlingSettings, transitions);
-    backendSetupGame(GAME_MODE.SPRINT, allGameSettings, allHandlingSettings)
+    playerGameInstance = createGameInstance(allGameSettings, sprintType, allHandlingSettings, transitions);
+    backendSetupGame(GAME_MODE.SPRINT_R1, allGameSettings, allHandlingSettings)
 
     function startSprint(): void {
-        //TODO disable menu controls
-        startASCIIAnimation();
-        startStatDisplay();
-        enableGameInputs();
-        playerGameInstance.stats.gameStartTime = performance.now();
+        enableResetInput();
+        showCountDownAndStart();
     }
     function resetSprint(): void {
-        //todo
-        //track reset amount?
-        disableGameInputs();
-        stopASCIIAnimation();
-        stopStatDisplay();
+        disableGameplay();
         resetGameInstance(playerGameInstance);
-        startASCIIAnimation();
-        startStatDisplay();
-        enableGameInputs();
-        playerGameInstance.stats.gameStartTime = performance.now();
+        showCountDownAndStart();
     }
-    function cancelSprint(): void {
-        //TODO enable menu controls
-        disableGameInputs();
-        stopASCIIAnimation();
-        stopStatDisplay();
-        resetGameInstance(playerGameInstance);
+    function leaveSprint(): void {
+        disableResetInput();
+        disableGameplay();
     }
     function sprintVictory(): void {
-        const stats = playerGameInstance.stats;
-        stats.gameEndTime = performance.now();
-        stats.gameDuration = stats.gameEndTime - stats.gameStartTime;
-        stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
-
-        disableGameInputs();
-        stopASCIIAnimation();
-        stopStatDisplay();
-        showASCIIVictory();
-        submitGameToDB(stats);
+        disableGameplay();
+        submitGameToDB(playerGameInstance.stats);
     }
     function sprintDeath(): void {
-        disableGameInputs();
-        stopASCIIAnimation();
-        stopStatDisplay();
+        disableGameplay();
         showASCIIDefeat();
     }
 }
@@ -86,7 +67,32 @@ function applyGameSettingsRefNumbers(gameSettings: GameSettings): void {
     gameSettings.maxAngle.value = gameSettings.maxAngle.refValue;
     gameSettings.widthPrecisionUnits.value = gameSettings.widthPrecisionUnits.refValue;
     gameSettings.collisionDetectionFactor.value = gameSettings.collisionDetectionFactor.refValue;
+    gameSettings.clearFloatingBubbles.value = clearFloatingBubbles.value;
+    gameSettings.prefillBoard.value = prefillBoard.value;
+    gameSettings.refillBoardAtLine.value = gameSettings.refillBoardAtLine.refValue;
+    gameSettings.refillAmount.value = gameSettings.refillAmount.refValue;
+    gameSettings.queuePreviewSize.value = gameSettings.queuePreviewSize.refValue;
+    gameSettings.bubbleBagSize.value = gameSettings.bubbleBagSize.refValue;
+    gameSettings.garbageMaxAtOnce.value = gameSettings.garbageMaxAtOnce.refValue;
+    gameSettings.garbageCleanAmount.value = gameSettings.garbageCleanAmount.refValue;
+    gameSettings.garbageColorAmount.value = gameSettings.garbageColorAmount.refValue;
 }
+
+function getSprintGameMode(): GAME_MODE {
+    const floating: boolean = clearFloatingBubbles.value;
+    const filled: boolean = prefillBoard.value;
+
+    if (floating && filled) {
+        return GAME_MODE.SPRINT_R1;
+    } else if (!floating && filled) {
+        return GAME_MODE.SPRINT_R2;
+    } else if (floating && !filled) {
+        return GAME_MODE.SPRINT_R3;
+    } else {
+        return GAME_MODE.SPRINT_R4;
+    }
+}
+
 
 export function startGame(): void {
     playerGameInstance.gameTransitions.onGameStart();
@@ -97,13 +103,24 @@ export function resetGame(): void {
 export function leaveGame(): void {
     playerGameInstance.gameTransitions.onGameAbort();
 }
-//not sure if this is needed
-export function triggerGameVictory(): void {
-    playerGameInstance.gameTransitions.onGameDefeat();
+
+function showCountDownAndStart(): void {
+    startASCIIAnimation();
+    startStatDisplay();
+    enableGameInputs();
+    playerGameInstance.stats.gameStartTime = performance.now();
 }
-export function triggerGameLost(): void {
-    playerGameInstance.gameTransitions.onGameVictory();
+function disableGameplay(): void {
+    const stats = playerGameInstance.stats;
+    stats.gameEndTime = performance.now();
+    stats.gameDuration = stats.gameEndTime - stats.gameStartTime;
+    stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
+    //save playtime/score
+    disableGameInputs();
+    stopASCIIAnimation();
+    stopStatDisplay();
 }
+
 
 
 //Inputs

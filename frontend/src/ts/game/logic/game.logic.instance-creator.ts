@@ -4,7 +4,7 @@ import { GameStats } from "../i/game.i.game-stats";
 import { GameTransitions } from "../i/game.i.game-transitions";
 import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 import { GameSettings } from "../settings/i/game.settings.i.game-settings";
-import { GAME_MODE } from "../settings/i/game.settings.i.game-modes";
+import { GAME_MODE, SprintAmountMap } from "../settings/i/game.settings.i.game-modes";
 import { HandlingSettings } from "../settings/i/game.settings.i.handling-settings";
 import { getNextSeed } from "./game.logic.random";
 
@@ -62,7 +62,7 @@ export function resetGameInstance(gameInstance: GameInstance): void {
 }
 
 function getEmptyStats(gameSettings: GameSettings, gameMode: GAME_MODE): GameStats {
-    const bubbleCountToWin = (gameMode === GAME_MODE.SPRINT) ? gameSettings.sprintClearAmount.value : Infinity;
+    const bubbleCountToWin = SprintAmountMap.get(gameMode) ?? Infinity;
     const stats: GameStats = {
         gameStartTime: 0,
         gameEndTime: 0,

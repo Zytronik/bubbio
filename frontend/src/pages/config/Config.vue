@@ -18,7 +18,7 @@
                 </div>
                 <div class="keys">
                   <div class="defaultKey">
-                    <p>{{ input.defaultKeyCode }}</p>
+                    <button @click="resetInput(input)">Reset</button>
                   </div>
                   <div v-if="input.customKeyMap.map" class="customKeys">
                     <div v-for="(key, keyIndex) in input.customKeyMap.map" :key="`key-${keyIndex}`"
@@ -179,6 +179,13 @@ export default {
       await uploadImage(fileType);
     }
 
+    function resetInput(input: Input): void {
+      input.customKeyMap.map[0] = input.defaultKeyCode;
+      input.customKeyMap.map[1] = "";
+      input.customKeyMap.map[2] = "";
+      saveInputs();
+    }
+
     async function uploadImage(fileType: string) {
       if (!selectedFile.value) {
         emit('showInfoMessage', 'No file selected.', 'info');
@@ -224,6 +231,7 @@ export default {
       allInputs,
       handleCustomKey,
       handleResetCustomKey,
+      resetInput,
     }
   }
 }

@@ -12,7 +12,10 @@ export interface GameSettings {
     widthPrecisionUnits: NumberSetting,
     collisionDetectionFactor: NumberSetting,
 
-    dissolveFloatingBubbles: BooleanSetting,
+    clearFloatingBubbles: BooleanSetting,
+    prefillBoard: BooleanSetting,
+    refillBoardAtLine: NumberSetting,
+    refillAmount: NumberSetting,
 
     queuePreviewSize: NumberSetting,
     bubbleBagSize: NumberSetting,
@@ -20,8 +23,6 @@ export interface GameSettings {
     garbageMaxAtOnce: NumberSetting,
     garbageCleanAmount: NumberSetting,
     garbageColorAmount: NumberSetting,
-
-    sprintClearAmount: NumberSetting,
 
     //passtrough
     //combotable

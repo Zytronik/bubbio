@@ -85,6 +85,8 @@ import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import Leaderboard from '@/globalComponents/Leaderboard.vue';
 import History from '@/globalComponents/History.vue';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-leaderboard';
+import { backInput } from '@/ts/input/input.possible-inputs';
+import { enableBackInputs } from '@/ts/input/input.input-manager';
 
 interface GameRecord {
   submittedAt: Date | string;
@@ -108,6 +110,8 @@ export default {
     ]);
 
     setupSprintGame();
+    backInput.fire = showDashboard;
+    enableBackInputs();
 
     function showGameView() {
       startGame();

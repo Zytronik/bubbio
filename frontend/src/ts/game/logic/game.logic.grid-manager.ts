@@ -22,7 +22,7 @@ export function setupGrid(settings: GameSettings): Grid {
         bubbleRadius: bubbleRadius,
         bubbleLauncherPosition: { x: precisionWidth / 2, y: precisionHeight - bubbleRadius },
         collisionRangeSquared: ((bubbleRadius * 2) ** 2) * settings.collisionDetectionFactor.value,
-        dissolveFloatingBubbles: settings.dissolveFloatingBubbles.value,
+        dissolveFloatingBubbles: settings.clearFloatingBubbles.value,
     }
     for (let h = 0; h < playGrid.gridHeight + playGrid.extraGridHeight; h++) {
         const isSmallRow = (h % 2 === 1);

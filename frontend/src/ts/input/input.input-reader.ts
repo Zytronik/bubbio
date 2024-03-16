@@ -14,22 +14,13 @@ export function attachInputReader() {
 
 function handleKeyDown(event: KeyboardEvent): void {
     allInputs.forEach((input: Input) => {
-        let hasCustomCode = false;
         input.customKeyMap.map.forEach((customCode: string) => {
             if (event.code === customCode && !input.pressed && input.enabled) {
                 input.pressed = true;
                 input.lastFiredAtTime = performance.now();
                 input.fire();
             }
-            if (customCode != "") {
-                hasCustomCode = true;
-            }
         });
-        if (!hasCustomCode && event.code === input.defaultKeyCode && !input.pressed && input.enabled) {
-            input.pressed = true;
-            input.lastFiredAtTime = performance.now();
-            input.fire();
-        }
     });
 }
 
@@ -44,13 +35,6 @@ function handleKeyUp(event: KeyboardEvent): void {
                 }
             }
         });
-        if (event.code === input.defaultKeyCode && input.enabled) {
-            input.pressed = false;
-            input.releasedAtTime = performance.now();
-            if (input.release) {
-                input.release();
-            }
-        }
     });
 }
 

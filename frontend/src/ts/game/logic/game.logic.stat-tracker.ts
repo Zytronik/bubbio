@@ -14,7 +14,7 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
 
     gameStats.bubblesLeftToClear = gameStats.bubbleClearToWin - gameStats.bubblesCleared;
 
-    if (game.gameMode === GAME_MODE.SPRINT && gameStats.bubblesCleared >= gameStats.bubbleClearToWin) {
+    if (game.gameMode === GAME_MODE.SPRINT_R1 && gameStats.bubblesCleared >= gameStats.bubbleClearToWin) {
         game.gameTransitions.onGameVictory();
     }
 

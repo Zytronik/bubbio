@@ -72,6 +72,31 @@ const DISSOLVE_FLOATING_BUBBLES: BooleanSetting = {
     refValue: true,
     defaultValue: true,
 }
+const PREFILL_BOARD: BooleanSetting = {
+    name: "Prefill Board",
+    description: "If the board already has bubbles on it.",
+    value: false,
+    refValue: false,
+    defaultValue: false,
+}
+const REFILL_BOARD_AT_LINE: NumberSetting = {
+    name: "Refill board at line",
+    description: "At what lineindex the board starts refilling (highest line with at least one hole)",
+    value: 2,
+    refValue: 2,
+    defaultValue: 2,
+    min: 0,
+    max: 5,
+}
+const REFILL_AMOUNT: NumberSetting = {
+    name: "Queue Preview Size",
+    description: "How many bubbles are shown in the queue preview.",
+    value: 3,
+    refValue: 5,
+    defaultValue: 5,
+    min: 0,
+    max: 10,
+}
 const QUEUE_PREVIEW_SIZE: NumberSetting = {
     name: "Queue Preview Size",
     description: "How many bubbles are shown in the queue preview.",
@@ -117,15 +142,6 @@ const GARBAGE_COLOR_AMOUNT: NumberSetting = {
     min: 2,
     max: 7,
 }
-const SPRINT_CLEAR_AMOUNT: NumberSetting = {
-    name: "Sprint Clear Amount",
-    description: "How many bubbles it takes to win a sprint.",
-    value: 100,
-    refValue: 100,
-    defaultValue: 100,
-    min: 20,
-    max: 1000,
-}
 export const allGameSettings: GameSettings = {
     gridWidth: GRID_WIDTH,
     gridHeight: GRID_HEIGHT,
@@ -134,11 +150,13 @@ export const allGameSettings: GameSettings = {
     maxAngle: MAX_ANGLE,
     widthPrecisionUnits: WIDTH_PRECISION_UNITS,
     collisionDetectionFactor: COLLISION_DETECTION_FACTOR,
-    dissolveFloatingBubbles: DISSOLVE_FLOATING_BUBBLES,
+    clearFloatingBubbles: DISSOLVE_FLOATING_BUBBLES,
+    prefillBoard: PREFILL_BOARD,
+    refillBoardAtLine: REFILL_BOARD_AT_LINE,
+    refillAmount: REFILL_AMOUNT,
     queuePreviewSize: QUEUE_PREVIEW_SIZE,
     bubbleBagSize: BUBBLE_BAG_SIZE,
     garbageMaxAtOnce: MAX_GARBAGE_AT_ONCE,
     garbageCleanAmount: CLEAN_GARBAGE_AMOUNT,
     garbageColorAmount: GARBAGE_COLOR_AMOUNT,
-    sprintClearAmount: SPRINT_CLEAR_AMOUNT,
 }
