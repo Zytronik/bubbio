@@ -5,6 +5,7 @@ import { HandlingSettings } from "../settings/i/game.settings.i.handling-setting
 import { httpClient } from "../../networking/networking.http-client";
 import { GameStats } from "../i/game.i.game-stats";
 import { nd_GameSetup } from "./i/game.network.i.game-setup-data";
+import eventBus from "@/ts/page/page.event-bus";
 
 export function backendSetupGame(gameMode: GAME_MODE, gameSettings: GameSettings, handlingSettings: HandlingSettings): void {
     if (state.socket) {
@@ -42,14 +43,14 @@ export async function submitGameToDB(gameStats: GameStats) {
         };
         try {
             const token = localStorage.getItem('authToken');
-            const response = await httpClient.post('/sprint/submit', submitStats, {
+            await httpClient.post('/sprint/submit', submitStats, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 },
             });
-            console.log('Game stats submitted successfully:', response.data);
+            eventBus.emit('show-info-message', { message: 'Sprint submitted successfully.', type: 'success' });
         } catch (error) {
-            console.error('Error submitting game stats:', error);
+            eventBus.emit('show-info-message', { message: 'There was an error submitting your Sprint.', type: 'error' });
         }
     }
 }

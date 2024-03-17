@@ -155,6 +155,7 @@ import useChatStore from '@/ts/page/page.globalChat';
 import { CountUp } from 'countup.js';
 import { getDefaultProfilePbURL } from '@/ts/networking/paths';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
+import { backInput } from '@/ts/input/input.possible-inputs';
 
 export default {
   name: "ChannelOverlay",
@@ -345,6 +346,7 @@ export default {
     }
 
     /* General */
+    backInput.fire = slideOverlayOut;
     const isAuthenticated = computed(() => checkUserAuthentication());
 
     onMounted(async () => {

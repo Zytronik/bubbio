@@ -11,9 +11,9 @@
               <button class="cat" :class="{ 'active': clearFloatingBubbles }" @click="toggleDissolve">
                 Dissolve Floating Bubbles
               </button>
-              <button class="cat" :class="{ 'active': prefillBoard }" @click="togglePrefilled">
+              <!-- <button class="cat" :class="{ 'active': prefillBoard }" @click="togglePrefilled">
                 Prefilled Board
-              </button>
+              </button> -->
             </div>
             <button class="playButton" @click="showGameView()">Play!</button>
             <History v-if="!isGuest" :gameMode="GameMode.Sprint"
@@ -95,7 +95,6 @@ import Leaderboard from '@/globalComponents/Leaderboard.vue';
 import History from '@/globalComponents/History.vue';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-leaderboard';
 import { backInput } from '@/ts/input/input.possible-inputs';
-import { enableBackInputs } from '@/ts/input/input.input-manager';
 import { UserData } from '@/ts/page/page.i-userData';
 import eventBus from '@/ts/page/page.event-bus';
 
@@ -120,7 +119,6 @@ export default {
 
     setupSprintGame();
     backInput.fire = showDashboard;
-    enableBackInputs();
 
     function toggleFloatingClear() {
       clearFloatingBubbles.value = !clearFloatingBubbles.value;

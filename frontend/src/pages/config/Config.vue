@@ -17,8 +17,8 @@
                   <h3 :title="input.description">{{ input.name }}</h3>
                 </div>
                 <div class="keys">
-                  <div class="defaultKey">
-                    <button @click="resetInput(input)">Reset</button>
+                  <div @click="resetInput(input, $event.currentTarget)" class="resetColumn">
+                    <span>Reset</span>
                   </div>
                   <div v-if="input.customKeyMap.map" class="customKeys">
                     <div v-for="(key, keyIndex) in input.customKeyMap.map" :key="`key-${keyIndex}`"
@@ -91,6 +91,7 @@ import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import { allInputs } from '@/ts/input/input.possible-inputs';
 import { Input } from '@/ts/input/input.i-input';
 import { saveInputs } from '@/ts/input/input.input-manager';
+import eventBus from '@/ts/page/page.event-bus';
 
 export default {
   name: 'ConfigPage',
@@ -123,7 +124,6 @@ export default {
         if (paragraphElement) {
           paragraphElement.innerText = inputEvent.code;
           allInputs[inputIndex].customKeyMap.map[keyIndex] = inputEvent.code;
-          console.log(allInputs, inputIndex, keyIndex, allInputs[inputIndex]);
           saveInputs();
         }
       }
@@ -159,18 +159,18 @@ export default {
     async function handleFileChange(fileType: string, event: Event) {
       const input = event.target as HTMLInputElement;
       if (!input.files || input.files.length === 0) {
-        emit('showInfoMessage', 'No file selected.', 'info');
+        eventBus.emit('show-info-message', { message: 'No file selected.', type: 'info' });
         return;
       }
       const file = input.files[0];
 
       if (file.size > 2 * 1024 * 1024) {
-        emit('showInfoMessage', 'File size should not exceed 2MB.', 'info');
+        eventBus.emit('show-info-message', { message: 'File size should not exceed 2MB.', type: 'info' });
         return;
       }
 
       if (!file.type.match(/^(image\/jpeg|image\/png)$/)) {
-        emit('showInfoMessage', 'Invalid file type. Only JPEG and PNG are allowed.', 'info');
+        eventBus.emit('show-info-message', { message: 'Invalid file type. Only JPEG and PNG are allowed.', type: 'info' });
         return;
       }
 
@@ -179,7 +179,13 @@ export default {
       await uploadImage(fileType);
     }
 
-    function resetInput(input: Input): void {
+    function resetInput(input: Input, e: EventTarget | null): void {
+      const element = e as HTMLElement;
+      const customKeyElems = element.parentElement?.querySelector('.customKeys')?.querySelectorAll('p');
+      if (customKeyElems) {
+        customKeyElems.forEach(p => p.innerText = 'Not Set');
+        customKeyElems[0].innerText = input.defaultKeyCode;
+      }
       input.customKeyMap.map[0] = input.defaultKeyCode;
       input.customKeyMap.map[1] = "";
       input.customKeyMap.map[2] = "";
@@ -188,7 +194,7 @@ export default {
 
     async function uploadImage(fileType: string) {
       if (!selectedFile.value) {
-        emit('showInfoMessage', 'No file selected.', 'info');
+        eventBus.emit('show-info-message', { message: 'No file selected.', type: 'info' });
         alert('No file selected');
         return;
       }
@@ -206,9 +212,9 @@ export default {
           }
         });
         emit('updateProfileData');
-        emit('showInfoMessage', 'Image uploaded successfully.', 'success');
+        eventBus.emit('show-info-message', { message: 'Image uploaded successfully.', type: 'success' });
       } catch (error) {
-        emit('showInfoMessage', 'Failed to upload image.', 'error');
+        eventBus.emit('show-info-message', { message: 'Failed to upload image.', type: 'error' });
       }
     }
 
@@ -316,7 +322,7 @@ button.logOutBtn:hover {
   flex-direction: row;
 }
 
-.input-setting .defaultKey,
+.input-setting .resetColumn,
 .input-setting .desc,
 .input-setting .customKeys>div {
   background-color: rgb(53, 53, 53);
@@ -327,11 +333,21 @@ button.logOutBtn:hover {
   align-items: center;
 }
 
+.input-setting .resetColumn {
+  background-color: rgb(53, 53, 53);
+  transition: 200ms;
+  cursor: pointer;
+}
+
+.input-setting .resetColumn:hover {
+  background-color: rgb(73, 73, 73);
+}
+
 .input-setting .desc {
   justify-content: flex-start;
 }
 
-.input-setting .keys .defaultKey {
+.input-setting .keys .resetColumn {
   width: 15%;
   position: relative;
   opacity: 0.7;
@@ -352,12 +368,8 @@ button.logOutBtn:hover {
   margin-bottom: unset;
 }
 
-.input-setting:first-of-type .keys .defaultKey::before {
-  content: "Default";
-}
-
 .input-setting:first-of-type .keys .customKeys>div::before,
-.input-setting:first-of-type .keys .defaultKey::before {
+.input-setting:first-of-type .keys .resetColumn::before {
   position: absolute;
   bottom: calc(100% + 15px);
 }
