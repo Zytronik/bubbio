@@ -1,8 +1,8 @@
-import { showASCIIDefeat, startASCIIAnimation, stopASCIIAnimation } from "./visuals/game.visuals.ascii";
+import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, stopASCIIAnimation } from "./visuals/game.visuals.ascii";
 import { GameInstance } from "./i/game.i.game-instance";
 import { disableGameInputs, disableResetInput, enableGameInputs, enableResetInput } from "../input/input.input-manager";
 import { cleanUpAngle } from "./logic/game.logic.angle";
-import { angleLeftInput, angleRightInput, backInput } from "../input/input.possible-inputs";
+import { angleLeftInput, angleRightInput } from "../input/input.possible-inputs";
 import { GameStats } from "./i/game.i.game-stats";
 import { Bubble } from "./i/game.i.bubble";
 import { Grid } from "./i/game.i.grid";
@@ -51,6 +51,7 @@ export function setupSprintGame(): void {
     }
     function sprintVictory(): void {
         disableGameplay();
+        showASCIIVictory();
         submitGameToDB(playerGameInstance.stats);
     }
     function sprintDeath(): void {

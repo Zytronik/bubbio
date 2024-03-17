@@ -1,5 +1,4 @@
 import { GameInstance } from "../i/game.i.game-instance";
-import { GAME_MODE } from "../settings/i/game.settings.i.game-modes";
 
 export function trackBubbleShot(game: GameInstance, wallBounces: number, amountCleared: number): void {
     const gameStats = game.stats;
@@ -14,7 +13,7 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
 
     gameStats.bubblesLeftToClear = gameStats.bubbleClearToWin - gameStats.bubblesCleared;
 
-    if (game.gameMode === GAME_MODE.SPRINT_R1 && gameStats.bubblesCleared >= gameStats.bubbleClearToWin) {
+    if (gameStats.bubblesCleared >= gameStats.bubbleClearToWin) {
         game.gameTransitions.onGameVictory();
     }
 

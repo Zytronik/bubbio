@@ -29,7 +29,7 @@ export function createGameInstance(
         bubbleQueue: [],
         playGrid: setupGrid(gameSettings),
         queuedGarbage: 0,
-        stats: getEmptyStats(gameSettings, gameMode),
+        stats: getEmptyStats(gameMode),
 
         gameStateHistory: {
             inputHistory: [],
@@ -57,12 +57,13 @@ export function resetGameInstance(gameInstance: GameInstance): void {
     };
     gameInstance.bubbleQueue = [];
     resetGrid(gameInstance.playGrid);
-    gameInstance.stats = getEmptyStats(gameInstance.gameSettings, gameInstance.gameMode);
+    gameInstance.stats = getEmptyStats(gameInstance.gameMode);
     updateBubbleQueueAndCurrent(gameInstance);
 }
 
-function getEmptyStats(gameSettings: GameSettings, gameMode: GAME_MODE): GameStats {
+function getEmptyStats(gameMode: GAME_MODE): GameStats {
     const bubbleCountToWin = SprintAmountMap.get(gameMode) ?? Infinity;
+    console.log("gameMode", gameMode, "bubbleCountToWin", bubbleCountToWin)
     const stats: GameStats = {
         gameStartTime: 0,
         gameEndTime: 0,

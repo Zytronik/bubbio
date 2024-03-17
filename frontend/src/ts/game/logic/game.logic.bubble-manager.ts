@@ -64,10 +64,8 @@ export function receiveGarbage(gameInstance: GameInstance): void {
         const randomCleanColorIndex = convertSeedToRandomNumber(0, colorSelection.length, gameInstance.garbageSeed);
         gameInstance.garbageSeed = getNextSeed(gameInstance.garbageSeed);
         const cleanColor = colorSelection.splice(randomCleanColorIndex, 1)[0];
-        console.log("cleanColor.ascii", cleanColor.ascii)
         for (let j = 0; j <= rowLength-cleanAmount; j++) {
             if (cleanColorLocation === j) {
-                console.log("cleanColorLocation", cleanColorLocation)
                 for (let k = 0; k < cleanAmount; k++) {
                     garbageRow.push(cleanColor);
                 }
@@ -77,7 +75,6 @@ export function receiveGarbage(gameInstance: GameInstance): void {
                 garbageRow.push(colorSelection[randomColorIndex]);
             }
         }
-        console.log("garbageRow", garbageRow)
         colorSelection.push(cleanColor);
         return garbageRow;
     }

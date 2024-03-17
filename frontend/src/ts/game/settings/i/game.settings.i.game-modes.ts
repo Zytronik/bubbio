@@ -7,8 +7,8 @@ export enum GAME_MODE {
 }
 
 export const SprintAmountMap: Map<GAME_MODE, number> = new Map([
-    [GAME_MODE.SPRINT_R1, 200],
-    [GAME_MODE.SPRINT_R2, 200],
-    [GAME_MODE.SPRINT_R3, 100],
-    [GAME_MODE.SPRINT_R4, 100],
+    [GAME_MODE.SPRINT_R1, 21],
+    [GAME_MODE.SPRINT_R2, 22],
+    [GAME_MODE.SPRINT_R3, 23],
+    [GAME_MODE.SPRINT_R4, 24],
 ]);
