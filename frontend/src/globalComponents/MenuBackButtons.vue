@@ -8,9 +8,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, onMounted, PropType } from 'vue';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { goToState } from '@/ts/page/page.page-manager';
+import { backInput } from '@/ts/input/input.possible-inputs';
 
 interface ButtonData {
   iconSrc: string;
@@ -36,6 +37,10 @@ export default defineComponent({
         }
       }
     }
+
+    onMounted(()=>{
+      backInput.fire = getGoBackState;
+    });
 
     function getGoBackState() {
       const activeButton = (props.buttonData as ButtonData[]).find(btn => !btn.disabled);

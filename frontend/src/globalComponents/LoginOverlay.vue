@@ -187,7 +187,7 @@ export default defineComponent({
     async function handleForgotPw() {
       const { success, error } = await forgotPw(formData.value.emailForgot);
       if (success) {
-        emit('showInfoMessage', 'Password reset email sent.', 'success');
+        eventBus.emit('show-info-message', { message: 'Password reset email sent.', type: 'success' });
         navigateToLogin();
         clearErrorMessage();
       } else {
@@ -199,7 +199,7 @@ export default defineComponent({
       const { success, error } = await changePw(token.value, formData.value.newPassword, formData.value.newPasswordAgain);
       if (success) {
         token.value = "";
-        emit('showInfoMessage', 'Password was changed successfully.', 'success');
+        eventBus.emit('show-info-message', { message: 'Password was changed successfully.', type: 'success' });
         history.replaceState(null, '', '/');
         toUsernameForm();
       } else {
@@ -263,7 +263,7 @@ export default defineComponent({
         if (axios.isAxiosError(error)) {
           e = error.response?.data?.message[0] || 'Request failed';
         }
-        emit('showInfoMessage', e, 'error');
+        eventBus.emit('show-info-message', { message: e, type: 'error' });
         history.replaceState(null, '', '/');
       }
     }

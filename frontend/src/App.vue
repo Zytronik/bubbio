@@ -13,11 +13,10 @@
       </div>
     </div>
     <InfoMessages ref="infoMessageRef" />
-    <LoginOverlay v-if="showLogin" @joinRoomFromHash="joinRoomFromHash" @updateAuthenticatedState="updateAuthenticatedState" @showInfoMessage="showInfoMessage" />
+    <LoginOverlay v-if="showLogin" @joinRoomFromHash="joinRoomFromHash" @updateAuthenticatedState="updateAuthenticatedState" />
     <Channel v-if="isChannelOpen" />
     <transition :name="isNavigatingForward ? 'slide-left' : 'slide-right'" mode="out-in">
-      <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom"
-        @showInfoMessage="showInfoMessage" @updateProfileData="updateProfileData" :key="currentComponentKey">
+      <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom" @updateProfileData="updateProfileData" :key="currentComponentKey">
       </component>
     </transition>
     <div class="bottomBar">
@@ -40,10 +39,15 @@ import eventBus from './ts/page/page.event-bus';
 import { attachInputReader } from './ts/input/input.input-reader';
 import { httpClient } from './ts/networking/networking.http-client';
 import { getDefaultProfilePbURL } from './ts/networking/paths';
-import { applySavedInputSettings } from './ts/input/input.input-manager';
+import { applySavedInputSettings, enableBackInputs } from './ts/input/input.input-manager';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
+}
+
+interface InfoMessageData {
+  message: string;
+  type: 'info' | 'error' | 'success';
 }
 
 export default {
@@ -210,6 +214,7 @@ export default {
     }
 
     onMounted(async () => {
+      enableBackInputs();
       setupTransitionFunctions();
       initializeGlobalSocket();
       isAuthenticated.value = checkUserAuthentication();
@@ -223,12 +228,17 @@ export default {
       addSocketConnectListener(initOnIsUserInRoomAlready);
       addSocketConnectListener(initOnSocketDisconnect);
       eventBus.on('navigationDirectionChanged', updateDirection);
+      eventBus.on('show-info-message', (infoMessageData: InfoMessageData) => {
+        showInfoMessage(infoMessageData.message, infoMessageData.type);
+      });
       window.addEventListener('beforeunload', clearGuestCookies);
     });
 
     onUnmounted(() => {
       disconnectGlobalSocket();
       window.removeEventListener('beforeunload', clearGuestCookies);
+      eventBus.off('show-info-message');
+      eventBus.off('navigationDirectionChanged');
       clearGuestCookies();
     });
 
@@ -240,7 +250,6 @@ export default {
       handleJoinRoom,
       handleLeaveRoom,
       logUserOut,
-      showInfoMessage,
       infoMessageRef,
       isChannelOpen,
       openChannelOverlay,
