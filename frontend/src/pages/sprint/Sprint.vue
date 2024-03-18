@@ -8,12 +8,10 @@
 
           <div class="left-content">
             <div class="cat-wrapper">
-              <button class="cat" :class="{ 'active': clearFloatingBubbles }" @click="toggleDissolve">
-                Dissolve Floating Bubbles
+              <button v-for="mod in modsComputed" :key="mod.abr" class="cat" :class="{ 'active': mod.enabled }"
+                @click="toggleMod(mod.abr)">
+                {{ mod.title }}
               </button>
-              <!-- <button class="cat" :class="{ 'active': prefillBoard }" @click="togglePrefilled">
-                Prefilled Board
-              </button> -->
             </div>
             <button class="playButton" @click="showGameView()">Play!</button>
             <History v-if="!isGuest" :gameMode="GameMode.Sprint"
@@ -87,8 +85,8 @@
 import Game from '../game/Game.vue';
 import { changeBackgroundTo, formatDateTime, goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { onMounted, ref } from 'vue';
-import { clearFloatingBubbles, leaveGame, prefillBoard, setupSprintGame, startGame } from '@/ts/game/game.master';
+import { computed, onMounted, ref } from 'vue';
+import { leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { bubbleClearToWin, bubblesCleared, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import Leaderboard from '@/globalComponents/Leaderboard.vue';
@@ -97,6 +95,7 @@ import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-l
 import { backInput } from '@/ts/input/input.possible-inputs';
 import { UserData } from '@/ts/page/page.i-userData';
 import eventBus from '@/ts/page/page.event-bus';
+import { allMods as importedMods } from '@/ts/game/settings/game.settings.all-mods';
 
 export default {
   name: 'SprintPage',
@@ -117,18 +116,25 @@ export default {
       { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/sprint.png'), disabled: false },
     ]);
 
-    setupSprintGame();
+    
     backInput.fire = showDashboard;
 
-    function toggleFloatingClear() {
-      clearFloatingBubbles.value = !clearFloatingBubbles.value;
-    }
+    const mods = ref(importedMods);
 
-    function togglePrefilledBoard() {
-      prefillBoard.value = !prefillBoard.value;
-    }
+    const toggleMod = (modAbr: string) => {
+        const modIndex = mods.value.findIndex(m => m.abr === modAbr);
+        if (modIndex !== -1) {
+            mods.value[modIndex].enabled = !mods.value[modIndex].enabled;
+        }
+    };
+
+    const modsComputed = computed(() => mods.value.map(mod => ({
+        ...mod,
+        isEnabled: mod.enabled,
+    })));
 
     function showGameView() {
+      setupSprintGame();
       startGame();
       isGaming.value = true;
       isDashboard.value = false;
@@ -165,11 +171,9 @@ export default {
       GameMode,
       LeaderboardCategory,
       SortDirection,
-      toggleDissolve: toggleFloatingClear,
-      togglePrefilled: togglePrefilledBoard,
-      clearFloatingBubbles,
-      prefillBoard,
       userData,
+      toggleMod,
+      modsComputed,
     };
   },
 };

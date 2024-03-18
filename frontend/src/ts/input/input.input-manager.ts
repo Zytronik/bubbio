@@ -1,4 +1,4 @@
-import { angleCenter, angleLeft, angleRight, changeAPS, debugTriggerGarbage, leaveGame, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
+import { angleCenter, angleLeft, angleRight, changeAPS, debugTriggerGarbage, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
 import { checkUserAuthentication } from "../networking/networking.auth";
 import { httpClient } from "../networking/networking.http-client";
 import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, debugTriggerGarbageInput, backInput, holdInput, resetInput, shootInput } from "./input.possible-inputs";
@@ -62,7 +62,7 @@ export async function applySavedInputSettings(): Promise<void> {
     let settings = null;
 
     allInputs.forEach(input => {
-        input.customKeyMap = { map: ["", "", ""] };
+        input.customKeyMap = { map: [input.defaultKeyCode, "", ""] };
     });
 
     if (checkUserAuthentication() && !sessionStorage.getItem('isGuest')) {

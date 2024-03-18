@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { NewsService } from 'src/news/news.service';
-import { GameStatsDto } from './dto/dto.game-stats';
+import { SprintStatsDto, SubmitSprintDto } from './dto/dto.submit-sprint-dto';
 
 @Injectable()
 export class SprintService {
@@ -12,24 +12,31 @@ export class SprintService {
         private userService: UserService,
     ) { }
 
-    async saveGameStats(userId: number, gameStatsDto: GameStatsDto): Promise<any> {
+    async saveGameStats(userId: number, submitSprintDto: SubmitSprintDto): Promise<any> {
         // Create Sprint
-        const newSprint = await this.createSprint(userId, gameStatsDto);
-        const sprintTime = gameStatsDto.gameDuration;
+        const sprintMods: string[] = this.getEnabledSprintMods(submitSprintDto.mods);
+        const newSprint = await this.createSprint(userId, submitSprintDto.submitStats, sprintMods);
+        const sprintTime = submitSprintDto.submitStats.gameDuration;
 
         // Get User by ID
         const user = await this.userService.getUserById(userId);
 
         // Check if the new sprint time is in the top 5
-        const topTimes = await this.getSprintRank(5);
+        const amountOfTopSprints = 5;
+        const topTimes = await this.getSprintRank(amountOfTopSprints);
         const rank = topTimes.findIndex(time => time.userId === newSprint.userId && time.sprintTime === newSprint.sprintTime) + 1;
 
-        if (rank > 0 && rank <= 5 && user) {
-            await this.newsService.createNews('Sprint', userId, rank, sprintTime);
+        if (rank > 0 && rank <= amountOfTopSprints && user) {
+            await this.newsService.createNews('Sprint', sprintMods, userId, rank, sprintTime);
             this.newsService.updateNews();
         }
 
         return newSprint;
+    }
+
+    getEnabledSprintMods(sprintModsDto: string): string[] {
+        const mods = JSON.parse(sprintModsDto);
+        return Object.keys(mods).filter(mod => mods[mod]);
     }
 
     async getSprintRank(take: number): Promise<any> {
@@ -51,14 +58,13 @@ export class SprintService {
         return leaderboardRecords;
     }
 
-
-
-    async createSprint(userId: number, gameStatsDto: GameStatsDto): Promise<any> {
+    async createSprint(userId: number, sprintStatsDto: SprintStatsDto, sprintMods: string[]): Promise<any> {
         try {
             return await this.prisma.sprint.create({
                 data: {
                     userId: userId,
-                    ...gameStatsDto,
+                    ...sprintStatsDto,
+                    mods: JSON.stringify(sprintMods),
                 },
             });
         } catch (error) {

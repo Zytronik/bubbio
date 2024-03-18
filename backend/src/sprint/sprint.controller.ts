@@ -1,8 +1,8 @@
 import { Controller, Get, UseGuards, Post, Body, Request, Query, Req } from '@nestjs/common';
 import { SprintService } from './sprint.service';
 import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
-import { GameStatsDto } from './dto/dto.game-stats';
 import { AuthenticatedRequest } from 'src/auth/auth.e-authRequest';
+import { SubmitSprintDto } from './dto/dto.submit-sprint-dto';
 
 @Controller('sprint')
 export class SprintController {
@@ -10,8 +10,8 @@ export class SprintController {
 
   @UseGuards(JwtAuthGuard)
   @Post('submit')
-  async submitGameStats(@Request() req: AuthenticatedRequest, @Body() gameStatsDto: GameStatsDto) {
-    return await this.sprintService.saveGameStats(req.user.userId, gameStatsDto);
+  async submitGameStats(@Request() req: AuthenticatedRequest, @Body() submitSprintDto: SubmitSprintDto) {
+    return await this.sprintService.saveGameStats(req.user.userId, submitSprintDto);
   }
 
   @Get('totalGames')

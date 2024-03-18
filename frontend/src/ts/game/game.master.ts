@@ -16,10 +16,7 @@ import { GameTransitions } from "./i/game.i.game-transitions";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { receiveGarbage, holdBubble, updateBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
 import { backendSetupGame, submitGameToDB } from "./network/game.network-commands";
-import { Ref, ref } from "vue";
-
-export const clearFloatingBubbles: Ref<boolean> = ref(false);
-export const prefillBoard: Ref<boolean> = ref(false);
+import { digMod, precisionMod } from "./settings/game.settings.all-mods";
 
 let playerGameInstance: GameInstance;
 export function setupSprintGame(): void {
@@ -68,8 +65,8 @@ function applyGameSettingsRefNumbers(gameSettings: GameSettings): void {
     gameSettings.maxAngle.value = gameSettings.maxAngle.refValue;
     gameSettings.widthPrecisionUnits.value = gameSettings.widthPrecisionUnits.refValue;
     gameSettings.collisionDetectionFactor.value = gameSettings.collisionDetectionFactor.refValue;
-    gameSettings.clearFloatingBubbles.value = clearFloatingBubbles.value;
-    gameSettings.prefillBoard.value = prefillBoard.value;
+    gameSettings.clearFloatingBubbles.value = precisionMod.enabled.value;
+    gameSettings.prefillBoard.value = digMod.enabled.value;
     gameSettings.refillBoardAtLine.value = gameSettings.refillBoardAtLine.refValue;
     gameSettings.refillAmount.value = gameSettings.refillAmount.refValue;
     gameSettings.queuePreviewSize.value = gameSettings.queuePreviewSize.refValue;
@@ -80,8 +77,8 @@ function applyGameSettingsRefNumbers(gameSettings: GameSettings): void {
 }
 
 function getSprintGameMode(): GAME_MODE {
-    const floating: boolean = clearFloatingBubbles.value;
-    const filled: boolean = prefillBoard.value;
+    const floating: boolean = digMod.enabled.value;
+    const filled: boolean = precisionMod.enabled.value;
 
     if (floating && filled) {
         return GAME_MODE.SPRINT_R1;

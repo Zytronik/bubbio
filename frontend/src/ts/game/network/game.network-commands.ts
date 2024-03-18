@@ -6,6 +6,7 @@ import { httpClient } from "../../networking/networking.http-client";
 import { GameStats } from "../i/game.i.game-stats";
 import { nd_GameSetup } from "./i/game.network.i.game-setup-data";
 import eventBus from "@/ts/page/page.event-bus";
+import { allMods } from "../settings/game.settings.all-mods";
 
 export function backendSetupGame(gameMode: GAME_MODE, gameSettings: GameSettings, handlingSettings: HandlingSettings): void {
     if (state.socket) {
@@ -41,9 +42,14 @@ export async function submitGameToDB(gameStats: GameStats) {
             "angleChangePerBubble": gameStats.angleChangePerBubble,
             "holds": gameStats.holds
         };
+        const mods: Record<string, boolean> = {};
+        allMods.forEach(mod => {
+            mods[mod.abr] = mod.enabled.value;
+        });
+        const modsJsonString = JSON.stringify(mods);
         try {
             const token = localStorage.getItem('authToken');
-            await httpClient.post('/sprint/submit', submitStats, {
+            await httpClient.post('/sprint/submit', {submitStats, mods: modsJsonString}, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 },

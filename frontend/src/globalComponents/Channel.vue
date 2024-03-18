@@ -226,6 +226,7 @@ export default {
       isVisible.value = false;
       setTimeout(() => {
         closeChannelOverlay();
+        closeUserProfileOverlay();
       }, 400);
     }
 
