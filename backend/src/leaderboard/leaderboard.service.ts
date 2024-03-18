@@ -21,48 +21,67 @@ export class LeaderboardService {
         sortDirection: string;
         category: string;
         country: string;
+        mods: string[];
         limit: number;
     }) {
-        // Get the Prisma model for the specified gameMode
         const prismaModel = this.getPrismaModelForGameMode(criteria.gameMode);
     
-        // Initialize the where clause for Prisma query
         let whereClause: Record<string, unknown> = {};
     
-        // Conditionally add country filter when category is 'national' and country is provided
         if (criteria.category === 'national' && criteria.country) {
-            // Adjust whereClause to navigate the relation to user and filter by country
-            whereClause.user = {
-                country: criteria.country,
+            whereClause = {
+                ...whereClause,
+                user: {
+                    country: criteria.country,
+                },
             };
         }
     
-        const bestRecords = await prismaModel.findMany({
+        // Fetch records, including user data
+        let records = await prismaModel.findMany({
             where: whereClause,
-            orderBy: {
-              [criteria.sortBy]: criteria.sortDirection,
-            },
-            distinct: ['userId'],
-            take: criteria.limit,
             include: {
-              user: {
-                select: { 
-                    username: true,
-                    country: true,
-                    pbUrl: true,
-                },
-              },
+                user: true, // This automatically selects all scalar fields of the user
             },
-          });
-          
+        });
     
-        // Filter the detailed records with the necessary condition
-        const leaderboardRecords = bestRecords.filter(record => 
-            criteria.category !== 'national' || record.user.country === criteria.country
-        );
+        // Filter by mods and ensure grouping by userId to select the best run
+        let bestRunsPerUser = records.reduce((acc, record) => {
+            try {
+                const recordMods = record.mods ? JSON.parse(record.mods) : [];
+                const modsMatch = criteria.mods.length === 0 ? recordMods.length === 0 : criteria.mods.every(mod => recordMods.includes(mod));
     
-        return leaderboardRecords;
+                // Proceed if mods criteria match
+                if (modsMatch) {
+                    const currentBest = acc[record.userId];
+                    const isBetterRun = !currentBest || (criteria.sortDirection === 'asc' ? record[criteria.sortBy] < currentBest[criteria.sortBy] : record[criteria.sortBy] > currentBest[criteria.sortBy]);
+    
+                    if (isBetterRun) {
+                        acc[record.userId] = record;
+                    }
+                }
+            } catch (error) {
+               // console.error("Error parsing mods for record:", record, error);
+            }
+            return acc;
+        }, {});
+    
+        // Convert the records object back to an array of best runs
+        let filteredRecords = Object.values(bestRunsPerUser);
+    
+        // Sort the filtered records by sortBy and sortDirection
+        filteredRecords.sort((a, b) => {
+            return criteria.sortDirection === 'asc' ? a[criteria.sortBy] - b[criteria.sortBy] : b[criteria.sortBy] - a[criteria.sortBy];
+        });
+    
+        // Limit the results
+        filteredRecords = filteredRecords.slice(0, criteria.limit);
+    
+        return filteredRecords;
     }
+    
+    
+    
     
     
 

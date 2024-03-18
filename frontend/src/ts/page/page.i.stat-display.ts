@@ -14,6 +14,11 @@ export const statDisplays: Record<string, StatDisplay> = {
         shortName: "",
         isTime: true,
     },
+    mods: {
+        fullName: "Mods",
+        shortName: "",
+        isTime: false,
+    },
     gameDuration: {
         fullName: "Game Duration",
         shortName: "",
@@ -107,6 +112,21 @@ export function formatFieldValue(value: string | number, fieldName: string): str
         //formattedValue = formatDateTime(new Date(value));
         formattedValue = formatDateToAgoText(new Date(value));
     }
+
+    if (statDisplay && typeof value === 'string' && fieldName === 'mods') {
+        let valueArray = [];
+        try {
+            valueArray = JSON.parse(value);
+        } catch (error) {
+            formattedValue = "";
+        }
+        if (valueArray.length > 0) {
+            formattedValue = valueArray.join(', ');
+        }else{
+            formattedValue = "";
+        }
+    }
+
 
     if (statDisplay && statDisplay.shortName) {
         formattedValue += ` ${statDisplay.shortName}`;

@@ -4,7 +4,8 @@
     <table v-if="historyData.length > 0" class="history">
       <thead>
         <tr>
-          <th v-for="field in orderedFields" :key="field" @click="updateSort(field)">
+          <th v-for="field in orderedFields" :key="field" :class="{ 'non-sortable': field === 'mods' }"
+            @click="field !== 'mods' && updateSort(field)">
             {{ getFullName(field) }}
             <span v-if="sortByVal === field">
               <span v-if="sortDirectionVal === 'asc'">▲</span>
@@ -73,7 +74,12 @@ export default defineComponent({
     const sortDirectionVal = ref(props.sortDirection);
     const orderedFields = ref<string[]>([]);
 
-    async function updateSort(newSortBy: string){
+    async function updateSort(newSortBy: string) {
+      if (newSortBy === 'mods') {
+        console.warn("Sorting by 'mods' is not allowed.");
+        return;
+      }
+
       let newSortDirection = sortDirectionVal.value === SortDirection.Asc ? SortDirection.Desc : SortDirection.Asc;
       if (sortByVal.value !== newSortBy) {
         newSortDirection = SortDirection.Asc;
@@ -87,7 +93,7 @@ export default defineComponent({
       const token = localStorage.getItem('authToken');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       try {
-        const response = await httpClient.get("/"+props.gameMode+"/history", {
+        const response = await httpClient.get("/" + props.gameMode + "/history", {
           params: {
             sortBy: sortByVal.value,
             sortDirection: sortDirectionVal.value,
@@ -104,7 +110,7 @@ export default defineComponent({
       }
     }
 
-    function sortAndFilterFields(){
+    function sortAndFilterFields() {
       const fieldsWithoutSortBy = props.fields.filter(field => field !== props.sortBy);
       orderedFields.value = [props.sortBy, ...fieldsWithoutSortBy];
     }
@@ -163,5 +169,9 @@ td p {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+}
+
+.non-sortable {
+  cursor: auto;
 }
 </style>

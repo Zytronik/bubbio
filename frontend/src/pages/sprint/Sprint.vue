@@ -15,7 +15,7 @@
             </div>
             <button class="playButton" @click="showGameView()">Play!</button>
             <History v-if="!isGuest" :gameMode="GameMode.Sprint"
-              :fields="['gameDuration', 'bubblesShot', 'bubblesPerSecond', 'bubblesCleared', 'submittedAt']"
+              :fields="['gameDuration', 'bubblesShot', 'bubblesPerSecond', 'bubblesCleared', 'submittedAt', 'mods']"
               :sortBy="'submittedAt'" :sortDirection="SortDirection.Desc" :limit="10" />
             <h4 v-else><br>Log in for Stats and Submit Scores.</h4>
           </div>
@@ -33,12 +33,12 @@
             <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
               <Leaderboard :gameMode="GameMode.Sprint" :fields="['gameDuration', 'bubblesPerSecond']"
                 :sortBy="'gameDuration'" :sortDirection="SortDirection.Asc"
-                :leaderboardCategory="LeaderboardCategory.Global" :limit="30" />
+                :leaderboardCategory="LeaderboardCategory.Global" :limit="30" :mods="modsEnabled" />
             </div>
             <div v-if="currentLeaderboard === 'National'" class="l-tab national-tab">
               <Leaderboard :gameMode="GameMode.Sprint" :fields="['gameDuration', 'bubblesPerSecond']"
                 :sortBy="'gameDuration'" :sortDirection="SortDirection.Asc"
-                :leaderboardCategory="LeaderboardCategory.National" :limit="30" />
+                :leaderboardCategory="LeaderboardCategory.National" :limit="30" :mods="modsEnabled" />
             </div>
           </div>
 
@@ -146,6 +146,12 @@ export default {
       leaveGame();
     }
 
+    const modsEnabled = computed(() => {
+      return mods.value
+        .filter(mod => mod.enabled)
+        .map(mod => mod.abr);
+    });
+
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
     });
@@ -174,6 +180,7 @@ export default {
       userData,
       toggleMod,
       modsComputed,
+      modsEnabled
     };
   },
 };

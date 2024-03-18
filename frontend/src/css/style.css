@@ -274,6 +274,11 @@ button.goBackButton:focus {
     margin-top: 30px;
 }
 
+.sprintDashboard .history-wrapper table tr td:last-of-type,
+.sprintDashboard .history-wrapper table tr th:last-of-type {
+    width: 10%;
+}
+
 .loader {
     width: 80px;
     aspect-ratio: 2;
@@ -284,6 +289,10 @@ button.goBackButton:focus {
       var(--_g) 100% 50%;
     background-size: calc(100%/3) 50%;
     animation: loader 1s infinite linear;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
   
   @keyframes loader {

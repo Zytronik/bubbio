@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, PropType, ref } from 'vue';
+import { computed, defineComponent, onMounted, PropType, ref, watch  } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-leaderboard';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
@@ -98,6 +98,11 @@ export default defineComponent({
       type: String,
       required: false,
     },
+    mods: {
+      type: Array as PropType<string[]>,
+      required: false,
+      default: () => [],
+    },
     limit: {
       type: Number,
       default: 20,
@@ -114,6 +119,13 @@ export default defineComponent({
       return [props.sortBy, ...fieldsWithoutSortBy];
     });
 
+    watch(() => props.mods, async () => {
+      loading.value = true;
+      await fetchLeaderboardData();
+    }, {
+      deep: true,
+    });
+
     async function fetchLeaderboardData() {
       const token = localStorage.getItem('authToken');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
@@ -125,6 +137,7 @@ export default defineComponent({
             sortDirection: props.sortDirection,
             category: props.leaderboardCategory,
             country: props.country,
+            mods: props.mods,
             limit: props.limit,
           },
           headers: headers
@@ -171,6 +184,7 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 p {
@@ -211,7 +225,7 @@ p {
   color: #CD7F32;
 }
 
-.row:nth-of-type(4)  {
+.row:nth-of-type(4) {
   border-top: 1px solid white;
 }
 

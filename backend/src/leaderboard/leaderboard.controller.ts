@@ -19,10 +19,13 @@ export class LeaderboardController {
         @Query('sortDirection') sortDirection: string,
         @Query('category') category: string,
         @Query('country') country: string,
+        @Query('mods') mods: string[],
         @Query('limit') limit: string,
         @Req() req: AuthenticatedRequest
     ) {
-
+        if(!mods){
+            mods = [];
+        }
         const limitInt = parseInt(limit);
         if (!country && req.user && req.user.userId) { //if user is logged in and not country is specified
             country = await this.userService.getUserCountry(req.user.userId);
@@ -36,6 +39,7 @@ export class LeaderboardController {
             sortDirection,
             category,
             country,
+            mods,
             limit: limitInt,
         });
     }
