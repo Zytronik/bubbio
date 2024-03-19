@@ -1,7 +1,7 @@
 import { angleCenter, angleLeft, angleRight, changeAPS, debugTriggerGarbage, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
 import { checkUserAuthentication } from "../networking/networking.auth";
 import { httpClient } from "../networking/networking.http-client";
-import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, debugTriggerGarbageInput, backInput, holdInput, resetInput, shootInput } from "./input.all-inputs";
+import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, debugTriggerGarbageInput, backInput, holdInput, resetInput, shootInput, defaultBlocker } from "./input.all-inputs";
 
 export function enableGameInputs(): void {
     angleLeftInput.fire = angleLeft;
@@ -20,6 +20,8 @@ export function enableGameInputs(): void {
     shootInput.enabled = true;
     holdInput.enabled = true;
     debugTriggerGarbageInput.enabled = true;
+
+    defaultBlocker.enabled = true;
 }
 
 export function disableGameInputs(): void {
@@ -39,6 +41,8 @@ export function disableGameInputs(): void {
     holdInput.pressed = false;
     resetInput.pressed = false;
     debugTriggerGarbageInput.pressed = false;
+    
+    defaultBlocker.enabled = false;
 }
 
 export function enableResetInput(): void {
@@ -59,41 +63,36 @@ export function disableBackInputs(): void {
 }
 
 export async function applySavedInputSettings(): Promise<void> {
-    // let settings = null;
+    let settings = null;
 
-    // //TODO whats that for?
-    // allInputs.forEach(input => {
-    //     input.customKeyMap = [input.defaultKeyCode, "", ""];
-    // });
+    if (checkUserAuthentication() && !sessionStorage.getItem('isGuest')) {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await httpClient.get('/users/settings/inputs', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            settings = response.data;
+        } catch (error) {
+            console.error('Error fetching input settings:', error);
+        }
+    } else {
+        const savedSettings = localStorage.getItem('userInputSettings');
+        if (savedSettings) {
+            settings = JSON.parse(savedSettings);
+        }
+    }
 
-    // if (checkUserAuthentication() && !sessionStorage.getItem('isGuest')) {
-    //     try {
-    //         const token = localStorage.getItem('authToken');
-    //         const response = await httpClient.get('/users/settings/inputs', {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //             },
-    //         });
-    //         settings = response.data;
-    //     } catch (error) {
-    //         console.error('Error fetching input settings:', error);
-    //     }
-    // } else {
-    //     const savedSettings = localStorage.getItem('userInputSettings');
-    //     if (savedSettings) {
-    //         settings = JSON.parse(savedSettings);
-    //     }
-    // }
-
-    // if (Array.isArray(settings)) {
-    //     settings.forEach(savedSetting => {
-    //         console.log(savedSetting)
-    //         const input = allInputs.find(input => input.name === savedSetting.name);
-    //         if (input && savedSetting.customKeyMap) {
-    //             input.customKeyMap = savedSetting.customKeyMap;
-    //         }
-    //     });
-    // }
+    if (Array.isArray(settings)) {
+        settings.forEach(savedSetting => {
+            console.log(savedSetting)
+            const input = allInputs.find(input => input.name === savedSetting.name);
+            if (input && savedSetting.customKeyMap) {
+                input.customKeyMap = savedSetting.customKeyMap;
+            }
+        });
+    }
 }
 
 export async function saveInputs() {
