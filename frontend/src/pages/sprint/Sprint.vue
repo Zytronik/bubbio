@@ -13,7 +13,7 @@
                 {{ mod.title }}
               </button>
             </div>
-            <button class="playButton" @click="showGameView()">Play!</button>
+            <button class="playButton" @click="play()">Play!</button>
             <History v-if="!isGuest" :gameMode="GameMode.Sprint"
               :fields="['gameDuration', 'bubblesShot', 'bubblesPerSecond', 'bubblesCleared', 'submittedAt', 'mods']"
               :sortBy="'submittedAt'" :sortDirection="SortDirection.Desc" :limit="10" />
@@ -45,7 +45,7 @@
         </div>
 
         <div v-if="isGaming" class="inGame">
-          <button class="backButton" @click="showDashboard()">Back</button>
+          <button class="backButton" @click="goBack()">Back</button>
           <div class="game-wrapper">
             <Game />
             <div class="inGameStats">
@@ -57,23 +57,16 @@
         </div>
 
         <div v-if="!isGaming && !isDashboard" class="gameComplete">
-          <button @click="showDashboard()">Back</button>
-          <button @click="showGameView()">Try Again</button>
-          <h2>More Stats</h2>
-          <p>Bubbles Shot: 0</p>
-          <p>Wallbounce Clear Count: 0</p>
-          <p>Triple Clear Count: 0</p>
-          <p>Quad Clear Count: 0</p>
-          <p>Quint Clear Count: 0</p>
-          <p>Do this for every amount of Clear bigger then 3</p>
-          <p>Highest Bubble Clear Count: 0</p>
-          <p>Key pressed</p>
-          <p>Key per bubble</p>
-          <p>Key per Second</p>
-          <p>Holds</p>
-          <p>Max Combo</p>
-          <p>Show Handlings (aps 1, aps 2)</p>
-          <p>Date & Time</p>
+          <button @click="goBack()">Back</button>
+          <button @click="play()">Try Again</button>
+          <table v-if="resultStats">
+            <tbody>
+              <tr v-for="(value, key) in resultStats" :key="key">
+                <td>{{ key }}</td>
+                <td>{{ value }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
       </div>
@@ -86,7 +79,7 @@ import Game from '../game/Game.vue';
 import { changeBackgroundTo, formatDateTime, goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
 import { computed, onMounted, ref } from 'vue';
-import { leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
+import { getGameStats, leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { bubbleClearToWin, bubblesCleared, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import Leaderboard from '@/globalComponents/Leaderboard.vue';
@@ -95,7 +88,8 @@ import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-l
 import { UserData } from '@/ts/page/page.i-userData';
 import eventBus from '@/ts/page/page.event-bus';
 import { allMods as importedMods } from '@/ts/game/settings/game.settings.all-mods';
-import { backInput } from '@/ts/input/input.all-inputs';
+import { backInput, resetInput } from '@/ts/input/input.all-inputs';
+import { GameStats } from '@/ts/game/i/game.i.game-stats';
 
 export default {
   name: 'SprintPage',
@@ -109,6 +103,7 @@ export default {
   setup() {
     const isGaming = ref<boolean>(false);
     const isDashboard = ref<boolean>(true);
+    const resultStats  = ref<GameStats>();
     const userData: UserData | null = eventBus.getUserData();
     const isGuestString = sessionStorage.getItem('isGuest');
     const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
@@ -116,8 +111,9 @@ export default {
       { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/sprint.png'), disabled: false },
     ]);
 
-    
     backInput.fire = showDashboard;
+    resetInput.fire = play;
+    resetInput.enabled = true;
 
     const mods = ref(importedMods);
 
@@ -133,9 +129,31 @@ export default {
         isEnabled: mod.enabled,
     })));
 
-    function showGameView() {
+    function showResultView(){
+      isGaming.value = false;
+      isDashboard.value = false;
+      resultStats.value = getGameStats();
+      console.log("test1");
+    }
+
+    function goBack(){
+      if(isGaming.value){
+        leaveGame();
+        showDashboard();
+      }
+      if(!isDashboard.value && !isGaming.value){
+        showDashboard();
+      }
+    }
+
+    function play(){
       setupSprintGame();
+      showGameView();
       startGame();
+    }
+
+    function showGameView() {
+      console.log("test2", isGaming.value , isDashboard.value);
       isGaming.value = true;
       isDashboard.value = false;
     }
@@ -143,7 +161,6 @@ export default {
     async function showDashboard() {
       isGaming.value = false;
       isDashboard.value = true;
-      leaveGame();
     }
 
     const modsEnabled = computed(() => {
@@ -154,6 +171,7 @@ export default {
 
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
+      eventBus.on("sprintVictory", showResultView);
     });
 
     return {
@@ -164,11 +182,10 @@ export default {
       bubblesPerSecond,
       goToState,
       PAGE_STATE,
-      showGameView,
+      play,
       isGaming,
       isDashboard,
       startGame,
-      showDashboard,
       formatDateTime,
       formatTimeNumberToString,
       isGuest,
@@ -180,7 +197,9 @@ export default {
       userData,
       toggleMod,
       modsComputed,
-      modsEnabled
+      modsEnabled,
+      goBack,
+      resultStats,
     };
   },
 };

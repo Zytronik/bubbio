@@ -19,6 +19,7 @@ import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { HandlingSettings } from "./settings/i/game.settings.i.handling-settings";
 import { BUBBLE_BAG_SIZE, GARBAGE_CLEAN_AMOUNT, COLLISION_DETECTION_FACTOR, GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH, MAX_ANGLE, GARBAGE_MAX_AT_ONCE, MIN_ANGLE, QUEUE_PREVIEW_SIZE, REFILL_AMOUNT, WIDTH_PRECISION_UNITS, GARBAGE_COLOR_AMOUNT, COUNTDOWN_DURATION } from "./settings/game.settings.all-game-settings";
 import { DEFAULT_APS, TOGGLE_APS } from "./settings/game.settings.all-handling-settings";
+import eventBus from "../page/page.event-bus";
 
 let playerGameInstance: GameInstance;
 export function setupSprintGame(): void {
@@ -51,6 +52,7 @@ export function setupSprintGame(): void {
     function sprintVictory(): void {
         disableGameplay();
         showASCIIVictory();
+        eventBus.emit("sprintVictory");
         submitGameToDB(playerGameInstance.stats);
     }
     function sprintDeath(): void {
@@ -98,13 +100,13 @@ function getHandlingSettings(): HandlingSettings {
 
 function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
     if (floating && filled) {
-        return 210;
+        return 3;
     } else if (!floating && filled) {
-        return 220;
+        return 3;
     } else if (floating && !filled) {
-        return 23;
+        return 3;
     } else {
-        return 24;
+        return 3;
     }
 }
 

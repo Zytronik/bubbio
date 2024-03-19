@@ -62,9 +62,29 @@ export class SprintStatsDto {
     @Min(0)
     bubbleClearToWin: number;
 
-    @IsJSON()
-    bubbleClearStats: string;
+    @IsInt()
+    @Min(0)
+    clear3: number
 
+    @IsInt()
+    @Min(0)
+    clear4: number
+
+    @IsInt()
+    @Min(0)
+    clear5: number
+
+    @IsInt()
+    @Min(0)
+    clear3wb: number
+
+    @IsInt()
+    @Min(0)
+    clear4wb: number
+
+    @IsInt()
+    @Min(0)
+    clear5wb: number
 }
 
 export class SubmitSprintDto {

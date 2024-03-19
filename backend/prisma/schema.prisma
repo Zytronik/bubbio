@@ -77,5 +77,10 @@ model Sprint {
   angleChangePerBubble  Float         
   holds               Int             
   bubbleClearToWin    Int             
-  bubbleClearStats    String           
+  clear3              Int             @default(0)
+  clear4              Int             @default(0)
+  clear5              Int             @default(0)
+  clear3wb            Int             @default(0)
+  clear4wb            Int             @default(0)
+  clear5wb            Int             @default(0)
 }
