@@ -147,7 +147,7 @@ export const allInputs: Input[] = [
     holdInput,
     resetInput,
     backInput,
-    debugTriggerGarbageInput,
+    // debugTriggerGarbageInput,
 ]
 
 const allKeyCodes = [

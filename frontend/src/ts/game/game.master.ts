@@ -100,13 +100,13 @@ function getHandlingSettings(): HandlingSettings {
 
 function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
     if (floating && filled) {
-        return 3;
+        return 200;
     } else if (!floating && filled) {
-        return 3;
+        return 200;
     } else if (floating && !filled) {
-        return 3;
+        return 100;
     } else {
-        return 3;
+        return 50;
     }
 }
 
