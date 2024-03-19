@@ -112,6 +112,8 @@ export default {
     ]);
 
     backInput.fire = showDashboard;
+    resetInput.fire = play;
+    resetInput.enabled = true;
 
     const mods = ref(importedMods);
 
@@ -132,7 +134,6 @@ export default {
       isDashboard.value = false;
       resultStats.value = getGameStats();
       console.log("test1");
-      resetInput.fire = showGameView;
     }
 
     function goBack(){
@@ -152,7 +153,7 @@ export default {
     }
 
     function showGameView() {
-      console.log("test2");
+      console.log("test2", isGaming.value , isDashboard.value);
       isGaming.value = true;
       isDashboard.value = false;
     }
