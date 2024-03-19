@@ -22,17 +22,24 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
         gameStats.bubblesCleared += amountCleared;
         gameStats.highestBubbleClear = (gameStats.highestBubbleClear > amountCleared) ? gameStats.highestBubbleClear : amountCleared;
         
-        let clearStatIndex = amountCleared;
-        if (wallBounces > 0) {
-            gameStats.wallBounceClears++;
-            clearStatIndex = -1 * clearStatIndex;
+        if (wallBounces === 0 && amountCleared === 3) {
+            gameStats.clear3++;
         } 
-        
-        if (!gameStats.bubbleClearStats[clearStatIndex]) {
-            gameStats.bubbleClearStats[clearStatIndex] = 1;
-        } else {
-            gameStats.bubbleClearStats[clearStatIndex]++;
-        }
+        if (wallBounces === 0 && amountCleared === 4) {
+            gameStats.clear4++;
+        } 
+        if (wallBounces === 0 && amountCleared >= 5) {
+            gameStats.clear5++;
+        } 
+        if (wallBounces > 0 && amountCleared === 3) {
+            gameStats.clear3++;
+        } 
+        if (wallBounces > 0 && amountCleared === 4) {
+            gameStats.clear4wb++;
+        } 
+        if (wallBounces > 0 && amountCleared >= 5) {
+            gameStats.clear5wb++;
+        } 
     }
 
     function breakCombo(): void {

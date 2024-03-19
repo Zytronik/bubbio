@@ -13,8 +13,12 @@ export interface GameStats {
     bubblesShot: number,
     bubblesPerSecond: number,
     
-    //examplex: bubbleClearStats[3] = 12 -> twelve clears of 3 bubbles ; [-4] = 1 -> one clear of 4 bubbles with wallbounce
-    bubbleClearStats: number[],  
+    clear3: number,
+    clear4: number,
+    clear5: number,
+    clear3wb: number,
+    clear4wb: number,
+    clear5wb: number,
     highestBubbleClear: number,
 
     wallBounces: number,

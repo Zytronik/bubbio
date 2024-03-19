@@ -25,7 +25,10 @@ export function stopASCIIAnimation(): void {
 }
 
 export function showASCIICountDown(): void {
+    //what to do here?
     console.log(3)
+    console.log(2)
+    console.log(1)
 }
 
 export function showASCIIVictory(): void {
