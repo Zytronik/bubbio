@@ -26,7 +26,12 @@ export async function submitGameToDB(gameStats: GameStats) {
     if(isGuest !== "true"){
         const submitStats = {
             "bubbleClearToWin": gameStats.bubbleClearToWin,
-            "bubbleClearStats": JSON.stringify(gameStats.bubbleClearStats),
+            "clear3": gameStats.clear3,
+            "clear4": gameStats.clear4,
+            "clear5": gameStats.clear5,
+            "clear3wb": gameStats.clear3wb,
+            "clear4wb": gameStats.clear4wb,
+            "clear5wb": gameStats.clear5wb,
             "bubblesCleared": gameStats.bubblesCleared,
             "bubblesShot": gameStats.bubblesShot,
             "bubblesPerSecond": gameStats.bubblesPerSecond,
