@@ -33,6 +33,8 @@ export interface GameSettings {
     garbageCleanAmount: number,
     garbageColorAmount: number,
 
+    countDownDuration: number,
+
     //passtrough
     //combotable
     //bagsize

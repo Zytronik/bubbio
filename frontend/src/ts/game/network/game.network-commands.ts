@@ -23,40 +23,40 @@ export function backendSetupGame(gameMode: GAME_MODE, gameSettings: GameSettings
 
 export async function submitGameToDB(gameStats: GameStats) {
     const isGuest = sessionStorage.getItem('isGuest');
-    if(isGuest !== "true"){
-        const submitStats = {
-            "bubbleClearToWin": gameStats.bubbleClearToWin,
-            "bubbleClearStats": JSON.stringify(gameStats.bubbleClearStats),
-            "bubblesCleared": gameStats.bubblesCleared,
-            "bubblesShot": gameStats.bubblesShot,
-            "bubblesPerSecond": gameStats.bubblesPerSecond,
-            "gameDuration": Math.floor(gameStats.gameDuration),
-            "highestBubbleClear": gameStats.highestBubbleClear,
-            "wallBounces": gameStats.wallBounces,
-            "wallBounceClears": gameStats.wallBounceClears,
-            "highestCombo": gameStats.highestCombo,
-            "keysPressed": gameStats.keysPressed,
-            "keysPerSecond": gameStats.keysPerSecond,
-            "keysPerBubble": gameStats.keysPerBubble,
-            "angleChanged": gameStats.angleChanged,
-            "angleChangePerBubble": gameStats.angleChangePerBubble,
-            "holds": gameStats.holds
-        };
-        const mods: Record<string, boolean> = {};
-        allMods.forEach(mod => {
-            mods[mod.abr] = mod.enabled.value;
-        });
-        const modsJsonString = JSON.stringify(mods);
-        try {
-            const token = localStorage.getItem('authToken');
-            await httpClient.post('/sprint/submit', {submitStats, mods: modsJsonString}, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
-            });
-            eventBus.emit('show-info-message', { message: 'Sprint submitted successfully.', type: 'success' });
-        } catch (error) {
-            eventBus.emit('show-info-message', { message: 'There was an error submitting your Sprint.', type: 'error' });
-        }
-    }
+    // if(isGuest !== "true"){
+    //     const submitStats = {
+    //         "bubbleClearToWin": gameStats.bubbleClearToWin,
+    //         "bubbleClearStats": JSON.stringify(gameStats.bubbleClearStats),
+    //         "bubblesCleared": gameStats.bubblesCleared,
+    //         "bubblesShot": gameStats.bubblesShot,
+    //         "bubblesPerSecond": gameStats.bubblesPerSecond,
+    //         "gameDuration": Math.floor(gameStats.gameDuration),
+    //         "highestBubbleClear": gameStats.highestBubbleClear,
+    //         "wallBounces": gameStats.wallBounces,
+    //         "wallBounceClears": gameStats.wallBounceClears,
+    //         "highestCombo": gameStats.highestCombo,
+    //         "keysPressed": gameStats.keysPressed,
+    //         "keysPerSecond": gameStats.keysPerSecond,
+    //         "keysPerBubble": gameStats.keysPerBubble,
+    //         "angleChanged": gameStats.angleChanged,
+    //         "angleChangePerBubble": gameStats.angleChangePerBubble,
+    //         "holds": gameStats.holds
+    //     };
+    //     const mods: Record<string, boolean> = {};
+    //     allMods.forEach(mod => {
+    //         mods[mod.abr] = mod.enabled.value;
+    //     });
+    //     const modsJsonString = JSON.stringify(mods);
+    //     try {
+    //         const token = localStorage.getItem('authToken');
+    //         await httpClient.post('/sprint/submit', {submitStats, mods: modsJsonString}, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`
+    //             },
+    //         });
+    //         eventBus.emit('show-info-message', { message: 'Sprint submitted successfully.', type: 'success' });
+    //     } catch (error) {
+    //         eventBus.emit('show-info-message', { message: 'There was an error submitting your Sprint.', type: 'error' });
+    //     }
+    // }
 }

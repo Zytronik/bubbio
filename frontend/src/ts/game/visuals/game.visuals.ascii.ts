@@ -1,13 +1,21 @@
 import { Ref, ref } from "vue";
-import { getAngle, getBubbleQueue, getCurrentBubble, getHoldBubble, getIncomingGarbageAmount, getPlayGrid, getQueueSize, updatePreviewBubble } from "../game.master";
+import { getAngle, getBubbleQueue, getCurrentBubble, getGridTotalHeight, getHoldBubble, getIncomingGarbageAmount, getPlayGrid, getQueueSize, updatePreviewBubble } from "../game.master";
 import { Coordinates } from "../i/game.i.grid-coordinates";
 import { Field } from "../i/game.i.field";
 
 export const playGridASCII: Ref<string> = ref("");
+export const holdString: Ref<string> = ref("");
+export const queueString: Ref<string> = ref("");
 export const incomingGarbage: Ref<string> = ref("");
 
-let animationFrameId: number | null = null;
 let asciiAnimationRunning = false;
+let asciiAnimationFrameId: number | null = null;
+
+let countdownAnimationRunning = false;
+let countdownStartTime: number;
+let countdownDuration: number;
+let onCountdownFinished: () => void;
+let countdownAnimationFrameId: number | null = null;
 
 export function startASCIIAnimation(): void {
     if (!asciiAnimationRunning) {
@@ -17,44 +25,54 @@ export function startASCIIAnimation(): void {
 }
 
 export function stopASCIIAnimation(): void {
-    if (asciiAnimationRunning && animationFrameId !== null) {
+    if (asciiAnimationRunning && asciiAnimationFrameId !== null) {
         asciiAnimationRunning = false;
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
+        cancelAnimationFrame(asciiAnimationFrameId);
+        asciiAnimationFrameId = null;
     }
 }
 
-export function showASCIICountDown(): void {
-    //what to do here?
-    console.log(3)
-    console.log(2)
-    console.log(1)
+export function startCountdownAnimation(duration: number, onFinished: () => void): void {
+    if (!countdownAnimationRunning) {
+        countdownAnimationRunning = true;
+        countdownStartTime = performance.now();
+        countdownDuration = duration;
+        onCountdownFinished = onFinished;
+        requestAnimationFrame(asciiCountdownAnimation);
+    }
 }
 
-export function showASCIIVictory(): void {
-    stopASCIIAnimation();
-    fillAsciiStrings();
-    const victoryBoard = playGridASCII.value
-    const topRows = victoryBoard.split('\n').slice(0, 7).join('\n');
-    const bottomRows = victoryBoard.split('\n').slice(12).join('\n');
-    const finalBoardText = topRows + victoryASCII + bottomRows;
-    playGridASCII.value = finalBoardText;
+export function stopCountdownAnimation(): void {
+    if (countdownAnimationRunning && countdownAnimationFrameId !== null) {
+        countdownAnimationRunning = false;
+        cancelAnimationFrame(countdownAnimationFrameId);
+        countdownAnimationFrameId = null;
+    }
 }
 
-export function showASCIIDefeat(): void {
-    stopASCIIAnimation();
-    fillAsciiStrings();
-    const lossBoard = playGridASCII.value
-    const topRows = lossBoard.split('\n').slice(0, 7).join('\n');
-    const bottomRows = lossBoard.split('\n').slice(12).join('\n');
-    const finalBoardText = topRows + defeatASCII + bottomRows;
-    playGridASCII.value = finalBoardText;
+function asciiCountdownAnimation(): void {
+    const elapsedTime = performance.now() - countdownStartTime;
+    if (elapsedTime < countdownDuration / 4) {
+        showASCIICountdownNumber(0);
+    } else if (elapsedTime < countdownDuration / 2) {
+        showASCIICountdownNumber(1);
+    } else if (elapsedTime < countdownDuration / 4 * 3) {
+        showASCIICountdownNumber(2);
+    } else {
+        showASCIICountdownNumber(3);
+    }
+    if (elapsedTime < countdownDuration && countdownAnimationRunning) {
+        countdownAnimationFrameId = requestAnimationFrame(() => asciiCountdownAnimation());
+    } else {
+        stopCountdownAnimation();
+        onCountdownFinished();
+    }
 }
 
 function asciiBoardAnimation(): void {
     fillAsciiStrings();
     if (asciiAnimationRunning) {
-        animationFrameId = requestAnimationFrame(() => asciiBoardAnimation());
+        asciiAnimationFrameId = requestAnimationFrame(() => asciiBoardAnimation());
     }
 }
 
@@ -69,8 +87,6 @@ function fillAsciiStrings(): void {
 
     const gridWidth = playGrid.gridWidth;
     let boardText = ""
-    boardText += getHoldBubbleString();
-    boardText += getBubbleQueueString();
     boardText += getUpperBoarderLineString(gridWidth);
     let once = true;
     playGrid.rows.forEach(row => {
@@ -83,8 +99,9 @@ function fillAsciiStrings(): void {
     boardText += getArrowLineString(gridWidth);
     boardText += getLowerBoarderLineString(gridWidth);
     playGridASCII.value = boardText;
-    incomingGarbage.value = "Incoming Garbage: " + getIncomingGarbageAmount();
-
+    holdString.value += getHoldBubbleString();
+    queueString.value += getBubbleQueueString();
+    incomingGarbage.value = getIncomingGarbageString();
 }
 
 function getUpperBoarderLineString(gridWidth: number): string {
@@ -161,6 +178,31 @@ function getBubbleQueueString(): string {
     return queueString + "\n\n";
 }
 
+function getIncomingGarbageString(): string {
+    const garbageAmount = getIncomingGarbageAmount();
+    const width = getGridTotalHeight();
+    let queueString = "╭";
+    for (let i = 0; i < width; i++) {
+        queueString += "─";
+    }
+    queueString += "╮\n│"
+
+    for (let i = 0; i < width; i++) {
+        if (i < garbageAmount) {
+            queueString += "▓";
+        } else {
+            queueString += "░";
+        }
+    }
+    queueString += "│\n╰"
+
+    for (let i = 0; i < width; i++) {
+        queueString += "─";
+    }
+    queueString += "╯"
+    return queueString + "\n\n";
+}
+
 function getASCIIArrow(): string {
     const currentAngle = getAngle();
     if (currentAngle < 22.5) {
@@ -176,6 +218,36 @@ function getASCIIArrow(): string {
         return "↗"
     }
     return "→"
+}
+
+function showASCIICountdownNumber(counter: number): void {
+    const countDownSteps = [countDown3, countDown2, countDown1, countDownGO];
+    fillAsciiStrings();
+    const victoryBoard = playGridASCII.value
+    const topRows = victoryBoard.split('\n').slice(0, 7).join('\n');
+    const bottomRows = victoryBoard.split('\n').slice(12).join('\n');
+    const finalBoardText = topRows + countDownSteps[counter] + bottomRows;
+    playGridASCII.value = finalBoardText;
+}
+
+export function showASCIIVictory(): void {
+    stopASCIIAnimation();
+    fillAsciiStrings();
+    const victoryBoard = playGridASCII.value
+    const topRows = victoryBoard.split('\n').slice(0, 7).join('\n');
+    const bottomRows = victoryBoard.split('\n').slice(12).join('\n');
+    const finalBoardText = topRows + victoryASCII + bottomRows;
+    playGridASCII.value = finalBoardText;
+}
+
+export function showASCIIDefeat(): void {
+    stopASCIIAnimation();
+    fillAsciiStrings();
+    const lossBoard = playGridASCII.value
+    const topRows = lossBoard.split('\n').slice(0, 7).join('\n');
+    const bottomRows = lossBoard.split('\n').slice(12).join('\n');
+    const finalBoardText = topRows + defeatASCII + bottomRows;
+    playGridASCII.value = finalBoardText;
 }
 
 const victoryASCII = `

@@ -52,7 +52,7 @@ export function createGameInstance(
 }
 
 export function resetGameInstance(gameInstance: GameInstance): void {
-    const seed = performance.now();
+    const seed = getNextSeed(Date.now());
     gameInstance.initialSeed = seed;
     gameInstance.bubbleSeed = seed;
     gameInstance.angle = 90;
@@ -62,6 +62,7 @@ export function resetGameInstance(gameInstance: GameInstance): void {
         ascii: "",
         type: 0
     };
+    gameInstance.playGrid.previewBubble = undefined;
     gameInstance.bubbleQueue = [];
     resetGrid(gameInstance.playGrid);
     gameInstance.queuedGarbage = 0;

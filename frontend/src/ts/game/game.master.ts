@@ -1,4 +1,4 @@
-import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, stopASCIIAnimation } from "./visuals/game.visuals.ascii";
+import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, startCountdownAnimation, stopASCIIAnimation, stopCountdownAnimation } from "./visuals/game.visuals.ascii";
 import { GameInstance } from "./i/game.i.game-instance";
 import { disableGameInputs, disableResetInput, enableGameInputs, enableResetInput } from "../input/input.input-manager";
 import { cleanUpAngle } from "./logic/game.logic.angle";
@@ -7,7 +7,7 @@ import { GameStats } from "./i/game.i.game-stats";
 import { Bubble } from "./i/game.i.bubble";
 import { Grid } from "./i/game.i.grid";
 import { calculatePreview, shootBubble } from "./logic/game.logic.shoot";
-import { startStatDisplay, stopStatDisplay } from "./visuals/game.visuals.stat-display";
+import { resetStatDisplays, startStatDisplay, stopStatDisplay } from "./visuals/game.visuals.stat-display";
 import { createGameInstance, resetGameInstance } from "./logic/game.logic.instance-creator";
 import { GAME_MODE } from "./settings/i/game.settings.e.game-modes";
 import { GameTransitions } from "./i/game.i.game-transitions";
@@ -17,7 +17,7 @@ import { digMod, precisionMod } from "./settings/game.settings.all-mods";
 import { receiveGarbage } from "./logic/game.logic.garbage";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { HandlingSettings } from "./settings/i/game.settings.i.handling-settings";
-import { BUBBLE_BAG_SIZE, GARBAGE_CLEAN_AMOUNT, COLLISION_DETECTION_FACTOR, GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH, MAX_ANGLE, GARBAGE_MAX_AT_ONCE, MIN_ANGLE, QUEUE_PREVIEW_SIZE, REFILL_AMOUNT, WIDTH_PRECISION_UNITS, GARBAGE_COLOR_AMOUNT } from "./settings/game.settings.all-game-settings";
+import { BUBBLE_BAG_SIZE, GARBAGE_CLEAN_AMOUNT, COLLISION_DETECTION_FACTOR, GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH, MAX_ANGLE, GARBAGE_MAX_AT_ONCE, MIN_ANGLE, QUEUE_PREVIEW_SIZE, REFILL_AMOUNT, WIDTH_PRECISION_UNITS, GARBAGE_COLOR_AMOUNT, COUNTDOWN_DURATION } from "./settings/game.settings.all-game-settings";
 import { DEFAULT_APS, TOGGLE_APS } from "./settings/game.settings.all-handling-settings";
 
 let playerGameInstance: GameInstance;
@@ -85,6 +85,7 @@ function getSprintSettings(): GameSettings {
         garbageMaxAtOnce: GARBAGE_MAX_AT_ONCE.defaultValue,
         garbageCleanAmount: GARBAGE_CLEAN_AMOUNT.defaultValue,
         garbageColorAmount: GARBAGE_COLOR_AMOUNT.defaultValue,
+        countDownDuration: COUNTDOWN_DURATION.defaultValue,
     };
 }
 
@@ -119,12 +120,18 @@ export function leaveGame(): void {
 }
 
 function showCountDownAndStart(): void {
-    startASCIIAnimation();
-    startStatDisplay();
-    enableGameInputs();
-    playerGameInstance.stats.gameStartTime = performance.now();
+    resetStatDisplays();
+    startCountdownAnimation(playerGameInstance.gameSettings.countDownDuration, afterCountdown)
+    function afterCountdown(): void {
+        startASCIIAnimation();
+        startStatDisplay();
+        enableGameInputs();
+        enableResetInput();
+        playerGameInstance.stats.gameStartTime = performance.now();
+    }
 }
 function disableGameplay(): void {
+    stopCountdownAnimation();
     const stats = playerGameInstance.stats;
     stats.gameEndTime = performance.now();
     stats.gameDuration = stats.gameEndTime - stats.gameStartTime;
@@ -220,4 +227,7 @@ export function getQueueSize(): number {
 }
 export function getIncomingGarbageAmount(): number {
     return playerGameInstance.queuedGarbage;
+}
+export function getGridTotalHeight(): number {
+    return playerGameInstance.playGrid.gridHeight + playerGameInstance.playGrid.extraGridHeight;
 }
