@@ -14,7 +14,7 @@ let statTrackingRunning = false;
 export function startStatDisplay(): void {
     if (!statTrackingRunning) {
         statTrackingRunning = true;
-        updateStatDisplay();
+        statDisplayAnimation();
     }
 }
 
@@ -23,10 +23,18 @@ export function stopStatDisplay(): void {
         statTrackingRunning = false;
         cancelAnimationFrame(trackingFrameId);
         trackingFrameId = null;
+        fillStatStrings();
     }
 }
 
-function updateStatDisplay(): void {
+function statDisplayAnimation(): void {
+    fillStatStrings();
+    if (statTrackingRunning) {
+        trackingFrameId = requestAnimationFrame(() => statDisplayAnimation());
+    }
+}
+
+function fillStatStrings(): void {
     const gameStats = getGameStats();
     const currentTime = performance.now() - gameStats.gameStartTime;
     const formattedCurrentTimeString = formatTimeNumberToString(currentTime);
@@ -46,10 +54,6 @@ function updateStatDisplay(): void {
     bubblesLeftToClear.value = gameStats.bubblesLeftToClear;
     bubblesShot.value = gameStats.bubblesShot;
     bubblesPerSecond.value = gameStats.bubblesPerSecond;
-
-    if (statTrackingRunning) {
-        trackingFrameId = requestAnimationFrame(() => updateStatDisplay());
-    }
 }
 
 export function formatTimeNumberToString(milliseconds: number): string {
