@@ -155,7 +155,7 @@ import useChatStore from '@/ts/page/page.globalChat';
 import { CountUp } from 'countup.js';
 import { getDefaultProfilePbURL } from '@/ts/networking/paths';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
-import { backInput } from '@/ts/input/input.possible-inputs';
+import { backInput } from '@/ts/input/input.all-inputs';
 
 export default {
   name: "ChannelOverlay",

@@ -1,4 +1,4 @@
-import { GAME_MODE } from "@/ts/game/settings/i/game.settings.i.game-modes";
+import { GAME_MODE } from "@/ts/game/settings/i/game.settings.e.game-modes";
 import state from "../../networking/networking.client-websocket";
 import { GameSettings } from "../settings/i/game.settings.i.game-settings";
 import { HandlingSettings } from "../settings/i/game.settings.i.handling-settings";

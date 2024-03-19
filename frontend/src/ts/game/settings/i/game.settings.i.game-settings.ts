@@ -1,28 +1,37 @@
-import { BooleanSetting } from "./game.settings.i.boolean-setting";
-import { NumberSetting } from "./game.settings.i.number-setting";
-
 export interface GameSettings {
-    gridWidth: NumberSetting,
-    gridHeight: NumberSetting,
-    gridExtraHeight: NumberSetting,
+    //grid settings
+    gridWidth: number,
+    gridHeight: number,
+    gridExtraHeight: number,
 
-    minAngle: NumberSetting,
-    maxAngle: NumberSetting,
+    //angle settings
+    minAngle: number,
+    maxAngle: number,
+    
+    //queue settings
+    queuePreviewSize: number,
 
-    widthPrecisionUnits: NumberSetting,
-    collisionDetectionFactor: NumberSetting,
+    //internal mathvalues
+    widthPrecisionUnits: number,
+    collisionDetectionFactor: number,
 
-    clearFloatingBubbles: BooleanSetting,
-    prefillBoard: BooleanSetting,
-    refillBoardAtLine: NumberSetting,
-    refillAmount: NumberSetting,
+    //sprintVictory
+    sprintVictoryCondition: number,
 
-    queuePreviewSize: NumberSetting,
-    bubbleBagSize: NumberSetting,
+    //mods
+    clearFloatingBubbles: boolean,
 
-    garbageMaxAtOnce: NumberSetting,
-    garbageCleanAmount: NumberSetting,
-    garbageColorAmount: NumberSetting,
+    prefillBoard: boolean,
+    prefillBoardAmount: number,
+    refillBoard:boolean,
+    refillBoardAtLine: number,
+    refillAmount: number,
+    bubbleBagSize: number,
+
+    //garbage settings
+    garbageMaxAtOnce: number,
+    garbageCleanAmount: number,
+    garbageColorAmount: number,
 
     //passtrough
     //combotable

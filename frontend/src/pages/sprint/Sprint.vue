@@ -92,10 +92,10 @@ import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import Leaderboard from '@/globalComponents/Leaderboard.vue';
 import History from '@/globalComponents/History.vue';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-leaderboard';
-import { backInput } from '@/ts/input/input.possible-inputs';
 import { UserData } from '@/ts/page/page.i-userData';
 import eventBus from '@/ts/page/page.event-bus';
 import { allMods as importedMods } from '@/ts/game/settings/game.settings.all-mods';
+import { backInput } from '@/ts/input/input.all-inputs';
 
 export default {
   name: 'SprintPage',

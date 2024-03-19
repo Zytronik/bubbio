@@ -6,23 +6,23 @@ import { GameSettings } from "../settings/i/game.settings.i.game-settings";
 import { Bubble } from "../i/game.i.bubble";
 
 export function setupGrid(settings: GameSettings): Grid {
-    const precisionWidth = settings.widthPrecisionUnits.value;
-    const bubbleRadius = precisionWidth / (2 * settings.gridWidth.value);
+    const precisionWidth = settings.widthPrecisionUnits;
+    const bubbleRadius = precisionWidth / (2 * settings.gridWidth);
     const bubbleDiameter = bubbleRadius * 2;
     const precisionRowHeight = Math.floor(bubbleRadius * Math.sqrt(3));
-    const precisionHeight = precisionRowHeight * (settings.gridHeight.value + settings.gridExtraHeight.value)
+    const precisionHeight = precisionRowHeight * (settings.gridHeight + settings.gridExtraHeight)
     const playGrid: Grid = {
         precisionWidth: precisionWidth,
         precisionHeight: precisionHeight,
         precisionRowHeight: precisionRowHeight,
-        gridWidth: settings.gridWidth.value,
-        gridHeight: settings.gridHeight.value,
-        extraGridHeight: settings.gridExtraHeight.value,
+        gridWidth: settings.gridWidth,
+        gridHeight: settings.gridHeight,
+        extraGridHeight: settings.gridExtraHeight,
         rows: [],
         bubbleRadius: bubbleRadius,
         bubbleLauncherPosition: { x: precisionWidth / 2, y: precisionHeight - bubbleRadius },
-        collisionRangeSquared: ((bubbleRadius * 2) ** 2) * settings.collisionDetectionFactor.value,
-        dissolveFloatingBubbles: settings.clearFloatingBubbles.value,
+        collisionRangeSquared: ((bubbleRadius * 2) ** 2) * settings.collisionDetectionFactor,
+        dissolveFloatingBubbles: settings.clearFloatingBubbles,
     }
     for (let h = 0; h < playGrid.gridHeight + playGrid.extraGridHeight; h++) {
         const isSmallRow = (h % 2 === 1);

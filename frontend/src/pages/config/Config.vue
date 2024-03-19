@@ -20,8 +20,8 @@
                   <div @click="resetInput(input, $event.currentTarget)" class="resetColumn">
                     <span>Reset</span>
                   </div>
-                  <div v-if="input.customKeyMap.map" class="customKeys">
-                    <div v-for="(key, keyIndex) in input.customKeyMap.map" :key="`key-${keyIndex}`"
+                  <div v-if="input.customKeyMap" class="customKeys">
+                    <div v-for="(key, keyIndex) in input.customKeyMap" :key="`key-${keyIndex}`"
                       @click="handleCustomKey($event, keyIndex, index)"
                       @contextmenu.prevent="handleResetCustomKey($event, keyIndex, input)">
                       <p>{{ key || 'Not Set' }}</p>
@@ -84,14 +84,13 @@
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
 import { Ref, SetupContext, computed, onMounted, ref } from 'vue';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { allGameSettings } from '@/ts/game/settings/game.settings.game';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { checkUserAuthentication, logUserOut } from '@/ts/networking/networking.auth';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
-import { allInputs } from '@/ts/input/input.possible-inputs';
-import { Input } from '@/ts/input/input.i-input';
 import { saveInputs } from '@/ts/input/input.input-manager';
 import eventBus from '@/ts/page/page.event-bus';
+import { allInputs } from '@/ts/input/input.all-inputs';
+import { Input } from '@/ts/input/i/input.i.input';
 
 export default {
   name: 'ConfigPage',
@@ -123,7 +122,7 @@ export default {
         window.removeEventListener('keydown', captureInput);
         if (paragraphElement) {
           paragraphElement.innerText = inputEvent.code;
-          allInputs[inputIndex].customKeyMap.map[keyIndex] = inputEvent.code;
+          allInputs[inputIndex].customKeyMap[keyIndex] = inputEvent.code;
           saveInputs();
         }
       }
@@ -136,9 +135,9 @@ export default {
       event.preventDefault();
       // Find the corresponding input configuration in allInputs
       const inputIndex = allInputs.findIndex(item => item === input);
-      if (inputIndex !== -1 && allInputs[inputIndex].customKeyMap && Array.isArray(allInputs[inputIndex].customKeyMap.map)) {
+      if (inputIndex !== -1 && allInputs[inputIndex].customKeyMap && Array.isArray(allInputs[inputIndex].customKeyMap)) {
         // Set the custom key code to an empty string
-        allInputs[inputIndex].customKeyMap.map[keyIndex] = "";
+        allInputs[inputIndex].customKeyMap[keyIndex] = "";
         saveInputs();
 
         // Update text to "Not Set"
@@ -186,9 +185,9 @@ export default {
         customKeyElems.forEach(p => p.innerText = 'Not Set');
         customKeyElems[0].innerText = input.defaultKeyCode;
       }
-      input.customKeyMap.map[0] = input.defaultKeyCode;
-      input.customKeyMap.map[1] = "";
-      input.customKeyMap.map[2] = "";
+      input.customKeyMap[0] = input.defaultKeyCode;
+      input.customKeyMap[1] = "";
+      input.customKeyMap[2] = "";
       saveInputs();
     }
 
@@ -231,7 +230,6 @@ export default {
       logUserOut,
       logOut,
       isAuthenticated,
-      allGameSettings,
       backButtonData,
       changeBackgroundTo,
       allInputs,

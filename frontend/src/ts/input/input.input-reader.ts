@@ -1,5 +1,5 @@
-import { Input } from "./input.i-input";
-import { allInputs } from "./input.possible-inputs";
+import { Input } from "./i/input.i.input";
+import { allInputs } from "./input.all-inputs";
 
 let hasAttachedAlready = false;
 
@@ -14,7 +14,7 @@ export function attachInputReader() {
 
 function handleKeyDown(event: KeyboardEvent): void {
     allInputs.forEach((input: Input) => {
-        input.customKeyMap.map.forEach((customCode: string) => {
+        input.customKeyMap.forEach((customCode: string) => {
             if (event.code === customCode && !input.pressed && input.enabled) {
                 input.pressed = true;
                 input.lastFiredAtTime = performance.now();
@@ -26,7 +26,7 @@ function handleKeyDown(event: KeyboardEvent): void {
 
 function handleKeyUp(event: KeyboardEvent): void {
     allInputs.forEach((input: Input) => {
-        input.customKeyMap.map.forEach((key: string) => {
+        input.customKeyMap.forEach((key: string) => {
             if (event.code === key && input.enabled) {
                 input.pressed = false;
                 input.releasedAtTime = performance.now();

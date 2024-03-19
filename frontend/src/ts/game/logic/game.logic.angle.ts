@@ -7,11 +7,11 @@ export function getVelocity(angle: number, settings: GameSettings): Coordinates 
 }
 
 export function cleanUpAngle(angle: number, settings: GameSettings): number {
-    if (angle < settings.minAngle.value) {
-        return settings.minAngle.value;
+    if (angle < settings.minAngle) {
+        return settings.minAngle;
     }
-    else if (angle > settings.maxAngle.value) {
-        return settings.maxAngle.value;
+    else if (angle > settings.maxAngle) {
+        return settings.maxAngle;
     }
     else {
         return Number(angle.toFixed(1));

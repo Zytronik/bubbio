@@ -1,8 +1,7 @@
 import { Ref, ref } from "vue";
-import { getAngle, getBubbleQueue, getCurrentBubble, getHoldBubble, getIncomingGarbageAmount, getPlayGrid, updatePreviewBubble } from "../game.master";
+import { getAngle, getBubbleQueue, getCurrentBubble, getHoldBubble, getIncomingGarbageAmount, getPlayGrid, getQueueSize, updatePreviewBubble } from "../game.master";
 import { Coordinates } from "../i/game.i.grid-coordinates";
 import { Field } from "../i/game.i.field";
-import { allGameSettings } from "../settings/game.settings.game";
 
 export const playGridASCII: Ref<string> = ref("");
 export const incomingGarbage: Ref<string> = ref("");
@@ -31,6 +30,7 @@ export function showASCIICountDown(): void {
 
 export function showASCIIVictory(): void {
     stopASCIIAnimation();
+    fillAsciiStrings();
     const victoryBoard = playGridASCII.value
     const topRows = victoryBoard.split('\n').slice(0, 7).join('\n');
     const bottomRows = victoryBoard.split('\n').slice(12).join('\n');
@@ -40,6 +40,7 @@ export function showASCIIVictory(): void {
 
 export function showASCIIDefeat(): void {
     stopASCIIAnimation();
+    fillAsciiStrings();
     const lossBoard = playGridASCII.value
     const topRows = lossBoard.split('\n').slice(0, 7).join('\n');
     const bottomRows = lossBoard.split('\n').slice(12).join('\n');
@@ -48,6 +49,13 @@ export function showASCIIDefeat(): void {
 }
 
 function asciiBoardAnimation(): void {
+    fillAsciiStrings();
+    if (asciiAnimationRunning) {
+        animationFrameId = requestAnimationFrame(() => asciiBoardAnimation());
+    }
+}
+
+function fillAsciiStrings(): void {
     updatePreviewBubble();
     const playGrid = getPlayGrid();
     const previewPosition: Coordinates = { x: -1, y: -1 };
@@ -73,9 +81,7 @@ function asciiBoardAnimation(): void {
     boardText += getLowerBoarderLineString(gridWidth);
     playGridASCII.value = boardText;
     incomingGarbage.value = "Incoming Garbage: " + getIncomingGarbageAmount();
-    if (asciiAnimationRunning) {
-        animationFrameId = requestAnimationFrame(() => asciiBoardAnimation());
-    }
+
 }
 
 function getUpperBoarderLineString(gridWidth: number): string {
@@ -146,7 +152,7 @@ function getBubbleQueueString(): string {
     const queue = getBubbleQueue();
     const current = getCurrentBubble();
     let queueString = `Queue: (${current.ascii}) |`;
-    for (let i = 0; i < allGameSettings.queuePreviewSize.value; i++) {
+    for (let i = 0; i < getQueueSize(); i++) {
         queueString += ` (${queue[i].ascii}) `;
     }
     return queueString + "\n\n";

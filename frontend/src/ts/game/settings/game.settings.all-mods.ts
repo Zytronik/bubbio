@@ -3,7 +3,7 @@ import { Mod } from "./i/game.settings.i.mod";
 
 export const digMod: Mod = {
     abr: "D",
-    title: "Digging",
+    title: "Dig",
     enabled: ref(false),
     icon: "",
 }
