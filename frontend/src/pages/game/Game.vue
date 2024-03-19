@@ -2,27 +2,15 @@
   <div class="gameUI-wrapper">
     <span class="monospace" v-html="incomingGarbage"></span>
     <span class="monospace" v-html="playGridASCII"></span>
-    <!-- <span>angle: {{ angle }}</span> <br> -->
   </div>
 </template>
 
 <script lang="ts">
-import { onUnmounted } from 'vue';
-import { leaveGame } from '@/ts/game/game.master';
 import { incomingGarbage, playGridASCII } from '@/ts/game/visuals/game.visuals.ascii';
-
-window.addEventListener('keydown', function (e) {
-  if (e.keyCode == 32 && e.target == document.body) {
-    e.preventDefault();
-  }
-});
 
 export default {
   name: 'GamePage',
   setup() {
-    onUnmounted(() => {
-      leaveGame();
-    })
     return {
       playGridASCII,
       incomingGarbage,
