@@ -16,6 +16,7 @@ function handleKeyDown(event: KeyboardEvent): void {
     allInputs.forEach((input: Input) => {
         input.customKeyMap.forEach((customCode: string) => {
             if (event.code === customCode && !input.pressed && input.enabled) {
+                event.preventDefault();
                 input.pressed = true;
                 input.lastFiredAtTime = performance.now();
                 input.fire();
@@ -28,6 +29,7 @@ function handleKeyUp(event: KeyboardEvent): void {
     allInputs.forEach((input: Input) => {
         input.customKeyMap.forEach((key: string) => {
             if (event.code === key && input.enabled) {
+                event.preventDefault();
                 input.pressed = false;
                 input.releasedAtTime = performance.now();
                 if (input.release) {
