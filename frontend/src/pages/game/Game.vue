@@ -1,7 +1,7 @@
 <template class="page" id="game">
   <div class="gameUI-wrapper">
     <span class="monospace" v-html="incomingGarbage"></span>
-    <span class="monospace" v-html="playGridASCII"></span>
+    <span class="monospace grid" v-html="playGridASCII"></span>
   </div>
 </template>
 
@@ -24,6 +24,7 @@ export default {
   white-space: pre-line;
   font-family: 'Consolas', monospace;
   font-size: 20px;
+  text-align: center;
 }
 
 .gameUI-wrapper{

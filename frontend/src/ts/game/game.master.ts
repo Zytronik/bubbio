@@ -2,7 +2,7 @@ import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, startCountdownA
 import { GameInstance } from "./i/game.i.game-instance";
 import { disableGameInputs, disableResetInput, enableGameInputs, enableResetInput } from "../input/input.input-manager";
 import { cleanUpAngle } from "./logic/game.logic.angle";
-import { angleLeftInput, angleRightInput, resetInput } from "../input/input.all-inputs";
+import { angleLeftInput, angleRightInput } from "../input/input.all-inputs";
 import { GameStats } from "./i/game.i.game-stats";
 import { Bubble } from "./i/game.i.bubble";
 import { Grid } from "./i/game.i.grid";
@@ -100,13 +100,13 @@ function getHandlingSettings(): HandlingSettings {
 
 function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
     if (floating && filled) {
-        return 200;
+        return 3;
     } else if (!floating && filled) {
-        return 200;
+        return 3;
     } else if (floating && !filled) {
-        return 100;
+        return 3;
     } else {
-        return 50;
+        return 3;
     }
 }
 

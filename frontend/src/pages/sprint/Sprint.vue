@@ -76,9 +76,9 @@
 
 <script lang="ts">
 import Game from '../game/Game.vue';
-import { changeBackgroundTo, formatDateTime, goToState } from '@/ts/page/page.page-manager';
+import { changeBackgroundTo, formatDateTime, goToState, setCookie } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { computed, onMounted, ref, withKeys } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { getGameStats, leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { bubbleClearToWin, bubblesCleared, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
@@ -87,7 +87,7 @@ import History from '@/globalComponents/History.vue';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-leaderboard';
 import { UserData } from '@/ts/page/page.i-userData';
 import eventBus from '@/ts/page/page.event-bus';
-import { allMods as importedMods } from '@/ts/game/settings/game.settings.all-mods';
+import { allMods } from '@/ts/game/settings/game.settings.all-mods';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { backInput, resetInput } from '@/ts/input/input.all-inputs';
 import { formatFieldValue, getFullName } from '@/ts/page/page.i.stat-display';
@@ -102,7 +102,7 @@ export default {
     };
   },
   setup() {
-    const mods = ref(importedMods);
+    const mods = ref(allMods);
     const isGaming = ref<boolean>(false);
     const isDashboard = ref<boolean>(true);
     const resultStats = ref<GameStats>();
@@ -116,6 +116,11 @@ export default {
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
       eventBus.on("sprintVictory", showResultView);
+
+    });
+
+    onUnmounted(()=>{
+      setCookie('mods', JSON.stringify(mods.value), 365);
     });
 
     function goBack() {
@@ -306,6 +311,7 @@ export default {
   justify-content: center;
   align-items: flex-end;
   position: relative;
+  width: 40%;
 }
 
 .inGame {
@@ -319,7 +325,7 @@ export default {
 
 .inGameStats {
   position: absolute;
-  right: calc(100% + 15px);
+  right: 85%;
   bottom: 10px;
   width: 200px;
   text-align: right;
