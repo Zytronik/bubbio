@@ -49,7 +49,7 @@ export class LeaderboardService {
         let bestRunsPerUser = records.reduce((acc, record) => {
             try {
                 const recordMods = record.mods ? JSON.parse(record.mods) : [];
-                const modsMatch = criteria.mods.length === 0 ? recordMods.length === 0 : criteria.mods.every(mod => recordMods.includes(mod));
+                const modsMatch = criteria.mods.length === 0 ? recordMods.length === 0 : criteria.mods.sort().join(',') === recordMods.sort().join(',');
     
                 // Proceed if mods criteria match
                 if (modsMatch) {

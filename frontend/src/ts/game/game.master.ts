@@ -17,7 +17,7 @@ import { digMod, precisionMod, randomnessMod } from "./settings/game.settings.al
 import { receiveGarbage } from "./logic/game.logic.garbage";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { HandlingSettings } from "./settings/i/game.settings.i.handling-settings";
-import { BUBBLE_BAG_SIZE, GARBAGE_CLEAN_AMOUNT, COLLISION_DETECTION_FACTOR, GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH, MAX_ANGLE, GARBAGE_MAX_AT_ONCE, MIN_ANGLE, QUEUE_PREVIEW_SIZE, REFILL_AMOUNT, WIDTH_PRECISION_UNITS, GARBAGE_COLOR_AMOUNT, COUNTDOWN_DURATION } from "./settings/game.settings.all-game-settings";
+import { GARBAGE_CLEAN_AMOUNT, COLLISION_DETECTION_FACTOR, GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH, MAX_ANGLE, GARBAGE_MAX_AT_ONCE, MIN_ANGLE, QUEUE_PREVIEW_SIZE, REFILL_AMOUNT, WIDTH_PRECISION_UNITS, GARBAGE_COLOR_AMOUNT, COUNTDOWN_DURATION } from "./settings/game.settings.all-game-settings";
 import { DEFAULT_APS, TOGGLE_APS } from "./settings/game.settings.all-handling-settings";
 import eventBus from "../page/page.event-bus";
 
@@ -62,9 +62,9 @@ export function setupSprintGame(): void {
 }
 
 function getSprintSettings(): GameSettings {
-    const floating = !precisionMod.enabled.value;
-    const filled = digMod.enabled.value;
-    const bagSize = randomnessMod.selected.value;
+    const floating = !precisionMod.enabled;
+    const filled = digMod.enabled;
+    const bagSize = randomnessMod.selected;
     let prefillAmount = Math.floor(GRID_HEIGHT.defaultValue / 2);
     prefillAmount = (prefillAmount % 2 === 0) ? prefillAmount - 1 : prefillAmount;
     const refillAmount = Math.ceil(prefillAmount / 2);
@@ -110,7 +110,6 @@ function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
         return 3;
     }
 }
-
 
 export function startGame(): void {
     playerGameInstance.gameTransitions.onGameStart();

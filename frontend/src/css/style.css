@@ -50,7 +50,7 @@ section .page-wrapper {
 }
 
 section .page-container {
-    padding: 60px 15px 70px;
+    padding: 80px 15px 80px;
     margin: 0 auto;
     max-width: 90%;
     height: 100%;
@@ -262,7 +262,7 @@ button.goBackButton:focus {
 }
 
 .sprintDashboard .playButton {
-    height: 20%;
+    height: 100%;
     width: 100%;
     font-size: 400%;
     cursor: pointer;

@@ -49,8 +49,13 @@ export async function submitGameToDB(gameStats: GameStats) {
         };
         const mods: Record<string, boolean> = {};
         allMods.forEach(mod => {
-            mods[mod.abr] = mod.enabled.value;
+            if ('enabled' in mod && typeof mod.enabled === 'boolean') {
+                mods[mod.abr] = mod.enabled;
+            } else if ('selected' in mod && typeof mod.selected == 'number') {
+                mods[mod.abr[mod.modValues.indexOf(mod.selected)]] = true;
+            }
         });
+        console.log(allMods, mods)
         const modsJsonString = JSON.stringify(mods);
         try {
             const token = localStorage.getItem('authToken');
