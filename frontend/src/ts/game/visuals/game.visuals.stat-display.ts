@@ -42,7 +42,7 @@ function fillStatStrings(): void {
     //keysPressed
     //keysPerSecond
     //keysPerBubble
-    
+
     //angleChanged
     //angleChangePerBubble
 
@@ -54,6 +54,15 @@ function fillStatStrings(): void {
     bubblesLeftToClear.value = gameStats.bubblesLeftToClear;
     bubblesShot.value = gameStats.bubblesShot;
     bubblesPerSecond.value = gameStats.bubblesPerSecond;
+}
+
+export function resetStatDisplays(): void {
+    formattedCurrentTime.value = ("00:00.00");
+    bubbleClearToWin.value = (0);
+    bubblesCleared.value = (0);
+    bubblesLeftToClear.value = (0);
+    bubblesShot.value = (0);
+    bubblesPerSecond.value = (0);
 }
 
 export function formatTimeNumberToString(milliseconds: number): string {

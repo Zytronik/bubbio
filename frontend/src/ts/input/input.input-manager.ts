@@ -86,7 +86,6 @@ export async function applySavedInputSettings(): Promise<void> {
 
     if (Array.isArray(settings)) {
         settings.forEach(savedSetting => {
-            console.log(savedSetting)
             const input = allInputs.find(input => input.name === savedSetting.name);
             if (input && savedSetting.customKeyMap) {
                 input.customKeyMap = savedSetting.customKeyMap;

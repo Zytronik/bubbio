@@ -21,6 +21,11 @@ export function updateBubbleQueueAndCurrent(gameInstance: GameInstance): void {
     while (gameInstance.bubbleQueue.length <= queueLength) {
         gameInstance.bubbleQueue.push(...getBubbleBag(gameInstance));
     }
+    // let betterlog = ""
+    // gameInstance.bubbleQueue.forEach(bubble => {
+    //     betterlog += bubble.type
+    // })
+    // console.log(betterlog)
     gameInstance.currentBubble = gameInstance.bubbleQueue.shift() as Bubble;
 }
 
@@ -33,8 +38,8 @@ function getBubbleBag(gameInstance: GameInstance): Bubble[] {
             leftOverBubbles.push(...allBubbles);
         }
         const randomIndex = convertSeedToRandomNumber(0, leftOverBubbles.length, gameInstance.bubbleSeed);
-        bag.push(leftOverBubbles.splice(randomIndex, 1)[0]);
         gameInstance.bubbleSeed = getNextSeed(gameInstance.bubbleSeed);
+        bag.push(leftOverBubbles.splice(randomIndex, 1)[0]);
     }
     return bag;
 }

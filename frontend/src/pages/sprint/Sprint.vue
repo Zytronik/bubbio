@@ -88,8 +88,8 @@ import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-l
 import { UserData } from '@/ts/page/page.i-userData';
 import eventBus from '@/ts/page/page.event-bus';
 import { allMods as importedMods } from '@/ts/game/settings/game.settings.all-mods';
-import { backInput, resetInput } from '@/ts/input/input.all-inputs';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
+import { backInput, resetInput } from '@/ts/input/input.all-inputs';
 import { formatFieldValue, getFullName } from '@/ts/page/page.i.stat-display';
 
 export default {
@@ -102,9 +102,10 @@ export default {
     };
   },
   setup() {
+    const mods = ref(importedMods);
     const isGaming = ref<boolean>(false);
     const isDashboard = ref<boolean>(true);
-    const resultStats  = ref<GameStats>();
+    const resultStats = ref<GameStats>();
     const userData: UserData | null = eventBus.getUserData();
     const isGuestString = sessionStorage.getItem('isGuest');
     const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
@@ -112,51 +113,26 @@ export default {
       { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/sprint.png'), disabled: false },
     ]);
 
-    backInput.fire = showDashboard;
-    resetInput.fire = play;
-    resetInput.enabled = true;
+    onMounted(() => {
+      changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
+      eventBus.on("sprintVictory", showResultView);
+    });
 
-    const mods = ref(importedMods);
-
-    const toggleMod = (modAbr: string) => {
-        const modIndex = mods.value.findIndex(m => m.abr === modAbr);
-        if (modIndex !== -1) {
-            mods.value[modIndex].enabled = !mods.value[modIndex].enabled;
-        }
-    };
-
-    const modsComputed = computed(() => mods.value.map(mod => ({
-        ...mod,
-        isEnabled: mod.enabled,
-    })));
-
-    function showResultView(){
-      isGaming.value = false;
-      isDashboard.value = false;
-      resultStats.value = getGameStats();
-      console.log("test1");
-    }
-
-    function goBack(){
-      if(isGaming.value){
+    function goBack() {
+      if (isGaming.value) {
         leaveGame();
         showDashboard();
       }
-      if(!isDashboard.value && !isGaming.value){
+      if (!isDashboard.value && !isGaming.value) {
         showDashboard();
       }
     }
 
-    function play(){
+    function play() {
+      backInput.fire = goBack;
       setupSprintGame();
       showGameView();
       startGame();
-    }
-
-    function showGameView() {
-      console.log("test2", isGaming.value , isDashboard.value);
-      isGaming.value = true;
-      isDashboard.value = false;
     }
 
     async function showDashboard() {
@@ -164,15 +140,34 @@ export default {
       isDashboard.value = true;
     }
 
+    function showGameView() {
+      isGaming.value = true;
+      isDashboard.value = false;
+    }
+
+    function showResultView() {
+      resultStats.value = getGameStats();
+      resetInput.fire = play;
+      isGaming.value = false;
+      isDashboard.value = false;
+    }
+
+    const toggleMod = (modAbr: string) => {
+      const modIndex = mods.value.findIndex(m => m.abr === modAbr);
+      if (modIndex !== -1) {
+        mods.value[modIndex].enabled = !mods.value[modIndex].enabled;
+      }
+    };
+
+    const modsComputed = computed(() => mods.value.map(mod => ({
+      ...mod,
+      isEnabled: mod.enabled,
+    })));
+
     const modsEnabled = computed(() => {
       return mods.value
         .filter(mod => mod.enabled)
         .map(mod => mod.abr);
-    });
-
-    onMounted(() => {
-      changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
-      eventBus.on("sprintVictory", showResultView);
     });
 
     return {
@@ -260,7 +255,7 @@ export default {
 
 .l-tab-button.active::after {
   content: "";
-  background-color: rgb(30,30,30);
+  background-color: rgb(30, 30, 30);
   position: absolute;
   height: 1px;
   width: 100%;
@@ -330,7 +325,7 @@ export default {
   text-align: right;
 }
 
-.inGameStats p{
+.inGameStats p {
   margin: unset;
   margin-top: 5px;
   font-size: 20px;
@@ -341,5 +336,4 @@ export default {
   left: 30px;
   top: 30px;
 }
-
 </style>

@@ -124,3 +124,11 @@ export const GARBAGE_COLOR_AMOUNT: NumberSetting = {
     min: 2,
     max: 7,
 }
+export const COUNTDOWN_DURATION: NumberSetting = {
+    name: "Countdown Duration",
+    description: "How long it takes to play the countdown.",
+    refNumber: ref(1000),
+    defaultValue: 1500,
+    min: 0,
+    max: 3000,
+}
