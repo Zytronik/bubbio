@@ -62,8 +62,8 @@
           <table v-if="resultStats">
             <tbody>
               <tr v-for="(value, key) in resultStats" :key="key">
-                <td>{{ key }}</td>
-                <td>{{ value }}</td>
+                <td>{{ getFullName(key) }}</td>
+                <td>{{ formatFieldValue(value, key) }}</td>
               </tr>
             </tbody>
           </table>
@@ -78,7 +78,7 @@
 import Game from '../game/Game.vue';
 import { changeBackgroundTo, formatDateTime, goToState } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, withKeys } from 'vue';
 import { getGameStats, leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { bubbleClearToWin, bubblesCleared, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
@@ -90,6 +90,7 @@ import eventBus from '@/ts/page/page.event-bus';
 import { allMods as importedMods } from '@/ts/game/settings/game.settings.all-mods';
 import { backInput, resetInput } from '@/ts/input/input.all-inputs';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
+import { formatFieldValue, getFullName } from '@/ts/page/page.i.stat-display';
 
 export default {
   name: 'SprintPage',
@@ -200,6 +201,8 @@ export default {
       modsEnabled,
       goBack,
       resultStats,
+      formatFieldValue,
+      getFullName,
     };
   },
 };

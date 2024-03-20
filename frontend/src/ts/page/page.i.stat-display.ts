@@ -89,6 +89,36 @@ export const statDisplays: Record<string, StatDisplay> = {
         shortName: "",
         isTime: false,
     },
+    clear3	: {
+        fullName: "Triples",
+        shortName: "",
+        isTime: false,
+    },
+    clear4: {
+        fullName: "Quads",
+        shortName: "",
+        isTime: false,
+    },
+    clear5: {
+        fullName: "Quints +",
+        shortName: "",
+        isTime: false,
+    },
+    clear3wb: {
+        fullName: "Wall Bounce Triples",
+        shortName: "",
+        isTime: false,
+    },
+    clear4wb: {
+        fullName: "Wall Bounce Quads",
+        shortName: "",
+        isTime: false,
+    },
+    clear5wb: {
+        fullName: "Wall Bounce Quints +",
+        shortName: "",
+        isTime: false,
+    },
 };
 
 export function getStatDisplay(statName: string): StatDisplay | undefined {
@@ -97,11 +127,15 @@ export function getStatDisplay(statName: string): StatDisplay | undefined {
 
 export function getFullName(fieldName: string): string {
     const statDisplay = getStatDisplay(fieldName);
-    return statDisplay ? statDisplay.fullName : fieldName;
+    return statDisplay ? statDisplay.fullName : "";
 }
 
 export function formatFieldValue(value: string | number, fieldName: string): string {
     const statDisplay = getStatDisplay(fieldName);
+    if(!statDisplay){
+        return "";
+    }
+
     let formattedValue = value;
 
     if (statDisplay && statDisplay.isTime && typeof value === 'number') {
