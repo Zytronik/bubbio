@@ -123,6 +123,7 @@ export default {
     const userData: UserData | null = eventBus.getUserData();
     const isGuestString = sessionStorage.getItem('isGuest');
     const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
+    const backInputOnLoad = ref<() => void>(() => "");
     const backButtonData = ref([
       { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/sprint.png'), disabled: false },
     ]);
@@ -130,8 +131,8 @@ export default {
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
       eventBus.on("sprintVictory", showResultView);
-      console
       applyMods();
+      backInputOnLoad.value = backInput.fire;
     });
 
     function applyMods() {
@@ -156,26 +157,30 @@ export default {
       }
     }
 
-
     function goBack() {
       if (isGaming.value) {
-        leaveGame();
-        showDashboard();
+        transitionOutOfGame(() => {
+          leaveGame();
+          showDashboard();
+          backInput.fire = backInputOnLoad.value;
+        });
       }
       if (!isDashboard.value && !isGaming.value) {
-        showDashboard();
+        transitionOutOfGame(() => {
+          showDashboard();
+          backInput.fire = backInputOnLoad.value;
+        });
       }
-      document.body.classList.remove('game-view'); //temp
     }
 
     function play() {
+      backInput.fire = goBack;
       transitionToGame(() => {
-        backInput.fire = goBack;
         startGame();
       });
     }
 
-    function transitionToGame(callback: () => void): void {
+    function transitionToGame(onTransitionEnd: () => void): void {
       document.body.classList.add('slide-out-left-to-game');
       const overlay = document.createElement('div');
       overlay.className = 'black-overlay-right';
@@ -190,7 +195,24 @@ export default {
         fillAsciiStrings();
         setTimeout(() => {
           document.body.removeChild(overlay);
-          callback();
+          onTransitionEnd();
+        }, 1000);
+      }, 500);
+    }
+
+    function transitionOutOfGame(onTransitionHidden: () => void): void {
+      document.body.classList.add('slide-out-right-off-game');
+      const overlay = document.createElement('div');
+      overlay.className = 'black-overlay-left';
+      document.body.appendChild(overlay);
+      setTimeout(() => {
+        overlay.classList.add('black-overlay-cover');
+        onTransitionHidden();
+        overlay.classList.remove('black-overlay-left');
+        document.body.classList.remove('slide-out-right-off-game');
+        document.body.classList.remove('game-view');
+        setTimeout(() => {
+          document.body.removeChild(overlay);
         }, 1000);
       }, 500);
     }
@@ -404,7 +426,7 @@ export default {
 
 .cat-wrapper .cat span {
   position: absolute;
-  padding: 5px;
+  padding: 0 5px;
   top: 75%;
   left: 10%;
   font-weight: bold;

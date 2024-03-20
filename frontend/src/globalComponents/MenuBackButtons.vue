@@ -1,7 +1,7 @@
 <template>
   <div class="menu-wrapper back-buttons" @click.self="getGoBackState()">
-    <button v-for="(button, index) in buttonData" :key="index" class="menu-btn" :class="button.disabled ? 'disabled' : ''"
-      @click="handleButtonClick(button)">
+    <button v-for="(button, index) in buttonData" :key="index" class="menu-btn"
+      :class="button.disabled ? 'disabled' : ''" @click="handleButtonClick(button)">
       <img :src="button.iconSrc" />
     </button>
   </div>
@@ -38,14 +38,18 @@ export default defineComponent({
       }
     }
 
-    onMounted(()=>{
+    onMounted(() => {
       backInput.fire = getGoBackState;
     });
 
     function getGoBackState() {
       const activeButton = (props.buttonData as ButtonData[]).find(btn => !btn.disabled);
       if (activeButton) {
-        goToState(activeButton.pageState);
+        goToState(activeButton.pageState, false);
+        let backButtons = document.querySelector("div.back-buttons");
+        if (backButtons) {
+          backButtons.classList.add('shrink');
+        }
       }
     }
 

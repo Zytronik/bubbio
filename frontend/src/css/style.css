@@ -38,53 +38,6 @@ body.game-view .back-buttons{
     display: none;
 }
 
-@keyframes slideOutToGame {
-    from {
-        transform: translateX(0);
-    }
-
-    to {
-        transform: translateX(-100%);
-    }
-}
-
-.slide-out-left-to-game {
-    animation: slideOutToGame 0.5s forwards;
-}
-
-.black-overlay-cover {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: black;
-    z-index: 999;
-    animation-delay: 1s;
-    animation: fadeOut 1s forwards;
-    opacity: 1;
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-    }
-}
-
-.black-overlay-right {
-    position: fixed;
-    top: 0;
-    left: 100%;
-    width: 100vw;
-    height: 100vh;
-    background-color: black;
-    z-index: 999;
-}
-
 /* Page */
 section.page {
     width: 100vw;
@@ -366,4 +319,76 @@ button.goBackButton:focus {
     80% {
         background-position: 0% 50%, 50% 50%, 100% 100%
     }
+}
+
+/* Game */
+@keyframes slideOutToGame {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.slide-out-left-to-game {
+    animation: slideOutToGame 0.5s forwards;
+}
+
+@keyframes slideOutOffGame {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.slide-out-right-off-game {
+    animation: slideOutOffGame 0.5s forwards;
+}
+
+.black-overlay-cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
+    animation-delay: 0.2s !important;
+    animation: fadeOut 1.3s forwards;
+    opacity: 1;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.black-overlay-right {
+    position: fixed;
+    top: 0;
+    left: 100%;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
+}
+
+.black-overlay-left {
+    position: fixed;
+    top: 0;
+    right: 100%;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
 }
