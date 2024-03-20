@@ -6,20 +6,22 @@ import { angleLeftInput, angleRightInput } from "../input/input.all-inputs";
 import { GameStats } from "./i/game.i.game-stats";
 import { Bubble } from "./i/game.i.bubble";
 import { Grid } from "./i/game.i.grid";
-import { calculatePreview, shootBubble } from "./logic/game.logic.shoot";
+import { calculatePreview, executeShot } from "./logic/game.logic.shoot";
 import { resetStatDisplays, startStatDisplay, stopStatDisplay } from "./visuals/game.visuals.stat-display";
 import { createGameInstance, resetGameInstance } from "./logic/game.logic.instance-creator";
 import { GAME_MODE } from "./settings/i/game.settings.e.game-modes";
 import { GameTransitions } from "./i/game.i.game-transitions";
-import { holdBubble, updateBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
-import { backendSetupGame, submitGameToDB } from "./network/game.network-commands";
-import { digMod, precisionMod, randomnessMod } from "./settings/game.settings.all-mods";
-import { receiveGarbage } from "./logic/game.logic.garbage";
+import { holdBubble } from "./logic/game.logic.bubble-manager";
+import { backendSetupGame, network_synchronizeGame, submitGameToDB } from "./network/game.network-commands";
+import { digMod, precisionMod, randomnessMod } from "./settings/ref/game.settings.ref.all-mods";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { HandlingSettings } from "./settings/i/game.settings.i.handling-settings";
-import { GARBAGE_CLEAN_AMOUNT, COLLISION_DETECTION_FACTOR, GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH, MAX_ANGLE, GARBAGE_MAX_AT_ONCE, MIN_ANGLE, QUEUE_PREVIEW_SIZE, REFILL_AMOUNT, WIDTH_PRECISION_UNITS, GARBAGE_COLOR_AMOUNT, COUNTDOWN_DURATION } from "./settings/game.settings.all-game-settings";
-import { DEFAULT_APS, TOGGLE_APS } from "./settings/game.settings.all-handling-settings";
+import { GARBAGE_CLEAN_AMOUNT, COLLISION_DETECTION_FACTOR, GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH, MAX_ANGLE, GARBAGE_MAX_AT_ONCE, MIN_ANGLE, QUEUE_PREVIEW_SIZE, REFILL_AMOUNT, WIDTH_PRECISION_UNITS, GARBAGE_COLOR_AMOUNT, COUNTDOWN_DURATION } from "./settings/ref/game.settings.ref.all-game-settings";
+import { DEFAULT_APS, TOGGLE_APS } from "./settings/ref/game.settings.ref.all-handling-settings";
 import eventBus from "../page/page.event-bus";
+import { getNextSeed } from "./logic/game.logic.random";
+import { GAME_INPUT } from "./network/dto/game.network.dto.game-input";
+import { InputFrame } from "./i/game.i.game-state-history";
 
 let playerGameInstance: GameInstance;
 export function setupSprintGame(): void {
@@ -33,8 +35,9 @@ export function setupSprintGame(): void {
     }
     const gameSettings = getSprintSettings();
     const handlingSettings = getHandlingSettings();
-    playerGameInstance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions);
-    backendSetupGame(gameMode, gameSettings, handlingSettings)
+    const startSeed = getNextSeed(Date.now());
+    playerGameInstance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed);
+    backendSetupGame(playerGameInstance)
 
     function startSprint(): void {
         enableResetInput();
@@ -42,7 +45,7 @@ export function setupSprintGame(): void {
     }
     function resetSprint(): void {
         disableGameplay();
-        resetGameInstance(playerGameInstance);
+        resetGameInstance(playerGameInstance, getNextSeed(Date.now()));
         showCountDownAndStart();
     }
     function leaveSprint(): void {
@@ -101,6 +104,7 @@ function getHandlingSettings(): HandlingSettings {
 
 function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
     if (floating && filled) {
+        return 3;
         return 3;
     } else if (!floating && filled) {
         return 3;
@@ -168,27 +172,26 @@ export function revertAPS(): void {
     playerGameInstance.currentAPS = playerGameInstance.handlingSettings.defaultAPS;
 }
 export function triggerShoot(): void {
-    const bubblesCleared = shootBubble(playerGameInstance);
-    if (!(bubblesCleared > 0)) {
-        receiveGarbage(playerGameInstance);
+    executeShot(playerGameInstance);
+    const inputFrame: InputFrame = {
+        indexID: -1,
+        frameTime: performance.now(),
+        input: GAME_INPUT.SHOOT,
+        angle: playerGameInstance.angle,
     }
-    if (playerGameInstance.gameSettings.refillBoard && playerGameInstance.queuedGarbage === 0) {
-        const refillBoardAtLine = playerGameInstance.gameSettings.refillBoardAtLine;
-        const line = playerGameInstance.playGrid.rows[refillBoardAtLine]
-        let hasToRefill = false;
-        for (const field of line.fields) {
-            if (field.bubble === undefined) {
-                hasToRefill = true
-            }
-        }
-        if (hasToRefill) {
-            playerGameInstance.queuedGarbage += playerGameInstance.gameSettings.refillAmount;
-        }
-    }
-    updateBubbleQueueAndCurrent(playerGameInstance);
+    playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
+    network_synchronizeGame(playerGameInstance);
 }
 export function triggerHold(): void {
     holdBubble(playerGameInstance);
+    const inputFrame: InputFrame = {
+        indexID: -1,
+        frameTime: performance.now(),
+        input: GAME_INPUT.HOLD,
+        angle: playerGameInstance.angle,
+    }
+    playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
+    network_synchronizeGame(playerGameInstance);
 }
 export function debugTriggerGarbage(): void {
     playerGameInstance.queuedGarbage += 1;

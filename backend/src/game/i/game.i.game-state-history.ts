@@ -1,3 +1,4 @@
+import { GAME_INPUT } from "../network/dto/game.network.dto.game-input";
 import { Bubble } from "./game.i.bubble";
 
 export interface GameStateHistory {
@@ -5,42 +6,36 @@ export interface GameStateHistory {
     boardHistory: BoardHistoryFrame[],
     bubbleQueueHistory: BubbleQueueFrame[],
     angleHistory: AngleFrame[],
-    //sentgarbagehistory
-    //receivedgarbagehistory
+    sentgarbagehistory: GarbageFrame[],
+    receivedgarbagehistory: GarbageFrame[],
 }
 
-interface InputFrame {
-    orderID: number,
+export interface InputFrame {
+    indexID: number,
     frameTime: number,
     input: GAME_INPUT,
-    processed: boolean,
+    angle: number,
 }
 
 interface BoardHistoryFrame {
-    orderID: number,
     frameTime: number,
-    boardState: BoardString,
+    boardState: string,
 }
 
 interface BubbleQueueFrame {
-    orderID: number,
     frameTime: number,
     currentBubble: Bubble,
     heldBubble: Bubble,
-    XORShift32State: number,
+    seedState: number,
 }
 
 interface AngleFrame {
-    orderID: number,
     frameTime: number,
     angle: number,
 }
 
-interface BoardString {
-    value: string,
-}
-
-export enum GAME_INPUT {
-    SHOOT = 'SHOOT',
-    HOLD = 'HOLD',
+interface GarbageFrame {
+    frameTime: number,
+    garbageAmount: number,
+    seedState: number,
 }

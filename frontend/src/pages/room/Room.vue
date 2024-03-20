@@ -123,7 +123,6 @@ export default defineComponent({
 
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(19, 20, 142, 1) 0%, rgba(97, 33, 33, 1) 100%)');
-      console.log('Vue app mounted | Room');
       joinRoom();
     });
 

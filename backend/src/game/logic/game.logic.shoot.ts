@@ -5,8 +5,31 @@ import { Field } from "../i/game.i.field";
 import { GameInstance } from "../i/game.i.game-instance";
 import { Grid } from "../i/game.i.grid";
 import { Coordinates } from "../i/game.i.grid-coordinates";
+import { receiveGarbage } from "./game.logic.garbage";
+import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 
-export function shootBubble(game: GameInstance): void {
+export function executeShot(playerGameInstance: GameInstance): void {
+    const bubblesCleared = shootBubble(playerGameInstance);
+    if (!(bubblesCleared > 0)) {
+        receiveGarbage(playerGameInstance);
+    }
+    if (playerGameInstance.gameSettings.refillBoard && playerGameInstance.queuedGarbage === 0) {
+        const refillBoardAtLine = playerGameInstance.gameSettings.refillBoardAtLine;
+        const line = playerGameInstance.playGrid.rows[refillBoardAtLine]
+        let hasToRefill = false;
+        for (const field of line.fields) {
+            if (field.bubble === undefined) {
+                hasToRefill = true
+            }
+        }
+        if (hasToRefill) {
+            playerGameInstance.queuedGarbage += playerGameInstance.gameSettings.refillAmount;
+        }
+    }
+    updateBubbleQueueAndCurrent(playerGameInstance);
+}
+
+export function shootBubble(game: GameInstance): number {
     const angle = game.angle;
     const grid = game.playGrid;
     const bubble = game.currentBubble;
@@ -32,6 +55,7 @@ export function shootBubble(game: GameInstance): void {
     if (bubblesCleared < 3 && grid.rows[gridField.coords.y].isInDeathZone) {
         game.gameTransitions.onGameDefeat();
     }
+    return bubblesCleared;
 }
 
 export function calculatePreview(game: GameInstance): void {

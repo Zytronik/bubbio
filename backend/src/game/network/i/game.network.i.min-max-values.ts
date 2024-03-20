@@ -1,4 +1,4 @@
-import { MinMaxSetting } from "./game.settings.i.min-max-setting";
+import { MinMaxSetting } from "./game.network.i.min-max-setting";
 
 export interface GameSettingsMinMaxValues {
     gridWidth: MinMaxSetting,

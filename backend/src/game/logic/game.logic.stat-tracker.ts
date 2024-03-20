@@ -1,5 +1,4 @@
 import { GameInstance } from "../i/game.i.game-instance";
-import { GAME_MODE } from "../settings/i/game.settings.i.game-modes";
 
 export function trackBubbleShot(game: GameInstance, wallBounces: number, amountCleared: number): void {
     const gameStats = game.stats;
@@ -14,7 +13,7 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
 
     gameStats.bubblesLeftToClear = gameStats.bubbleClearToWin - gameStats.bubblesCleared;
 
-    if (game.gameMode === GAME_MODE.SPRINT && gameStats.bubblesCleared >= gameStats.bubbleClearToWin) {
+    if (gameStats.bubblesCleared >= gameStats.bubbleClearToWin) {
         game.gameTransitions.onGameVictory();
     }
 
@@ -23,17 +22,24 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
         gameStats.bubblesCleared += amountCleared;
         gameStats.highestBubbleClear = (gameStats.highestBubbleClear > amountCleared) ? gameStats.highestBubbleClear : amountCleared;
         
-        let clearStatIndex = amountCleared;
-        if (wallBounces > 0) {
-            gameStats.wallBounceClears++;
-            clearStatIndex = -1 * clearStatIndex;
+        if (wallBounces === 0 && amountCleared === 3) {
+            gameStats.clear3++;
         } 
-        
-        if (!gameStats.bubbleClearStats[clearStatIndex]) {
-            gameStats.bubbleClearStats[clearStatIndex] = 1;
-        } else {
-            gameStats.bubbleClearStats[clearStatIndex]++;
-        }
+        if (wallBounces === 0 && amountCleared === 4) {
+            gameStats.clear4++;
+        } 
+        if (wallBounces === 0 && amountCleared >= 5) {
+            gameStats.clear5++;
+        } 
+        if (wallBounces > 0 && amountCleared === 3) {
+            gameStats.clear3++;
+        } 
+        if (wallBounces > 0 && amountCleared === 4) {
+            gameStats.clear4wb++;
+        } 
+        if (wallBounces > 0 && amountCleared >= 5) {
+            gameStats.clear5wb++;
+        } 
     }
 
     function breakCombo(): void {
