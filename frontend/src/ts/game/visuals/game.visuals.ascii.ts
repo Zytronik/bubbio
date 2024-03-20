@@ -76,7 +76,7 @@ function asciiBoardAnimation(): void {
     }
 }
 
-function fillAsciiStrings(): void {
+export function fillAsciiStrings(): void {
     updatePreviewBubble();
     const playGrid = getPlayGrid();
     const previewPosition: Coordinates = { x: -1, y: -1 };

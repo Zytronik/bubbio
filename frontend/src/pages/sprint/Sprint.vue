@@ -104,6 +104,7 @@ import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { backInput, resetInput } from '@/ts/input/input.all-inputs';
 import { formatFieldValue, getFullName } from '@/ts/page/page.i.stat-display';
 import { MultiMod, ToggleMod } from '@/ts/game/settings/i/game.settings.i.mod';
+import { fillAsciiStrings } from '@/ts/game/visuals/game.visuals.ascii';
 
 export default {
   name: 'SprintPage',
@@ -129,22 +130,32 @@ export default {
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
       eventBus.on("sprintVictory", showResultView);
+      console
       applyMods();
     });
 
     function applyMods() {
-      const savedMods = getCookie('mods');
-      if (savedMods) {
+      const savedModsJson = getCookie('mods');
+      if (savedModsJson) {
         try {
-          mods.value = JSON.parse(savedMods);
+          const savedMods: (ToggleMod | MultiMod)[] = JSON.parse(savedModsJson);
+          mods.value.forEach(mod => {
+            const savedMod = savedMods.find(savedMod => savedMod.abr === mod.abr || savedMod.title === mod.title);
+            if (savedMod) {
+              if ('enabled' in mod && 'enabled' in savedMod) {
+                mod.enabled = savedMod.enabled;
+              }
+              if ('selected' in mod && 'selected' in savedMod) {
+                mod.selected = savedMod.selected;
+              }
+            }
+          });
         } catch (error) {
           console.error('Error parsing mods from cookie:', error);
-          mods.value = allMods;
         }
-      } else {
-        mods.value = allMods;
       }
     }
+
 
     function goBack() {
       if (isGaming.value) {
@@ -154,13 +165,34 @@ export default {
       if (!isDashboard.value && !isGaming.value) {
         showDashboard();
       }
+      document.body.classList.remove('game-view'); //temp
     }
 
     function play() {
-      backInput.fire = goBack;
-      setupSprintGame();
-      showGameView();
-      startGame();
+      transitionToGame(() => {
+        backInput.fire = goBack;
+        startGame();
+      });
+    }
+
+    function transitionToGame(callback: () => void): void {
+      document.body.classList.add('slide-out-left-to-game');
+      const overlay = document.createElement('div');
+      overlay.className = 'black-overlay-right';
+      document.body.appendChild(overlay);
+      setTimeout(() => {
+        overlay.classList.add('black-overlay-cover');
+        overlay.classList.remove('black-overlay-right');
+        document.body.classList.remove('slide-out-left-to-game');
+        document.body.classList.add('game-view');
+        setupSprintGame();
+        showGameView();
+        fillAsciiStrings();
+        setTimeout(() => {
+          document.body.removeChild(overlay);
+          callback();
+        }, 1000);
+      }, 500);
     }
 
     async function showDashboard() {

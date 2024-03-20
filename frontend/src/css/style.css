@@ -5,6 +5,8 @@ html body {
     background-color: black;
     box-sizing: border-box;
     overflow: hidden;
+    height: 100vh;
+    width: 100vw;
 }
 
 #app,
@@ -28,6 +30,59 @@ h2 {
     margin: unset;
     margin-bottom: 15px;
     font-size: 30px;
+}
+
+body.game-view .topbar,
+body.game-view .bottomBar,
+body.game-view .back-buttons{
+    display: none;
+}
+
+@keyframes slideOutToGame {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.slide-out-left-to-game {
+    animation: slideOutToGame 0.5s forwards;
+}
+
+.black-overlay-cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
+    animation-delay: 1s;
+    animation: fadeOut 1s forwards;
+    opacity: 1;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.black-overlay-right {
+    position: fixed;
+    top: 0;
+    left: 100%;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
 }
 
 /* Page */
@@ -284,31 +339,31 @@ button.goBackButton:focus {
     aspect-ratio: 2;
     --_g: no-repeat radial-gradient(circle closest-side, #ffffff 90%, #ffffff00);
     background:
-      var(--_g) 0% 50%,
-      var(--_g) 50% 50%,
-      var(--_g) 100% 50%;
+        var(--_g) 0% 50%,
+        var(--_g) 50% 50%,
+        var(--_g) 100% 50%;
     background-size: calc(100%/3) 50%;
     animation: loader 1s infinite linear;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-  }
-  
-  @keyframes loader {
+}
+
+@keyframes loader {
     20% {
-      background-position: 0% 0%, 50% 50%, 100% 50%
+        background-position: 0% 0%, 50% 50%, 100% 50%
     }
-  
+
     40% {
-      background-position: 0% 100%, 50% 0%, 100% 50%
+        background-position: 0% 100%, 50% 0%, 100% 50%
     }
-  
+
     60% {
-      background-position: 0% 50%, 50% 100%, 100% 0%
+        background-position: 0% 50%, 50% 100%, 100% 0%
     }
-  
+
     80% {
-      background-position: 0% 50%, 50% 50%, 100% 100%
+        background-position: 0% 50%, 50% 50%, 100% 100%
     }
-  }
+}
