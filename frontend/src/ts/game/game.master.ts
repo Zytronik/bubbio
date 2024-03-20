@@ -13,7 +13,7 @@ import { GAME_MODE } from "./settings/i/game.settings.e.game-modes";
 import { GameTransitions } from "./i/game.i.game-transitions";
 import { holdBubble, updateBubbleQueueAndCurrent } from "./logic/game.logic.bubble-manager";
 import { backendSetupGame, submitGameToDB } from "./network/game.network-commands";
-import { digMod, precisionMod } from "./settings/game.settings.all-mods";
+import { digMod, precisionMod, randomnessMod } from "./settings/game.settings.all-mods";
 import { receiveGarbage } from "./logic/game.logic.garbage";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { HandlingSettings } from "./settings/i/game.settings.i.handling-settings";
@@ -64,6 +64,7 @@ export function setupSprintGame(): void {
 function getSprintSettings(): GameSettings {
     const floating = !precisionMod.enabled.value;
     const filled = digMod.enabled.value;
+    const bagSize = randomnessMod.selected.value;
     let prefillAmount = Math.floor(GRID_HEIGHT.defaultValue / 2);
     prefillAmount = (prefillAmount % 2 === 0) ? prefillAmount - 1 : prefillAmount;
     const refillAmount = Math.ceil(prefillAmount / 2);
@@ -83,7 +84,7 @@ function getSprintSettings(): GameSettings {
         refillBoard: filled,
         refillBoardAtLine: refillAmount,
         refillAmount: REFILL_AMOUNT.defaultValue,
-        bubbleBagSize: BUBBLE_BAG_SIZE.defaultValue,
+        bubbleBagSize: bagSize,
         garbageMaxAtOnce: GARBAGE_MAX_AT_ONCE.defaultValue,
         garbageCleanAmount: GARBAGE_CLEAN_AMOUNT.defaultValue,
         garbageColorAmount: GARBAGE_COLOR_AMOUNT.defaultValue,
