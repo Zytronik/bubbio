@@ -11,7 +11,7 @@
               <button class="playButton" @click="play()">Play!</button>
               <div class="cat-wrapper">
                 <div class="cat" v-for="mod in modsComputed" :key="mod.abr.toString()" @click="toggleMod(mod.abr)"
-                :class="{ 'active': mod.type === 'toggle' && mod.enabled }">
+                  :class="{ 'active': mod.type === 'toggle' && mod.enabled }">
                   <!-- ToggleMod -->
                   <div v-if="mod.type === 'toggle'">
                     <img v-if="mod.enabled" :src="getIconPath(mod.icon[0])" alt="Enabled Icon" />
@@ -19,7 +19,7 @@
                     <span>{{ mod.title }}</span>
                   </div>
                   <!-- MultiMod -->
-                  <div v-else-if="mod.type === 'multi'" >
+                  <div v-else-if="mod.type === 'multi'">
                     <img v-if="mod.index != null" :src="getIconPath(mod.icon[mod.index])" alt="Enabled Icon" />
                     <span>{{ mod.title }}</span>
                   </div>
@@ -90,7 +90,7 @@
 import Game from '../game/Game.vue';
 import { changeBackgroundTo, formatDateTime, getCookie, goToState, setCookie } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { getGameStats, leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { bubbleClearToWin, bubblesCleared, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
@@ -129,14 +129,10 @@ export default {
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
       eventBus.on("sprintVictory", showResultView);
-      //applyMods();
+      applyMods();
     });
 
-    onUnmounted(()=>{
-      //setCookie('mods', JSON.stringify(mods.value), 365);
-    });
-
-/*     function applyMods() {
+    function applyMods() {
       const savedMods = getCookie('mods');
       if (savedMods) {
         try {
@@ -148,7 +144,7 @@ export default {
       } else {
         mods.value = allMods;
       }
-    } */
+    }
 
     function goBack() {
       if (isGaming.value) {
@@ -186,7 +182,6 @@ export default {
 
     const toggleMod = (modAbr: string) => {
       mods.value.forEach((mod) => {
-        console.log('mod:', mod);
         if ('enabled' in mod && mod.abr === modAbr) {
           mod.enabled = !mod.enabled;
         } else if ('selected' in mod && mod.abr.includes(modAbr)) {
@@ -195,6 +190,7 @@ export default {
           mod.selected = mod.modValues[nextIndex];
         }
       });
+      setCookie('mods', JSON.stringify(mods.value), 365);
     };
 
     const modsComputed = computed(() => mods.value.map(mod => {
@@ -225,7 +221,6 @@ export default {
     });
 
     function getIconPath(icon: string) {
-      console.log('icon:', icon);
       return require(`@/img/mods/${icon}`);
     }
 
@@ -360,7 +355,7 @@ export default {
   align-items: center;
 }
 
-.cat-wrapper .cat > div {
+.cat-wrapper .cat>div {
   height: 100%;
   width: 100%;
   display: flex;
