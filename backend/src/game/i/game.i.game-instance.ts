@@ -1,4 +1,4 @@
-import { GAME_MODE } from "../settings/i/game.settings.i.game-modes";
+import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
 import { GameSettings } from "../settings/i/game.settings.i.game-settings";
 import { HandlingSettings } from "../settings/i/game.settings.i.handling-settings";
 import { Bubble } from "./game.i.bubble";
@@ -13,13 +13,15 @@ export interface GameInstance {
     handlingSettings: HandlingSettings,
     initialSeed: number,
 
-    currentSeed: number,
+    bubbleSeed: number,
+    garbageSeed: number,
     angle: number,
     currentAPS: number,
     currentBubble: Bubble,
     holdBubble?: Bubble,
     bubbleQueue: Bubble[],
     playGrid: Grid,
+    queuedGarbage: number,
     stats: GameStats,
 
     gameStateHistory: GameStateHistory,

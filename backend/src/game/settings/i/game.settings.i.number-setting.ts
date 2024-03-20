@@ -1,8 +1,9 @@
-//TODO Remove min max from frontend and load from backend
+import { Ref } from "vue";
+
 export interface NumberSetting {
     name: string,
     description: string,
-    value: number,
+    refNumber: Ref<number>,
     defaultValue: number,
     min: number,
     max: number,

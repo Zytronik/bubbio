@@ -2,30 +2,13 @@ import { convertSeedToRandomNumber, getNextSeed } from "./game.logic.random";
 import { Bubble } from "../i/game.i.bubble";
 import { GameInstance } from "../i/game.i.game-instance";
 
-export function setupBubbleQueueAndCurrent(gameInstance: GameInstance): void {
-    const currentSeed = gameInstance.currentSeed;
-    let randomIndex = convertSeedToRandomNumber(0, allBubbles.length, currentSeed);
-    gameInstance.currentBubble = allBubbles[randomIndex];
-
-    let nextSeed = currentSeed;
-    const queueLength = gameInstance.gameSettings.queuePreviewSize.value;
-    for (let i = 0; i < queueLength; i++) {
-        nextSeed = getNextSeed(nextSeed);
-        randomIndex = convertSeedToRandomNumber(0, allBubbles.length, nextSeed);
-        gameInstance.bubbleQueue.push(allBubbles[randomIndex]);
-    }
-
-    nextSeed = getNextSeed(nextSeed);
-    gameInstance.currentSeed = nextSeed;
-}
-
 export function holdBubble(gameInstance: GameInstance): void {
     if (!gameInstance.holdBubble) {
-        const randomIndex = convertSeedToRandomNumber(0, allBubbles.length, gameInstance.currentSeed);
+        const randomIndex = convertSeedToRandomNumber(0, allBubbles.length, gameInstance.bubbleSeed);
+        gameInstance.bubbleSeed = getNextSeed(gameInstance.bubbleSeed);
         gameInstance.bubbleQueue.push(allBubbles[randomIndex]);
         gameInstance.holdBubble = gameInstance.currentBubble;
         gameInstance.currentBubble = gameInstance.bubbleQueue.shift() as Bubble;
-        gameInstance.currentSeed = getNextSeed(gameInstance.currentSeed);
     } else {
         const temp = gameInstance.currentBubble;
         gameInstance.currentBubble = gameInstance.holdBubble as Bubble;
@@ -34,10 +17,26 @@ export function holdBubble(gameInstance: GameInstance): void {
 }
 
 export function updateBubbleQueueAndCurrent(gameInstance: GameInstance): void {
-    const randomIndex = convertSeedToRandomNumber(0, allBubbles.length, gameInstance.currentSeed);
-    gameInstance.bubbleQueue.push(allBubbles[randomIndex]);
+    const queueLength = gameInstance.gameSettings.queuePreviewSize;
+    while (gameInstance.bubbleQueue.length <= queueLength) {
+        gameInstance.bubbleQueue.push(...getBubbleBag(gameInstance));
+    }
     gameInstance.currentBubble = gameInstance.bubbleQueue.shift() as Bubble;
-    gameInstance.currentSeed = getNextSeed(gameInstance.currentSeed);
+}
+
+function getBubbleBag(gameInstance: GameInstance): Bubble[] {
+    const bagSize = gameInstance.gameSettings.bubbleBagSize;
+    const bag: Bubble[] = [];
+    const leftOverBubbles = [...allBubbles];
+    while (bag.length < bagSize) {
+        if (leftOverBubbles.length === 0) {
+            leftOverBubbles.push(...allBubbles);
+        }
+        const randomIndex = convertSeedToRandomNumber(0, leftOverBubbles.length, gameInstance.bubbleSeed);
+        gameInstance.bubbleSeed = getNextSeed(gameInstance.bubbleSeed);
+        bag.push(leftOverBubbles.splice(randomIndex, 1)[0]);
+    }
+    return bag;
 }
 
 
@@ -76,7 +75,7 @@ const white: Bubble = {
     ascii: `<span style="color: rgb(255, 255, 255);">W</span>`,
     type: 6,
 }
-const allBubbles: Bubble[] = [
+export const allBubbles: Bubble[] = [
     red,
     orange,
     yellow,

@@ -6,7 +6,7 @@ import { GameInstance } from "../i/game.i.game-instance";
 import { Grid } from "../i/game.i.grid";
 import { Coordinates } from "../i/game.i.grid-coordinates";
 
-export function shootBubble(game: GameInstance): void {
+export function shootBubble(game: GameInstance): number {
     const angle = game.angle;
     const grid = game.playGrid;
     const bubble = game.currentBubble;
@@ -32,6 +32,7 @@ export function shootBubble(game: GameInstance): void {
     if (bubblesCleared < 3 && grid.rows[gridField.coords.y].isInDeathZone) {
         game.gameTransitions.onGameDefeat();
     }
+    return bubblesCleared;
 }
 
 export function calculatePreview(game: GameInstance): void {

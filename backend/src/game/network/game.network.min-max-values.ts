@@ -1,5 +1,5 @@
-import { GameSettingsMinMaxValues } from "./i/game.settings.i.game-settings-min-max-values"
-import { MinMaxSetting } from "./i/game.settings.i.min-max-setting"
+import { GameSettingsMinMaxValues } from "../settings/i/game.settings.i.game-settings-min-max-values"
+import { MinMaxSetting } from "./i/game.network.i.min-max-setting"
 
 const GRID_WIDTH: MinMaxSetting = {
     min: 4,

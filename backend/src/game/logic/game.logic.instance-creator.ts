@@ -2,14 +2,19 @@ import { GameInstance } from "../i/game.i.game-instance";
 import { resetGrid, setupGrid } from "./game.logic.grid-manager";
 import { GameStats } from "../i/game.i.game-stats";
 import { GameTransitions } from "../i/game.i.game-transitions";
-import { setupBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
+import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 import { GameSettings } from "../settings/i/game.settings.i.game-settings";
-import { GAME_MODE } from "../settings/i/game.settings.i.game-modes";
+import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
 import { HandlingSettings } from "../settings/i/game.settings.i.handling-settings";
 import { getNextSeed } from "./game.logic.random";
+import { prefillBoard } from "./game.logic.garbage";
 
 export function createGameInstance(
-    gameSettings: GameSettings, gameMode: GAME_MODE, handlingSettings: HandlingSettings, gameTransitions: GameTransitions): GameInstance {
+    gameMode: GAME_MODE,
+    gameSettings: GameSettings,
+    handlingSettings: HandlingSettings,
+    gameTransitions: GameTransitions): GameInstance {
+
     const startSeed = getNextSeed(Date.now());
     const gameInstance: GameInstance = {
         gameMode: gameMode,
@@ -17,9 +22,10 @@ export function createGameInstance(
         handlingSettings: handlingSettings,
         initialSeed: startSeed,
 
-        currentSeed: startSeed,
+        bubbleSeed: startSeed,
+        garbageSeed: startSeed,
         angle: 90,
-        currentAPS: handlingSettings.defaultAPS.value,
+        currentAPS: handlingSettings.defaultAPS,
         currentBubble: {
             color: "",
             ascii: "",
@@ -27,7 +33,8 @@ export function createGameInstance(
         },
         bubbleQueue: [],
         playGrid: setupGrid(gameSettings),
-        stats: getEmptyStats(gameSettings, gameMode),
+        queuedGarbage: 0,
+        stats: getEmptyStats(gameSettings),
 
         gameStateHistory: {
             inputHistory: [],
@@ -37,40 +44,51 @@ export function createGameInstance(
         },
         gameTransitions: gameTransitions,
     }
-
-    setupBubbleQueueAndCurrent(gameInstance);
+    if (gameInstance.gameSettings.prefillBoard) {
+        prefillBoard(gameInstance);
+    }
+    updateBubbleQueueAndCurrent(gameInstance);
     return gameInstance;
 }
 
 export function resetGameInstance(gameInstance: GameInstance): void {
-    const seed = performance.now();
+    const seed = getNextSeed(Date.now());
     gameInstance.initialSeed = seed;
-    gameInstance.currentSeed = seed;
+    gameInstance.bubbleSeed = seed;
     gameInstance.angle = 90;
-    gameInstance.currentAPS = gameInstance.handlingSettings.defaultAPS.value;
+    gameInstance.currentAPS = gameInstance.handlingSettings.defaultAPS;
     gameInstance.currentBubble = {
         color: "",
         ascii: "",
         type: 0
     };
+    gameInstance.playGrid.previewBubble = undefined;
     gameInstance.bubbleQueue = [];
     resetGrid(gameInstance.playGrid);
-    gameInstance.stats = getEmptyStats(gameInstance.gameSettings, gameInstance.gameMode);
-    setupBubbleQueueAndCurrent(gameInstance);
+    gameInstance.queuedGarbage = 0;
+    gameInstance.stats = getEmptyStats(gameInstance.gameSettings);
+    if (gameInstance.gameSettings.prefillBoard) {
+        prefillBoard(gameInstance);
+    }
+    updateBubbleQueueAndCurrent(gameInstance);
 }
 
-function getEmptyStats(gameSettings: GameSettings, gameMode: GAME_MODE): GameStats {
-    const bubbleCountToWin = (gameMode === GAME_MODE.SPRINT) ? gameSettings.sprintClearAmount.value : Infinity;
+function getEmptyStats(gameSettings: GameSettings): GameStats {
     const stats: GameStats = {
         gameStartTime: 0,
         gameEndTime: 0,
         gameDuration: 0,
-        bubbleClearToWin: bubbleCountToWin,
+        bubbleClearToWin: gameSettings.sprintVictoryCondition,
         bubblesCleared: 0,
-        bubblesLeftToClear: bubbleCountToWin,
+        bubblesLeftToClear: gameSettings.sprintVictoryCondition,
         bubblesShot: 0,
         bubblesPerSecond: 0,
-        bubbleClearStats: [],
+        clear3: 0,
+        clear4: 0,
+        clear5: 0,
+        clear3wb: 0,
+        clear4wb: 0,
+        clear5wb: 0,
         highestBubbleClear: 0,
         wallBounces: 0,
         wallBounceClears: 0,
@@ -83,5 +101,5 @@ function getEmptyStats(gameSettings: GameSettings, gameMode: GAME_MODE): GameSta
         angleChangePerBubble: 0,
         holds: 0
     }
-    return stats;
+    return stats; 
 }
