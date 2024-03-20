@@ -1,10 +1,13 @@
-import { IsEmail, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class RegisterDto {
     @IsString()
     @IsNotEmpty()
     @MaxLength(20)
     @MinLength(2)
+    @Matches(/^[a-z0-9-_]+$/, {
+        message: 'Username must contain only lowercase letters, numbers, hyphens, and underscores.',
+    })
     readonly username: string;
 
     @IsString()

@@ -1,16 +1,16 @@
-import { Ref } from "vue";
-
-export interface ToggleMod{
-    abr: string;
+export interface Mod {
     title: string;
-    enabled: Ref<boolean>;
-    icon: string;
 }
 
-export interface MultiMod{
+export interface ToggleMod extends Mod{
+    abr: string;
+    enabled: boolean;
+    icon: string[];
+}
+
+export interface MultiMod extends Mod{
     abr: string[];
-    title: string;
-    selected: Ref<number>;
+    selected: number;
     modValues: number[];
     icon: string[];
 }

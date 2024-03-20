@@ -3,6 +3,7 @@ import { GameInstance } from "./i/game.i.game-instance";
 import { disableGameInputs, disableResetInput, enableGameInputs, enableResetInput } from "../input/input.input-manager";
 import { cleanUpAngle } from "./logic/game.logic.angle";
 import { angleLeftInput, angleRightInput } from "../input/input.all-inputs";
+import { angleLeftInput, angleRightInput } from "../input/input.all-inputs";
 import { GameStats } from "./i/game.i.game-stats";
 import { Bubble } from "./i/game.i.bubble";
 import { Grid } from "./i/game.i.grid";
@@ -65,9 +66,9 @@ export function setupSprintGame(): void {
 }
 
 function getSprintSettings(): GameSettings {
-    const floating = !precisionMod.enabled.value;
-    const filled = digMod.enabled.value;
-    const bagSize = randomnessMod.selected.value;
+    const floating = !precisionMod.enabled;
+    const filled = digMod.enabled;
+    const bagSize = randomnessMod.selected;
     let prefillAmount = Math.floor(GRID_HEIGHT.defaultValue / 2);
     prefillAmount = (prefillAmount % 2 === 0) ? prefillAmount - 1 : prefillAmount;
     const refillAmount = Math.ceil(prefillAmount / 2);
@@ -105,6 +106,7 @@ function getHandlingSettings(): HandlingSettings {
 function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
     if (floating && filled) {
         return 3;
+        return 3;
     } else if (!floating && filled) {
         return 3;
     } else if (floating && !filled) {
@@ -113,7 +115,6 @@ function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
         return 3;
     }
 }
-
 
 export function startGame(): void {
     playerGameInstance.gameTransitions.onGameStart();
