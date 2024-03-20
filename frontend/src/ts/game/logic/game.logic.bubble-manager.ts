@@ -21,11 +21,6 @@ export function updateBubbleQueueAndCurrent(gameInstance: GameInstance): void {
     while (gameInstance.bubbleQueue.length <= queueLength) {
         gameInstance.bubbleQueue.push(...getBubbleBag(gameInstance));
     }
-    // let betterlog = ""
-    // gameInstance.bubbleQueue.forEach(bubble => {
-    //     betterlog += bubble.type
-    // })
-    // console.log(betterlog)
     gameInstance.currentBubble = gameInstance.bubbleQueue.shift() as Bubble;
 }
 
