@@ -81,87 +81,87 @@ export function goToState(destination: PAGE_STATE, isNavigatingForward = true) {
 //page Transitions
 
 function mainMenuToSettingsPage() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function multiMenuToRoomListing() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function mainMenuToMultiMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function mainMenuToSoloMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function multiMenuToSoloMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function settingsPageToMainMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function roomListingToMultiMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function roomListingToRoomPage() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function roomPageToRoomListing() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function roomPageToMultiMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function soloMenuToMainMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function gamePageToMainMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function gamePageToRoomPage() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function spintPageToSoloMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function soloMenuToSprintPage() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function multiMenuToMainMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function soloMenuToMultiMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function soloMenuTosettingsPage() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function multiMenuToSettingsPage() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function settingsPageToMultiMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 function settingsPageToSoloMenu() {
-    console.log("current page: " + currentPageState.value);
+    // console.log("current page: " + currentPageState.value);
 }
 
 //overlay Transitions

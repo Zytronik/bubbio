@@ -31,7 +31,6 @@ export default {
 
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(96, 221, 43, 1) 0%, rgba(198, 63, 135, 1) 100%)');
-      console.log('Vue app mounted | soloMenu');
     });
 
     return {

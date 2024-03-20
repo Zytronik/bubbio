@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { MultiMod, ToggleMod } from "./i/game.settings.i.mod";
+import { MultiMod, ToggleMod } from "./i/game.settings.ref.i.mod";
 
 export const digMod: ToggleMod = {
     abr: "D",
@@ -14,7 +14,7 @@ export const precisionMod: ToggleMod = {
     enabled: ref(false),
     icon: "",
 }
-
+ 
 export const randomnessMod: MultiMod = {
     abr: ["Random", "7-Bag", "10-Bag", "21-Bag"],
     title: "Bubble Randomness",

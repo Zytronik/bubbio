@@ -25,6 +25,7 @@ export interface GameInstance {
     stats: GameStats,
 
     gameStateHistory: GameStateHistory,
+    processedInputsIndex: number,
 
     gameTransitions: GameTransitions,
 }

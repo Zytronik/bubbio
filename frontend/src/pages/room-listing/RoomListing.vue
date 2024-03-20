@@ -77,7 +77,6 @@ export default {
 
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(209, 25, 114, 1) 0%, rgba(45, 19, 19, 1) 100%)');
-      console.log('Vue app mounted | Room Listing');
       fetchActiveRooms();
     });
 

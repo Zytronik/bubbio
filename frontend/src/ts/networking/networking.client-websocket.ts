@@ -34,7 +34,6 @@ export const disconnectGlobalSocket = (): void => {
     if (state.socket) {
         state.socket.disconnect();
         state.socket = null;
-        console.log("socket disconnected");
     }
 }
 
@@ -56,12 +55,10 @@ function initializeSocket(): Socket {
         ioOptions.path = "";
     }
 
-    console.log("Initializing socket connection");
     const socket = io(socketIoHost, ioOptions);
     socket.connect();
 
     socket.on('connect', () => {
-        console.log('Socket connected:', socket.id);
         executeOnConnectCallbacks();
     });
 

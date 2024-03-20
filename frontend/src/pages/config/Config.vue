@@ -152,7 +152,6 @@ export default {
 
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(69,51,59,1) 0%, rgba(24,193,169,1) 100%)');
-      console.log('Vue app mounted | Config Page');
     });
 
     async function handleFileChange(fileType: string, event: Event) {

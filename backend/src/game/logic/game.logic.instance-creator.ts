@@ -6,16 +6,15 @@ import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 import { GameSettings } from "../settings/i/game.settings.i.game-settings";
 import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
 import { HandlingSettings } from "../settings/i/game.settings.i.handling-settings";
-import { getNextSeed } from "./game.logic.random";
 import { prefillBoard } from "./game.logic.garbage";
 
 export function createGameInstance(
     gameMode: GAME_MODE,
     gameSettings: GameSettings,
     handlingSettings: HandlingSettings,
-    gameTransitions: GameTransitions): GameInstance {
+    gameTransitions: GameTransitions,
+    startSeed: number): GameInstance {
 
-    const startSeed = getNextSeed(Date.now());
     const gameInstance: GameInstance = {
         gameMode: gameMode,
         gameSettings: gameSettings,
@@ -40,8 +39,11 @@ export function createGameInstance(
             inputHistory: [],
             boardHistory: [],
             bubbleQueueHistory: [],
-            angleHistory: []
+            angleHistory: [],
+            sentgarbagehistory: [],
+            receivedgarbagehistory: []
         },
+        processedInputsIndex: 0,
         gameTransitions: gameTransitions,
     }
     if (gameInstance.gameSettings.prefillBoard) {
@@ -51,10 +53,10 @@ export function createGameInstance(
     return gameInstance;
 }
 
-export function resetGameInstance(gameInstance: GameInstance): void {
-    const seed = getNextSeed(Date.now());
+export function resetGameInstance(gameInstance: GameInstance, seed: number): void {
     gameInstance.initialSeed = seed;
     gameInstance.bubbleSeed = seed;
+    gameInstance.garbageSeed = seed;
     gameInstance.angle = 90;
     gameInstance.currentAPS = gameInstance.handlingSettings.defaultAPS;
     gameInstance.currentBubble = {
@@ -67,6 +69,13 @@ export function resetGameInstance(gameInstance: GameInstance): void {
     resetGrid(gameInstance.playGrid);
     gameInstance.queuedGarbage = 0;
     gameInstance.stats = getEmptyStats(gameInstance.gameSettings);
+    gameInstance.gameStateHistory.inputHistory = [];
+    gameInstance.gameStateHistory.boardHistory = [];
+    gameInstance.gameStateHistory.bubbleQueueHistory = [];
+    gameInstance.gameStateHistory.angleHistory = [];
+    gameInstance.gameStateHistory.sentgarbagehistory = [];
+    gameInstance.gameStateHistory.receivedgarbagehistory = [];
+    gameInstance.processedInputsIndex = 0;
     if (gameInstance.gameSettings.prefillBoard) {
         prefillBoard(gameInstance);
     }
@@ -101,5 +110,5 @@ function getEmptyStats(gameSettings: GameSettings): GameStats {
         angleChangePerBubble: 0,
         holds: 0
     }
-    return stats; 
+    return stats;
 }

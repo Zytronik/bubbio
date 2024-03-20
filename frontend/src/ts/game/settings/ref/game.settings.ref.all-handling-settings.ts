@@ -1,4 +1,4 @@
-import { NumberSetting } from "./i/game.settings.i.number-setting"
+import { NumberSetting } from "./i/game.settings.ref.i.number-setting"
 import { ref } from "vue"
 
 export const DEFAULT_APS: NumberSetting = {

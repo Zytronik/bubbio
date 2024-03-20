@@ -31,7 +31,6 @@ export default {
 
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,221,185,1) 0%, rgba(198,63,119,1) 100%)');
-      console.log('Vue app mounted | multiMenu');
     });
 
     return {

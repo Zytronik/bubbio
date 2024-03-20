@@ -87,7 +87,7 @@ import History from '@/globalComponents/History.vue';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-leaderboard';
 import { UserData } from '@/ts/page/page.i-userData';
 import eventBus from '@/ts/page/page.event-bus';
-import { allMods as importedMods } from '@/ts/game/settings/game.settings.all-mods';
+import { allMods as importedMods } from '@/ts/game/settings/ref/game.settings.ref.all-mods';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { backInput, resetInput } from '@/ts/input/input.all-inputs';
 import { formatFieldValue, getFullName } from '@/ts/page/page.i.stat-display';
@@ -337,3 +337,4 @@ export default {
   top: 30px;
 }
 </style>
+@/ts/game/settings/ref/game.settings.all-mods
