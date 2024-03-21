@@ -39,7 +39,8 @@ import eventBus from './ts/page/page.event-bus';
 import { attachInputReader } from './ts/input/input.input-reader';
 import { httpClient } from './ts/networking/networking.http-client';
 import { getDefaultProfilePbURL } from './ts/networking/paths';
-import { applySavedInputSettings, enableBackInputs, enableChannelInput } from './ts/input/input.input-manager';
+import { applySavedInputSettings, enableBackInputs, enableChannelInput, enableNetworkDebugInputs } from './ts/input/input.input-manager';
+import { setupSocketListeners } from "./ts/game/network/game.network.commands";
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -214,8 +215,10 @@ export default {
     }
 
     onMounted(async () => {
+      addSocketConnectListener(setupSocketListeners);
       enableBackInputs();
       enableChannelInput();
+      enableNetworkDebugInputs();
       setupTransitionFunctions();
       initializeGlobalSocket();
       isAuthenticated.value = checkUserAuthentication();
@@ -400,4 +403,4 @@ export default {
 
 
 
-</style>
+</style>./ts/game/network/game.network.commands

@@ -153,6 +153,51 @@ export const debugTriggerGarbageInput: Input = {
     enabled: false,
 };
 
+export const debugNetworkGetSpectationEntries: Input = {
+    name: "Get Spectation Entries",
+    description: "Get Spectation Entries",
+    customKeyMap: ["KeyI", "", ""],
+    defaultKeyCode: "KeyI",
+    isTrigger: true,
+    pressed: false,
+    lastFiredAtTime: 0,
+    releasedAtTime: 0,
+    fire: () => {
+        console.error("no fire event attached to keyCode: " + debugNetworkClearOngoingGames.name);
+    },
+    enabled: false,
+};
+
+export const debugNetworkGetOngoingGames: Input = {
+    name: "Log Ongoing Games",
+    description: "Log Ongoing Games",
+    customKeyMap: ["KeyO", "", ""],
+    defaultKeyCode: "KeyO",
+    isTrigger: true,
+    pressed: false,
+    lastFiredAtTime: 0,
+    releasedAtTime: 0,
+    fire: () => {
+        console.error("no fire event attached to keyCode: " + debugNetworkGetOngoingGames.name);
+    },
+    enabled: false,
+};
+
+export const debugNetworkClearOngoingGames: Input = {
+    name: "Clear Ongoing Games",
+    description: "Clear Ongoing Games",
+    customKeyMap: ["KeyP", "", ""],
+    defaultKeyCode: "KeyP",
+    isTrigger: true,
+    pressed: false,
+    lastFiredAtTime: 0,
+    releasedAtTime: 0,
+    fire: () => {
+        console.error("no fire event attached to keyCode: " + debugNetworkClearOngoingGames.name);
+    },
+    enabled: false,
+};
+
 export const allInputs: Input[] = [
     angleLeftInput,
     angleRightInput,
@@ -164,6 +209,9 @@ export const allInputs: Input[] = [
     backInput,
     channelInput,
     // debugTriggerGarbageInput,
+    debugNetworkGetSpectationEntries,
+    debugNetworkGetOngoingGames,
+    debugNetworkClearOngoingGames,
 ]
 
 const allKeyCodes = [
