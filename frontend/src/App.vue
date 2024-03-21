@@ -31,7 +31,7 @@ import state, { addSocketConnectListener, disconnectGlobalSocket, initializeGlob
 import { currentPageState, goToState, isChannelActive, openChannelOverlay, openProfile, pages, setupTransitionFunctions, showUserPageFromURL } from './ts/page/page.page-manager';
 import LoginOverlay from './globalComponents/LoginOverlay.vue';
 import InfoMessages from './globalComponents/InfoMessages.vue';
-import Channel from './globalComponents/Channel.vue';
+import Channel from './globalComponents/channel/Channel.vue';
 
 import { PAGE_STATE } from './ts/page/page.e-page-state';
 import { checkUserAuthentication, clearClientState, clearGuestCookies, logUserOut, showLoginForm } from './ts/networking/networking.auth';

@@ -4,7 +4,7 @@
     <div class="page-wrapper">
       <div class="page-container">
 
-        <div v-if="!isGaming && isDashboard" class="sprintDashboard">
+        <div v-if="isDashboard" class="sprintDashboard">
 
           <div class="left-content">
             <div class="playMods">
@@ -68,7 +68,7 @@
           </div>
         </div>
 
-        <div v-if="!isGaming && !isDashboard" class="gameComplete">
+        <div v-if="isResultView" class="gameComplete">
           <button @click="goBack()">Back</button>
           <button @click="play()">Try Again</button>
           <table v-if="resultStats">
@@ -90,7 +90,7 @@
 import Game from '../game/Game.vue';
 import { changeBackgroundTo, formatDateTime, getCookie, goToState, setCookie } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import { getGameStats, leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { bubbleClearToWin, bubblesCleared, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
@@ -105,6 +105,7 @@ import { formatFieldValue, getFullName } from '@/ts/page/page.i.stat-display';
 import { fillAsciiStrings } from '@/ts/game/visuals/game.visuals.ascii';
 import { MultiMod, ToggleMod } from '@/ts/game/settings/ref/i/game.settings.ref.i.mod';
 import { allMods } from '@/ts/game/settings/ref/game.settings.ref.all-mods';
+import { disableResetInput } from '@/ts/input/input.input-manager';
 
 export default {
   name: 'SprintPage',
@@ -119,6 +120,7 @@ export default {
     const mods = ref<(ToggleMod | MultiMod)[]>(allMods);
     const isGaming = ref<boolean>(false);
     const isDashboard = ref<boolean>(true);
+    const isResultView = ref<boolean>(false);
     const resultStats = ref<GameStats>();
     const userData: UserData | null = eventBus.getUserData();
     const isGuestString = sessionStorage.getItem('isGuest');
@@ -165,13 +167,35 @@ export default {
           backInput.fire = backInputOnLoad.value;
         });
       }
-      if (!isDashboard.value && !isGaming.value) {
-        showDashboard();
+      if (isResultView.value) {
+        transitionResultViewToDashboard();
         backInput.fire = backInputOnLoad.value;
       }
     }
 
-    function transitionToResultView(){
+    async function transitionResultViewToDashboard() {
+      disableResetInput();
+      isGaming.value = false;
+      isResultView.value = true;
+      isDashboard.value = true;
+      await nextTick(); // if i dont do this, dashboard is undefined
+      const dashboard = document.querySelector('.sprintDashboard') as HTMLElement;
+      const resultScreen = document.querySelector('.gameComplete') as HTMLElement;
+      const container = document.querySelector('.page-container') as HTMLElement;
+      container.classList.add('flex-row'); //add flex-row to container
+      dashboard.classList.add('move-left'); //position dashboard to the left
+      resultScreen.classList.add('slideToRight'); //slide result screen to the left
+      dashboard.classList.add('slideLeftToCenter'); //slide dashboard to the left
+      setTimeout(() => {
+        resultScreen.classList.remove('slideToRight'); //reset styles
+        isResultView.value = false; //remove result screen
+        dashboard.classList.remove('move-left'); //reset styles
+        dashboard.classList.remove('slideLeftToCenter'); //reset styles
+        container.classList.remove('flex-row') //remove flex-row from container
+      }, 500);
+    }
+
+    function transitionToResultView() {
       transitionOutOfGame(() => {
         showResultView();
       });
@@ -224,11 +248,13 @@ export default {
     async function showDashboard() {
       isGaming.value = false;
       isDashboard.value = true;
+      isResultView.value = false;
     }
 
     function showGameView() {
       isGaming.value = true;
       isDashboard.value = false;
+      isResultView.value = false;
     }
 
     function showResultView() {
@@ -236,6 +262,7 @@ export default {
       resetInput.fire = play;
       isGaming.value = false;
       isDashboard.value = false;
+      isResultView.value = true;
     }
 
     const toggleMod = (modAbr: string) => {
@@ -311,6 +338,7 @@ export default {
       formatFieldValue,
       getFullName,
       getIconPath,
+      isResultView,
     };
   },
 };
@@ -482,5 +510,60 @@ export default {
   left: 30px;
   top: 30px;
 }
+
+.gameComplete {
+  background-color: rgb(30, 30, 30);
+  width: 100%;
+  height: 100%;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.slideToRight {
+  animation: slideToRight 0.5s forwards;
+}
+
+.slideLeftToCenter {
+  animation: slideLeftToCenter 0.5s forwards;
+}
+
+@keyframes slideToRight {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(110%);
+    }
+}
+
+@keyframes slideLeftToCenter {
+    from {
+        transform: translateX(-110%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+.page-container {
+  position: relative;
+}
+
+.move-left {
+  position: absolute;
+  top: 80px;
+  bottom: 80px;
+  height: calc(100% - 160px);
+  left: 15px;
+  width: calc(100% - 30px);
+  transform: translateX(-110%);
+}
 </style>
-@/ts/game/settings/ref/game.settings.all-mods

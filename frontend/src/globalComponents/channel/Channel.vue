@@ -74,12 +74,12 @@
               </transition>
               <transition name="fade">
                 <div v-if="currentTab === 'Leaderboards'" class="tab-content">
-                  <p>TODO</p>
+                  <LeaderboardsTab />
                 </div>
               </transition>
               <transition name="fade">
                 <div v-if="currentTab === 'Spectate'" class="tab-content">
-                  <p>TODO</p>
+                  <SpectateTab />
                 </div>
               </transition>
             </div>
@@ -148,7 +148,9 @@ import debounce from 'debounce';
 import { closeChannelOverlay, formatDateToAgoText, getFlagImagePath } from '@/ts/page/page.page-manager';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import axios from 'axios';
-import UserProfileOverlay from './UserProfileOverlay.vue';
+import UserProfileOverlay from '../UserProfileOverlay.vue';
+import SpectateTab from './components/SpectateTab.vue';
+import LeaderboardsTab from './components/LeaderboardsTab.vue';
 import state from '@/ts/networking/networking.client-websocket';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 import useChatStore from '@/ts/page/page.globalChat';
@@ -159,7 +161,7 @@ import { backInput } from '@/ts/input/input.all-inputs';
 
 export default {
   name: "ChannelOverlay",
-  components: { UserProfileOverlay },
+  components: { UserProfileOverlay, SpectateTab, LeaderboardsTab },
   data() {
     return {
       currentTab: 'Dashboard',
