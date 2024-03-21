@@ -127,14 +127,11 @@ export function getStatDisplay(statName: string): StatDisplay | undefined {
 
 export function getFullName(fieldName: string): string {
     const statDisplay = getStatDisplay(fieldName);
-    return statDisplay ? statDisplay.fullName : "";
+    return statDisplay ? statDisplay.fullName : fieldName;
 }
 
 export function formatFieldValue(value: string | number, fieldName: string): string {
     const statDisplay = getStatDisplay(fieldName);
-    if(!statDisplay){
-        return "";
-    }
 
     let formattedValue = value;
 

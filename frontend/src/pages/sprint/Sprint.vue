@@ -57,7 +57,6 @@
         </div>
 
         <div v-if="isGaming" class="inGame">
-          <button class="backButton" @click="goBack()">Back</button>
           <div class="game-wrapper">
             <Game />
             <div class="inGameStats">
@@ -69,16 +68,32 @@
         </div>
 
         <div v-if="isResultView" class="gameComplete">
-          <button @click="goBack()">Back</button>
-          <button @click="play()">Try Again</button>
-          <table v-if="resultStats">
-            <tbody>
-              <tr v-for="(value, key) in resultStats" :key="key">
-                <td>{{ getFullName(key) }}</td>
-                <td>{{ formatFieldValue(value, key) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- <button @click="goBack()">Back</button> -->
+          <div class="top">
+            <div class="sprintTime">
+              <p class="time">{{ formatTimeNumberToString(sprintResultTime) }}</p>
+              <p class="diff"><span>Diff to pb: </span>00:00:69</p>
+            </div>
+            <button class="retry" @click="play()">Retry</button>
+          </div>
+
+          <div v-if="resultStats">
+            <div class="columns">
+              <div class="column">
+                <div class="row" v-for="(value, key) in splitResultStats.firstHalf" :key="`first-${key}`">
+                  <div class="col">{{ getFullName(key) }}</div>
+                  <div class="col">{{ formatFieldValue(value ?? '', key) }}</div>
+                </div>
+              </div>
+              <div class="column">
+                <div class="row" v-for="(value, key) in splitResultStats.secondHalf" :key="`second-${key}`">
+                  <div class="col">{{ getFullName(key) }}</div>
+                  <div class="col">{{ formatFieldValue(value ?? '', key) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -105,7 +120,7 @@ import { formatFieldValue, getFullName } from '@/ts/page/page.i.stat-display';
 import { fillAsciiStrings } from '@/ts/game/visuals/game.visuals.ascii';
 import { MultiMod, ToggleMod } from '@/ts/game/settings/ref/i/game.settings.ref.i.mod';
 import { allMods } from '@/ts/game/settings/ref/game.settings.ref.all-mods';
-import { disableResetInput } from '@/ts/input/input.input-manager';
+import { disableBackInputs, disableResetInput, enableBackInputs, enableResetInput } from '@/ts/input/input.input-manager';
 
 export default {
   name: 'SprintPage',
@@ -121,14 +136,44 @@ export default {
     const isGaming = ref<boolean>(false);
     const isDashboard = ref<boolean>(true);
     const isResultView = ref<boolean>(false);
-    const resultStats = ref<GameStats>();
+    const resultStats = ref<Partial<GameStats>>();
     const userData: UserData | null = eventBus.getUserData();
     const isGuestString = sessionStorage.getItem('isGuest');
     const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
     const backInputOnLoad = ref<() => void>(() => "");
+    const sprintResultTime = ref<number>(0);
     const backButtonData = ref([
       { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/sprint.png'), disabled: false },
     ]);
+
+    const splitResultStats = computed(() => {
+      if (!resultStats.value) {
+        return { firstHalf: {}, secondHalf: {} };
+      }
+
+      const keys = Object.keys(resultStats.value) as Array<keyof GameStats>;
+      const half = Math.ceil(keys.length / 2);
+      const firstHalf: Partial<GameStats> = {};
+      const secondHalf: Partial<GameStats> = {};
+
+      keys.slice(0, half).forEach((key) => {
+        firstHalf[key] = safelyGetStat(resultStats.value, key);
+      });
+
+      keys.slice(half).forEach((key) => {
+        secondHalf[key] = safelyGetStat(resultStats.value, key);
+      });
+
+      return { firstHalf, secondHalf };
+    });
+
+    function safelyGetStat<T extends keyof GameStats>(
+      stats: Partial<GameStats> | undefined,
+      key: T
+    ): GameStats[T] | undefined {
+      return stats ? stats[key] : undefined;
+    }
+
 
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
@@ -165,7 +210,7 @@ export default {
           leaveGame();
           showDashboard();
           backInput.fire = backInputOnLoad.value;
-        });
+        }, true);
       }
       if (isResultView.value) {
         transitionResultViewToDashboard();
@@ -198,7 +243,7 @@ export default {
     function transitionToResultView() {
       transitionOutOfGame(() => {
         showResultView();
-      });
+      }, false);
     }
 
     function play() {
@@ -209,11 +254,13 @@ export default {
     }
 
     function transitionToGame(onTransitionEnd: () => void): void {
+      disableBackInputs();
       document.body.classList.add('slide-out-left-to-game');
       const overlay = document.createElement('div');
       overlay.className = 'black-overlay-right';
       document.body.appendChild(overlay);
       setTimeout(() => {
+        enableBackInputs();
         overlay.classList.add('black-overlay-cover');
         overlay.classList.remove('black-overlay-right');
         document.body.classList.remove('slide-out-left-to-game');
@@ -228,21 +275,28 @@ export default {
       }, 500);
     }
 
-    function transitionOutOfGame(onTransitionHidden: () => void): void {
-      document.body.classList.add('slide-out-right-off-game');
-      const overlay = document.createElement('div');
-      overlay.className = 'black-overlay-left';
-      document.body.appendChild(overlay);
+    function transitionOutOfGame(onTransitionHidden: () => void, isQuit: boolean): void {
+      disableResetInput();
+      disableBackInputs();
+      const isQuitDelay = isQuit ? 0 : 1500;
       setTimeout(() => {
-        overlay.classList.add('black-overlay-cover');
-        onTransitionHidden();
-        overlay.classList.remove('black-overlay-left');
-        document.body.classList.remove('slide-out-right-off-game');
-        document.body.classList.remove('game-view');
+        document.body.classList.add('slide-out-right-off-game');
+        const overlay = document.createElement('div');
+        overlay.className = 'black-overlay-left';
+        document.body.appendChild(overlay);
         setTimeout(() => {
-          document.body.removeChild(overlay);
-        }, 1000);
-      }, 500);
+          overlay.classList.add('black-overlay-cover');
+          onTransitionHidden();
+          overlay.classList.remove('black-overlay-left');
+          document.body.classList.remove('slide-out-right-off-game');
+          document.body.classList.remove('game-view');
+          setTimeout(() => {
+            enableBackInputs();
+            enableResetInput();
+            document.body.removeChild(overlay);
+          }, 1000);
+        }, 500);
+      }, isQuitDelay);
     }
 
     async function showDashboard() {
@@ -258,12 +312,33 @@ export default {
     }
 
     function showResultView() {
-      resultStats.value = getGameStats();
+      const rawStats: GameStats = getGameStats();
+      sprintResultTime.value = rawStats.gameDuration;
+      const statBanList = [
+        'gameStartTime',
+        'gameEndTime',
+        'bubbleClearToWin',
+        'bubblesLeftToClear',
+        'currentCombo',
+        'gameDuration',
+      ];
+
+      const filteredStats = Object.keys(rawStats)
+        .filter(key => !statBanList.includes(key))
+        .reduce<Partial<GameStats>>((obj, key) => {
+          const keyAsKeyType = key as keyof GameStats;
+          obj[keyAsKeyType] = rawStats[keyAsKeyType] as number;
+          return obj;
+        }, {});
+
+      resultStats.value = filteredStats;
+
       resetInput.fire = play;
       isGaming.value = false;
       isDashboard.value = false;
       isResultView.value = true;
     }
+
 
     const toggleMod = (modAbr: string) => {
       mods.value.forEach((mod) => {
@@ -339,6 +414,8 @@ export default {
       getFullName,
       getIconPath,
       isResultView,
+      splitResultStats,
+      sprintResultTime,
     };
   },
 };
@@ -515,6 +592,7 @@ export default {
   background-color: rgb(30, 30, 30);
   width: 100%;
   height: 100%;
+  padding: 15px;
 }
 
 .flex-row {
@@ -534,23 +612,23 @@ export default {
 }
 
 @keyframes slideToRight {
-    from {
-        transform: translateX(0);
-    }
+  from {
+    transform: translateX(0);
+  }
 
-    to {
-        transform: translateX(110%);
-    }
+  to {
+    transform: translateX(110%);
+  }
 }
 
 @keyframes slideLeftToCenter {
-    from {
-        transform: translateX(-110%);
-    }
+  from {
+    transform: translateX(-110%);
+  }
 
-    to {
-        transform: translateX(0);
-    }
+  to {
+    transform: translateX(0);
+  }
 }
 
 .page-container {
@@ -566,4 +644,64 @@ export default {
   width: calc(100% - 30px);
   transform: translateX(-110%);
 }
+
+.columns {
+  display: flex;
+  border-bottom: 1px solid white;
+  border-top: 1px solid white;
+}
+
+.row {
+  display: flex;
+  border-bottom: 1px solid white;
+  padding: 5px 15px;
+  justify-content: space-between;
+}
+
+.column:first-of-type {
+  border-right: 1px solid white;
+}
+
+.column:first-of-type .row:last-of-type {
+  border: none;
+}
+
+.column {
+  flex: 1;
+}
+
+.gameComplete .top {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.sprintTime {
+  width: 70%;
+  border: 1px solid white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+}
+
+.sprintTime .time {
+  font-size: 450%;
+}
+
+.sprintTime .diff {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+}
+
+.gameComplete .top p {
+  margin: unset;
+}
+
+.gameComplete .top {
+  height: 15%;
+}
+
 </style>

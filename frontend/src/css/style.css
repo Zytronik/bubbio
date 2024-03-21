@@ -34,7 +34,7 @@ h2 {
 
 body.game-view .topbar,
 body.game-view .bottomBar,
-body.game-view .back-buttons{
+body.game-view .back-buttons {
     display: none;
 }
 
@@ -269,10 +269,17 @@ button.goBackButton:focus {
     transform: translateX(-60%);
 }
 
-.sprintDashboard .playButton {
+.sprintDashboard button.playButton {
     height: 100%;
     width: 100%;
     font-size: 400%;
+    cursor: pointer;
+    border: none;
+}
+
+button.retry {
+    width: 30%;
+    font-size: 300%;
     cursor: pointer;
     border: none;
 }
