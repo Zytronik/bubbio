@@ -1,7 +1,8 @@
 import { angleCenter, angleLeft, angleRight, changeAPS, debugTriggerGarbage, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
 import { checkUserAuthentication } from "../networking/networking.auth";
 import { httpClient } from "../networking/networking.http-client";
-import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, debugTriggerGarbageInput, backInput, holdInput, resetInput, shootInput, defaultBlocker } from "./input.all-inputs";
+import { openChannelOverlay } from "../page/page.page-manager";
+import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, debugTriggerGarbageInput, backInput, holdInput, resetInput, shootInput, defaultBlocker, channelInput } from "./input.all-inputs";
 
 export function enableGameInputs(): void {
     angleLeftInput.fire = angleLeft;
@@ -60,6 +61,15 @@ export function enableBackInputs(): void {
 
 export function disableBackInputs(): void {
     backInput.enabled = false;
+}
+
+export function enableChannelInput(): void {
+    channelInput.enabled = true;
+    channelInput.fire = openChannelOverlay;
+}
+
+export function disableChannelInput(): void {
+    channelInput.enabled = false;
 }
 
 export async function applySavedInputSettings(): Promise<void> {

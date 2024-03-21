@@ -99,8 +99,8 @@ export function fillAsciiStrings(): void {
     boardText += getArrowLineString(gridWidth);
     boardText += getLowerBoarderLineString(gridWidth);
     playGridASCII.value = boardText;
-    holdString.value += getHoldBubbleString();
-    queueString.value += getBubbleQueueString();
+    holdString.value = getHoldBubbleString();
+    queueString.value = getBubbleQueueString();
     incomingGarbage.value = getIncomingGarbageString();
 }
 

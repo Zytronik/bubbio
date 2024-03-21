@@ -130,7 +130,7 @@ export default {
 
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
-      eventBus.on("sprintVictory", showResultView);
+      eventBus.on("sprintVictory", transitionToResultView);
       applyMods();
       backInputOnLoad.value = backInput.fire;
     });
@@ -166,11 +166,15 @@ export default {
         });
       }
       if (!isDashboard.value && !isGaming.value) {
-        transitionOutOfGame(() => {
-          showDashboard();
-          backInput.fire = backInputOnLoad.value;
-        });
+        showDashboard();
+        backInput.fire = backInputOnLoad.value;
       }
+    }
+
+    function transitionToResultView(){
+      transitionOutOfGame(() => {
+        showResultView();
+      });
     }
 
     function play() {
@@ -447,6 +451,7 @@ export default {
   align-items: flex-end;
   position: relative;
   width: 40%;
+  font-size: 24px;
 }
 
 .inGame {

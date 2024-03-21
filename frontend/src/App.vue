@@ -39,7 +39,7 @@ import eventBus from './ts/page/page.event-bus';
 import { attachInputReader } from './ts/input/input.input-reader';
 import { httpClient } from './ts/networking/networking.http-client';
 import { getDefaultProfilePbURL } from './ts/networking/paths';
-import { applySavedInputSettings, enableBackInputs } from './ts/input/input.input-manager';
+import { applySavedInputSettings, enableBackInputs, enableChannelInput } from './ts/input/input.input-manager';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -215,6 +215,7 @@ export default {
 
     onMounted(async () => {
       enableBackInputs();
+      enableChannelInput();
       setupTransitionFunctions();
       initializeGlobalSocket();
       isAuthenticated.value = checkUserAuthentication();

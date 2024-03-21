@@ -1,6 +1,6 @@
 import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, startCountdownAnimation, stopASCIIAnimation, stopCountdownAnimation } from "./visuals/game.visuals.ascii";
 import { GameInstance } from "./i/game.i.game-instance";
-import { disableGameInputs, disableResetInput, enableGameInputs, enableResetInput } from "../input/input.input-manager";
+import { disableChannelInput, disableGameInputs, disableResetInput, enableChannelInput, enableGameInputs, enableResetInput } from "../input/input.input-manager";
 import { cleanUpAngle } from "./logic/game.logic.angle";
 import { angleLeftInput, angleRightInput } from "../input/input.all-inputs";
 import { GameStats } from "./i/game.i.game-stats";
@@ -41,6 +41,7 @@ export function setupSprintGame(): void {
 
     function startSprint(): void {
         enableResetInput();
+        disableChannelInput();
         showCountDownAndStart();
     }
     function resetSprint(): void {
@@ -50,6 +51,7 @@ export function setupSprintGame(): void {
     }
     function leaveSprint(): void {
         disableResetInput();
+        enableChannelInput();
         disableGameplay();
     }
     function sprintVictory(): void {

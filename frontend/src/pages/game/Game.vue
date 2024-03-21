@@ -1,12 +1,14 @@
 <template class="page" id="game">
   <div class="gameUI-wrapper">
+    <span class="monospace" v-html="queueString"></span>
+    <span class="monospace" v-html="holdString"></span>
     <span class="monospace" v-html="incomingGarbage"></span>
     <span class="monospace grid" v-html="playGridASCII"></span>
   </div>
 </template>
 
 <script lang="ts">
-import { incomingGarbage, playGridASCII } from '@/ts/game/visuals/game.visuals.ascii';
+import { holdString, incomingGarbage, playGridASCII, queueString } from '@/ts/game/visuals/game.visuals.ascii';
 
 export default {
   name: 'GamePage',
@@ -14,6 +16,8 @@ export default {
     return {
       playGridASCII,
       incomingGarbage,
+      queueString,
+      holdString,
     }
   },
 }
@@ -23,14 +27,12 @@ export default {
 .monospace {
   white-space: pre-line;
   font-family: 'Consolas', monospace;
-  font-size: 20px;
   text-align: center;
 }
 
 .gameUI-wrapper{
   display: flex;
   flex-direction: column;
-  min-width: 390px;
 }
 
 html body {

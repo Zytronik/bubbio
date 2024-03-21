@@ -123,6 +123,21 @@ export const backInput: Input = {
     enabled: false,
 };
 
+export const channelInput: Input = {
+    name: "Open Channel",
+    description: "Open the channel",
+    customKeyMap: ["F9", "", ""],
+    defaultKeyCode: "F9",
+    isTrigger: true,
+    pressed: false,
+    lastFiredAtTime: 0,
+    releasedAtTime: 0,
+    fire: () => {
+        console.error("no fire event attached to keyCode: " + channelInput.name);
+    },
+    enabled: false,
+};
+
 export const debugTriggerGarbageInput: Input = {
     name: "Trigger Garbage",
     description: "Adds Garbage to the grid",
@@ -147,6 +162,7 @@ export const allInputs: Input[] = [
     holdInput,
     resetInput,
     backInput,
+    channelInput,
     // debugTriggerGarbageInput,
 ]
 
