@@ -1,5 +1,5 @@
 import { angleCenter, angleLeft, angleRight, changeAPS, debugTriggerGarbage, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
-import { network_clearOngoingGames, network_getOngoingGames, network_getSpectationEntries } from "../game/network/game.network.commands";
+import { network_clearOngoingGames, network_getOngoingGames, network_getSpectationEntries } from "../game/network/game.network.debug";
 import { checkUserAuthentication } from "../networking/networking.auth";
 import { httpClient } from "../networking/networking.http-client";
 import { openChannelOverlay } from "../page/page.page-manager";

@@ -12,7 +12,7 @@ import { createGameInstance, resetGameInstance } from "./logic/game.logic.instan
 import { GAME_MODE } from "./settings/i/game.settings.e.game-modes";
 import { GameTransitions } from "./i/game.i.game-transitions";
 import { holdBubble } from "./logic/game.logic.bubble-manager";
-import { backendSetupGame, network_synchronizeGame, submitGameToDB } from "./network/game.network.commands";
+import { network_setupGame, network_synchronizeGame, submitGameToDB } from "./network/game.network.game";
 import { digMod, precisionMod, randomnessMod } from "./settings/ref/game.settings.ref.all-mods";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { HandlingSettings } from "./settings/i/game.settings.i.handling-settings";
@@ -37,7 +37,7 @@ export function setupSprintGame(): void {
     const handlingSettings = getHandlingSettings();
     const startSeed = getNextSeed(Date.now());
     playerGameInstance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed);
-    backendSetupGame(playerGameInstance)
+    network_setupGame(playerGameInstance)
 
     function startSprint(): void {
         enableResetInput();

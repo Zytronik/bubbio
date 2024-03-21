@@ -40,7 +40,7 @@ import { attachInputReader } from './ts/input/input.input-reader';
 import { httpClient } from './ts/networking/networking.http-client';
 import { getDefaultProfilePbURL } from './ts/networking/paths';
 import { applySavedInputSettings, enableBackInputs, enableChannelInput, enableNetworkDebugInputs } from './ts/input/input.input-manager';
-import { setupSocketListeners } from "./ts/game/network/game.network.commands";
+import { setupDebugListeners } from "./ts/game/network/game.network.debug";
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -215,7 +215,7 @@ export default {
     }
 
     onMounted(async () => {
-      addSocketConnectListener(setupSocketListeners);
+      addSocketConnectListener(setupDebugListeners);
       enableBackInputs();
       enableChannelInput();
       enableNetworkDebugInputs();
@@ -403,4 +403,4 @@ export default {
 
 
 
-</style>./ts/game/network/game.network.commands
+</style>./ts/game/network/game.network.commands./ts/game/network/game.network.game
