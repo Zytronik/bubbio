@@ -105,11 +105,11 @@
 import Game from '../game/Game.vue';
 import { changeBackgroundTo, formatDateTime, getCookie, goToState, setCookie } from '@/ts/page/page.page-manager';
 import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { ComputedRef, computed, nextTick, onMounted, ref } from 'vue';
 import { getGameStats, leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { bubbleClearToWin, bubblesCleared, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
-import Leaderboard from '@/globalComponents/Leaderboard.vue';
+import Leaderboard, { ModDetail } from '@/globalComponents/Leaderboard.vue';
 import History from '@/globalComponents/History.vue';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-leaderboard';
 import { UserData } from '@/ts/page/page.i-userData';
@@ -374,10 +374,22 @@ export default {
       }
     }));
 
-    const enabledToggleMods = computed(() => {
-      return mods.value
-        .filter((mod): mod is ToggleMod => 'enabled' in mod && mod.enabled)
-        .map(mod => mod.abr);
+    const enabledToggleMods: ComputedRef<ModDetail[]> = computed(() => {
+      return mods.value.map((mod): ModDetail => {
+        if ('enabled' in mod) {
+          return {
+            abr: mod.abr,
+            type: 'toggle',
+            enabled: mod.enabled,
+          };
+        }
+        else {
+          return {
+            abr: mod.abr[mod.modValues.indexOf(mod.selected)],
+            type: 'multi',
+          };
+        }
+      }).filter((mod) => mod.type === 'toggle' ? mod.enabled === true : true);
     });
 
     function getIconPath(icon: string) {

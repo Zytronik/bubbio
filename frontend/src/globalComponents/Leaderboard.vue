@@ -67,6 +67,13 @@ interface LeaderboardEntry extends GameStats {
   [key: string]: any;
 }
 
+export interface ModDetail {
+  abr: string;
+  type: 'toggle' | 'multi';
+  enabled?: boolean;
+}
+
+
 export default defineComponent({
   name: 'LeaderboardComponent',
   props: {
@@ -99,7 +106,7 @@ export default defineComponent({
       required: false,
     },
     mods: {
-      type: Array as PropType<string[]>,
+      type: Array as PropType<ModDetail[]>,
       required: false,
       default: () => [],
     },
