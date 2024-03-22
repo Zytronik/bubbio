@@ -1,43 +1,34 @@
 import state from "../../networking/networking.client-websocket";
 import { dto_GameInstance } from "./dto/game.network.dto.game-instance";
-import { dto_SpectationEntry } from "./dto/spectate.dto.spectation-entry";
+
+const DI_GET_ONGOING_GAMES = "debugInput_getAllOngoingGames";
+const DO_GET_ONGOING_GAMES = "debugOutput_getAllOngoingGames";
+const DI_CLEAR_ONGOING_GAMES = "debugInput_clearAllOngoingGames";
 
 const registeredDebugEvents: Set<string> = new Set();
 export function network_getOngoingGames(): void {
-    console.log("network_getOngoingGames");
+    console.log(DI_GET_ONGOING_GAMES);
     if (state.socket) {
-        state.socket.emit("getOngoingGames");
-    }
-}
-
-export function network_getSpectationEntries(): void {
-    console.log("network_getSpectationEntries");
-    if (state.socket) {
-        state.socket.emit("getSpectationEntries");
+        state.socket.emit(DI_GET_ONGOING_GAMES);
+    } else {
+        console.error("YOU DONT HAVE ANY SOCKETS!");
     }
 }
 
 export function network_clearOngoingGames(): void {
-    console.log("network_clearOngoingGames");
+    console.log(DI_CLEAR_ONGOING_GAMES);
     if (state.socket) {
-        state.socket.emit("clearOngoingGames");
+        state.socket.emit(DI_CLEAR_ONGOING_GAMES);
+    } else {
+        console.error("YOU DONT HAVE ANY SOCKETS!");
     }
 }
 
 export function setupDebugListeners() {
-    const returnAllGames = "returnAllOngoingGames";
-    const spectateGame = "updateGameInstaceForSpectators";
-    if (state.socket && !registeredDebugEvents.has(returnAllGames)) {
-        state.socket.on(returnAllGames, (data: any) => {
-            console.log(returnAllGames, data);
+    if (state.socket && !registeredDebugEvents.has(DO_GET_ONGOING_GAMES)) {
+        state.socket.on(DO_GET_ONGOING_GAMES, (data: dto_GameInstance[]) => {
+            console.log(DO_GET_ONGOING_GAMES, data);
         });
-        registeredDebugEvents.add(returnAllGames);
-    }
-    if (state.socket && !registeredDebugEvents.has(spectateGame)) {
-        console.log("todo register to spectate", "state.socket.id");
-        state.socket.on(spectateGame, (data: dto_GameInstance) => {
-            console.log(spectateGame, data.gameInstance);
-        });
-        registeredDebugEvents.add(spectateGame);
+        registeredDebugEvents.add(DO_GET_ONGOING_GAMES);
     }
 }

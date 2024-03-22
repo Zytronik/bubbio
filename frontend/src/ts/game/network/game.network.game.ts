@@ -6,9 +6,14 @@ import { allMods } from "../settings/ref/game.settings.ref.all-mods";
 import { GameInstance } from "../i/game.i.game-instance";
 import { dto_GameSetup } from "./dto/game.network.dto.game-setup";
 
+const I_SETUP_GAME = "input_setupGame";
+const I_QUEUE_INPUTS = "input_queueUpGameInputs";
+const I_LEAVE_GAME = "input_leaveGame";
+const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
+
 const registeredGameEvents: Set<string> = new Set();
 export function network_setupGame(playerGameInstance: GameInstance): void {
-    console.log("backendSetupGame");
+    console.log(I_SETUP_GAME);
     if (state.socket) {
         const networkData: dto_GameSetup = {
             gameMode: playerGameInstance.gameMode,
@@ -16,9 +21,9 @@ export function network_setupGame(playerGameInstance: GameInstance): void {
             handlingSettings: playerGameInstance.handlingSettings,
             seed: playerGameInstance.initialSeed,
         }
-        state.socket.emit("setupGame", networkData);
+        state.socket.emit(I_SETUP_GAME, networkData);
     } else {
-        console.error("ohno, something went wrong");
+        console.error("YOU DONT HAVE ANY SOCKETS!");
     }
 }
 
@@ -30,7 +35,9 @@ export function network_synchronizeGame(gameInstance: GameInstance): void {
         }
         const inputQueue = gameInstance.gameStateHistory.inputHistory.slice(0);
         console.log(inputQueue)
-        state.socket.emit("queueUpGameInputs", inputQueue);
+        state.socket.emit(I_QUEUE_INPUTS, inputQueue);
+    } else {
+        console.error("YOU DONT HAVE ANY SOCKETS!");
     }
 }
 

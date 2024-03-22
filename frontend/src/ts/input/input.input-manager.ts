@@ -1,9 +1,9 @@
 import { angleCenter, angleLeft, angleRight, changeAPS, debugTriggerGarbage, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
-import { network_clearOngoingGames, network_getOngoingGames, network_getSpectationEntries } from "../game/network/game.network.debug";
+import { network_clearOngoingGames, network_getOngoingGames } from "../game/network/game.network.debug";
 import { checkUserAuthentication } from "../networking/networking.auth";
 import { httpClient } from "../networking/networking.http-client";
 import { openChannelOverlay } from "../page/page.page-manager";
-import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, debugTriggerGarbageInput, backInput, holdInput, resetInput, shootInput, defaultBlocker, channelInput, debugNetworkGetOngoingGames, debugNetworkClearOngoingGames, debugNetworkGetSpectationEntries } from "./input.all-inputs";
+import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, debugTriggerGarbageInput, backInput, holdInput, resetInput, shootInput, defaultBlocker, channelInput, debugNetwork2, debugNetwork3, debugNetwork1 } from "./input.all-inputs";
 
 export function enableGameInputs(): void {
     angleLeftInput.fire = angleLeft;
@@ -74,19 +74,19 @@ export function disableChannelInput(): void {
 }
 
 export function enableNetworkDebugInputs(): void {
-    debugNetworkGetOngoingGames.fire = network_getOngoingGames;
-    debugNetworkGetSpectationEntries.fire = network_getSpectationEntries;
-    debugNetworkClearOngoingGames.fire = network_clearOngoingGames;
+    // debugNetwork1.fire = network_getSpectationEntries;
+    debugNetwork2.fire = network_getOngoingGames;
+    debugNetwork3.fire = network_clearOngoingGames;
 
-    debugNetworkGetOngoingGames.enabled = true;
-    debugNetworkGetSpectationEntries.enabled = true;
-    debugNetworkClearOngoingGames.enabled = true;
+    debugNetwork1.enabled = true;
+    debugNetwork2.enabled = true;
+    debugNetwork3.enabled = true;
 }
 
 export function disableNetworkDebugInputs(): void {
-    debugNetworkGetOngoingGames.enabled = false;
-    debugNetworkGetSpectationEntries.enabled = false;
-    debugNetworkClearOngoingGames.enabled = false;
+    debugNetwork1.enabled = false;
+    debugNetwork2.enabled = false;
+    debugNetwork3.enabled = false;
 }
 
 export async function applySavedInputSettings(): Promise<void> {

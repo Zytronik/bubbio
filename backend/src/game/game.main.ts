@@ -11,28 +11,59 @@ import { holdBubble } from './logic/game.logic.bubble-manager';
 import { dto_GameInstance } from './network/dto/game.network.dto.game-instance';
 import { dto_SpectationEntry } from './network/dto/game.network.dto.spectation-entry';
 
+
+/*
+J: Join Room
+L: Leave Room
+I: Input Data
+O: Output Data
+DI: Debug Input
+DO: Debug Output
+*/
+const J_SPECTATOR_ENTRIES = "join_spectatorEntriesRoom";
+const L_SPECTATOR_ENTRIES = "leave_spectatorEntriesRoom";
+const O_SPECTATOR_ENTRIES = "update_spectatorEntries";
+
+const J_PLAYER_SPECTATOR = "join_playerSpectatorRoom";
+const L_PLAYER_SPECTATOR = "leave_playerSpectatorRoom";
+const O_PLAYER_SPECTATOR = "update_playerSpectator";
+
+const I_SETUP_GAME = "input_setupGame";
+const I_QUEUE_INPUTS = "input_queueUpGameInputs";
+const I_LEAVE_GAME = "input_leaveGame";
+const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
+
+const DI_GET_ONGOING_GAMES = "debugInput_getAllOngoingGames";
+const DO_GET_ONGOING_GAMES = "debugOutput_getAllOngoingGames";
+const DI_CLEAR_ONGOING_GAMES = "debugInput_clearAllOngoingGames";
+
+const SPECTATE_PREFIX = "spectate_";
 const spectatorRoomName = 'spectatorRoom';
 const ongoingGamesMap: Map<string, OngoingGame> = new Map(); //<client.id: string, OngoingGame>
 @WebSocketGateway()
 export class GameGateway implements OnGatewayDisconnect {
 
-  @WebSocketServer() 
+  @WebSocketServer()
   server: Server;
 
   handleDisconnect(client: Socket) {
     const game = ongoingGamesMap.get(client.id);
     if (game) {
       ongoingGamesMap.delete(client.id);
-      this.server.to(spectatorRoomName).emit('updateSpectatorEntries', this.getSpectatorEntries());
+      this.server.to(spectatorRoomName).emit(O_SPECTATOR_ENTRIES, this.getSpectatorEntries());
     }
   }
 
-  @SubscribeMessage('setupGame')
-  setupGame(client: Socket, nd_GameSetup: dto_GameSetup): void {
-    const gameMode = nd_GameSetup.gameMode;
-    const gameSettings = nd_GameSetup.gameSettings;
-    const handlingSettings = nd_GameSetup.handlingSettings;
-    const seed = nd_GameSetup.seed;
+
+
+  // #region Gameplay
+  @SubscribeMessage(I_SETUP_GAME)
+  setupGame(client: Socket, dto_GameSetup: dto_GameSetup): void {
+    console.log(I_SETUP_GAME);
+    const gameMode = dto_GameSetup.gameMode;
+    const gameSettings = dto_GameSetup.gameSettings;
+    const handlingSettings = dto_GameSetup.handlingSettings;
+    const seed = dto_GameSetup.seed;
     const transitions: GameTransitions = {
       onGameStart: function (): void {
         console.log('START GAME');
@@ -54,70 +85,91 @@ export class GameGateway implements OnGatewayDisconnect {
       playerClient: client,
       playerName: client.data.user.username,
       gameInstance: createGameInstance(gameMode, gameSettings, handlingSettings, transitions, seed),
-      spectatorClients: [client],
+      spectatorRoomName: SPECTATE_PREFIX + client.id,
       queuedInputs: [],
       isProcessing: false,
     }
     ongoingGamesMap.set(client.id, game);
-    this.server.to(spectatorRoomName).emit('updateSpectatorEntries', this.getSpectatorEntries());
+    this.server.to(spectatorRoomName).emit(O_SPECTATOR_ENTRIES, this.getSpectatorEntries());
   }
 
-  @SubscribeMessage('queueUpGameInputs')
+  @SubscribeMessage(I_QUEUE_INPUTS)
   queueUpGameInputs(client: Socket, gameInputs: InputFrame[]): void {
+    console.log(I_QUEUE_INPUTS);
     const game = ongoingGamesMap.get(client.id)
     gameInputs.forEach(inputFrame => game.queuedInputs[inputFrame.indexID] = inputFrame);
-    client.emit('queuedUpGameInputsReceivedAnswer', game.queuedInputs.length - 1);
-    processGameInputs(game);
+    client.emit(O_QUEUE_INPUTS, game.queuedInputs.length - 1);
 
-    function processGameInputs(game: OngoingGame): void {
-      if (!game.isProcessing) {
-        game.isProcessing = true;
-        const queuedInputs = game.queuedInputs;
-        const processedInputs = game.gameInstance.gameStateHistory.inputHistory;
-        while (queuedInputs.length > processedInputs.length) {
-          const inputFrame = queuedInputs[processedInputs.length];
-          if (inputFrame.input === GAME_INPUT.SHOOT) {
-            game.gameInstance.angle = inputFrame.angle;
-            executeShot(game.gameInstance);
-          } else if (inputFrame.input === GAME_INPUT.HOLD) {
-            holdBubble(game.gameInstance);
-          }
-          processedInputs[inputFrame.indexID] = inputFrame;
+    if (!game.isProcessing) {
+      game.isProcessing = true;
+      const queuedInputs = game.queuedInputs;
+      const processedInputs = game.gameInstance.gameStateHistory.inputHistory;
+      while (queuedInputs.length > processedInputs.length) {
+        const inputFrame = queuedInputs[processedInputs.length];
+        if (inputFrame.input === GAME_INPUT.SHOOT) {
+          game.gameInstance.angle = inputFrame.angle;
+          executeShot(game.gameInstance);
+        } else if (inputFrame.input === GAME_INPUT.HOLD) {
+          holdBubble(game.gameInstance);
         }
-        updateSpectatorGameInstance(game)
-        game.isProcessing = false;
+        processedInputs[inputFrame.indexID] = inputFrame;
       }
-    }
-
-    function updateSpectatorGameInstance(game: OngoingGame): void {
-      for (const spectator of game.spectatorClients) {
-        const dto: dto_GameInstance = {
-          playerName: game.playerName,
-          playerID: game.playerClient.id,
-          gameInstance: game.gameInstance
-        }
-        spectator.emit('updateGameInstaceForSpectators', dto);
-      }
+      const spectators = game.spectatorRoomName
+      this.server.to(spectators).emit(O_PLAYER_SPECTATOR, this.getGameInstanceDto(game));
+      game.isProcessing = false;
+      console.log(O_PLAYER_SPECTATOR)
     }
   }
+  // #endregion
 
 
-  //Spectate
-  @SubscribeMessage('joinSpectatorRoom')
+
+  // #region Spectate
+  @SubscribeMessage(J_SPECTATOR_ENTRIES)
   joinSpectatorRoom(client: Socket): void {
+    console.log(J_SPECTATOR_ENTRIES);
     client.join(spectatorRoomName);
-    client.emit('updateSpectatorEntries', this.getSpectatorEntries());
+    client.emit(O_SPECTATOR_ENTRIES, this.getSpectatorEntries());
   }
 
-  @SubscribeMessage('leaveSpectatorRoom')
+  @SubscribeMessage(L_SPECTATOR_ENTRIES)
   leaveSpectatorRoom(client: Socket): void {
+    console.log(L_SPECTATOR_ENTRIES);
     client.leave(spectatorRoomName);
   }
 
-  @SubscribeMessage('spectatePlayer')
-  spectatePlayer(client: Socket, playerClientID: string) {
-    const playerGame = ongoingGamesMap.get(playerClientID);
-    playerGame.spectatorClients.push(client);
+  @SubscribeMessage(J_PLAYER_SPECTATOR)
+  joinPlayerSpectator(client: Socket, playerClientID: string) {
+    console.log(J_PLAYER_SPECTATOR);
+    const roomname = ongoingGamesMap.get(playerClientID).spectatorRoomName;
+    client.join(roomname);
+    client.emit(O_PLAYER_SPECTATOR, this.getGameInstanceDto(playerClientID));
+  }
+
+  @SubscribeMessage(L_PLAYER_SPECTATOR)
+  leavePlayerSpectator(client: Socket, playerClientID: string): void {
+    console.log(L_PLAYER_SPECTATOR);
+    const roomname = ongoingGamesMap.get(playerClientID).spectatorRoomName;
+    client.leave(roomname);
+  }
+  // #endregion
+
+
+
+  // #region Data
+  getGameInstanceDto(input: string | OngoingGame): dto_GameInstance {
+    let game: OngoingGame;
+    if (typeof input === 'string') {
+      game = ongoingGamesMap.get(input);
+    } else {
+      game = input;
+    }
+    const dto: dto_GameInstance = {
+      playerName: game.playerName,
+      playerID: game.playerClient.id,
+      gameInstance: game.gameInstance
+    }
+    return dto;
   }
 
   getSpectatorEntries(): dto_SpectationEntry[] {
@@ -134,21 +186,29 @@ export class GameGateway implements OnGatewayDisconnect {
       spectationEntries.push(entry);
     }
     return spectationEntries;
-    
-  }
 
-  //Debug
-  @SubscribeMessage('getOngoingGames')
+  }
+  // #endregion
+
+
+
+  // #region Debug
+  @SubscribeMessage(DI_GET_ONGOING_GAMES)
   logOngoingGames(client: Socket): void {
-    console.log(ongoingGamesMap);
-    client.emit('returnAllOngoingGames', ongoingGamesMap);
+    console.log(DI_GET_ONGOING_GAMES, ongoingGamesMap);
+    const allData: dto_GameInstance[] = []
+    for (const [key, value] of ongoingGamesMap.entries()) {
+      allData.push(this.getGameInstanceDto(value));
+    }
+    client.emit(DO_GET_ONGOING_GAMES, allData);
   }
 
-  @SubscribeMessage('clearOngoingGames')
-  clearOngoingGames(client: Socket): void {
-    console.log('clearOngoingGames');
+  @SubscribeMessage(DI_CLEAR_ONGOING_GAMES)
+  clearOngoingGames(): void {
+    console.log(DI_CLEAR_ONGOING_GAMES);
     ongoingGamesMap.clear();
   }
+  // #endregion
 }
 
 

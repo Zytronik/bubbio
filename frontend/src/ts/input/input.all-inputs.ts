@@ -153,9 +153,9 @@ export const debugTriggerGarbageInput: Input = {
     enabled: false,
 };
 
-export const debugNetworkGetSpectationEntries: Input = {
-    name: "Get Spectation Entries",
-    description: "Get Spectation Entries",
+export const debugNetwork1: Input = {
+    name: "debugNetwork1",
+    description: "debugNetwork1",
     customKeyMap: ["KeyI", "", ""],
     defaultKeyCode: "KeyI",
     isTrigger: true,
@@ -163,14 +163,14 @@ export const debugNetworkGetSpectationEntries: Input = {
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
-        console.error("no fire event attached to keyCode: " + debugNetworkClearOngoingGames.name);
+        console.error("no fire event attached to keyCode: " + debugNetwork3.name);
     },
     enabled: false,
 };
 
-export const debugNetworkGetOngoingGames: Input = {
-    name: "Log Ongoing Games",
-    description: "Log Ongoing Games",
+export const debugNetwork2: Input = {
+    name: "debugNetwork2",
+    description: "debugNetwork2",
     customKeyMap: ["KeyO", "", ""],
     defaultKeyCode: "KeyO",
     isTrigger: true,
@@ -178,14 +178,14 @@ export const debugNetworkGetOngoingGames: Input = {
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
-        console.error("no fire event attached to keyCode: " + debugNetworkGetOngoingGames.name);
+        console.error("no fire event attached to keyCode: " + debugNetwork2.name);
     },
     enabled: false,
 };
 
-export const debugNetworkClearOngoingGames: Input = {
-    name: "Clear Ongoing Games",
-    description: "Clear Ongoing Games",
+export const debugNetwork3: Input = {
+    name: "debugNetwork3",
+    description: "debugNetwork3",
     customKeyMap: ["KeyP", "", ""],
     defaultKeyCode: "KeyP",
     isTrigger: true,
@@ -193,7 +193,7 @@ export const debugNetworkClearOngoingGames: Input = {
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
-        console.error("no fire event attached to keyCode: " + debugNetworkClearOngoingGames.name);
+        console.error("no fire event attached to keyCode: " + debugNetwork3.name);
     },
     enabled: false,
 };
@@ -209,9 +209,9 @@ export const allInputs: Input[] = [
     backInput,
     channelInput,
     // debugTriggerGarbageInput,
-    debugNetworkGetSpectationEntries,
-    debugNetworkGetOngoingGames,
-    debugNetworkClearOngoingGames,
+    debugNetwork1,
+    debugNetwork2,
+    debugNetwork3,
 ]
 
 const allKeyCodes = [

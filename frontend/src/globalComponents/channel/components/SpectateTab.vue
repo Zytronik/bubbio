@@ -1,36 +1,47 @@
 <template>
-  <p>Hello There</p>
-  <div>
-    <button v-for="entry in allSpectationEntries" :key="entry.clientID" @click="spectatePlayer(entry.clientID)">
+  <div v-if="!isSpectating">
+    <button v-for="entry in allSpectationEntries" :key="entry.clientID" @click="spectatePlayer(entry.clientID); showSpectatedGame();">
       {{ entry.playerName }}
     </button>
     <span v-if="allSpectationEntries.length === 0">No players to spectate.</span>
   </div>
+    <div v-if="isSpectating">
+      <button @click="showSpectationEntries();">Switch back to old view</button>
+    </div>
 </template>
 
 <script lang="ts">
-import { joinSpectatorRoom, leaveSpectatorRoom, spectatePlayer } from '@/ts/game/network/game.network.spectate';
-import { defineComponent, onMounted, onUnmounted, watch } from 'vue';
+import { network_joinSpectatorRoom, network_leaveSpectatorRoom, network_spectatePlayer } from '@/ts/game/network/game.network.spectate';
+import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import { allSpectationEntries } from "@/ts/game/spectate/spectate.spectator";
 
 export default defineComponent({
   name: 'SpectateTab',
   setup() {
-    watch(() => allSpectationEntries, (newVal, oldVal) => {
-    console.log('allSpectationEntries changed:', newVal);
-  });
+    const isSpectating = ref(false);
+
+    function showSpectatedGame() {
+      isSpectating.value = true;
+    }
+
+    function showSpectationEntries() {
+      isSpectating.value = false;
+    }
 
     onMounted(() => {
-      joinSpectatorRoom();
+      network_joinSpectatorRoom();
     });
 
     onUnmounted(() => {
-      leaveSpectatorRoom();
+      network_leaveSpectatorRoom();
     });
 
     return {
       allSpectationEntries,
-      spectatePlayer,
+      spectatePlayer: network_spectatePlayer,
+      isSpectating,
+      showSpectatedGame,
+      showSpectationEntries,
     };
   },
 });
