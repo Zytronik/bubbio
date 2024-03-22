@@ -5,6 +5,7 @@ import eventBus from "@/ts/page/page.event-bus";
 import { allMods } from "../settings/ref/game.settings.ref.all-mods";
 import { GameInstance } from "../i/game.i.game-instance";
 import { dto_GameSetup } from "./dto/game.network.dto.game-setup";
+import { ToggleMod, MultiMod } from "../settings/ref/i/game.settings.ref.i.mod";
 
 const registeredGameEvents: Set<string> = new Set();
 export function network_setupGame(playerGameInstance: GameInstance): void {
@@ -29,9 +30,12 @@ export function network_synchronizeGame(gameInstance: GameInstance): void {
             history[i].indexID = i;
         }
         const inputQueue = gameInstance.gameStateHistory.inputHistory.slice(0);
-        console.log(inputQueue)
         state.socket.emit("queueUpGameInputs", inputQueue);
     }
+}
+
+function isMultiMod(mod: ToggleMod | MultiMod): mod is MultiMod {
+    return 'modValues' in mod;
 }
 
 export async function submitGameToDB(gameStats: GameStats) {
@@ -60,16 +64,21 @@ export async function submitGameToDB(gameStats: GameStats) {
             "angleChangePerBubble": gameStats.angleChangePerBubble,
             "holds": gameStats.holds
         };
-        const mods: Record<string, boolean> = {};
-        allMods.forEach(mod => {
-            if ('enabled' in mod && typeof mod.enabled === 'boolean') {
-                mods[mod.abr] = mod.enabled;
-            } else if ('selected' in mod && typeof mod.selected == 'number') {
-                mods[mod.abr[mod.modValues.indexOf(mod.selected)]] = true;
+        const convertedMods = allMods.map(mod => {
+            if (isMultiMod(mod)) {
+                return {
+                    abr: mod.abr[mod.modValues.indexOf(mod.selected)],
+                    type: 'multi'
+                };
+            } else {
+                return {
+                    abr: mod.abr,
+                    type: 'toggle',
+                    enabled: mod.enabled
+                };
             }
         });
-        console.log(allMods, mods)
-        const modsJsonString = JSON.stringify(mods);
+        const modsJsonString = JSON.stringify(convertedMods);
         try {
             const token = localStorage.getItem('authToken');
             await httpClient.post('/sprint/submit', { submitStats, mods: modsJsonString }, {

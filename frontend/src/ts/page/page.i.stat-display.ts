@@ -145,16 +145,12 @@ export function formatFieldValue(value: string | number, fieldName: string): str
     }
 
     if (statDisplay && typeof value === 'string' && fieldName === 'mods') {
-        let valueArray = [];
         try {
-            valueArray = JSON.parse(value);
+            const modsArray = JSON.parse(value);
+            const modsString = modsArray.map((mod: { abr: string; type: string }) => mod.abr).join(', ');
+            formattedValue = modsString;
         } catch (error) {
-            formattedValue = "";
-        }
-        if (valueArray.length > 0) {
-            formattedValue = valueArray.join(', ');
-        }else{
-            formattedValue = "";
+            console.error('Error parsing mods JSON:', error);
         }
     }
 

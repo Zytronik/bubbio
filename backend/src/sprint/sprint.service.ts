@@ -34,9 +34,14 @@ export class SprintService {
         return newSprint;
     }
 
-    getEnabledSprintMods(sprintModsDto: string): string[] {
+    getEnabledSprintMods(sprintModsDto: string) {
         const mods = JSON.parse(sprintModsDto);
-        return Object.keys(mods).filter(mod => mods[mod]);
+        const filteredMods = mods.filter(mod => mod.type !== 'toggle' || mod.enabled);
+        const enabledMods = filteredMods.map(mod => {
+            return { abr: mod.abr, type: mod.type };
+        });
+    
+        return enabledMods;
     }
 
     async getSprintRank(take: number): Promise<any> {

@@ -19,7 +19,7 @@ export class LeaderboardController {
         @Query('sortDirection') sortDirection: string,
         @Query('category') category: string,
         @Query('country') country: string,
-        @Query('mods') mods: string[],
+        @Query('mods') mods: ModDetail[],
         @Query('limit') limit: string,
         @Req() req: AuthenticatedRequest
     ) {
@@ -44,4 +44,10 @@ export class LeaderboardController {
         });
     }
 
+}
+
+export interface ModDetail {
+    abr: string;
+    type: 'toggle' | 'multi';
+    enabled?: boolean;
 }
