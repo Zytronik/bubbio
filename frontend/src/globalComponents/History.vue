@@ -29,8 +29,8 @@
 <script lang="ts">
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { httpClient } from '@/ts/networking/networking.http-client';
-import { GameMode, SortDirection } from '@/ts/page/page.e-leaderboard';
-import { formatFieldValue, getFullName } from '@/ts/page/page.i.stat-display';
+import { GameMode, SortDirection } from '@/ts/page/e/page.e-leaderboard';
+import { formatFieldValue, getFullName } from '@/ts/page/i/page.i.stat-display';
 import { PropType, defineComponent, onMounted, ref, watchEffect } from 'vue';
 
 interface HistoryEntry extends GameStats {

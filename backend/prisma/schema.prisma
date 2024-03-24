@@ -17,9 +17,12 @@ model User {
   pbUrl           String?         
   bannerUrl       String?          
   inputSettings   String?
-  LastDisconnectedAt  DateTime?        
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @default(now()) @updatedAt
+  LastDisconnectedAt  DateTime?
+  rating            Float            @default(1500)
+  ratingDeviation   Float            @default(350)
+  volatility        Float            @default(0.06)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now()) @updatedAt
   tokenBlacklists TokenBlacklist[]
   sprint          Sprint[]
   news          News[]

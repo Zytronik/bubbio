@@ -29,7 +29,7 @@
 <script lang="ts">
 import state from '@/ts/networking/networking.client-websocket';
 import { ref, SetupContext, onMounted } from 'vue';
-import { PAGE_STATE } from '@/ts/page/page.e-page-state';
+import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 

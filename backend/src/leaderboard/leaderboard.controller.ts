@@ -3,6 +3,7 @@ import { LeaderboardService } from './leaderboard.service';
 import { UserService } from 'src/user/user.service';
 import { AuthenticatedRequest } from 'src/auth/auth.e-authRequest';
 import { OptionalJwtAuthGuard } from 'src/auth/jwt/auth.jwt.optionalGuard';
+import { ModDetail } from './leaderboard.i.mods';
 
 @Controller('leaderboard')
 export class LeaderboardController {
@@ -44,10 +45,4 @@ export class LeaderboardController {
         });
     }
 
-}
-
-export interface ModDetail {
-    abr: string;
-    type: 'toggle' | 'multi';
-    enabled?: boolean;
 }

@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, PropType } from 'vue';
-import { PAGE_STATE } from '@/ts/page/page.e-page-state';
+import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { goToState } from '@/ts/page/page.page-manager';
 import { backInput } from '@/ts/input/input.all-inputs';
 

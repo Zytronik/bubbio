@@ -45,13 +45,13 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, PropType, ref, watch  } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
-import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-leaderboard';
+import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 import eventBus from '@/ts/page/page.event-bus';
-import { UserData } from '@/ts/page/page.i-userData';
+import { UserData } from '@/ts/page/i/page.i-userData';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { getDefaultProfilePbURL } from '@/ts/networking/paths';
-import { formatFieldValue, getFullName } from '@/ts/page/page.i.stat-display';
+import { formatFieldValue, getFullName } from '@/ts/page/i/page.i.stat-display';
 import { openProfile } from '@/ts/page/page.page-manager';
 
 interface LeaderboardEntry extends GameStats {

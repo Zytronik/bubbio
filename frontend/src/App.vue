@@ -33,7 +33,7 @@ import LoginOverlay from './globalComponents/LoginOverlay.vue';
 import InfoMessages from './globalComponents/InfoMessages.vue';
 import Channel from './globalComponents/channel/Channel.vue';
 
-import { PAGE_STATE } from './ts/page/page.e-page-state';
+import { PAGE_STATE } from './ts/page/e/page.e-page-state';
 import { checkUserAuthentication, clearClientState, clearGuestCookies, logUserOut, showLoginForm } from './ts/networking/networking.auth';
 import eventBus from './ts/page/page.event-bus';
 import { attachInputReader } from './ts/input/input.input-reader';

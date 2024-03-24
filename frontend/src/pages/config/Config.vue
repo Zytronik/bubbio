@@ -83,7 +83,7 @@
 <script lang="ts">
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
 import { Ref, SetupContext, computed, onMounted, ref } from 'vue';
-import { PAGE_STATE } from '@/ts/page/page.e-page-state';
+import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { checkUserAuthentication, logUserOut } from '@/ts/networking/networking.auth';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';

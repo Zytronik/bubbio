@@ -5,7 +5,6 @@
       <div class="page-container">
 
         <div v-if="isDashboard" class="sprintDashboard">
-
           <div class="left-content">
             <div class="playMods">
               <button class="playButton" @click="play()">Play!</button>
@@ -68,11 +67,12 @@
         </div>
 
         <div v-if="isResultView" class="gameComplete">
-          <!-- <button @click="goBack()">Back</button> -->
+          <button class="backButton" @click="goBack()">Back</button>
           <div class="top">
             <div class="sprintTime">
               <p class="time">{{ formatTimeNumberToString(sprintResultTime) }}</p>
-              <p class="diff"><span>Diff to pb: </span>00:00:69</p>
+              <p class="diff" v-if="diffToPb">Diff to pb: {{ formatTimeNumberToString(diffToPb ?? 0) }}</p>
+              <p class="pb" v-if="diffToPb === 0">Personal Best!</p>
             </div>
             <button class="retry" @click="play()">Retry</button>
           </div>
@@ -103,23 +103,26 @@
 
 <script lang="ts">
 import Game from '../game/Game.vue';
-import { changeBackgroundTo, formatDateTime, getCookie, goToState, setCookie } from '@/ts/page/page.page-manager';
-import { PAGE_STATE } from '@/ts/page/page.e-page-state';
-import { ComputedRef, computed, nextTick, onMounted, ref } from 'vue';
+import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
+import { formatDateTime, getCookie, setCookie } from '@/ts/page/page.page-utils';
+import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
+import { ComputedRef, computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import { getGameStats, leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { bubbleClearToWin, bubblesCleared, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import Leaderboard, { ModDetail } from '@/globalComponents/Leaderboard.vue';
 import History from '@/globalComponents/History.vue';
-import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/page.e-leaderboard';
-import { UserData } from '@/ts/page/page.i-userData';
+import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
+import { UserData } from '@/ts/page/i/page.i-userData';
 import eventBus from '@/ts/page/page.event-bus';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { backInput, resetInput } from '@/ts/input/input.all-inputs';
-import { formatFieldValue, getFullName } from '@/ts/page/page.i.stat-display';
+import { formatFieldValue, getFullName } from '@/ts/page/i/page.i.stat-display';
 import { fillAsciiStrings } from '@/ts/game/visuals/game.visuals.ascii';
 import { MultiMod, ToggleMod } from '@/ts/game/settings/ref/i/game.settings.ref.i.mod';
 import { allMods } from '@/ts/game/settings/ref/game.settings.ref.all-mods';
+import { triggerConfettiAnimation } from '@/ts/page/page.visuals';
+import { getDifferenceToPB } from '@/ts/page/page.page-requests';
 import { disableBackInputs, disableResetInput, enableBackInputs, enableResetInput } from '@/ts/input/input.input-manager';
 
 export default {
@@ -142,6 +145,7 @@ export default {
     const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
     const backInputOnLoad = ref<() => void>(() => "");
     const sprintResultTime = ref<number>(0);
+    const diffToPb = ref<number | undefined>(0);
     const backButtonData = ref([
       { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/sprint.png'), disabled: false },
     ]);
@@ -174,6 +178,9 @@ export default {
       return stats ? stats[key] : undefined;
     }
 
+    onUnmounted(() => {
+      eventBus.off("sprintVictory", transitionToResultView);
+    });
 
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
@@ -311,8 +318,12 @@ export default {
       isResultView.value = false;
     }
 
-    function showResultView() {
+    async function showResultView() {
       const rawStats: GameStats = getGameStats();
+      diffToPb.value = await getDifferenceToPB(rawStats.gameDuration, enabledToggleMods.value);
+      if (diffToPb.value === 0) {
+        triggerConfettiAnimation(".page-container");
+      }
       sprintResultTime.value = rawStats.gameDuration;
       const statBanList = [
         'gameStartTime',
@@ -428,6 +439,7 @@ export default {
       isResultView,
       splitResultStats,
       sprintResultTime,
+      diffToPb,
     };
   },
 };
@@ -582,7 +594,7 @@ export default {
 
 .inGameStats {
   position: absolute;
-  right: 85%;
+  right: 90%;
   bottom: 10px;
   width: 200px;
   text-align: right;
@@ -702,7 +714,8 @@ export default {
   font-size: 450%;
 }
 
-.sprintTime .diff {
+.sprintTime .diff,
+.sprintTime .pb {
   position: absolute;
   right: 15px;
   bottom: 15px;
@@ -715,5 +728,4 @@ export default {
 .gameComplete .top {
   height: 15%;
 }
-
 </style>

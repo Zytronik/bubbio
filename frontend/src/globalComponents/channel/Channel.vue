@@ -145,7 +145,7 @@
 <script lang="ts">
 import { Ref, computed, nextTick, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import debounce from 'debounce';
-import { closeChannelOverlay, formatDateToAgoText, getFlagImagePath } from '@/ts/page/page.page-manager';
+import { closeChannelOverlay } from '@/ts/page/page.page-manager';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import axios from 'axios';
 import UserProfileOverlay from '../UserProfileOverlay.vue';
@@ -158,6 +158,8 @@ import { CountUp } from 'countup.js';
 import { getDefaultProfilePbURL } from '@/ts/networking/paths';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
 import { backInput } from '@/ts/input/input.all-inputs';
+import { getFlagImagePath } from '@/ts/page/page.page-requests';
+import { formatDateToAgoText } from '@/ts/page/page.page-utils';
 
 export default {
   name: "ChannelOverlay",
