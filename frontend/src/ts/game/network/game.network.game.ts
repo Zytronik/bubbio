@@ -49,6 +49,7 @@ export async function submitGameToDB(gameStats: GameStats) {
     if (isGuest !== "true") {
         const submitStats = {
             "bubbleClearToWin": gameStats.bubbleClearToWin,
+            "bpsGraph": JSON.stringify(gameStats.bpsGraph),
             "clear3": gameStats.clear3,
             "clear4": gameStats.clear4,
             "clear5": gameStats.clear5,

@@ -11,9 +11,9 @@
     <div v-for="[playerName, visuals] in playerNameVisualsMap" :key="playerName">
       <span>{{ playerName }}</span>
       <br>
-      <!-- <p>{{ visuals.statNumbers.formattedCurrentTime }}</p> -->
+      <p>{{ visuals.statNumbers.formattedCurrentTime }}</p>
       <p>Bubbles Cleared: {{ visuals.statNumbers.bubblesCleared }}/{{ visuals.statNumbers.bubbleClearToWin }}</p>
-      <p>Bubbles Shot: {{ visuals.statNumbers.bubblesShot }} <!-- BPS: {{ visuals.statNumbers.bubblesPerSecond }} --></p>
+      <p>Bubbles Shot: {{ visuals.statNumbers.bubblesShot }} BPS: {{ visuals.statNumbers.bubblesPerSecond }}</p>
     
       <span class="monospace" v-html="visuals.asciiBoard.queueString"></span>
       <span class="monospace" v-html="visuals.asciiBoard.holdString"></span>

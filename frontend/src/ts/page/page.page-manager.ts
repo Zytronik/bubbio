@@ -1,6 +1,6 @@
 import { checkUserAuthentication, logUserOut } from "../networking/networking.auth";
 import { PAGE_STATE } from "./e/page.e-page-state";
-import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToMultiMenuTransition, roomListingToMultiMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, roomPageToMultiMenuTransition, multiMenuToSoloMenuTransition, soloMenuToSprintPageTransition, spintPageToSoloMenuTransition, mainMenuToSoloMenuTransition, soloMenuToMainMenuTransition, multiMenuToRoomListingTransition, multiMenuToMainMenuTransition, soloMenuToMultiMenuTransition, soloMenuTosettingsPageTransition, multiMenuToSettingsPageTransition, settingsPageToMultiMenuTransition, settingsPageToSoloMenuTransition } from "./page.possible-transitions";
+import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToMultiMenuTransition, roomListingToMultiMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, roomPageToMultiMenuTransition, multiMenuToSoloMenuTransition, soloMenuToSprintPageTransition, spintPageToSoloMenuTransition, mainMenuToSoloMenuTransition, soloMenuToMainMenuTransition, multiMenuToRoomListingTransition, multiMenuToMainMenuTransition, soloMenuToMultiMenuTransition, soloMenuTosettingsPageTransition, multiMenuToSettingsPageTransition, settingsPageToMultiMenuTransition, settingsPageToSoloMenuTransition, multiMenuToRankedPageTransition, rankedPageToMultiMenuTransition, rankedPageToRoomListingTransition, roomListingToRankedPageTransition } from "./page.possible-transitions";
 import { Page } from "./i/page.i-page";
 import StartMenu from '../../pages/startmenu/StartMenu.vue';
 import Room from '../../pages/room/Room.vue';
@@ -8,6 +8,7 @@ import Game from '../../pages/game/Game.vue';
 import Sprint from '../../pages/sprint/Sprint.vue';
 import Config from '../../pages/config/Config.vue';
 import RoomListing from '../../pages/room-listing/RoomListing.vue';
+import RankedPage from '../../pages/ranked/RankedPage.vue';
 import SoloMenu from '../../pages/solomenu/SoloMenu.vue';
 import MultiMenu from '../../pages/multimenu/MultiMenu.vue';
 import { ref } from 'vue';
@@ -17,6 +18,7 @@ export const pages: Page[] = [
     { title: 'StartMenu', pageState: PAGE_STATE.mainMenu, component: StartMenu },
     { title: 'SoloMenu', pageState: PAGE_STATE.soloMenu, component: SoloMenu },
     { title: 'MultiMenu', pageState: PAGE_STATE.multiMenu, component: MultiMenu },
+    { title: 'RankedPage', pageState: PAGE_STATE.rankedPage, component: RankedPage},
     { title: 'RoomListing', pageState: PAGE_STATE.roomListing, component: RoomListing },
     { title: 'Room', pageState: PAGE_STATE.roomPage, component: Room },
     { title: 'Config', pageState: PAGE_STATE.settingsPage, component: Config },
@@ -47,6 +49,10 @@ export function setupTransitionFunctions() {
     multiMenuToSettingsPageTransition.transitionFunction = multiMenuToSettingsPage;
     settingsPageToMultiMenuTransition.transitionFunction = settingsPageToMultiMenu;
     settingsPageToSoloMenuTransition.transitionFunction = settingsPageToSoloMenu;
+    multiMenuToRankedPageTransition.transitionFunction = multiMenuToRankedPage;
+    rankedPageToMultiMenuTransition.transitionFunction = rankedPageToMultiMenu;
+    roomListingToRankedPageTransition.transitionFunction = roomListingToRankedPage;
+    rankedPageToRoomListingTransition.transitionFunction = rankedPageToRoomListing;
 }
 
 export const currentPageState = ref<PAGE_STATE>(PAGE_STATE.mainMenu);
@@ -161,6 +167,22 @@ function settingsPageToMultiMenu() {
 }
 
 function settingsPageToSoloMenu() {
+    // console.log("current page: " + currentPageState.value);
+}
+
+function multiMenuToRankedPage() {
+    // console.log("current page: " + currentPageState.value);
+}
+
+function rankedPageToMultiMenu() {
+    // console.log("current page: " + currentPageState.value);
+}
+
+function roomListingToRankedPage() {
+    // console.log("current page: " + currentPageState.value);
+}
+
+function rankedPageToRoomListing() {
     // console.log("current page: " + currentPageState.value);
 }
 

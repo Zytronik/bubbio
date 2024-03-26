@@ -7,26 +7,32 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { PropType, defineComponent, onMounted, ref } from 'vue';
 import Chart, { ChartConfiguration, ChartData } from 'chart.js/auto';
+import { formatTimeNumberToStringSec } from '@/ts/page/page.page-utils';
 
 export default defineComponent({
   name: 'LineChart',
-  setup() {
+  props: {
+    data: {
+      type: Array as PropType<number[]>,
+      required: true,
+    },
+  },
+  setup(props) {
     const chartCanvas = ref<HTMLCanvasElement | null>(null);
     const chartInstance = ref<unknown>(null);
 
     onMounted(() => {
       if (chartCanvas.value) {
-        const datapoints = [0, 20, 20, 60.00, 60.12, 120.67, 90, 180, 120, 125, 105, 110, 170];
-        const labels = Array.from({ length: datapoints.length }, (_, i) => i.toString());
+        const labels = Array.from({ length: props.data.length }, (_, i) => i.toString());
 
         const data = {
           labels: labels,
           datasets: [
             {
               label: 'Cubic interpolation',
-              data: datapoints,
+              data: props.data,
               borderColor: 'rgb(255, 255, 255)',
               fill: false,
               tension: 0.4,
@@ -47,9 +53,20 @@ export default defineComponent({
               title: {
                 display: false,
               },
-              /*  tooltip: {
-                 enabled: false
-               }, */
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    return `${Math.round(context.parsed.y * 100) / 100} BPS`;
+                  },
+                  title: function () {
+                    return '';
+                  },
+                  footer: function () {
+                    return '';
+                  },
+                },
+                displayColors: false,
+              },
             },
             interaction: {
               intersect: false,
@@ -62,12 +79,12 @@ export default defineComponent({
                 display: true,
                 title: {
                   display: true,
-                  text: "Time (s)",
+                  text: "Time (m:s)",
                 },
                 ticks: {
                   color: 'white',
-                  callback: function(val) {
-                    return val + "s";
+                  callback: function (val) {
+                    return formatTimeNumberToStringSec(parseInt(val.toString()) * 1000);
                   },
                 },
               },
@@ -110,7 +127,7 @@ export default defineComponent({
 }
 
 .chartWrapper {
-  width: 90%;
+  width: 100%;
   height: 100%;
 }
 

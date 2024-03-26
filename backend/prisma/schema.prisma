@@ -65,6 +65,7 @@ model Sprint {
   user                User            @relation(fields: [userId], references: [id])
   userId              Int            
   mods                String          @default("[]")
+  bpsGraph            String          @default("[]")
   bubblesCleared      Int             
   bubblesShot         Int                
   bubblesPerSecond    Float           
