@@ -45,6 +45,7 @@ export default {
     const roomId = ref<string>('');
     const activeRooms = ref<ActiveRoomInfo[]>([]);
     const backButtonData = ref([
+      { pageState: PAGE_STATE.rankedPage, iconSrc: require('@/img/icons/ranked.png') , disabled: true},
       { pageState: PAGE_STATE.multiMenu, iconSrc: require('@/img/icons/rooms.png') , disabled: false},
     ]);
 

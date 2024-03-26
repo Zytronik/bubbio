@@ -70,25 +70,99 @@
           <button class="backButton" @click="goBack()">Back</button>
           <div class="top">
             <div class="sprintTime">
-              <p class="time">{{ formatTimeNumberToString(sprintResultTime) }}</p>
+              <p v-if="resultStats" class="time">{{ formatTimeNumberToString(resultStats.gameDuration ?? 0) }}</p>
               <p class="diff" v-if="diffToPb">Diff to pb: {{ formatTimeNumberToString(diffToPb ?? 0) }}</p>
               <p class="pb" v-if="diffToPb === 0">Personal Best!</p>
             </div>
             <button class="retry" @click="play()">Retry</button>
           </div>
 
+          <LineChart v-if="resultStats" :data="resultStats.bpsGraph ?? []" />
+
           <div v-if="resultStats">
             <div class="columns">
               <div class="column">
-                <div class="row" v-for="(value, key) in splitResultStats.firstHalf" :key="`first-${key}`">
-                  <div class="col">{{ getFullName(key) }}</div>
-                  <div class="col">{{ formatFieldValue(value ?? '', key) }}</div>
+                <div class="row" key="bubbleClearToWin">
+                  <div class="col">{{ getFullName("bubbleClearToWin") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.bubbleClearToWin ?? '', "bubbleClearToWin") }}</div>
+                </div>
+                <div class="row" key="bubblesCleared">
+                  <div class="col">{{ getFullName("bubblesCleared") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.bubblesCleared ?? '', "bubblesCleared") }}</div>
+                </div>
+                <div class="row" key="bubblesShot">
+                  <div class="col">{{ getFullName("bubblesShot") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.bubblesShot ?? '', "bubblesShot") }}</div>
+                </div>
+                <div class="row" key="bubblesPerSecond">
+                  <div class="col">{{ getFullName("bubblesPerSecond") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.bubblesPerSecond ?? '', "bubblesPerSecond") }}</div>
+                </div>
+                <div class="row" key="clear3">
+                  <div class="col">{{ getFullName("clear3") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.clear3 ?? '', "clear3") }}</div>
+                </div>
+                <div class="row" key="clear4">
+                  <div class="col">{{ getFullName("clear4") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.clear4 ?? '', "clear4") }}</div>
+                </div>
+                <div class="row" key="clear5">
+                  <div class="col">{{ getFullName("clear5") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.clear5 ?? '', "clear5") }}</div>
+                </div>
+                <div class="row" key="clear3wb">
+                  <div class="col">{{ getFullName("clear3wb") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.clear3wb ?? '', "clear3wb") }}</div>
+                </div>
+                <div class="row" key="clear4wb">
+                  <div class="col">{{ getFullName("clear4wb") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.clear4wb ?? '', "clear4wb") }}</div>
+                </div>
+                <div class="row" key="clear5wb">
+                  <div class="col">{{ getFullName("clear5wb") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.clear5wb ?? '', "clear5wb") }}</div>
                 </div>
               </div>
               <div class="column">
-                <div class="row" v-for="(value, key) in splitResultStats.secondHalf" :key="`second-${key}`">
-                  <div class="col">{{ getFullName(key) }}</div>
-                  <div class="col">{{ formatFieldValue(value ?? '', key) }}</div>
+                <div class="row" key="highestBubbleClear">
+                  <div class="col">{{ getFullName("highestBubbleClear") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.highestBubbleClear ?? '', "highestBubbleClear") }}</div>
+                </div>
+                <div class="row" key="wallBounces">
+                  <div class="col">{{ getFullName("wallBounces") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.wallBounces ?? '', "wallBounces") }}</div>
+                </div>
+                <div class="row" key="wallBounceClears">
+                  <div class="col">{{ getFullName("wallBounceClears") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.wallBounceClears ?? '', "wallBounceClears") }}</div>
+                </div>
+                <div class="row" key="highestCombo">
+                  <div class="col">{{ getFullName("highestCombo") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.highestCombo ?? '', "highestCombo") }}</div>
+                </div>
+                <div class="row" key="keysPressed">
+                  <div class="col">{{ getFullName("keysPressed") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.keysPressed ?? '', "keysPressed") }}</div>
+                </div>
+                <div class="row" key="keysPerSecond">
+                  <div class="col">{{ getFullName("keysPerSecond") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.keysPerSecond ?? '', "keysPerSecond") }}</div>
+                </div>
+                <div class="row" key="keysPerBubble">
+                  <div class="col">{{ getFullName("keysPerBubble") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.keysPerBubble ?? '', "keysPerBubble") }}</div>
+                </div>
+                <div class="row" key="angleChanged">
+                  <div class="col">{{ getFullName("angleChanged") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.angleChanged ?? '', "angleChanged") }}</div>
+                </div>
+                <div class="row" key="angleChangePerBubble">
+                  <div class="col">{{ getFullName("angleChangePerBubble") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.angleChangePerBubble ?? '', "angleChangePerBubble") }}</div>
+                </div>
+                <div class="row" key="holds">
+                  <div class="col">{{ getFullName("holds") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.holds ?? '', "holds") }}</div>
                 </div>
               </div>
             </div>
@@ -125,11 +199,12 @@ import { triggerConfettiAnimation } from '@/ts/page/page.visuals';
 import { getDifferenceToPB } from '@/ts/page/page.page-requests';
 import { convertModToModDetail, getModIconPath } from '@/ts/page/page.mods';
 import { ModDetail } from '@/ts/page/i/page.i.mod-detail';
+import LineChart from '@/globalComponents/LineChart.vue';
 import { disableBackInputs, disableResetInput, enableBackInputs, enableResetInput } from '@/ts/input/input.input-manager';
 
 export default {
   name: 'SprintPage',
-  components: { Game, MenuBackButtons, Leaderboard, History },
+  components: { Game, MenuBackButtons, Leaderboard, History, LineChart },
   data() {
     return {
       currentLeaderboard: 'Global',
@@ -151,34 +226,6 @@ export default {
     const backButtonData = ref([
       { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/sprint.png'), disabled: false },
     ]);
-
-    const splitResultStats = computed(() => {
-      if (!resultStats.value) {
-        return { firstHalf: {}, secondHalf: {} };
-      }
-
-      const keys = Object.keys(resultStats.value) as Array<keyof GameStats>;
-      const half = Math.ceil(keys.length / 2);
-      const firstHalf: Partial<GameStats> = {};
-      const secondHalf: Partial<GameStats> = {};
-
-      keys.slice(0, half).forEach((key) => {
-        firstHalf[key] = safelyGetStat(resultStats.value, key);
-      });
-
-      keys.slice(half).forEach((key) => {
-        secondHalf[key] = safelyGetStat(resultStats.value, key);
-      });
-
-      return { firstHalf, secondHalf };
-    });
-
-    function safelyGetStat<T extends keyof GameStats>(
-      stats: Partial<GameStats> | undefined,
-      key: T
-    ): GameStats[T] | undefined {
-      return stats ? stats[key] : undefined;
-    }
 
     onUnmounted(() => {
       eventBus.off("sprintVictory");
@@ -323,31 +370,13 @@ export default {
     }
 
     async function showResultView() {
-      const rawStats: GameStats = playerGameInstance.stats;
-      diffToPb.value = await getDifferenceToPB(rawStats.gameDuration, enabledToggleMods.value);
+      resultStats.value = playerGameInstance.stats;
+      if (resultStats.value.gameDuration !== undefined) {
+        diffToPb.value = await getDifferenceToPB(resultStats.value.gameDuration, enabledToggleMods.value);
+      }
       if (diffToPb.value === 0) {
         triggerConfettiAnimation(".page-container");
       }
-      sprintResultTime.value = rawStats.gameDuration;
-      const statBanList = [
-        'gameStartTime',
-        'gameEndTime',
-        'bubbleClearToWin',
-        'bubblesLeftToClear',
-        'currentCombo',
-        'gameDuration',
-      ];
-
-      const filteredStats = Object.keys(rawStats)
-        .filter(key => !statBanList.includes(key))
-        .reduce<Partial<GameStats>>((obj, key) => {
-          const keyAsKeyType = key as keyof GameStats;
-          obj[keyAsKeyType] = rawStats[keyAsKeyType] as number;
-          return obj;
-        }, {});
-
-      resultStats.value = filteredStats;
-
       isGaming.value = false;
       isDashboard.value = false;
       isResultView.value = true;
@@ -417,10 +446,10 @@ export default {
       getFullName,
       getModIconPath,
       isResultView,
-      splitResultStats,
       sprintResultTime,
       diffToPb,
       convertModToModDetail,
+      LineChart,
     };
   },
 };

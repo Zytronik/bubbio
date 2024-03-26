@@ -3,6 +3,11 @@
     <MenuBackButtons :buttonData="backButtonData" />
     <div class="page-wrapper">
       <div class="menu-wrapper">
+        <button class="menu-btn" @click="goToState(PAGE_STATE.rankedPage)">
+          <img src="@/img/icons/ranked.png" />
+          <p>Play Ranked</p>
+          <p class="desc">Play ranked 1vs1</p>
+        </button>
         <button class="menu-btn" @click="goToState(PAGE_STATE.roomListing)">
           <img src="@/img/icons/rooms.png" />
           <p>Room Listing</p>

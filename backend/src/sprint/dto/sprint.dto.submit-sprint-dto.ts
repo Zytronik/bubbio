@@ -85,6 +85,9 @@ export class SprintStatsDto {
     @IsInt()
     @Min(0)
     clear5wb: number
+
+    @IsJSON()
+    bpsGraph: string;
 }
 
 export class SubmitSprintDto {
@@ -92,6 +95,6 @@ export class SubmitSprintDto {
     @Type(() => SprintStatsDto)
     submitStats: SprintStatsDto;
 
-    @IsString()
+    @IsJSON()
     mods: string;
 }

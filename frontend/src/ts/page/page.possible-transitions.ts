@@ -67,6 +67,15 @@ export const roomListingToMultiMenuTransition: PageTransition = {
     }
 }
 
+export const roomListingToRankedPageTransition: PageTransition = {
+    name: "roomListingToRankedPageTransition",
+    origin: PAGE_STATE.roomListing,
+    destination: PAGE_STATE.rankedPage,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + roomListingToRankedPageTransition.name);
+    }
+}
+
 export const roomListingToRoomPageTransition: PageTransition = {
     name: "roomListingToRoomPageTransition",
     origin: PAGE_STATE.roomListing,
@@ -171,6 +180,15 @@ export const multiMenuToRoomListingTransition: PageTransition = {
     }
 }
 
+export const multiMenuToRankedPageTransition: PageTransition = {
+    name: "multiMenuToRankedPageTransition",
+    origin: PAGE_STATE.multiMenu,
+    destination: PAGE_STATE.rankedPage,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + multiMenuToRankedPageTransition.name);
+    }
+}
+
 export const multiMenuToMainMenuTransition: PageTransition = {
     name: "multiMenuToMainMenuTransition",
     origin: PAGE_STATE.multiMenu,
@@ -198,6 +216,25 @@ export const multiMenuToSoloMenuTransition: PageTransition = {
     }
 }
 
+/* Ranked Page */
+export const rankedPageToMultiMenuTransition: PageTransition = {
+    name: "rankedPageToMultiMenuTransition",
+    origin: PAGE_STATE.rankedPage,
+    destination: PAGE_STATE.multiMenu,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + rankedPageToMultiMenuTransition.name);
+    }
+}
+
+export const rankedPageToRoomListingTransition: PageTransition = {
+    name: "rankedPageToRoomListingTransition",
+    origin: PAGE_STATE.rankedPage,
+    destination: PAGE_STATE.roomListing,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + rankedPageToRoomListingTransition.name);
+    }
+}
+
 export const allPossibleTransitions: PageTransition[] = [
     mainMenuToSettingsPageTransition,
     multiMenuToRoomListingTransition,
@@ -220,4 +257,8 @@ export const allPossibleTransitions: PageTransition[] = [
     multiMenuToSettingsPageTransition,
     settingsPageToSoloMenuTransition,
     settingsPageToMultiMenuTransition,
+    multiMenuToRankedPageTransition,
+    rankedPageToMultiMenuTransition,
+    roomListingToRankedPageTransition,
+    rankedPageToRoomListingTransition,
 ];

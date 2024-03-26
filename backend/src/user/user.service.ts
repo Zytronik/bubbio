@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import axios from 'axios';
 import { FileStorageService } from './file-storage.service';
+import { glicko } from 'src/glicko/glicko.service';
 
 @Injectable()
 export class UserService {
@@ -52,7 +53,6 @@ export class UserService {
                 country,
             },
         });
-
         delete user.password;
         return user;
     }
