@@ -47,3 +47,30 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
         gameStats.currentCombo = 0;
     }
 }
+
+export function createStatGraphData(game: GameInstance): void {
+    const graph = game.stats.bpsGraph;
+    const inputHistory = game.gameStateHistory.inputHistory;
+    const gameDuration = game.stats.gameDuration / 1000;
+    for (let i = 0; i <= gameDuration; i++) {
+        let inputCount = 0;
+        let duration = 4;
+        for (let j = 0; j < inputHistory.length; j++) {
+            const inputTime = inputHistory[j].frameTime;
+            if (inputTime > i * 1000 - 2000 && inputTime < i * 1000 + 2000) {
+                inputCount++;
+            }
+        }
+        if (i === 0 || i === gameDuration) {
+            duration = 2
+        }
+        if (i === 1 || i === gameDuration - 1) {
+            duration = 3
+        }
+        if (duration > gameDuration) {
+            duration = gameDuration;
+        }
+        graph[i] = inputCount/duration;
+    }
+    console.log(graph)
+}

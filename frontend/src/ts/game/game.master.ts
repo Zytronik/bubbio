@@ -21,6 +21,7 @@ import { GAME_INPUT } from "./network/dto/game.network.dto.game-input";
 import { InputFrame } from "./i/game.i.game-state-history";
 import { GameVisuals } from "./visuals/i/game.visuals.i.game-visuals";
 import { ref } from "vue";
+import { createStatGraphData } from "./logic/game.logic.stat-tracker";
 
 export const playerGameVisuals: GameVisuals = {
     asciiBoard: {
@@ -159,6 +160,7 @@ function disableGameplay(): void {
     stats.gameEndTime = performance.now();
     stats.gameDuration = stats.gameEndTime - stats.gameStartTime;
     stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
+    createStatGraphData(playerGameInstance);
     //TODO: save playtime/score
     disableGameInputs();
     stopASCIIAnimation();
@@ -189,25 +191,25 @@ export function revertAPS(): void {
     playerGameInstance.currentAPS = playerGameInstance.handlingSettings.defaultAPS;
 }
 export function triggerShoot(): void {
-    executeShot(playerGameInstance);
     const inputFrame: InputFrame = {
-        indexID: -1,
-        frameTime: performance.now(),
+        indexID: playerGameInstance.gameStateHistory.inputHistory.length,
+        frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
         input: GAME_INPUT.SHOOT,
         angle: playerGameInstance.angle,
     }
     playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
+    executeShot(playerGameInstance);
     network_synchronizeGame(playerGameInstance);
 }
 export function triggerHold(): void {
-    holdBubble(playerGameInstance);
     const inputFrame: InputFrame = {
-        indexID: -1,
-        frameTime: performance.now(),
+        indexID: playerGameInstance.gameStateHistory.inputHistory.length,
+        frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
         input: GAME_INPUT.HOLD,
         angle: playerGameInstance.angle,
     }
     playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
+    holdBubble(playerGameInstance);
     network_synchronizeGame(playerGameInstance);
 }
 export function debugTriggerGarbage(): void {

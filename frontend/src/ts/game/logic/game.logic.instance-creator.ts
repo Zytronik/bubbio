@@ -92,6 +92,7 @@ function getEmptyStats(gameSettings: GameSettings): GameStats {
         bubblesLeftToClear: gameSettings.sprintVictoryCondition,
         bubblesShot: 0,
         bubblesPerSecond: 0,
+        bpsGraph: [],
         clear3: 0,
         clear4: 0,
         clear5: 0,
@@ -108,7 +109,7 @@ function getEmptyStats(gameSettings: GameSettings): GameStats {
         keysPerBubble: 0,
         angleChanged: 0,
         angleChangePerBubble: 0,
-        holds: 0
+        holds: 0,
     }
     return stats;
 }
