@@ -1,4 +1,5 @@
 import { httpClient } from "../networking/networking.http-client";
+import { ModDetail } from '@/ts/page/i/page.i.mod-detail';
 
 export function getFlagImagePath(countryCode: string) {
     if (countryCode) {
@@ -32,10 +33,4 @@ async function getPersonalBest(mods: ModDetail[]) {
         console.error("Failed to fetch personal Best: ", error);
         return undefined;
     }
-}
-
-export interface ModDetail {
-    abr: string;
-    type: 'toggle' | 'multi';
-    enabled?: boolean;
 }

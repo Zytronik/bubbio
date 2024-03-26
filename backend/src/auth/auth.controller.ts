@@ -4,8 +4,8 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/auth.dto.login';
 import { RegisterDto } from './dto/auth.dto.register';
 import { JwtAuthGuard } from './jwt/auth.jwt.guard';
-import { AuthenticatedRequest } from './auth.e-authRequest';
-import { ForgotPwDto } from './dto/auth.dto.forgotPw';
+import { AuthenticatedRequest } from './e/auth.e-auth-request';
+import { ForgotPwDto } from './dto/auth.dto.forgot-pw';
 
 @Controller('auth')
 export class AuthController {

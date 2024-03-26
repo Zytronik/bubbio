@@ -3,7 +3,7 @@
     <span class="monospace" v-html="queueString"></span>
     <span class="monospace" v-html="holdString"></span>
     <span class="monospace" v-html="incomingGarbage"></span>
-    <span class="monospace grid" v-html="playGridASCII"></span>
+    <span class="monospace text-center" v-html="playGridASCII"></span>
   </div>
 </template>
 
@@ -27,7 +27,6 @@ export default {
 .monospace {
   white-space: pre-line;
   font-family: 'Consolas', monospace;
-  text-align: center;
 }
 
 .gameUI-wrapper{

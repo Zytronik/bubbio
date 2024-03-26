@@ -1,5 +1,5 @@
 import { PAGE_STATE } from "./e/page.e-page-state";
-import { PageTransition } from "./i/page.i-page-transition";
+import { PageTransition } from "./i/page.i.page-transition";
 
 /* MainMenu */
 export const mainMenuToSettingsPageTransition: PageTransition = {

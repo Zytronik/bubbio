@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from 'src/auth/dto/auth.dto.createUser';
+import { CreateUserDto } from 'src/auth/dto/auth.dto.create-user';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import axios from 'axios';
-import { FileStorageService } from './fileStorage.service';
+import { FileStorageService } from './file-storage.service';
 
 @Injectable()
 export class UserService {

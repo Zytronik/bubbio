@@ -1,9 +1,9 @@
 import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { LeaderboardService } from './leaderboard.service';
 import { UserService } from 'src/user/user.service';
-import { AuthenticatedRequest } from 'src/auth/auth.e-authRequest';
-import { OptionalJwtAuthGuard } from 'src/auth/jwt/auth.jwt.optionalGuard';
-import { ModDetail } from './leaderboard.i.mods';
+import { AuthenticatedRequest } from 'src/auth/e/auth.e-auth-request';
+import { OptionalJwtAuthGuard } from 'src/auth/jwt/auth.jwt.optional-guard';
+import { ModDetail } from './i/leaderboard.i.mod-detail';
 
 @Controller('leaderboard')
 export class LeaderboardController {

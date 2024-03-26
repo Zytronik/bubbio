@@ -1,6 +1,7 @@
 import { Inject, Injectable, forwardRef } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { NewsGateway } from "./news.gateway";
+import { NewsData } from "./i/news.i.data";
 
 @Injectable()
 export class NewsService {

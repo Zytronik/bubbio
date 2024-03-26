@@ -200,7 +200,7 @@ function getIncomingGarbageString(): string {
         queueString += "─";
     }
     queueString += "╯"
-    return queueString + "\n\n";
+    return queueString;
 }
 
 function getASCIIArrow(): string {

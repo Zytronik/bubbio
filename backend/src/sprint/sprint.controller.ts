@@ -1,9 +1,9 @@
 import { Controller, Get, UseGuards, Post, Body, Request, Query, Req } from '@nestjs/common';
 import { SprintService } from './sprint.service';
 import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
-import { AuthenticatedRequest } from 'src/auth/auth.e-authRequest';
-import { SubmitSprintDto } from './dto/dto.submit-sprint-dto';
-import { ModDetail } from 'src/leaderboard/leaderboard.i.mods';
+import { AuthenticatedRequest } from 'src/auth/e/auth.e-auth-request';
+import { SubmitSprintDto } from './dto/sprint.dto.submit-sprint-dto';
+import { ModDetail } from 'src/leaderboard/i/leaderboard.i.mod-detail';
 
 @Controller('sprint')
 export class SprintController {

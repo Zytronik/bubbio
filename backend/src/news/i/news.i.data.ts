@@ -1,4 +1,4 @@
-interface NewsData {
+export interface NewsData {
     type: string;
     rank: number;
     value: number;

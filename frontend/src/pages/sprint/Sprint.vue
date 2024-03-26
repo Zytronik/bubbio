@@ -9,17 +9,17 @@
             <div class="playMods">
               <button class="playButton" @click="play()">Play!</button>
               <div class="cat-wrapper">
-                <div class="cat" v-for="mod in modsComputed" :key="mod.abr.toString()" @click="toggleMod(mod.abr)"
+                <div class="cat" v-for="mod in modsCheckboxDisplay" :key="mod.abr.toString()" @click="toggleMod(mod.abr)"
                   :class="{ 'active': mod.type === 'toggle' && mod.enabled }">
                   <!-- ToggleMod -->
                   <div v-if="mod.type === 'toggle'">
-                    <img v-if="mod.enabled" :src="getIconPath(mod.icon[0])" alt="Enabled Icon" />
-                    <img v-else :src="getIconPath(mod.icon[1])" alt="Disabled Icon" />
+                    <img v-if="mod.enabled" :src="getModIconPath(mod.icon[0])" alt="Enabled Icon" />
+                    <img v-else :src="getModIconPath(mod.icon[1])" alt="Disabled Icon" />
                     <span>{{ mod.title }}</span>
                   </div>
                   <!-- MultiMod -->
                   <div v-else-if="mod.type === 'multi'">
-                    <img v-if="mod.index != null" :src="getIconPath(mod.icon[mod.index])" alt="Enabled Icon" />
+                    <img v-if="mod.index != null" :src="getModIconPath(mod.icon[mod.index])" alt="Enabled Icon" />
                     <span>{{ mod.title }}</span>
                   </div>
                 </div>
@@ -57,12 +57,12 @@
 
         <div v-if="isGaming" class="inGame">
           <div class="game-wrapper">
-            <Game />
             <div class="inGameStats">
               <p>{{ formattedCurrentTime }}</p>
               <p>{{ bubblesCleared }}/{{ bubbleClearToWin }}</p>
               <p>{{ bubblesShot }} BPS: {{ bubblesPerSecond }}</p>
             </div>
+            <Game />
           </div>
         </div>
 
@@ -110,10 +110,10 @@ import { ComputedRef, computed, nextTick, onMounted, onUnmounted, ref } from 'vu
 import { getGameStats, leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { bubbleClearToWin, bubblesCleared, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
-import Leaderboard, { ModDetail } from '@/globalComponents/Leaderboard.vue';
+import Leaderboard from '@/globalComponents/Leaderboard.vue';
 import History from '@/globalComponents/History.vue';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
-import { UserData } from '@/ts/page/i/page.i-userData';
+import { UserData } from '@/ts/page/i/page.i.user-data';
 import eventBus from '@/ts/page/page.event-bus';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { backInput, resetInput } from '@/ts/input/input.all-inputs';
@@ -123,6 +123,8 @@ import { MultiMod, ToggleMod } from '@/ts/game/settings/ref/i/game.settings.ref.
 import { allMods } from '@/ts/game/settings/ref/game.settings.ref.all-mods';
 import { triggerConfettiAnimation } from '@/ts/page/page.visuals';
 import { getDifferenceToPB } from '@/ts/page/page.page-requests';
+import { convertModToModDetail, getModIconPath } from '@/ts/page/page.mods';
+import { ModDetail } from '@/ts/page/i/page.i.mod-detail';
 import { disableBackInputs, disableResetInput, enableBackInputs, enableResetInput } from '@/ts/input/input.input-manager';
 
 export default {
@@ -179,7 +181,7 @@ export default {
     }
 
     onUnmounted(() => {
-      eventBus.off("sprintVictory", transitionToResultView);
+      eventBus.off("sprintVictory");
     });
 
     onMounted(() => {
@@ -239,6 +241,7 @@ export default {
       resultScreen.classList.add('slideToRight'); //slide result screen to the left
       dashboard.classList.add('slideLeftToCenter'); //slide dashboard to the left
       setTimeout(() => {
+        leaveGame();
         resultScreen.classList.remove('slideToRight'); //reset styles
         isResultView.value = false; //remove result screen
         dashboard.classList.remove('move-left'); //reset styles
@@ -300,6 +303,7 @@ export default {
           setTimeout(() => {
             enableBackInputs();
             enableResetInput();
+            resetInput.fire = play;
             document.body.removeChild(overlay);
           }, 1000);
         }, 500);
@@ -344,14 +348,12 @@ export default {
 
       resultStats.value = filteredStats;
 
-      resetInput.fire = play;
       isGaming.value = false;
       isDashboard.value = false;
       isResultView.value = true;
     }
 
-
-    const toggleMod = (modAbr: string) => {
+    function toggleMod(modAbr: string) {
       mods.value.forEach((mod) => {
         if ('enabled' in mod && mod.abr === modAbr) {
           mod.enabled = !mod.enabled;
@@ -362,9 +364,9 @@ export default {
         }
       });
       setCookie('mods', JSON.stringify(mods.value), 365);
-    };
+    }
 
-    const modsComputed = computed(() => mods.value.map(mod => {
+    const modsCheckboxDisplay = computed(() => mods.value.map(mod => {
       if ('enabled' in mod) {
         return {
           type: 'toggle',
@@ -386,26 +388,8 @@ export default {
     }));
 
     const enabledToggleMods: ComputedRef<ModDetail[]> = computed(() => {
-      return mods.value.map((mod): ModDetail => {
-        if ('enabled' in mod) {
-          return {
-            abr: mod.abr,
-            type: 'toggle',
-            enabled: mod.enabled,
-          };
-        }
-        else {
-          return {
-            abr: mod.abr[mod.modValues.indexOf(mod.selected)],
-            type: 'multi',
-          };
-        }
-      }).filter((mod) => mod.type === 'toggle' ? mod.enabled === true : true);
+      return convertModToModDetail(mods.value);
     });
-
-    function getIconPath(icon: string) {
-      return require(`@/img/mods/${icon}`);
-    }
 
     return {
       formattedCurrentTime,
@@ -429,17 +413,18 @@ export default {
       SortDirection,
       userData,
       toggleMod,
-      modsComputed,
+      modsCheckboxDisplay,
       enabledToggleMods,
       goBack,
       resultStats,
       formatFieldValue,
       getFullName,
-      getIconPath,
+      getModIconPath,
       isResultView,
       splitResultStats,
       sprintResultTime,
       diffToPb,
+      convertModToModDetail,
     };
   },
 };

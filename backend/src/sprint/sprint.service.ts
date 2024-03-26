@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { NewsService } from 'src/news/news.service';
-import { SprintStatsDto, SubmitSprintDto } from './dto/dto.submit-sprint-dto';
-import { ModDetail } from 'src/leaderboard/leaderboard.i.mods';
+import { SprintStatsDto, SubmitSprintDto } from './dto/sprint.dto.submit-sprint-dto';
+import { ModDetail } from 'src/leaderboard/i/leaderboard.i.mod-detail';
 
 @Injectable()
 export class SprintService {
