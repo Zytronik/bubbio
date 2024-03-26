@@ -1,3 +1,4 @@
+import { reactive } from "vue";
 import state from "../../networking/networking.client-websocket";
 import { allSpectationEntries, playerNameVisualsMap } from "../spectate/spectate.spectator";
 import { fillAsciiStrings } from "../visuals/game.visuals.ascii";
@@ -17,7 +18,6 @@ const O_PLAYER_SPECTATOR = "update_playerSpectator";
 const registeredSpectateEvents: Set<string> = new Set();
 const currentlySpectating: Set<string> = new Set();
 export function network_joinSpectatorRoom(): void {
-    console.log(J_SPECTATOR_ENTRIES);
     if (state.socket && !registeredSpectateEvents.has(O_SPECTATOR_ENTRIES)) {
         state.socket.emit(J_SPECTATOR_ENTRIES);
         state.socket.on(O_SPECTATOR_ENTRIES, (data: dto_SpectationEntry[]) => {
@@ -31,7 +31,6 @@ export function network_joinSpectatorRoom(): void {
 }
 
 export function network_leaveSpectatorRoom(): void {
-    console.log(L_SPECTATOR_ENTRIES);
     if (state.socket) {
         state.socket.emit(L_SPECTATOR_ENTRIES);
         state.socket.off(O_SPECTATOR_ENTRIES);
@@ -42,24 +41,14 @@ export function network_leaveSpectatorRoom(): void {
 }
 
 export function network_spectatePlayer(clientID: string): void {
-    console.log(J_PLAYER_SPECTATOR, clientID);
     if (state.socket && !registeredSpectateEvents.has(O_PLAYER_SPECTATOR)) {
         currentlySpectating.add(clientID);
         state.socket.emit(J_PLAYER_SPECTATOR, clientID);
         state.socket.on(O_PLAYER_SPECTATOR, (data: dto_GameInstance) => {
-            if (playerNameVisualsMap.has(data.playerName)) {
-                const visuals = playerNameVisualsMap.get(data.playerName);
-                if (visuals) {
-                    fillAsciiStrings(data.gameInstance, visuals.asciiBoard);
-                    fillStatStrings(data.gameInstance, visuals.statNumbers);
-                }
-            } else {
-                const visuals = getEmptyGameVisuals();
-                fillAsciiStrings(data.gameInstance, visuals.asciiBoard);
-                fillStatStrings(data.gameInstance, visuals.statNumbers);
-                playerNameVisualsMap.set(data.playerName, visuals);
-            }
-            console.log("spectating:" + data.playerName, playerNameVisualsMap.get(data.playerName))
+            const visuals = getEmptyGameVisuals();
+            fillAsciiStrings(data.gameInstance, visuals.asciiBoard);
+            fillStatStrings(data.gameInstance, visuals.statNumbers);
+            playerNameVisualsMap.set(data.playerName, reactive(visuals));
         });
         registeredSpectateEvents.add(O_PLAYER_SPECTATOR);
     } else if (registeredSpectateEvents.has(O_PLAYER_SPECTATOR)) {
@@ -70,7 +59,6 @@ export function network_spectatePlayer(clientID: string): void {
 }
 
 export function network_stopSpectating(clientID: string): void {
-    console.log(L_PLAYER_SPECTATOR, clientID);
     currentlySpectating.forEach((id) => {
         if (state.socket) {
             state.socket.emit(L_PLAYER_SPECTATOR, id);

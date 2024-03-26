@@ -29,7 +29,6 @@ export function receiveGarbage(gameInstance: GameInstance): void {
             addGarbageToGrid(garbage, gameInstance.playGrid);
             gameInstance.queuedGarbage--;
             hasDied = checkIfGarbageKills(gameInstance);
-            console.log(hasDied)
             if (hasDied && (i === maxAtOnce - 1 || gameInstance.queuedGarbage === 0)) {
                 gameInstance.gameTransitions.onGameDefeat();
                 break;

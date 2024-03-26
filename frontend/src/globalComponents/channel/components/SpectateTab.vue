@@ -10,10 +10,12 @@
     <button @click="showSpectationEntries();">Switch back to old view</button>
     <div v-for="[playerName, visuals] in playerNameVisualsMap" :key="playerName">
       <span>{{ playerName }}</span>
-      <span class="monospace" v-html="visuals.asciiBoard.queueString.value"></span>
-      <span class="monospace" v-html="visuals.asciiBoard.holdString.value"></span>
-      <span class="monospace" v-html="visuals.asciiBoard.incomingGarbage.value"></span>
-      <span class="monospace" v-html="visuals.asciiBoard.playGridASCII.value"></span>
+      <br>
+      <span class="monospace" v-html="visuals.asciiBoard.queueString"></span>
+      <span class="monospace" v-html="visuals.asciiBoard.holdString"></span>
+      <span class="monospace" v-html="visuals.asciiBoard.incomingGarbage"></span>
+      <br>
+      <span class="monospace" v-html="visuals.asciiBoard.playGridASCII"></span>
     </div>
   </div>
 </template>

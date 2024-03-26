@@ -59,7 +59,6 @@ export class GameGateway implements OnGatewayDisconnect {
   // #region Gameplay
   @SubscribeMessage(I_SETUP_GAME)
   setupGame(client: Socket, dto_GameSetup: dto_GameSetup): void {
-    console.log(I_SETUP_GAME);
     const gameMode = dto_GameSetup.gameMode;
     const gameSettings = dto_GameSetup.gameSettings;
     const handlingSettings = dto_GameSetup.handlingSettings;
@@ -95,7 +94,6 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(I_QUEUE_INPUTS)
   queueUpGameInputs(client: Socket, gameInputs: InputFrame[]): void {
-    console.log(I_QUEUE_INPUTS);
     const game = ongoingGamesMap.get(client.id)
     gameInputs.forEach(inputFrame => game.queuedInputs[inputFrame.indexID] = inputFrame);
     client.emit(O_QUEUE_INPUTS, game.queuedInputs.length - 1);
@@ -117,7 +115,6 @@ export class GameGateway implements OnGatewayDisconnect {
       const spectators = game.spectatorRoomName
       this.server.to(spectators).emit(O_PLAYER_SPECTATOR, this.getGameInstanceDto(game));
       game.isProcessing = false;
-      console.log(O_PLAYER_SPECTATOR)
     }
   }
   // #endregion
@@ -127,20 +124,17 @@ export class GameGateway implements OnGatewayDisconnect {
   // #region Spectate
   @SubscribeMessage(J_SPECTATOR_ENTRIES)
   joinSpectatorRoom(client: Socket): void {
-    console.log(J_SPECTATOR_ENTRIES);
     client.join(spectatorRoomName);
     client.emit(O_SPECTATOR_ENTRIES, this.getSpectatorEntries());
   }
 
   @SubscribeMessage(L_SPECTATOR_ENTRIES)
   leaveSpectatorRoom(client: Socket): void {
-    console.log(L_SPECTATOR_ENTRIES);
     client.leave(spectatorRoomName);
   }
 
   @SubscribeMessage(J_PLAYER_SPECTATOR)
   joinPlayerSpectator(client: Socket, playerClientID: string) {
-    console.log(J_PLAYER_SPECTATOR);
     const roomname = ongoingGamesMap.get(playerClientID).spectatorRoomName;
     client.join(roomname);
     client.emit(O_PLAYER_SPECTATOR, this.getGameInstanceDto(playerClientID));
@@ -148,7 +142,6 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(L_PLAYER_SPECTATOR)
   leavePlayerSpectator(client: Socket, playerClientID: string): void {
-    console.log(L_PLAYER_SPECTATOR);
     const roomname = ongoingGamesMap.get(playerClientID).spectatorRoomName;
     client.leave(roomname);
   }

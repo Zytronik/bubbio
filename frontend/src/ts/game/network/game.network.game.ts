@@ -14,7 +14,6 @@ const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
 
 const registeredGameEvents: Set<string> = new Set();
 export function network_setupGame(playerGameInstance: GameInstance): void {
-    console.log(I_SETUP_GAME);
     if (state.socket) {
         const networkData: dto_GameSetup = {
             gameMode: playerGameInstance.gameMode,
@@ -35,7 +34,6 @@ export function network_synchronizeGame(gameInstance: GameInstance): void {
             history[i].indexID = i;
         }
         const inputQueue = gameInstance.gameStateHistory.inputHistory.slice(0);
-        console.log(inputQueue)
         state.socket.emit(I_QUEUE_INPUTS, inputQueue);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
@@ -98,15 +96,5 @@ export async function submitGameToDB(gameStats: GameStats) {
         } catch (error) {
             eventBus.emit('show-info-message', { message: 'There was an error submitting your Sprint.', type: 'error' });
         }
-    }
-}
-
-export function setupSocketListeners() {
-    const receivedIndexAnswer = "queuedUpGameInputsReceivedAnswer";
-    if (state.socket && !registeredGameEvents.has(receivedIndexAnswer)) {
-        state.socket.on(receivedIndexAnswer, (data: number) => {
-            console.log(receivedIndexAnswer, data);
-        });
-        registeredGameEvents.add(receivedIndexAnswer);
     }
 }
