@@ -194,7 +194,7 @@ function getIncomingGarbageString(garbageAmount: number, gridtotalHeight: number
         queueString += "─";
     }
     queueString += "╯"
-    return queueString + "\n\n";
+    return queueString;
 }
 
 function getASCIIArrow(angle: number): string {

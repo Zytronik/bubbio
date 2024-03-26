@@ -6,8 +6,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ValidateImagePipe } from './validateImgPipeline';
 import { UpdateInputSettingsDto } from './dto/user.dto.inputSettings';
-import { AuthenticatedRequest } from 'src/auth/auth.e-authRequest';
-import { CheckUsernameDto } from 'src/auth/dto/auth.dto.checkUsername';
+import { AuthenticatedRequest } from 'src/auth/e/auth.e-auth-request';
+import { CheckUsernameDto } from 'src/auth/dto/auth.dto.check-username';
 
 @Controller('users')
 export class UserController {

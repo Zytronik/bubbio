@@ -48,11 +48,12 @@ import { httpClient } from '@/ts/networking/networking.http-client';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 import eventBus from '@/ts/page/page.event-bus';
-import { UserData } from '@/ts/page/i/page.i-userData';
+import { UserData } from '@/ts/page/i/page.i.user-data';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { getDefaultProfilePbURL } from '@/ts/networking/paths';
 import { formatFieldValue, getFullName } from '@/ts/page/i/page.i.stat-display';
 import { openProfile } from '@/ts/page/page.page-manager';
+import { ModDetail } from '@/ts/page/i/page.i.mod-detail';
 
 interface LeaderboardEntry extends GameStats {
   user: {
@@ -66,13 +67,6 @@ interface LeaderboardEntry extends GameStats {
   // eslint-disable-next-line
   [key: string]: any;
 }
-
-export interface ModDetail {
-  abr: string;
-  type: 'toggle' | 'multi';
-  enabled?: boolean;
-}
-
 
 export default defineComponent({
   name: 'LeaderboardComponent',
@@ -259,3 +253,4 @@ p {
   opacity: 0.7;
 }
 </style>
+@/ts/page/i/page.i-user-data@/ts/page/i/page.i.mod-detail

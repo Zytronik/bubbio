@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ModDetail } from './leaderboard.i.mods';
+import { ModDetail } from './i/leaderboard.i.mod-detail';
 
 @Injectable()
 export class LeaderboardService {

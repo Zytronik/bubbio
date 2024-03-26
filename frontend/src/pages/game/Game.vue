@@ -3,7 +3,7 @@
     <span class="monospace" v-html="playerGameVisuals.asciiBoard.queueString.value"></span>
     <span class="monospace" v-html="playerGameVisuals.asciiBoard.holdString.value"></span>
     <span class="monospace" v-html="playerGameVisuals.asciiBoard.incomingGarbage.value"></span>
-    <span class="monospace grid" v-html="playerGameVisuals.asciiBoard.playGridASCII.value"></span>
+    <span class="monospace text-center" v-html="playerGameVisuals.asciiBoard.playGridASCII.value"></span>
   </div>
 </template>
 
@@ -24,7 +24,6 @@ export default {
 .monospace {
   white-space: pre-line;
   font-family: 'Consolas', monospace;
-  text-align: center;
 }
 
 .gameUI-wrapper{

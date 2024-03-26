@@ -85,6 +85,10 @@ section .page-container {
     font-size: 120%;
 }
 
+.text-center {
+    text-align: center;
+}
+
 /* Overlay */
 .overlay {
     position: fixed;
