@@ -39,7 +39,7 @@ function updateTimeStats(): void {
         const playerInstance = playerNameInstanceMap.get(playerName);
         if (playerInstance && playerInstance.stats && visuals && visuals.statNumbers) {
             const gameStartTime = playerInstance.stats.gameStartTime;
-            const currentTime = performance.now() - gameStartTime;
+            const currentTime = gameStartTime + visuals.timeDifference;
             visuals.statNumbers.formattedCurrentTime = formatTimeNumberToString(currentTime);
             visuals.statNumbers.bubblesPerSecond = visuals.statNumbers.bubblesShot / currentTime * 1000;
         }
