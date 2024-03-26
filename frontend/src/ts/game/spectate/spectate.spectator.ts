@@ -12,6 +12,7 @@ let spectatorFrameID: number | null = null;
 let spectatingAnimRunning = false;
 
 export function startSpectatorStatDisplay(): void {
+    console.log("are you even spectating?")
     if (!spectatingAnimRunning) {
         spectatingAnimRunning = true;
         statDisplayAnimation();
@@ -38,10 +39,9 @@ function updateTimeStats(): void {
     playerNameVisualsMap.forEach((visuals, playerName) => {
         const playerInstance = playerNameInstanceMap.get(playerName);
         if (playerInstance && playerInstance.stats && visuals && visuals.statNumbers) {
-            const gameStartTime = playerInstance.stats.gameStartTime;
-            const currentTime = gameStartTime + visuals.timeDifference;
+            const currentTime = performance.now() + visuals.timeDifference;
             visuals.statNumbers.formattedCurrentTime = formatTimeNumberToString(currentTime);
-            visuals.statNumbers.bubblesPerSecond = visuals.statNumbers.bubblesShot / currentTime * 1000;
+            visuals.statNumbers.bubblesPerSecond = Number((visuals.statNumbers.bubblesShot / currentTime * 1000).toFixed(2));
         }
     });
 }

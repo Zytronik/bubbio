@@ -1,6 +1,6 @@
 import { reactive } from "vue";
 import state from "../../networking/networking.client-websocket";
-import { allSpectationEntries, playerNameVisualsMap } from "../spectate/spectate.spectator";
+import { allSpectationEntries, playerNameInstanceMap, playerNameVisualsMap } from "../spectate/spectate.spectator";
 import { fillAsciiStrings } from "../visuals/game.visuals.ascii";
 import { fillStatStrings } from "../visuals/game.visuals.stat-display";
 import { getEmptyGameVisuals } from "../visuals/i/game.visuals.i.game-visuals";
@@ -45,6 +45,7 @@ export function network_spectatePlayer(clientID: string): void {
         currentlySpectating.add(clientID);
         state.socket.emit(J_PLAYER_SPECTATOR, clientID);
         state.socket.on(O_PLAYER_SPECTATOR, (data: dto_GameInstance) => {
+            playerNameInstanceMap.set(data.playerName, data.gameInstance);
             const visuals = getEmptyGameVisuals();
             fillAsciiStrings(data.gameInstance, visuals.asciiBoard);
             fillStatStrings(data.gameInstance, visuals.statNumbers);
@@ -68,6 +69,8 @@ export function network_stopSpectating(clientID: string): void {
             console.error("YOU DONT HAVE ANY SOCKETS!");
         }
         currentlySpectating.delete(clientID);
+        playerNameInstanceMap.clear();
+        playerNameVisualsMap.clear();
     });
     registeredSpectateEvents.delete(O_PLAYER_SPECTATOR);
 }

@@ -111,6 +111,7 @@ export class GameGateway implements OnGatewayDisconnect {
           holdBubble(game.gameInstance);
         }
         processedInputs[inputFrame.indexID] = inputFrame;
+        game.gameInstance.stats.gameDuration = inputFrame.frameTime;
       }
       const spectators = game.spectatorRoomName
       this.server.to(spectators).emit(O_PLAYER_SPECTATOR, this.getGameInstanceDto(game));
