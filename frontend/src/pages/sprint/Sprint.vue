@@ -59,9 +59,9 @@
           <div class="game-wrapper">
             <Game />
             <div class="inGameStats">
-              <p>{{ formattedCurrentTime }}</p>
-              <p>{{ bubblesCleared }}/{{ bubbleClearToWin }}</p>
-              <p>{{ bubblesShot }} BPS: {{ bubblesPerSecond }}</p>
+              <p>{{ playerGameVisuals.statNumbers.formattedCurrentTime }}</p>
+              <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}</p>
+              <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond }}</p>
             </div>
           </div>
         </div>
@@ -107,8 +107,8 @@ import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
 import { formatDateTime, getCookie, setCookie } from '@/ts/page/page.page-utils';
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { ComputedRef, computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
-import { getGameStats, leaveGame, setupSprintGame, startGame } from '@/ts/game/game.master';
-import { bubbleClearToWin, bubblesCleared, bubblesPerSecond, bubblesShot, formatTimeNumberToString, formattedCurrentTime } from '@/ts/game/visuals/game.visuals.stat-display';
+import { playerGameInstance, leaveGame, playerGameVisuals, setupSprintGame, startGame } from '@/ts/game/game.master';
+import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import Leaderboard, { ModDetail } from '@/globalComponents/Leaderboard.vue';
 import History from '@/globalComponents/History.vue';
@@ -274,7 +274,7 @@ export default {
         document.body.classList.add('game-view');
         setupSprintGame();
         showGameView();
-        fillAsciiStrings();
+        fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
         setTimeout(() => {
           document.body.removeChild(overlay);
           onTransitionEnd();
@@ -319,7 +319,7 @@ export default {
     }
 
     async function showResultView() {
-      const rawStats: GameStats = getGameStats();
+      const rawStats: GameStats = playerGameInstance.stats;
       diffToPb.value = await getDifferenceToPB(rawStats.gameDuration, enabledToggleMods.value);
       if (diffToPb.value === 0) {
         triggerConfettiAnimation(".page-container");
@@ -408,11 +408,7 @@ export default {
     }
 
     return {
-      formattedCurrentTime,
-      bubbleClearToWin,
-      bubblesCleared,
-      bubblesShot,
-      bubblesPerSecond,
+      playerGameVisuals,
       goToState,
       PAGE_STATE,
       play,

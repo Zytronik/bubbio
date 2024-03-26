@@ -1,12 +1,6 @@
-import { Ref, ref } from "vue";
-import { getGameStats } from "../game.master";
-
-export const formattedCurrentTime: Ref<string> = ref("");
-export const bubbleClearToWin: Ref<number> = ref(0);
-export const bubblesCleared: Ref<number> = ref(0);
-export const bubblesLeftToClear: Ref<number> = ref(0);
-export const bubblesShot: Ref<number> = ref(0);
-export const bubblesPerSecond: Ref<number> = ref(0);
+import { playerGameInstance, playerGameVisuals } from "../game.master";
+import { GameInstance } from "../i/game.i.game-instance";
+import { StatNumberRefs } from "./i/game.visuals.i.stat-numberscopy";
 
 let trackingFrameId: number | null = null;
 let statTrackingRunning = false;
@@ -23,19 +17,19 @@ export function stopStatDisplay(): void {
         statTrackingRunning = false;
         cancelAnimationFrame(trackingFrameId);
         trackingFrameId = null;
-        fillStatStrings();
+        fillStatStrings(playerGameInstance, playerGameVisuals.statNumbers);
     }
 }
 
 function statDisplayAnimation(): void {
-    fillStatStrings();
+    fillStatStrings(playerGameInstance, playerGameVisuals.statNumbers);
     if (statTrackingRunning) {
         trackingFrameId = requestAnimationFrame(() => statDisplayAnimation());
     }
 }
 
-function fillStatStrings(): void {
-    const gameStats = getGameStats();
+export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNumberRefs): void {
+    const gameStats = gameInstance.stats;
     const currentTime = performance.now() - gameStats.gameStartTime;
     const formattedCurrentTimeString = formatTimeNumberToString(currentTime);
     gameStats.bubblesPerSecond = Number((gameStats.bubblesShot / currentTime * 1000).toFixed(2));
@@ -48,21 +42,21 @@ function fillStatStrings(): void {
 
     //holds
 
-    formattedCurrentTime.value = formattedCurrentTimeString;
-    bubbleClearToWin.value = gameStats.bubbleClearToWin;
-    bubblesCleared.value = gameStats.bubblesCleared;
-    bubblesLeftToClear.value = gameStats.bubblesLeftToClear;
-    bubblesShot.value = gameStats.bubblesShot;
-    bubblesPerSecond.value = gameStats.bubblesPerSecond;
+    statStrings.formattedCurrentTime.value = formattedCurrentTimeString;
+    statStrings.bubbleClearToWin.value = gameStats.bubbleClearToWin;
+    statStrings.bubblesCleared.value = gameStats.bubblesCleared;
+    statStrings.bubblesLeftToClear.value = gameStats.bubblesLeftToClear;
+    statStrings.bubblesShot.value = gameStats.bubblesShot;
+    statStrings.bubblesPerSecond.value = gameStats.bubblesPerSecond;
 }
 
-export function resetStatDisplays(): void {
-    formattedCurrentTime.value = ("00:00.00");
-    bubbleClearToWin.value = (0);
-    bubblesCleared.value = (0);
-    bubblesLeftToClear.value = (0);
-    bubblesShot.value = (0);
-    bubblesPerSecond.value = (0);
+export function resetStatDisplays(statStrings: StatNumberRefs): void {
+    statStrings.formattedCurrentTime.value = ("00:00.00");
+    statStrings.bubbleClearToWin.value = (0);
+    statStrings.bubblesCleared.value = (0);
+    statStrings.bubblesLeftToClear.value = (0);
+    statStrings.bubblesShot.value = (0);
+    statStrings.bubblesPerSecond.value = (0);
 }
 
 export function formatTimeNumberToString(milliseconds: number): string {

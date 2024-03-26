@@ -3,10 +3,7 @@ import { GameInstance } from "./i/game.i.game-instance";
 import { disableChannelInput, disableGameInputs, disableResetInput, enableChannelInput, enableGameInputs, enableResetInput } from "../input/input.input-manager";
 import { cleanUpAngle } from "./logic/game.logic.angle";
 import { angleLeftInput, angleRightInput } from "../input/input.all-inputs";
-import { GameStats } from "./i/game.i.game-stats";
-import { Bubble } from "./i/game.i.bubble";
-import { Grid } from "./i/game.i.grid";
-import { calculatePreview, executeShot } from "./logic/game.logic.shoot";
+import { executeShot } from "./logic/game.logic.shoot";
 import { resetStatDisplays, startStatDisplay, stopStatDisplay } from "./visuals/game.visuals.stat-display";
 import { createGameInstance, resetGameInstance } from "./logic/game.logic.instance-creator";
 import { GAME_MODE } from "./settings/i/game.settings.e.game-modes";
@@ -22,8 +19,26 @@ import eventBus from "../page/page.event-bus";
 import { getNextSeed } from "./logic/game.logic.random";
 import { GAME_INPUT } from "./network/dto/game.network.dto.game-input";
 import { InputFrame } from "./i/game.i.game-state-history";
+import { GameVisuals } from "./visuals/i/game.visuals.i.game-visuals";
+import { ref } from "vue";
 
-let playerGameInstance: GameInstance;
+export const playerGameVisuals: GameVisuals = {
+    asciiBoard: {
+        playGridASCII: ref(""),
+        holdString: ref(""),
+        queueString: ref(""),
+        incomingGarbage: ref(""),
+    },
+    statNumbers: {
+        formattedCurrentTime: ref(""),
+        bubbleClearToWin: ref(0),
+        bubblesCleared: ref(0),
+        bubblesLeftToClear: ref(0),
+        bubblesShot: ref(0),
+        bubblesPerSecond: ref(0),
+    }
+};
+export let playerGameInstance: GameInstance;
 export function setupSprintGame(): void {
     const gameMode = GAME_MODE.SPRINT;
     const transitions: GameTransitions = {
@@ -56,13 +71,13 @@ export function setupSprintGame(): void {
     }
     function sprintVictory(): void {
         disableGameplay();
-        showASCIIVictory();
+        showASCIIVictory(playerGameInstance, playerGameVisuals.asciiBoard);
         eventBus.emit("sprintVictory");
         submitGameToDB(playerGameInstance.stats);
     }
     function sprintDeath(): void {
         disableGameplay();
-        showASCIIDefeat();
+        showASCIIDefeat(playerGameInstance, playerGameVisuals.asciiBoard);
     }
 }
 
@@ -107,7 +122,6 @@ function getHandlingSettings(): HandlingSettings {
 function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
     if (floating && filled) {
         return 3;
-        return 3;
     } else if (!floating && filled) {
         return 3;
     } else if (floating && !filled) {
@@ -116,6 +130,7 @@ function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
         return 3;
     }
 }
+
 
 export function startGame(): void {
     playerGameInstance.gameTransitions.onGameStart();
@@ -128,7 +143,7 @@ export function leaveGame(): void {
 }
 
 function showCountDownAndStart(): void {
-    resetStatDisplays();
+    resetStatDisplays(playerGameVisuals.statNumbers);
     startCountdownAnimation(playerGameInstance.gameSettings.countDownDuration, afterCountdown)
     function afterCountdown(): void {
         startASCIIAnimation();
@@ -197,44 +212,4 @@ export function triggerHold(): void {
 }
 export function debugTriggerGarbage(): void {
     playerGameInstance.queuedGarbage += 1;
-}
-
-
-//Exported visuals
-export function getGameStats(): GameStats {
-    return playerGameInstance.stats;
-}
-export function getAngle(): number {
-    return playerGameInstance.angle;
-}
-export function getCurrentBubble(): Bubble {
-    return playerGameInstance.currentBubble;
-}
-export function getHoldBubble(): Bubble {
-    if (!playerGameInstance.holdBubble) {
-        return {
-            color: "",
-            ascii: "",
-            type: 0
-        }
-    }
-    return playerGameInstance.holdBubble as Bubble;
-}
-export function getBubbleQueue(): Bubble[] {
-    return playerGameInstance.bubbleQueue;
-}
-export function getPlayGrid(): Grid {
-    return playerGameInstance.playGrid;
-}
-export function updatePreviewBubble(): void {
-    calculatePreview(playerGameInstance);
-}
-export function getQueueSize(): number {
-    return playerGameInstance.gameSettings.queuePreviewSize;
-}
-export function getIncomingGarbageAmount(): number {
-    return playerGameInstance.queuedGarbage;
-}
-export function getGridTotalHeight(): number {
-    return playerGameInstance.playGrid.gridHeight + playerGameInstance.playGrid.extraGridHeight;
 }

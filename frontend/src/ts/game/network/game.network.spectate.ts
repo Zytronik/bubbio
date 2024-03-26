@@ -1,5 +1,8 @@
 import state from "../../networking/networking.client-websocket";
-import { allSpectationEntries } from "../spectate/spectate.spectator";
+import { allSpectationEntries, playerNameVisualsMap } from "../spectate/spectate.spectator";
+import { fillAsciiStrings } from "../visuals/game.visuals.ascii";
+import { fillStatStrings } from "../visuals/game.visuals.stat-display";
+import { getEmptyGameVisuals } from "../visuals/i/game.visuals.i.game-visuals";
 import { dto_GameInstance } from "./dto/game.network.dto.game-instance";
 import { dto_SpectationEntry } from "./dto/spectate.dto.spectation-entry";
 
@@ -44,14 +47,25 @@ export function network_spectatePlayer(clientID: string): void {
         currentlySpectating.add(clientID);
         state.socket.emit(J_PLAYER_SPECTATOR, clientID);
         state.socket.on(O_PLAYER_SPECTATOR, (data: dto_GameInstance) => {
-            console.log(data)
+            if (playerNameVisualsMap.has(data.playerName)) {
+                const visuals = playerNameVisualsMap.get(data.playerName);
+                if (visuals) {
+                    fillAsciiStrings(data.gameInstance, visuals.asciiBoard);
+                    fillStatStrings(data.gameInstance, visuals.statNumbers);
+                }
+            } else {
+                const visuals = getEmptyGameVisuals();
+                fillAsciiStrings(data.gameInstance, visuals.asciiBoard);
+                fillStatStrings(data.gameInstance, visuals.statNumbers);
+                playerNameVisualsMap.set(data.playerName, visuals);
+            }
+            console.log("spectating:" + data.playerName, playerNameVisualsMap.get(data.playerName))
         });
         registeredSpectateEvents.add(O_PLAYER_SPECTATOR);
     } else if (registeredSpectateEvents.has(O_PLAYER_SPECTATOR)) {
         console.error("already spectating", O_PLAYER_SPECTATOR);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
-    
     }
 }
 

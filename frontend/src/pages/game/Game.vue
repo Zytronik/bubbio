@@ -1,23 +1,20 @@
 <template class="page" id="game">
   <div class="gameUI-wrapper">
-    <span class="monospace" v-html="queueString"></span>
-    <span class="monospace" v-html="holdString"></span>
-    <span class="monospace" v-html="incomingGarbage"></span>
-    <span class="monospace grid" v-html="playGridASCII"></span>
+    <span class="monospace" v-html="playerGameVisuals.asciiBoard.queueString.value"></span>
+    <span class="monospace" v-html="playerGameVisuals.asciiBoard.holdString.value"></span>
+    <span class="monospace" v-html="playerGameVisuals.asciiBoard.incomingGarbage.value"></span>
+    <span class="monospace grid" v-html="playerGameVisuals.asciiBoard.playGridASCII.value"></span>
   </div>
 </template>
 
 <script lang="ts">
-import { holdString, incomingGarbage, playGridASCII, queueString } from '@/ts/game/visuals/game.visuals.ascii';
+import { playerGameVisuals } from '@/ts/game/game.master';
 
 export default {
   name: 'GamePage',
   setup() {
     return {
-      playGridASCII,
-      incomingGarbage,
-      queueString,
-      holdString,
+      playerGameVisuals,
     }
   },
 }
