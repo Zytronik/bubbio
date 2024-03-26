@@ -23,7 +23,7 @@
 <script lang="ts">
 import { network_joinSpectatorRoom, network_leaveSpectatorRoom, network_spectatePlayer } from '@/ts/game/network/game.network.spectate';
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
-import { allSpectationEntries, playerNameVisualsMap } from "@/ts/game/spectate/spectate.spectator";
+import { allSpectationEntries, playerNameVisualsMap, startSpectatorStatDisplay, stopSpectatorStatDisplay } from "@/ts/game/spectate/spectate.spectator";
 
 export default defineComponent({
   name: 'SpectateTab',
@@ -32,10 +32,12 @@ export default defineComponent({
 
     function showSpectatedGame() {
       isSpectating.value = true;
+      startSpectatorStatDisplay();
     }
 
     function showSpectationEntries() {
       isSpectating.value = false;
+      stopSpectatorStatDisplay();
     }
 
     onMounted(() => {
@@ -44,6 +46,7 @@ export default defineComponent({
 
     onUnmounted(() => {
       network_leaveSpectatorRoom();
+      stopSpectatorStatDisplay();
     });
 
     return {
