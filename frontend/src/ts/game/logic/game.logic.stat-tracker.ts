@@ -70,7 +70,7 @@ export function createStatGraphData(game: GameInstance): void {
         if (duration > gameDuration) {
             duration = gameDuration;
         }
-        graph[i] = inputCount/duration;
+        graph[i] = Number((inputCount/duration).toFixed(2));
     }
     console.log(graph)
 }

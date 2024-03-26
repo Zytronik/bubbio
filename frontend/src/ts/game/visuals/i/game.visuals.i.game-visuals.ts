@@ -4,7 +4,8 @@ import { StatNumberRefs } from "./game.visuals.i.stat-numberscopy";
 
 export interface GameVisuals {
     asciiBoard: AsciiBoardRefs,
-    statNumbers: StatNumberRefs
+    statNumbers: StatNumberRefs,
+    timeDifference: number,
 }
 
 export function getEmptyGameVisuals(): GameVisuals {
@@ -22,6 +23,7 @@ export function getEmptyGameVisuals(): GameVisuals {
             bubblesLeftToClear: ref(0),
             bubblesShot: ref(0),
             bubblesPerSecond: ref(0)
-        }
+        },
+        timeDifference: 0,
     }
 }

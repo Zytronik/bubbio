@@ -37,7 +37,8 @@ export const playerGameVisuals: GameVisuals = {
         bubblesLeftToClear: ref(0),
         bubblesShot: ref(0),
         bubblesPerSecond: ref(0),
-    }
+    },
+    timeDifference: 0,
 };
 export let playerGameInstance: GameInstance;
 export function setupSprintGame(): void {
