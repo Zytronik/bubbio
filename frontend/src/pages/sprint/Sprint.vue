@@ -77,6 +77,8 @@
             <button class="retry" @click="play()">Retry</button>
           </div>
 
+          <LineChart />
+
           <div v-if="resultStats">
             <div class="columns">
               <div class="column">
@@ -125,11 +127,12 @@ import { triggerConfettiAnimation } from '@/ts/page/page.visuals';
 import { getDifferenceToPB } from '@/ts/page/page.page-requests';
 import { convertModToModDetail, getModIconPath } from '@/ts/page/page.mods';
 import { ModDetail } from '@/ts/page/i/page.i.mod-detail';
+import LineChart from '@/globalComponents/LineChart.vue';
 import { disableBackInputs, disableResetInput, enableBackInputs, enableResetInput } from '@/ts/input/input.input-manager';
 
 export default {
   name: 'SprintPage',
-  components: { Game, MenuBackButtons, Leaderboard, History },
+  components: { Game, MenuBackButtons, Leaderboard, History, LineChart },
   data() {
     return {
       currentLeaderboard: 'Global',
@@ -421,6 +424,7 @@ export default {
       sprintResultTime,
       diffToPb,
       convertModToModDetail,
+      LineChart,
     };
   },
 };

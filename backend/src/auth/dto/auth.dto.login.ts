@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, Length, MinLength } from 'class-validator';
 export class LoginDto {
     @IsString()
     @IsNotEmpty()
-    @Length(4, 20)
+    @Length(4, 15)
     readonly username: string;
 
     @IsString()

@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'cl
 export class RegisterDto {
     @IsString()
     @IsNotEmpty()
-    @MaxLength(20)
+    @MaxLength(15)
     @MinLength(2)
     @Matches(/^[a-z0-9-_]+$/, {
         message: 'Username must contain only lowercase letters, numbers, hyphens, and underscores.',
