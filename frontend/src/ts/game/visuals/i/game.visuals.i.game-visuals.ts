@@ -14,7 +14,8 @@ export function getEmptyGameVisuals(): GameVisuals {
             playGridASCII: ref(""),
             holdString: ref(""),
             queueString: ref(""),
-            incomingGarbage: ref("")
+            incomingGarbage: ref(""),
+            floatingText: ref(""),
         },
         statNumbers: {
             formattedCurrentTime: ref(""),

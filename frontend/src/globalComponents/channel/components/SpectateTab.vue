@@ -20,12 +20,14 @@
       <span class="monospace" v-html="visuals.asciiBoard.incomingGarbage"></span>
       <br>
       <span class="monospace" v-html="visuals.asciiBoard.playGridASCII"></span>
+      <br>
+      <span class="monospace" v-html="visuals.asciiBoard.floatingText"></span>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { network_joinSpectatorRoom, network_leaveSpectatorRoom, network_spectatePlayer } from '@/ts/game/network/game.network.spectate';
+import { network_joinSpectatorRoom, network_leaveSpectatorRoom, network_spectatePlayer, network_stopSpectating } from '@/ts/game/network/game.network.spectate';
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import { allSpectationEntries, playerNameVisualsMap, startSpectatorStatDisplay, stopSpectatorStatDisplay } from "@/ts/game/spectate/spectate.spectator";
 
@@ -42,6 +44,7 @@ export default defineComponent({
     function showSpectationEntries() {
       isSpectating.value = false;
       stopSpectatorStatDisplay();
+      network_stopSpectating();
     }
 
     onMounted(() => {

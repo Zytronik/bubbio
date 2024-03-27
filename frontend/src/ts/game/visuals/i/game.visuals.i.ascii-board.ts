@@ -5,4 +5,5 @@ export interface AsciiBoardRefs {
     holdString: Ref<string>,
     queueString: Ref<string>,
     incomingGarbage: Ref<string>,
+    floatingText: Ref<string>,
 }

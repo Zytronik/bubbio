@@ -1,4 +1,4 @@
-import { showASCIIDefeat, showASCIIVictory, startASCIIAnimation, startCountdownAnimation, stopASCIIAnimation, stopCountdownAnimation } from "./visuals/game.visuals.ascii";
+import { startASCIIAnimation, startCountdownAnimation, stopASCIIAnimation, stopCountdownAnimation } from "./visuals/game.visuals.ascii";
 import { GameInstance } from "./i/game.i.game-instance";
 import { disableChannelInput, disableGameInputs, disableResetInput, enableChannelInput, enableGameInputs, enableResetInput } from "../input/input.input-manager";
 import { cleanUpAngle } from "./logic/game.logic.angle";
@@ -9,7 +9,7 @@ import { createGameInstance, resetGameInstance } from "./logic/game.logic.instan
 import { GAME_MODE } from "./settings/i/game.settings.e.game-modes";
 import { GameTransitions } from "./i/game.i.game-transitions";
 import { holdBubble } from "./logic/game.logic.bubble-manager";
-import { network_setupGame, network_synchronizeGame, submitGameToDB } from "./network/game.network.game";
+import { network_countDownState, network_leaveGame, network_resetGame, network_setupGame, network_synchronizeGame, submitGameToDB } from "./network/game.network.game";
 import { digMod, precisionMod, randomnessMod } from "./settings/ref/game.settings.ref.all-mods";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { HandlingSettings } from "./settings/i/game.settings.i.handling-settings";
@@ -22,6 +22,7 @@ import { InputFrame } from "./i/game.i.game-state-history";
 import { GameVisuals } from "./visuals/i/game.visuals.i.game-visuals";
 import { ref } from "vue";
 import { createStatGraphData } from "./logic/game.logic.stat-tracker";
+import { GAME_STATE } from "./i/game.e.state";
 
 export const playerGameVisuals: GameVisuals = {
     asciiBoard: {
@@ -29,6 +30,7 @@ export const playerGameVisuals: GameVisuals = {
         holdString: ref(""),
         queueString: ref(""),
         incomingGarbage: ref(""),
+        floatingText: ref(""),
     },
     statNumbers: {
         formattedCurrentTime: ref(""),
@@ -64,22 +66,24 @@ export function setupSprintGame(): void {
     function resetSprint(): void {
         disableGameplay();
         resetGameInstance(playerGameInstance, getNextSeed(Date.now()));
+        network_resetGame(playerGameInstance.initialSeed);
         showCountDownAndStart();
     }
     function leaveSprint(): void {
         disableResetInput();
         enableChannelInput();
         disableGameplay();
+        network_leaveGame();
     }
     function sprintVictory(): void {
+        playerGameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
         disableGameplay();
-        showASCIIVictory(playerGameInstance, playerGameVisuals.asciiBoard);
         eventBus.emit("sprintVictory");
         submitGameToDB(playerGameInstance.stats);
     }
     function sprintDeath(): void {
+        playerGameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
         disableGameplay();
-        showASCIIDefeat(playerGameInstance, playerGameVisuals.asciiBoard);
     }
 }
 
@@ -155,6 +159,12 @@ function showCountDownAndStart(): void {
         playerGameInstance.stats.gameStartTime = performance.now();
     }
 }
+export function setGameStateAndNotify(gameState: GAME_STATE): void {
+    if (playerGameInstance.gameState != gameState) {
+        playerGameInstance.gameState = gameState;
+        network_countDownState(gameState);
+    }
+}
 function disableGameplay(): void {
     stopCountdownAnimation();
     const stats = playerGameInstance.stats;
@@ -162,7 +172,6 @@ function disableGameplay(): void {
     stats.gameDuration = stats.gameEndTime - stats.gameStartTime;
     stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
     createStatGraphData(playerGameInstance);
-    //TODO: save playtime/score
     disableGameInputs();
     stopASCIIAnimation();
     stopStatDisplay();

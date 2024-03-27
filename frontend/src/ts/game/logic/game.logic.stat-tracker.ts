@@ -72,5 +72,4 @@ export function createStatGraphData(game: GameInstance): void {
         }
         graph[i] = Number((inputCount/duration).toFixed(2));
     }
-    console.log(graph)
 }
