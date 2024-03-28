@@ -17,6 +17,7 @@ export class MatchmakingService {
     private queue: MatchmakingQueue = {};
     private acceptableGap = 100; // Startwert für den akzeptablen Skill Gap
     private gapIncreaseInterval = 5000; // Zeit in Millisekunden, nach der der Skill Gap erhöht wird
+    private matchmakingIntervalTime = 5000;
     private gapIncreaseAmount = 100; // Erhöhung des Skill Gaps
     private maxGap = 1000; // Maximale Erweiterung des Skill Gaps
     private matchmakingInterval: NodeJS.Timeout | null = null;
@@ -34,7 +35,7 @@ export class MatchmakingService {
                 this.notifyAllUsersOfEstimatedWaitTime();
             }
             this.notifyAllUsersOfQueueSize();
-            console.log(this.queue);
+            //console.log(this.queue);
         }
     }
 
@@ -56,7 +57,7 @@ export class MatchmakingService {
                     clearInterval(this.matchmakingInterval);
                     this.matchmakingInterval = null;
                 }
-            }, this.gapIncreaseInterval);
+            }, this.matchmakingIntervalTime);
         }
     }
 
@@ -92,9 +93,11 @@ export class MatchmakingService {
             for (let j = i + 1; j < userIds.length; j++) {
                 const opponentId = parseInt(userIds[j]);
                 const opponent = this.queue[opponentId];
+                console.log(currentGap)
                 if (!opponent) continue;
 
                 const ratingDiff = Math.abs(glicko - opponent.glicko);
+                console.log(ratingDiff, currentGap);
                 if (ratingDiff <= currentGap) {
                     matches.push([userId, opponentId]);
                     break;
@@ -124,7 +127,7 @@ export class MatchmakingService {
 
     calculateEstimatedWaitTime(userId: number): number | string{
         if (this.getQueueSize() <= 1) {
-            return "unknown";
+            return "Unknown";
         }
 
         const userIds = Object.keys(this.queue);
@@ -144,7 +147,7 @@ export class MatchmakingService {
                     if (!user2) continue;
 
                     const ratingDiff = Math.abs(glicko - user2.glicko);
-                    console.log(currentGap);
+                    /* console.log(currentGap); */
                     if (ratingDiff <= currentGap) {
                         if(user1Id === userId || user2Id === userId){
                             matchFound = true;

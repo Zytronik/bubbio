@@ -32,14 +32,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage('getEstimatedWaitTime')
-    handleGetEstimatedWaitTime(@ConnectedSocket() client: Socket) {
-        if(this.matchmakingService.isLoggedInUser(client)){
-            const estimatedWaitTime = this.matchmakingService.calculateEstimatedWaitTime(client.data.user.id);
-            client.emit('estimatedWaitTime', estimatedWaitTime);
-        }
-    }
-
     @SubscribeMessage('getQueueSize')
     handleGetQueueSize(@ConnectedSocket() client: Socket) {
         if(this.matchmakingService.isLoggedInUser(client)){
