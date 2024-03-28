@@ -72,4 +72,11 @@ export class UserController {
     return this.userService.getInputSettings(userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('matchmaking/stats')
+  async getMatchmakingStats(@Req() req: AuthenticatedRequest) {
+    const userId = req.user.userId;
+    return this.userService.getMatchmakingStats(userId);
+  }
+
 }

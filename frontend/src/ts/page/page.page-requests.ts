@@ -14,7 +14,7 @@ export async function getDifferenceToPB(currentTime: number, mods: ModDetail[]) 
     if (pbTime !== undefined && currentTime !== undefined) {
         return currentTime - pbTime;
     } else {
-        return undefined;
+        return 0;
     }
 }
 

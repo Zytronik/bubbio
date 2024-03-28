@@ -8,6 +8,8 @@ import { SprintModule } from './sprint/sprint.module';
 import { NewsModule } from './news/news.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { MailModule } from './mailer/mailer.module';
+import { MatchmakingGateway } from './matchmaking/matchmaking.gateway';
+import { MatchmakingModule } from './matchmaking/matchmaking.module';
 
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { MailModule } from './mailer/mailer.module';
     NewsModule,
     LeaderboardModule,
     MailModule,
+    MatchmakingModule,
   ],
   providers: [LobbyGateway, GameGateway, GlobalChatGateway],
 })

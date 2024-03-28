@@ -298,4 +298,27 @@ export class UserService {
             },
         });
     }
+
+    async getMatchmakingStats(userId: number): Promise<any> {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                rating: true,
+                ratingDeviation: true,
+            },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        return {
+            rating: user.rating,
+            ratingDeviation: user.ratingDeviation,
+            globalRank: 0,
+            gamesWon: 0,
+            gamesCount: 0,
+            rank: 'Unranked',
+        };
+    }
 }
