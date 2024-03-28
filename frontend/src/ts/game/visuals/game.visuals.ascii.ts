@@ -2,9 +2,10 @@ import { Coordinates } from "../i/game.i.grid-coordinates";
 import { Field } from "../i/game.i.field";
 import { AsciiBoardRefs } from "./i/game.visuals.i.ascii-board";
 import { GameInstance } from "../i/game.i.game-instance";
-import { playerGameInstance, playerGameVisuals } from "../game.master";
+import { playerGameInstance, playerGameVisuals, setGameStateAndNotify } from "../game.master";
 import { calculatePreview } from "../logic/game.logic.shoot";
 import { Bubble } from "../i/game.i.bubble";
+import { GAME_STATE } from "../i/game.e.state";
 
 let asciiAnimationRunning = false;
 let asciiAnimationFrameId: number | null = null;
@@ -27,6 +28,7 @@ export function stopASCIIAnimation(): void {
         asciiAnimationRunning = false;
         cancelAnimationFrame(asciiAnimationFrameId);
         asciiAnimationFrameId = null;
+        fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
     }
 }
 
@@ -50,19 +52,25 @@ export function stopCountdownAnimation(): void {
 
 function asciiCountdownAnimation(): void {
     const elapsedTime = performance.now() - countdownStartTime;
+    const asciiRefs = playerGameVisuals.asciiBoard;
     if (elapsedTime < countdownDuration / 4) {
-        showASCIICountdownNumber(0, playerGameInstance, playerGameVisuals.asciiBoard);
+        asciiRefs.floatingText.value = showASCIICountdownNumber(0);
+        setGameStateAndNotify(GAME_STATE.COUNTDOWN_3);
     } else if (elapsedTime < countdownDuration / 2) {
-        showASCIICountdownNumber(1, playerGameInstance, playerGameVisuals.asciiBoard);
+        asciiRefs.floatingText.value = showASCIICountdownNumber(1);
+        setGameStateAndNotify(GAME_STATE.COUNTDOWN_2);
     } else if (elapsedTime < countdownDuration / 4 * 3) {
-        showASCIICountdownNumber(2, playerGameInstance, playerGameVisuals.asciiBoard);
+        asciiRefs.floatingText.value = showASCIICountdownNumber(2);
+        setGameStateAndNotify(GAME_STATE.COUNTDOWN_1);
     } else {
-        showASCIICountdownNumber(3, playerGameInstance, playerGameVisuals.asciiBoard);
+        asciiRefs.floatingText.value = showASCIICountdownNumber(3);
+        setGameStateAndNotify(GAME_STATE.COUNTDOWN_GO);
     }
     if (elapsedTime < countdownDuration && countdownAnimationRunning) {
         countdownAnimationFrameId = requestAnimationFrame(() => asciiCountdownAnimation());
     } else {
         stopCountdownAnimation();
+        setGameStateAndNotify(GAME_STATE.IN_GAME);
         onCountdownFinished();
     }
 }
@@ -100,6 +108,25 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
     asciiRefs.holdString.value = getHoldBubbleString(gameInstance.holdBubble);
     asciiRefs.queueString.value = getBubbleQueueString(gameInstance.currentBubble, gameInstance.bubbleQueue, gameInstance.gameSettings.queuePreviewSize);
     asciiRefs.incomingGarbage.value = getIncomingGarbageString(gameInstance.queuedGarbage, gameInstance.playGrid.gridHeight + gameInstance.playGrid.extraGridHeight);
+    if (gameInstance.gameState === GAME_STATE.VICTORY_SCREEN) {
+        asciiRefs.floatingText.value = victoryASCII;
+    } else if (gameInstance.gameState === GAME_STATE.DEFEAT_SCREEN) {
+        asciiRefs.floatingText.value = defeatASCII;
+    } else if (gameInstance.gameState === GAME_STATE.COUNTDOWN_GO) {
+        asciiRefs.floatingText.value = countDownGO;
+    } else if (gameInstance.gameState === GAME_STATE.COUNTDOWN_3) {
+        asciiRefs.floatingText.value = countDown3;
+    } else if (gameInstance.gameState === GAME_STATE.COUNTDOWN_2) {
+        asciiRefs.floatingText.value = countDown2;
+    } else if (gameInstance.gameState === GAME_STATE.COUNTDOWN_1) {
+        asciiRefs.floatingText.value = countDown1;
+    } else if (gameInstance.gameState === GAME_STATE.IS_IN_MENU) {
+        asciiRefs.floatingText.value = inMenu;
+    } else if (gameInstance.gameState === GAME_STATE.DISCONNECTED) {
+        asciiRefs.floatingText.value = disconnected;
+    } else {
+        asciiRefs.floatingText.value = "";
+    }
 }
 
 function getUpperBoarderLineString(gridWidth: number): string {
@@ -213,35 +240,22 @@ function getASCIIArrow(angle: number): string {
     return "→"
 }
 
-function showASCIICountdownNumber(counter: number, gameInstance: GameInstance, asciiRefs: AsciiBoardRefs): void {
+function showASCIICountdownNumber(counter: number): string {
     const countDownSteps = [countDown3, countDown2, countDown1, countDownGO];
-    fillAsciiStrings(gameInstance, asciiRefs);
-    const victoryBoard = asciiRefs.playGridASCII.value;
-    const topRows = victoryBoard.split('\n').slice(0, 7).join('\n');
-    const bottomRows = victoryBoard.split('\n').slice(12).join('\n');
-    const finalBoardText = topRows + countDownSteps[counter] + bottomRows;
-    asciiRefs.playGridASCII.value = finalBoardText;
+    return countDownSteps[counter];
 }
 
-export function showASCIIVictory(gameInstance: GameInstance, asciiRefs: AsciiBoardRefs): void {
-    stopASCIIAnimation();
-    fillAsciiStrings(gameInstance, asciiRefs);
-    const victoryBoard = asciiRefs.playGridASCII.value;
-    const topRows = victoryBoard.split('\n').slice(0, 7).join('\n');
-    const bottomRows = victoryBoard.split('\n').slice(12).join('\n');
-    const finalBoardText = topRows + victoryASCII + bottomRows;
-    asciiRefs.playGridASCII.value = finalBoardText;
-}
+// export function showASCIIVictory(gameInstance: GameInstance, asciiRefs: AsciiBoardRefs): void {
+//     stopASCIIAnimation();
+//     fillAsciiStrings(gameInstance, asciiRefs);
+//     asciiRefs.floatingText.value = victoryASCII;
+// }
 
-export function showASCIIDefeat(gameInstance: GameInstance, asciiRefs: AsciiBoardRefs): void {
-    stopASCIIAnimation();
-    fillAsciiStrings(gameInstance, asciiRefs);
-    const lossBoard = asciiRefs.playGridASCII.value;
-    const topRows = lossBoard.split('\n').slice(0, 7).join('\n');
-    const bottomRows = lossBoard.split('\n').slice(12).join('\n');
-    const finalBoardText = topRows + defeatASCII + bottomRows;
-    asciiRefs.playGridASCII.value = finalBoardText;
-}
+// export function showASCIIDefeat(gameInstance: GameInstance, asciiRefs: AsciiBoardRefs): void {
+//     stopASCIIAnimation();
+//     fillAsciiStrings(gameInstance, asciiRefs);
+//     asciiRefs.floatingText.value = defeatASCII;
+// }
 
 const victoryASCII = `
 ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
@@ -289,4 +303,18 @@ const countDownGO = `
 ██████████████████ █▀▀██ ███ █▄████████████████
 ██████████████████ ▀▀▄██ ▀▀▀ █▀████████████████
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+`;
+const inMenu = `
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+█▄ ▄██ ▀██ ████ ▄▀▄ ██ ▄▄▄██ ▀██ ██ ██ ██
+██ ███ █ █ ████ █ █ ██ ▄▄▄██ █ █ ██ ██ ██
+█▀ ▀██ ██▄ ████ ███ ██ ▀▀▀██ ██▄ ██▄▀▀▄██
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+`;
+const disconnected = `
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+██ ▄▄▀█▄ ▄██ ▄▄▄ ██ ▄▄▀██ ▄▄▄ ██ ▀██ ██ ▀██ ██ ▄▄▄██ ▄▄▀█▄▄ ▄▄██ ▄▄▄██ ▄▄▀██
+██ ██ ██ ███▄▄▄▀▀██ █████ ███ ██ █ █ ██ █ █ ██ ▄▄▄██ ██████ ████ ▄▄▄██ ██ ██
+██ ▀▀ █▀ ▀██ ▀▀▀ ██ ▀▀▄██ ▀▀▀ ██ ██▄ ██ ██▄ ██ ▀▀▀██ ▀▀▄███ ████ ▀▀▀██ ▀▀ ██
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
 `;

@@ -6,9 +6,12 @@ import { allMods } from "../settings/ref/game.settings.ref.all-mods";
 import { GameInstance } from "../i/game.i.game-instance";
 import { dto_GameSetup } from "./dto/game.network.dto.game-setup";
 import { ToggleMod, MultiMod } from "../settings/ref/i/game.settings.ref.i.mod";
+import { GAME_STATE } from "../i/game.e.state";
 
 const I_SETUP_GAME = "input_setupGame";
+const I_COUNT_DOWN_STATE = "input_countDownState";
 const I_QUEUE_INPUTS = "input_queueUpGameInputs";
+const I_RESET_GAME = "input_resetGame";
 const I_LEAVE_GAME = "input_leaveGame";
 const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
 
@@ -22,6 +25,18 @@ export function network_setupGame(playerGameInstance: GameInstance): void {
             seed: playerGameInstance.initialSeed,
         }
         state.socket.emit(I_SETUP_GAME, networkData);
+        state.socket.on(O_QUEUE_INPUTS, (data: number) => {
+            playerGameInstance.processedInputsIndex = data;
+        });
+        registeredGameEvents.add(O_QUEUE_INPUTS);
+    } else {
+        console.error("YOU DONT HAVE ANY SOCKETS!");
+    }
+}
+
+export function network_countDownState(gameState: GAME_STATE): void {
+    if (state.socket) {
+        state.socket.emit(I_COUNT_DOWN_STATE, gameState);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
     }
@@ -33,15 +48,27 @@ export function network_synchronizeGame(gameInstance: GameInstance): void {
         for (let i = 0; i < history.length; i++) {
             history[i].indexID = i;
         }
-        const inputQueue = gameInstance.gameStateHistory.inputHistory.slice(0);
+        const inputQueue = gameInstance.gameStateHistory.inputHistory.slice(gameInstance.processedInputsIndex);
         state.socket.emit(I_QUEUE_INPUTS, inputQueue);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
     }
 }
 
-function isMultiMod(mod: ToggleMod | MultiMod): mod is MultiMod {
-    return 'modValues' in mod;
+export function network_resetGame(seed: number): void {
+    if (state.socket) {
+        state.socket.emit(I_RESET_GAME, seed);
+    } else {
+        console.error("YOU DONT HAVE ANY SOCKETS!");
+    }
+}
+
+export function network_leaveGame(): void {
+    if (state.socket) {
+        state.socket.emit(I_LEAVE_GAME);
+    } else {
+        console.error("YOU DONT HAVE ANY SOCKETS!");
+    }
 }
 
 export async function submitGameToDB(gameStats: GameStats) {
@@ -97,5 +124,9 @@ export async function submitGameToDB(gameStats: GameStats) {
         } catch (error) {
             eventBus.emit('show-info-message', { message: 'There was an error submitting your Sprint.', type: 'error' });
         }
+    }
+
+    function isMultiMod(mod: ToggleMod | MultiMod): mod is MultiMod {
+        return 'modValues' in mod;
     }
 }

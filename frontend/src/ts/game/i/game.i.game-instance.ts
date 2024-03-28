@@ -6,6 +6,7 @@ import { GameStateHistory } from "./game.i.game-state-history";
 import { GameTransitions } from "./game.i.game-transitions";
 import { Grid } from "./game.i.grid";
 import { GameStats } from "./game.i.game-stats";
+import { GAME_STATE } from "./game.e.state";
 
 export interface GameInstance {
     gameMode: GAME_MODE,
@@ -13,6 +14,7 @@ export interface GameInstance {
     handlingSettings: HandlingSettings,
     initialSeed: number,
 
+    gameState: GAME_STATE,
     bubbleSeed: number,
     garbageSeed: number,
     angle: number,

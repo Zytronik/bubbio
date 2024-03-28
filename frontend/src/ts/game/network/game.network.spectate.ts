@@ -60,7 +60,7 @@ export function network_spectatePlayer(clientID: string): void {
     }
 }
 
-export function network_stopSpectating(clientID: string): void {
+export function network_stopSpectating(): void {
     currentlySpectating.forEach((id) => {
         if (state.socket) {
             state.socket.emit(L_PLAYER_SPECTATOR, id);
@@ -68,7 +68,7 @@ export function network_stopSpectating(clientID: string): void {
         } else {
             console.error("YOU DONT HAVE ANY SOCKETS!");
         }
-        currentlySpectating.delete(clientID);
+        currentlySpectating.delete(id);
         playerNameInstanceMap.clear();
         playerNameVisualsMap.clear();
     });

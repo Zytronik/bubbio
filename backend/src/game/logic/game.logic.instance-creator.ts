@@ -7,6 +7,7 @@ import { GameSettings } from "../settings/i/game.settings.i.game-settings";
 import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
 import { HandlingSettings } from "../settings/i/game.settings.i.handling-settings";
 import { prefillBoard } from "./game.logic.garbage";
+import { GAME_STATE } from "../i/game.e.state";
 
 export function createGameInstance(
     gameMode: GAME_MODE,
@@ -21,6 +22,7 @@ export function createGameInstance(
         handlingSettings: handlingSettings,
         initialSeed: startSeed,
 
+        gameState: GAME_STATE.READY,
         bubbleSeed: startSeed,
         garbageSeed: startSeed,
         angle: 90,
@@ -55,6 +57,7 @@ export function createGameInstance(
 
 export function resetGameInstance(gameInstance: GameInstance, seed: number): void {
     gameInstance.initialSeed = seed;
+    gameInstance.gameState = GAME_STATE.READY,
     gameInstance.bubbleSeed = seed;
     gameInstance.garbageSeed = seed;
     gameInstance.angle = 90;
@@ -92,6 +95,7 @@ function getEmptyStats(gameSettings: GameSettings): GameStats {
         bubblesLeftToClear: gameSettings.sprintVictoryCondition,
         bubblesShot: 0,
         bubblesPerSecond: 0,
+        bpsGraph: [],
         clear3: 0,
         clear4: 0,
         clear5: 0,
@@ -108,7 +112,7 @@ function getEmptyStats(gameSettings: GameSettings): GameStats {
         keysPerBubble: 0,
         angleChanged: 0,
         angleChangePerBubble: 0,
-        holds: 0
+        holds: 0,
     }
     return stats;
 }
