@@ -1,5 +1,5 @@
 <template>
-  <h1>User1 vs User2</h1>
+  <h1>Ich bin der VS screen</h1>
 </template>
   
 <script lang="ts">

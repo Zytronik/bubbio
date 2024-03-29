@@ -12,7 +12,24 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
     server: Server;
 
     handleDisconnect(client: Socket) {
-        this.matchmakingService.removeUserFromQueue(client.data.user.id);
+        if(this.matchmakingService.isLoggedInUser(client)){
+            this.matchmakingService.removeUserFromQueue(client.data.user.id);
+            this.matchmakingService.userLeftMmVue(client);
+        }
+    }
+
+    @SubscribeMessage('playerJoinedMmVue')
+    handlePlayerJoinedMmVue(@ConnectedSocket() client: Socket) {
+        if(this.matchmakingService.isLoggedInUser(client)){
+            this.matchmakingService.userJoinedMmVue(client);
+        }
+    }
+
+    @SubscribeMessage('playerLeftMmVue')
+    handlePlayerLeftMmVue(@ConnectedSocket() client: Socket) {
+        if(this.matchmakingService.isLoggedInUser(client)){
+            this.matchmakingService.userLeftMmVue(client);
+        }
     }
 
     @SubscribeMessage('enterQueue')
@@ -29,13 +46,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
     handleLeaveQueue(@ConnectedSocket() client: Socket) {
         if(this.matchmakingService.isLoggedInUser(client)){
             this.matchmakingService.removeUserFromQueue(client.data.user.id);
-        }
-    }
-
-    @SubscribeMessage('getQueueSize')
-    handleGetQueueSize(@ConnectedSocket() client: Socket) {
-        if(this.matchmakingService.isLoggedInUser(client)){
-            client.emit('queueSize', this.matchmakingService.getQueueSize());
         }
     }
 }

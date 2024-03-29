@@ -41,7 +41,7 @@ const DO_GET_ONGOING_GAMES = "debugOutput_getAllOngoingGames";
 const DI_CLEAR_ONGOING_GAMES = "debugInput_clearAllOngoingGames";
 
 const SPECTATE_PREFIX = "spectate_";
-const spectatorRoomName = 'spectatorRoom';
+const spectatorRoomName = 'spectatorRoom_iuejdhrfg9ew7485r90734rhwerhgf897q3zh4gf87zeer89gz89rg78uerzhg78erg';
 const ongoingGamesMap: Map<string, OngoingGame> = new Map(); //<client.id: string, OngoingGame>
 @WebSocketGateway()
 export class GameGateway implements OnGatewayDisconnect {

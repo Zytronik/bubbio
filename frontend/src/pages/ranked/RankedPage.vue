@@ -3,30 +3,57 @@
     <MenuBackButtons :buttonData="backButtonData" />
     <div class="page-wrapper">
       <div class="page-container">
-        <div v-if="!hasMatchFound">
-          <div v-if="playerStats">
-            <p>Current Elo: <span>{{ playerStats.rating }}</span></p>
-            <p>Rating Deviation: <span>+/-{{ playerStats.ratingDeviation }}</span></p>
-            <p>Global Rank: <span>#{{ playerStats.globalRank }}</span></p>
-            <p>Games Won: <span>{{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}</span></p>
-            <p>Rank: <span>{{ playerStats.rank }}</span></p>
-          </div>
-          <br><br>
-          <p>Player in Queue: <span>{{ playersInQueue }}</span></p>
-          <p>Players in Ranked Games: <span>0</span></p>
-
-          <div class="matchmakingButton" @click="toggleQueue" :class="{ 'in-queue': isInQueue }">
-            <div v-if="isInQueue">
-              <p>Leave Queue | </p>
-              <p>Estimated waiting Time: {{ estimatedWaitTime }}s</p>
-              <p>Passed Time: {{ passedTime }}s</p>
+        <div v-if="!hasMatchFound" class="page-dashboard rankedDashboard">
+          <div class="left-content">
+            <div v-if="playerStats">
+              <p>Current Elo: <span>{{ playerStats.rating }}</span></p>
+              <p>Rating Deviation: <span>+/-{{ playerStats.ratingDeviation }}</span></p>
+              <p>Global Rank: <span>#{{ playerStats.globalRank }}</span></p>
+              <p>Games Won: <span>{{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}</span></p>
+              <p>Percentile: <span>{{ playerStats.percentile }}%</span></p>
+              <p>Rank: <span>{{ playerStats.rank }}</span></p>
             </div>
-            <div v-else>Enter Queue</div>
+            <br><br>
+            <p>Player in Queue: <span>{{ playersInQueue }}</span></p>
+            <p>Players in Ranked Games: <span>0</span></p>
+
+            <div class="matchmakingButton" @click="toggleQueue" :class="{ 'in-queue': isInQueue }">
+              <div v-if="isInQueue">
+                <p>Leave Queue | </p>
+                <p>Passed Time: {{ passedTime }}s</p>
+              </div>
+              <div v-else>Enter Queue</div>
+            </div>
           </div>
+
+          <div class="right-content">
+            <div class="l-tab-buttons">
+              <button class="l-tab-button" v-for="tab in leaderboardTabs" :key="tab"
+                :class="{ active: currentLeaderboard === tab }" @click="currentLeaderboard = tab">
+                <span>{{ tab }}</span>
+                <span v-if="tab === 'National' && userData?.countryCode">
+                  ({{ userData.countryCode }})
+                </span>
+              </button>
+            </div>
+            <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
+              <Leaderboard :gameMode="GameMode.Ranked" :fields="['rating']"
+                :sortBy="'rating'" :sortDirection="SortDirection.Desc"
+                :leaderboardCategory="LeaderboardCategory.Global" :limit="30" />
+            </div>
+            <div v-if="currentLeaderboard === 'National'" class="l-tab national-tab">
+              <Leaderboard :gameMode="GameMode.Ranked" :fields="['rating']"
+                :sortBy="'rating'" :sortDirection="SortDirection.Desc"
+                :leaderboardCategory="LeaderboardCategory.National" :limit="30" />
+            </div>
+          </div>
+
         </div>
+
         <div v-if="hasMatchFound">
           <VsScreen />
         </div>
+
       </div>
     </div>
   </section>
@@ -40,6 +67,10 @@ import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import state from '@/ts/networking/networking.client-websocket';
 import VsScreen from './components/VsScreen.vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
+import Leaderboard from '@/globalComponents/Leaderboard.vue';
+import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
+import { UserData } from '@/ts/page/i/page.i.user-data';
+import eventBus from '@/ts/page/page.event-bus';
 
 interface PlayerMatchmakingStats {
   rating: number;
@@ -47,12 +78,19 @@ interface PlayerMatchmakingStats {
   globalRank: number;
   gamesWon: number;
   gamesCount: number;
+  percentile: number;
   rank: string;
 }
 
 export default {
   name: 'RankedPage',
-  components: { MenuBackButtons, VsScreen },
+  components: { MenuBackButtons, VsScreen, Leaderboard },
+  data() {
+    return {
+      currentLeaderboard: 'Global',
+      leaderboardTabs: ['Global', 'National'],
+    };
+  },
   setup() {
     const backButtonData = ref([
       { pageState: PAGE_STATE.multiMenu, iconSrc: require('@/img/icons/ranked.png'), disabled: false },
@@ -61,8 +99,8 @@ export default {
     const isInQueue = ref<boolean>(false);
     const playerStats = ref<PlayerMatchmakingStats | null>(null);
     const playersInQueue = ref<number>(0);
-    const estimatedWaitTime = ref<number | string>(0);
     const passedTime = ref<number>(0);
+    const userData: UserData | null = eventBus.getUserData();
     const hasMatchFound = ref<boolean>(false);
     let passedTimeInterval: ReturnType<typeof setInterval> | undefined = 0;
 
@@ -79,7 +117,6 @@ export default {
       if (state.socket) {
         stopPassedTimeCountdown();
         state.socket.emit('leaveQueue');
-        state.socket.emit('getQueueSize');
       }
     }
 
@@ -125,9 +162,7 @@ export default {
 
     function mountSockets() {
       if (state.socket) {
-        state.socket.on('estimatedWaitTime', (estWaitTime: number | string) => {
-          estimatedWaitTime.value = estWaitTime;
-        });
+        state.socket.emit('playerJoinedMmVue');
 
         state.socket.on('matchFound', () => {
           matchFound();
@@ -140,8 +175,9 @@ export default {
     }
 
     function unmountSockets() {
+      leaveQueue();
       if (state.socket) {
-        state.socket.off('estimatedWaitTime');
+        state.socket.emit('playerLeftMmVue');
         state.socket.off('matchFound');
         state.socket.off('queueSize');
       }
@@ -167,9 +203,12 @@ export default {
       isInQueue,
       playerStats,
       playersInQueue,
-      estimatedWaitTime,
       passedTime,
       hasMatchFound,
+      GameMode,
+      SortDirection,
+      LeaderboardCategory,
+      userData,
     }
   }
 };
@@ -196,4 +235,6 @@ export default {
 p {
   margin: unset;
 }
+
+
 </style>
