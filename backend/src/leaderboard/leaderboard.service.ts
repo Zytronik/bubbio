@@ -25,6 +25,9 @@ export class LeaderboardService {
         mods: ModDetail[];
         limit: number;
     }) {
+        if (criteria.gameMode === "ranked") {
+            return this.getRankedLeaderboard(criteria.sortDirection, criteria.category, criteria.country, criteria.limit);
+        }
         const prismaModel = this.getPrismaModelForGameMode(criteria.gameMode);
 
         let whereClause: Record<string, unknown> = {};
@@ -47,7 +50,12 @@ export class LeaderboardService {
         let records = await prismaModel.findMany({
             where: whereClause,
             include: {
-                user: true, // This automatically selects all scalar fields of the user
+                user: {
+                    select: {
+                        username: true,
+                        pbUrl: true,
+                    }
+                },
             },
         });
 
@@ -87,5 +95,46 @@ export class LeaderboardService {
 
         return filteredRecords;
     }
+
+    async getRankedLeaderboard(sortDirection: string, category: string, country: string, limit: number) {
+        let whereClause: Record<string, string> = {};
+
+        if (category === 'national' && country) {
+            whereClause.country = country;
+        }
+
+        let queryOptions = {
+            where: whereClause,
+            orderBy: { rating: sortDirection },
+            take: limit,
+            select: {
+                username: true,
+                rating: true,
+                pbUrl: true,
+                id: true,
+            }
+        };
+
+        try {
+            const leaderboardRecords = await this.prisma.user.findMany(queryOptions as unknown);
+
+            const formattedLeaderboard = leaderboardRecords.map(record => ({
+                user: {
+                    username: record.username,
+                    pbUrl: record.pbUrl,
+                },
+                userId: record.id,
+                rating: record.rating + " Elo",
+            }));
+
+            return formattedLeaderboard;
+        } catch (error) {
+            console.error("Failed to fetch ranked leaderboard data:", error);
+            throw new Error("An error occurred while fetching the ranked leaderboard data.");
+        }
+    }
+
+
+
 
 }

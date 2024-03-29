@@ -1,5 +1,6 @@
 export enum GameMode {
     Sprint = "sprint",
+    Ranked = "ranked",
 }
 
 export enum LeaderboardCategory {

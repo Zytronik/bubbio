@@ -7,7 +7,7 @@
           <h3>{{ userData?.username.toUpperCase() }}</h3>
           <div>
             <p>Lv.727</p>
-            <p class="rank">PI-Rank</p>
+            <p v-if="userData?.rank" class="rank">{{ userData?.rank }}</p>
           </div>
         </div>
       </div>
@@ -152,6 +152,7 @@ export default {
       countryCode?: string;
       country?: string;
       pbUrl: string;
+      rank?: string;
     }
 
     const userData = ref<UserData | null>(null);

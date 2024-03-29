@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import axios from 'axios';
 import { FileStorageService } from './file-storage.service';
 import { glicko } from 'src/glicko/glicko.service';
+import { ranks } from 'src/glicko/ranks';
 
 @Injectable()
 export class UserService {
@@ -196,6 +197,7 @@ export class UserService {
 
         return {
             ...user,
+            rank: await this.getRankName(user.id),
             sprintStats: {
                 averageBubblesCleared: sprintStats._avg.bubblesCleared,
                 averageBubblesPerSecond: sprintStats._avg.bubblesPerSecond,
@@ -299,6 +301,82 @@ export class UserService {
         });
     }
 
+    async getGlobalRank(userId: number): Promise<number> {
+        const users = await this.prisma.user.findMany({
+            orderBy: [
+                {
+                    rating: 'desc',
+                },
+                {
+                    ratingDeviation: 'asc',
+                },
+            ]
+        });
+        const userIndex = users.findIndex(user => user.id === userId);
+
+        return userIndex + 1;
+    }
+
+    async getTotalNumberOfRegisteredUsers(): Promise<number> {
+        return await this.prisma.user.count();
+    }
+
+    async getPercentile(userId: number): Promise<number> {
+        const rank = await this.getGlobalRank(userId);
+        const totalUsers = await this.getTotalNumberOfRegisteredUsers();
+        return rank / totalUsers * 100
+    }
+
+    async getRankName(userId: number): Promise<string>{
+        const percentile = await this.getPercentile(userId);
+        if(percentile < ranks.p_plus.percentile){
+            return ranks.p_plus.name;
+        }
+        if(percentile < ranks.p_minus.percentile){
+            return ranks.p_minus.name;
+        }
+        if(percentile < ranks.w_plus.percentile){
+            return ranks.w_plus.name;
+        }
+        if(percentile < ranks.w_minus.percentile){
+            return ranks.w_minus.name;
+        }
+        if(percentile < ranks.s_plus.percentile){
+            return ranks.s_plus.name;
+        }
+        if(percentile < ranks.s_minus.percentile){
+            return ranks.s_minus.name;
+        }
+        if(percentile < ranks.a_plus.percentile){
+            return ranks.a_plus.name;
+        }
+        if(percentile < ranks.a_minus.percentile){
+            return ranks.a_minus.name;
+        }
+        if(percentile < ranks.b_plus.percentile){
+            return ranks.b_plus.name;
+        }
+        if(percentile < ranks.b_minus.percentile){
+            return ranks.b_minus.name;
+        }
+        if(percentile < ranks.c_plus.percentile){
+            return ranks.c_plus.name;
+        }
+        if(percentile < ranks.c_minus.percentile){
+            return ranks.c_minus.name;
+        }
+        if(percentile < ranks.d_plus.percentile){
+            return ranks.d_plus.name;
+        }
+        if(percentile < ranks.d_minus.percentile){
+            return ranks.d_minus.name;
+        }
+        if(percentile < ranks.e_plus.percentile){
+            return ranks.e_plus.name;
+        }
+        return ranks.e_minus.name;
+    }
+
     async getMatchmakingStats(userId: number): Promise<any> {
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
@@ -315,10 +393,11 @@ export class UserService {
         return {
             rating: user.rating,
             ratingDeviation: user.ratingDeviation,
-            globalRank: 0,
+            globalRank: await this.getGlobalRank(userId),
             gamesWon: 0,
             gamesCount: 0,
-            rank: 'Unranked',
+            percentile: await this.getPercentile(userId),
+            rank: await this.getRankName(userId),
         };
     }
 }

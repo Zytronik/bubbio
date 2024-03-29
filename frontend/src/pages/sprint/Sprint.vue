@@ -4,7 +4,7 @@
     <div class="page-wrapper">
       <div class="page-container">
 
-        <div v-if="isDashboard" class="sprintDashboard">
+        <div v-if="isDashboard" class="sprintDashboard page-dashboard">
           <div class="left-content">
             <div class="playMods">
               <button class="playButton" @click="play()">Play!</button>
@@ -82,10 +82,6 @@
           <div v-if="resultStats">
             <div class="columns">
               <div class="column">
-                <div class="row" key="bubbleClearToWin">
-                  <div class="col">{{ getFullName("bubbleClearToWin") }}</div>
-                  <div class="col">{{ formatFieldValue(resultStats.bubbleClearToWin ?? '', "bubbleClearToWin") }}</div>
-                </div>
                 <div class="row" key="bubblesCleared">
                   <div class="col">{{ getFullName("bubblesCleared") }}</div>
                   <div class="col">{{ formatFieldValue(resultStats.bubblesCleared ?? '', "bubblesCleared") }}</div>
@@ -122,12 +118,12 @@
                   <div class="col">{{ getFullName("clear5wb") }}</div>
                   <div class="col">{{ formatFieldValue(resultStats.clear5wb ?? '', "clear5wb") }}</div>
                 </div>
-              </div>
-              <div class="column">
                 <div class="row" key="highestBubbleClear">
                   <div class="col">{{ getFullName("highestBubbleClear") }}</div>
                   <div class="col">{{ formatFieldValue(resultStats.highestBubbleClear ?? '', "highestBubbleClear") }}</div>
                 </div>
+              </div>
+              <div class="column">
                 <div class="row" key="wallBounces">
                   <div class="col">{{ getFullName("wallBounces") }}</div>
                   <div class="col">{{ formatFieldValue(resultStats.wallBounces ?? '', "wallBounces") }}</div>
@@ -460,74 +456,10 @@ export default {
   background: linear-gradient(45deg, rgba(96, 221, 43, 1) 0%, rgba(198, 63, 135, 1) 100%);
 }
 
-.sprintDashboard {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  height: 100%;
-  gap: 15px;
-}
-
-.sprintDashboard>div {
-  padding: 15px;
-  background-color: rgb(30, 30, 30);
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-.left-content {
-  width: 72%;
-}
-
-.right-content {
-  width: 28%;
-}
-
-.l-tab {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow-y: scroll;
-}
-
 .playMods {
   display: flex;
   flex-direction: row;
   gap: 15px;
-}
-
-.l-tab-button {
-  background-color: rgb(30, 30, 30);
-  color: white;
-  border: none;
-  margin-left: 15px;
-  opacity: 0.5;
-  cursor: pointer;
-  border: 1px solid white;
-  border-bottom: unset;
-  padding: 5px 15px;
-  font-size: 90%;
-  position: relative;
-}
-
-.l-tab-button.active::after {
-  content: "";
-  background-color: rgb(30, 30, 30);
-  position: absolute;
-  height: 1px;
-  width: 100%;
-  left: 0;
-  top: 100%;
-}
-
-.l-tab-buttons {
-  margin-bottom: 15px;
-  border-bottom: 1px solid white;
-}
-
-.l-tab-button.active {
-  opacity: 1;
 }
 
 .cat-wrapper {
