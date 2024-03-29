@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Socket } from 'socket.io';
+import { GameGateway } from 'src/game/game.gateway';
 
 interface UserMatchmakingData {
     glicko: number;
@@ -24,6 +25,7 @@ export class MatchmakingService {
 
     constructor(
         private prismaService: PrismaService,
+        private gameGateway: GameGateway,
     ) { }
 
     removeUserFromQueue(userId: number) {
@@ -119,6 +121,7 @@ export class MatchmakingService {
         const opponent = this.queue[opponentId];
 
         if (user && opponent) {
+            this.gameGateway.setupRankedGame(user.client, opponent.client);
             user.client.emit('matchFound', { userId, opponentId });
             opponent.client.emit('matchFound', { userId, opponentId });
             onMatched();

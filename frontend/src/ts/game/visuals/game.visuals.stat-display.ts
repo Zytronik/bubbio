@@ -41,7 +41,6 @@ export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNum
     //angleChangePerBubble
 
     //holds
-
     statStrings.formattedCurrentTime.value = formattedCurrentTimeString;
     statStrings.bubbleClearToWin.value = gameStats.bubbleClearToWin;
     statStrings.bubblesCleared.value = gameStats.bubblesCleared;

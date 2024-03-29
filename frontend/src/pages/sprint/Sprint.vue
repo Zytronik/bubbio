@@ -58,7 +58,7 @@
         <div v-if="isGaming" class="inGame">
           <div class="game-wrapper">
             <div class="inGameStats">
-              <p>{{ playerGameVisuals.statNumbers.formattedCurrentTime }}</p>
+              <p v-html="playerGameVisuals.statNumbers.formattedCurrentTime.value"></p>
               <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}</p>
               <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond }}</p>
             </div>
