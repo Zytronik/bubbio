@@ -7,7 +7,7 @@
           <h3>{{ userData?.username.toUpperCase() }}</h3>
           <div>
             <p>Lv.727</p>
-            <p v-if="userData?.rank" class="rank">{{ userData?.rank }}</p>
+            <p v-if="userData?.rank" class="rank-letter">{{ userData?.rank }}</p>
           </div>
         </div>
       </div>
@@ -324,7 +324,7 @@ export default {
   font-size: 20px;
 }
 
-.profile-content > div .rank {
+.profile-content > div .rank-letter {
   margin-left: 30px;
 }
 

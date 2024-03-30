@@ -4,7 +4,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import axios from 'axios';
 import { FileStorageService } from './file-storage.service';
-import { glicko } from 'src/glicko/glicko.service';
 import { ranks } from 'src/glicko/ranks';
 
 @Injectable()
@@ -330,51 +329,51 @@ export class UserService {
     async getRankName(userId: number): Promise<string>{
         const percentile = await this.getPercentile(userId);
         if(percentile < ranks.p_plus.percentile){
-            return ranks.p_plus.name;
+            return ranks.p_plus.ascii;
         }
         if(percentile < ranks.p_minus.percentile){
-            return ranks.p_minus.name;
+            return ranks.p_minus.ascii;
         }
         if(percentile < ranks.w_plus.percentile){
-            return ranks.w_plus.name;
+            return ranks.w_plus.ascii;
         }
         if(percentile < ranks.w_minus.percentile){
-            return ranks.w_minus.name;
+            return ranks.w_minus.ascii;
         }
         if(percentile < ranks.s_plus.percentile){
-            return ranks.s_plus.name;
+            return ranks.s_plus.ascii;
         }
         if(percentile < ranks.s_minus.percentile){
-            return ranks.s_minus.name;
+            return ranks.s_minus.ascii;
         }
         if(percentile < ranks.a_plus.percentile){
-            return ranks.a_plus.name;
+            return ranks.a_plus.ascii;
         }
         if(percentile < ranks.a_minus.percentile){
-            return ranks.a_minus.name;
+            return ranks.a_minus.ascii;
         }
         if(percentile < ranks.b_plus.percentile){
-            return ranks.b_plus.name;
+            return ranks.b_plus.ascii;
         }
         if(percentile < ranks.b_minus.percentile){
-            return ranks.b_minus.name;
+            return ranks.b_minus.ascii;
         }
         if(percentile < ranks.c_plus.percentile){
-            return ranks.c_plus.name;
+            return ranks.c_plus.ascii;
         }
         if(percentile < ranks.c_minus.percentile){
-            return ranks.c_minus.name;
+            return ranks.c_minus.ascii;
         }
         if(percentile < ranks.d_plus.percentile){
-            return ranks.d_plus.name;
+            return ranks.d_plus.ascii;
         }
         if(percentile < ranks.d_minus.percentile){
-            return ranks.d_minus.name;
+            return ranks.d_minus.ascii;
         }
         if(percentile < ranks.e_plus.percentile){
-            return ranks.e_plus.name;
+            return ranks.e_plus.ascii;
         }
-        return ranks.e_minus.name;
+        return ranks.e_minus.ascii;
     }
 
     async getMatchmakingStats(userId: number): Promise<any> {

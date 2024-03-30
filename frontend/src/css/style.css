@@ -42,6 +42,16 @@ body.game-view .back-buttons {
     text-align: center;
 }
 
+/* Fonts */
+@font-face {
+    font-family: rankFont;
+    src: url(../fonts/cslgreek.ttf);
+}
+
+.rank-letter {
+    font-family: rankFont;
+}
+
 /* Page */
 section.page {
     width: 100vw;
@@ -592,4 +602,9 @@ button.retry {
 
 .page-dashboard .right-content .l-tab-button.active {
     opacity: 1;
+}
+
+.ranked-dashboard .leaderboard .row .cell:last-of-type p {
+    font-family: rankFont;
+    font-size: 140%;
 }

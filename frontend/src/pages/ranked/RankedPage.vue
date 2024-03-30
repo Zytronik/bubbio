@@ -3,7 +3,7 @@
     <MenuBackButtons :buttonData="backButtonData" />
     <div class="page-wrapper">
       <div class="page-container">
-        <div v-if="!hasMatchFound" class="page-dashboard rankedDashboard">
+        <div v-if="!hasMatchFound" class="page-dashboard ranked-dashboard">
           <div class="left-content">
             <div v-if="playerStats">
               <p>Current Elo: <span>{{ playerStats.rating }}</span></p>
@@ -11,7 +11,7 @@
               <p>Global Rank: <span>#{{ playerStats.globalRank }}</span></p>
               <p>Games Won: <span>{{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}</span></p>
               <p>Percentile: <span>{{ playerStats.percentile }}%</span></p>
-              <p>Rank: <span>{{ playerStats.rank }}</span></p>
+              <p>Rank: <span class="rank-letter">{{ playerStats.rank }}</span></p>
             </div>
             <br><br>
             <p>Player in Queue: <span>{{ playersInQueue }}</span></p>
