@@ -37,12 +37,12 @@
               </button>
             </div>
             <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
-              <Leaderboard :gameMode="GameMode.Ranked" :fields="['rating']"
+              <Leaderboard :gameMode="GameMode.Ranked" :fields="['rank', 'rating']"
                 :sortBy="'rating'" :sortDirection="SortDirection.Desc"
                 :leaderboardCategory="LeaderboardCategory.Global" :limit="30" />
             </div>
             <div v-if="currentLeaderboard === 'National'" class="l-tab national-tab">
-              <Leaderboard :gameMode="GameMode.Ranked" :fields="['rating']"
+              <Leaderboard :gameMode="GameMode.Ranked" :fields="['rank', 'rating']"
                 :sortBy="'rating'" :sortDirection="SortDirection.Desc"
                 :leaderboardCategory="LeaderboardCategory.National" :limit="30" />
             </div>

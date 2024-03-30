@@ -38,6 +38,10 @@ body.game-view .back-buttons {
     display: none;
 }
 
+.text-center {
+    text-align: center;
+}
+
 /* Page */
 section.page {
     width: 100vw;
@@ -401,6 +405,28 @@ button.retry {
 }
 
 /* Game */
+.gameUI-wrapper {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.gameUI-wrapper .monospace {
+    white-space: pre-line;
+    font-family: 'Consolas', monospace;
+}
+
+.gameUI-wrapper .overlap-infos {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.gameUI-wrapper .remove-whiteSpaces {
+    display: ruby;
+}
+
 @keyframes slideOutToGame {
     from {
         transform: translateX(0);
@@ -472,7 +498,7 @@ button.retry {
     z-index: 999;
 }
 
-/* Pages */
+/* Game Pages */
 .page-dashboard {
     display: flex;
     flex-direction: row;

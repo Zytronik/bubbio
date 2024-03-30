@@ -1,14 +1,6 @@
 <template>
   <div class="leaderboard-wrapper">
     <div v-if="loading" class="loader"></div>
-    <!-- <p>
-      <span>Game Mode: {{ gameMode }} | </span>
-      <span v-if="!isLoggedIn && !country">Category: global | </span>
-      <span v-else>Category: {{ leaderboardCategory }} | </span>
-      <span v-if="country">Country: {{ country }} | </span>
-      <span v-else-if="isLoggedIn">Country: auto | </span>
-      <span>Sorted By: {{ orderedFields[0] }} </span>
-    </p> -->
     <div class="leaderboard" v-if="leaderboard.length">
       <div class="head">
         <div class="row">

@@ -14,14 +14,13 @@
       <p>{{ visuals.statNumbers.formattedCurrentTime }}</p>
       <p>Bubbles Cleared: {{ visuals.statNumbers.bubblesCleared }}/{{ visuals.statNumbers.bubbleClearToWin }}</p>
       <p>Bubbles Shot: {{ visuals.statNumbers.bubblesShot }} BPS: {{ visuals.statNumbers.bubblesPerSecond }}</p>
-    
-      <span class="monospace" v-html="visuals.asciiBoard.queueString"></span>
-      <span class="monospace" v-html="visuals.asciiBoard.holdString"></span>
-      <span class="monospace" v-html="visuals.asciiBoard.incomingGarbage"></span>
-      <br>
-      <span class="monospace" v-html="visuals.asciiBoard.playGridASCII"></span>
-      <br>
-      <span class="monospace" v-html="visuals.asciiBoard.floatingText"></span>
+      <div class="gameUI-wrapper">
+        <span class="monospace" v-html="visuals.asciiBoard.incomingGarbage"></span>
+        <span class="monospace" v-html="visuals.asciiBoard.holdString"></span>
+        <span class="monospace remove-whiteSpaces" v-html="visuals.asciiBoard.queueString"></span>
+        <span class="monospace text-center" v-html="visuals.asciiBoard.playGridASCII"></span>
+        <span class="monospace overlap-infos" v-html="visuals.asciiBoard.floatingText"></span>
+      </div>
     </div>
   </div>
 </template>
@@ -69,9 +68,4 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.monospace {
-  white-space: pre-line;
-  font-family: 'Consolas', monospace;
-  text-align: center;
-}
 </style>
