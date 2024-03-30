@@ -516,15 +516,6 @@ export default {
   transform: rotate(5deg);
 }
 
-.game-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  position: relative;
-  width: 40%;
-  font-size: 24px;
-}
-
 .inGame {
   height: 100%;
   display: flex;
@@ -532,20 +523,6 @@ export default {
   height: 100%;
   justify-content: center;
   align-items: center;
-}
-
-.inGameStats {
-  position: absolute;
-  right: 90%;
-  bottom: 10px;
-  width: 200px;
-  text-align: right;
-}
-
-.inGameStats p {
-  margin: unset;
-  margin-top: 5px;
-  font-size: 20px;
 }
 
 .inGame .backButton {

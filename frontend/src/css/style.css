@@ -411,6 +411,37 @@ button.retry {
     position: relative;
 }
 
+.game-wrapper .inGameStats {
+    position: absolute;
+    right: 90%;
+    bottom: 10px;
+    width: 200px;
+    text-align: right;
+}
+
+.game-wrapper .inGameStats p {
+    margin: unset;
+    margin-top: 5px;
+    font-size: 20px;
+}
+
+.game-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: relative;
+    width: 40%;
+    font-size: 24px;
+}
+
+.gameUI-wrapper .playerName {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+
 .gameUI-wrapper .monospace {
     white-space: pre-line;
     font-family: 'Consolas', monospace;

@@ -6,20 +6,24 @@
     </button>
     <span v-if="allSpectationEntries.length === 0">No players to spectate.</span>
   </div>
-  <div v-if="isSpectating">
+  <div class="spectating" v-if="isSpectating">
     <button @click="showSpectationEntries();">Switch back to old view</button>
-    <div v-for="[playerName, visuals] in playerNameVisualsMap" :key="playerName">
-      <span>{{ playerName }}</span>
-      <br>
-      <p>{{ visuals.statNumbers.formattedCurrentTime }}</p>
-      <p>Bubbles Cleared: {{ visuals.statNumbers.bubblesCleared }}/{{ visuals.statNumbers.bubbleClearToWin }}</p>
-      <p>Bubbles Shot: {{ visuals.statNumbers.bubblesShot }} BPS: {{ visuals.statNumbers.bubblesPerSecond }}</p>
-      <div class="gameUI-wrapper">
-        <span class="monospace" v-html="visuals.asciiBoard.incomingGarbage"></span>
-        <span class="monospace" v-html="visuals.asciiBoard.holdString"></span>
-        <span class="monospace remove-whiteSpaces" v-html="visuals.asciiBoard.queueString"></span>
-        <span class="monospace text-center" v-html="visuals.asciiBoard.playGridASCII"></span>
-        <span class="monospace overlap-infos" v-html="visuals.asciiBoard.floatingText"></span>
+    <div class="game" v-for="[playerName, visuals] in playerNameVisualsMap" :key="playerName">
+
+      <div class="game-wrapper">
+        <div class="inGameStats">
+          <p>{{ visuals.statNumbers.formattedCurrentTime }}</p>
+          <p>{{ visuals.statNumbers.bubblesCleared }}/{{ visuals.statNumbers.bubbleClearToWin }}</p>
+          <p>{{ visuals.statNumbers.bubblesShot }} BPS: {{ visuals.statNumbers.bubblesPerSecond }}</p>
+        </div>
+        <div class="gameUI-wrapper">
+          <span class="monospace" v-html="visuals.asciiBoard.incomingGarbage"></span>
+          <span class="monospace" v-html="visuals.asciiBoard.holdString"></span>
+          <span class="monospace remove-whiteSpaces" v-html="visuals.asciiBoard.queueString"></span>
+          <span class="monospace text-center" v-html="visuals.asciiBoard.playGridASCII"></span>
+          <span class="monospace overlap-infos" v-html="visuals.asciiBoard.floatingText"></span>
+          <span class="playerName">{{ playerName.toUpperCase() }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -68,4 +72,21 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.game {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding-bottom: 5%;
+  box-sizing: border-box;
+}
+
+.spectating {
+  height: 100%;
+}
+
+.game-wrapper {
+  font-size: 20px;
+}
 </style>
