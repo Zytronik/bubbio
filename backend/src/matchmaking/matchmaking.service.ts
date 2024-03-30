@@ -1,6 +1,7 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Server,Socket } from 'socket.io';
+import { GameGateway } from 'src/game/game.gateway';
 import { MatchmakingGateway } from './matchmaking.gateway';
 
 interface UserMatchmakingData {
@@ -26,6 +27,7 @@ export class MatchmakingService {
 
     constructor(
         private prismaService: PrismaService,
+        private gameGateway: GameGateway,
         @Inject(forwardRef(() => MatchmakingGateway))
         private matchmakingGateway: MatchmakingGateway,
     ) { }
@@ -124,6 +126,7 @@ export class MatchmakingService {
         const opponent = this.queue[opponentId];
 
         if (user && opponent) {
+            this.gameGateway.setupRankedGame(user.client, opponent.client);
             user.client.emit('matchFound', { userId, opponentId });
             opponent.client.emit('matchFound', { userId, opponentId });
             onMatched();
