@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ModDetail } from './i/leaderboard.i.mod-detail';
-import { UserService } from 'src/user/user.service';
+import { RanksService } from 'src/ranked/ranks.service';
 
 @Injectable()
 export class LeaderboardService {
     constructor(
         private prisma: PrismaService,
-        private userService: UserService
+        private ranksService: RanksService,
     ) { }
     getPrismaModelForGameMode(gameMode: string) {
         switch (gameMode) {
@@ -121,7 +121,7 @@ export class LeaderboardService {
             const leaderboardRecords = await this.prisma.user.findMany(queryOptions as unknown);
 
             const formattedLeaderboard = await Promise.all(leaderboardRecords.map(async (record) => {
-                const rankName = await this.userService.getRankName(record.id);
+                const rankName = (await this.ranksService.getRankInfo(record.id)).ascii;
 
                 return {
                     user: {

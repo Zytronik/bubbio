@@ -26,6 +26,6 @@ import { TokensCleanupService } from './auth.tokens-cleanup-service';
   ],
   providers: [AuthService, JwtStrategy, JwtAuthGuard, TokensCleanupService],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule, UsersModule],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

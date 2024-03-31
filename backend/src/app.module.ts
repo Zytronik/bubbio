@@ -9,6 +9,8 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { MailModule } from './mailer/mailer.module';
 import { MatchmakingModule } from './matchmaking/matchmaking.module';
 import { GameModule } from './game/game.module';
+import { RankedModule } from './ranked/ranked.module';
+import { UsersModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { GameModule } from './game/game.module';
     MailModule,
     MatchmakingModule,
     GameModule,
+    RankedModule,
+    UsersModule,
   ],
   providers: [LobbyGateway, GlobalChatGateway],
 })

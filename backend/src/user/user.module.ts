@@ -1,11 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FileStorageService } from './file-storage.service';
+import { RankedModule } from 'src/ranked/ranked.module';
 
 @Module({
-    imports: [],
+    imports: [forwardRef(() => RankedModule)],
     providers: [UserService, PrismaService, FileStorageService],
     controllers: [UserController],
     exports: [UserService]

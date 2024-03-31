@@ -5,22 +5,46 @@
       <div class="page-container">
         <div v-if="!hasMatchFound" class="page-dashboard ranked-dashboard">
           <div class="left-content">
-            <div v-if="playerStats">
-              <p>Current Elo: <span>{{ playerStats.rating }}</span></p>
-              <p>Rating Deviation: <span>+/-{{ playerStats.ratingDeviation }}</span></p>
-              <p>Global Rank: <span>#{{ playerStats.globalRank }}</span></p>
-              <p>Games Won: <span>{{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}</span></p>
-              <p>Percentile: <span>{{ playerStats.percentile }}%</span></p>
-              <p>Rank: <span class="rank-letter">{{ playerStats.rank }}</span></p>
+
+            <div class="playerStats" v-if="playerStats">
+              <div>
+                <p class="rank">#{{ playerStats.globalRank }}</p>
+                <p class="rating">Elo {{ playerStats.rating }}<span>±{{ playerStats.ratingDeviation }}</span></p>
+              </div>
+              <p>Games won: {{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}</p>
             </div>
-            <br><br>
-            <p>Player in Queue: <span>{{ playersInQueue }}</span></p>
-            <p>Players in Ranked Games: <span>0</span></p>
+            
+            <div v-if="playerStats && playerStats.rankInfo.prevRank && playerStats.rankInfo.nextRank"
+              class="progressBarWrapper">
+              <div class="prevRank">
+                <p>{{ playerStats.rankInfo.prevRank.percentile }}%</p>
+                <p class="rank-letter">{{ playerStats.rankInfo.prevRank.ascii }}</p>
+              </div>
+              <div class="progress">
+                <div class="currentRank">
+                  <p>{{ playerStats.percentile }}%</p>
+                  <p class="rank-letter">{{ playerStats.rankInfo.ascii }}</p>
+                </div>
+                <div class="progressBar">
+                  <div class="progressBarFill"
+                    :style="{ width: (100 - (100 / (playerStats.rankInfo.prevRank.percentile - playerStats.rankInfo.nextRank.percentile) *  (playerStats.percentile - playerStats.rankInfo.nextRank.percentile)))  + '%' }">
+                  </div>
+                </div>
+              </div>
+              <div class="nextRank">
+                <p>{{ playerStats.rankInfo.nextRank.percentile }}%</p>
+                <p class="rank-letter">{{ playerStats.rankInfo.nextRank.ascii }}</p>
+              </div>
+            </div>
+
+            <div class="queueInfos">
+              <p><span>{{ playersInQueue }}</span> in Queue</p>
+              <p><span>0</span> in Games</p>
+            </div>
 
             <div class="matchmakingButton" @click="toggleQueue" :class="{ 'in-queue': isInQueue }">
               <div v-if="isInQueue">
-                <p>Leave Queue | </p>
-                <p>Passed Time: {{ passedTime }}s</p>
+                <p>Leave Queue | Passed Time: {{ passedTime }}s</p>
               </div>
               <div v-else>Enter Queue</div>
             </div>
@@ -37,14 +61,12 @@
               </button>
             </div>
             <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
-              <Leaderboard :gameMode="GameMode.Ranked" :fields="['rank', 'rating']"
-                :sortBy="'rating'" :sortDirection="SortDirection.Desc"
-                :leaderboardCategory="LeaderboardCategory.Global" :limit="30" />
+              <Leaderboard :gameMode="GameMode.Ranked" :fields="['rank', 'rating']" :sortBy="'rating'"
+                :sortDirection="SortDirection.Desc" :leaderboardCategory="LeaderboardCategory.Global" :limit="30" />
             </div>
             <div v-if="currentLeaderboard === 'National'" class="l-tab national-tab">
-              <Leaderboard :gameMode="GameMode.Ranked" :fields="['rank', 'rating']"
-                :sortBy="'rating'" :sortDirection="SortDirection.Desc"
-                :leaderboardCategory="LeaderboardCategory.National" :limit="30" />
+              <Leaderboard :gameMode="GameMode.Ranked" :fields="['rank', 'rating']" :sortBy="'rating'"
+                :sortDirection="SortDirection.Desc" :leaderboardCategory="LeaderboardCategory.National" :limit="30" />
             </div>
           </div>
 
@@ -79,7 +101,21 @@ interface PlayerMatchmakingStats {
   gamesWon: number;
   gamesCount: number;
   percentile: number;
-  rank: string;
+  rankInfo: RankInfo;
+}
+
+interface RankInfo {
+  ascii: string;
+  name: string;
+  percentile: number;
+  prevRank?: Rank;
+  nextRank?: Rank;
+}
+
+interface Rank {
+  ascii: string;
+  percentile: number;
+  name: string;
 }
 
 export default {
@@ -220,15 +256,21 @@ export default {
 }
 
 .matchmakingButton {
-  font-size: 30px;
+  font-size: 35px;
   padding: 10px;
   cursor: pointer;
   background-color: grey;
+  height: 10%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   text-align: center;
+  transition: 300ms;
 }
 
 .in-queue {
-  background-color: #f00;
+  background-color: rgb(80, 80, 80);
   color: #fff;
 }
 
@@ -236,5 +278,113 @@ p {
   margin: unset;
 }
 
+.playerStats {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  font-size: 150%;
+}
 
+.playerStats .rating, 
+.playerStats .rank {
+  font-size: 200%;
+}
+
+.playerStats .rank {
+  margin-right: 30px;
+}
+
+.playerStats .rating span {
+  font-size: 50%;
+}
+
+.playerStats div {
+  display: flex;
+}
+
+.queueInfos {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-evenly;
+  align-items: center;
+  font-size: 30px;
+  padding: 10px 0;
+}
+
+.queueInfos p {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.queueInfos span {
+  font-size: 200%;
+  margin-right: 10px;
+}
+
+.progressBarWrapper {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 0;
+}
+
+.progressBarWrapper .rank-letter {
+  font-size: 200%;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  align-items: center;
+  position: relative;
+}
+
+.currentRank {
+  position: absolute;
+  bottom: 80%;
+  /* bottom: 50%;
+  transform: translateY(50%); */
+}
+
+.progressBar {
+  background-color: #fff;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  border-radius: 15px;
+  height: 15px;
+}
+
+.progressBarFill {
+  background-color: rgb(206, 0, 175);
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+}
+
+.prevRank {
+  padding-left: 15px;
+}
+
+.nextRank {
+  padding-right: 15px;
+}
+
+.prevRank,
+.nextRank,
+.currentRank {
+  display: flex;
+  gap: 10px;
+  align-items: center
+}
 </style>
