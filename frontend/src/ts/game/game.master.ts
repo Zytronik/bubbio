@@ -46,9 +46,6 @@ export let playerGameInstance: GameInstance;
 export function setupSprintGame(): void {
     const gameMode = GAME_MODE.SPRINT;
     const transitions: GameTransitions = {
-        onGameStart: startSprint,
-        onGameReset: resetSprint,
-        onGameAbort: leaveSprint,
         onGameDefeat: sprintDeath,
         onGameVictory: sprintVictory
     }
@@ -57,24 +54,6 @@ export function setupSprintGame(): void {
     const startSeed = getNextSeed(Date.now());
     playerGameInstance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed);
     network_setupGame(playerGameInstance)
-
-    function startSprint(): void {
-        enableResetInput();
-        disableChannelInput();
-        showCountDownAndStart();
-    }
-    function resetSprint(): void {
-        disableGameplay();
-        resetGameInstance(playerGameInstance, getNextSeed(Date.now()));
-        network_resetGame(playerGameInstance.initialSeed);
-        showCountDownAndStart();
-    }
-    function leaveSprint(): void {
-        disableResetInput();
-        enableChannelInput();
-        disableGameplay();
-        network_leaveGame();
-    }
     function sprintVictory(): void {
         playerGameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
         disableGameplay();
@@ -139,13 +118,21 @@ function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
 
 
 export function startGame(): void {
-    playerGameInstance.gameTransitions.onGameStart();
+    enableResetInput();
+    disableChannelInput();
+    showCountDownAndStart();
 }
 export function resetGame(): void {
-    playerGameInstance.gameTransitions.onGameReset();
+    disableGameplay();
+    resetGameInstance(playerGameInstance, getNextSeed(Date.now()));
+    network_resetGame(playerGameInstance.initialSeed);
+    showCountDownAndStart();
 }
 export function leaveGame(): void {
-    playerGameInstance.gameTransitions.onGameAbort();
+    disableResetInput();
+    enableChannelInput();
+    disableGameplay();
+    network_leaveGame();
 }
 
 function showCountDownAndStart(): void {

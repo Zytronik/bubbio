@@ -8,11 +8,11 @@ import { dto_GameSetup } from "./dto/game.network.dto.game-setup";
 import { ToggleMod, MultiMod } from "../settings/ref/i/game.settings.ref.i.mod";
 import { GAME_STATE } from "../i/game.e.state";
 
-const I_SETUP_GAME = "input_setupGame";
+const I_SETUP_SINGLEPLAYER_GAME = "input_setupSinglePlayerGame";
 const I_COUNT_DOWN_STATE = "input_countDownState";
 const I_QUEUE_INPUTS = "input_queueUpGameInputs";
-const I_RESET_GAME = "input_resetGame";
-const I_LEAVE_GAME = "input_leaveGame";
+const I_RESET_SINGLEPLAYER_GAME = "input_resetSinglePlayerGame";
+const I_LEAVE_SINGLEPLAYER_GAME = "input_leaveSinglePlayerGame";
 const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
 
 const registeredGameEvents: Set<string> = new Set();
@@ -21,10 +21,9 @@ export function network_setupGame(playerGameInstance: GameInstance): void {
         const networkData: dto_GameSetup = {
             gameMode: playerGameInstance.gameMode,
             gameSettings: playerGameInstance.gameSettings,
-            handlingSettings: playerGameInstance.handlingSettings,
             seed: playerGameInstance.initialSeed,
         }
-        state.socket.emit(I_SETUP_GAME, networkData);
+        state.socket.emit(I_SETUP_SINGLEPLAYER_GAME, networkData);
         state.socket.on(O_QUEUE_INPUTS, (data: number) => {
             playerGameInstance.processedInputsIndex = data;
         });
@@ -57,7 +56,7 @@ export function network_synchronizeGame(gameInstance: GameInstance): void {
 
 export function network_resetGame(seed: number): void {
     if (state.socket) {
-        state.socket.emit(I_RESET_GAME, seed);
+        state.socket.emit(I_RESET_SINGLEPLAYER_GAME, seed);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
     }
@@ -65,7 +64,7 @@ export function network_resetGame(seed: number): void {
 
 export function network_leaveGame(): void {
     if (state.socket) {
-        state.socket.emit(I_LEAVE_GAME);
+        state.socket.emit(I_LEAVE_SINGLEPLAYER_GAME);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
     }
