@@ -52,6 +52,10 @@ body.game-view .back-buttons {
     font-family: rankFont;
 }
 
+.rank-img {
+    filter: invert(1);
+}
+
 /* Page */
 section.page {
     width: 100vw;

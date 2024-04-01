@@ -38,7 +38,7 @@
             <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
 
             <button type="submit">Login</button>
-            <button type="button" @click="toForgotPwForm">I Forgor</button>
+            <button type="button" @click="toForgotPwForm">I Forgot</button>
             <button type="button" @click="backtoUsernameForm">Back</button>
           </form>
 

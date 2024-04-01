@@ -24,3 +24,7 @@ export function getDefaultProfilePbURL(){
 export function getDefaultProfileBannerURL(){
     return require(`@/img/default/bannerPlaceholder.png`);
 }
+
+export function getRankImagePath(rankName: string){
+    return require(`@/img/ranks/${rankName}.png`);
+}

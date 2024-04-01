@@ -6,6 +6,6 @@ import { UsersModule } from 'src/user/user.module';
 @Module({
     imports: [forwardRef(() => UsersModule)],
     providers: [GlickoService, RanksService],
-    exports: [RanksService],
+    exports: [RanksService, GlickoService],
 })
 export class RankedModule { }
