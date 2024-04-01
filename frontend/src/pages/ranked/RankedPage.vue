@@ -22,9 +22,9 @@
             </div>
 
             <div v-if="playerStats" class="progressBarWrapper">
-              <div v-if="playerStats.rankInfo.prevRank?.ascii" class="prevRank">
-                <p v-if="playerStats.rankInfo.percentile">{{ playerStats.rankInfo.percentile }}%</p>
-                <p v-if="playerStats.rankInfo.prevRank.ascii" class="rank-letter">{{ playerStats.rankInfo.prevRank.ascii
+              <div class="prevRank">
+                <p v-if="playerStats.rankInfo.prevRank?.ascii">{{ playerStats.rankInfo.percentile }}%</p>
+                <p v-if="playerStats.rankInfo.prevRank?.ascii" class="rank-letter">{{ playerStats.rankInfo.prevRank.ascii
                   }}</p>
               </div>
               <div class="progress">
