@@ -328,7 +328,7 @@ export class UserService {
     async getPercentile(userId: number): Promise<number> {
         const rank = await this.getGlobalRank(userId);
         const totalUsers = await this.getTotalNumberOfRegisteredUsers();
-        return rank / totalUsers * 100
+        return Math.round((rank / totalUsers * 100 + Number.EPSILON) * 100) / 100;
     }
 
     async getMatchmakingStats(userId: number): Promise<any> {

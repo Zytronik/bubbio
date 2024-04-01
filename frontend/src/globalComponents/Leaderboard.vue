@@ -21,7 +21,7 @@
             <div class="user-info" @click="openProfile(entry.user.username)">
               <img :src="entry.user.pbUrl ? entry.user.pbUrl : getDefaultProfilePbURL()" alt="flag" width="30"
                 height="30" />
-              <p>{{ entry.user.username }}</p>
+              <p>{{ truncateString(entry.user.username, 11).toUpperCase() }}</p>
             </div>
           </div>
           <div class="cell" v-for="field in orderedFields" :key="field">
@@ -46,6 +46,7 @@ import { getDefaultProfilePbURL } from '@/ts/networking/paths';
 import { formatFieldValue, getFullName } from '@/ts/page/i/page.i.stat-display';
 import { openProfile } from '@/ts/page/page.page-manager';
 import { ModDetail } from '@/ts/page/i/page.i.mod-detail';
+import { truncateString } from '@/ts/page/page.page-utils';
 
 interface LeaderboardEntry extends GameStats {
   user: {
@@ -161,6 +162,7 @@ export default defineComponent({
       getFullName,
       noEntries,
       openProfile,
+      truncateString,
     };
   },
 });
@@ -191,6 +193,7 @@ p {
 .row {
   display: flex;
   flex-direction: row;
+  text-align: center;
 }
 
 .head {
@@ -200,10 +203,12 @@ p {
 .row .cell:first-of-type {
   flex: 0.3;
   padding: 0 10px;
+  text-align: left;
 }
 
 .row .cell:nth-of-type(2) {
-  flex: 1.8;
+  flex: 2;
+  text-align: left;
 }
 
 .row:nth-of-type(1) .cell:first-of-type p {
@@ -228,6 +233,14 @@ p {
   box-sizing: border-box;
   display: flex;
   align-items: center;
+}
+
+.cell > p {
+  width: 100%;
+}
+
+.cell:last-of-type > p {
+  padding-right: 20px;
 }
 
 .user-info {

@@ -14,11 +14,11 @@
               <p>Games won: {{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}</p>
             </div>
             
-            <div v-if="playerStats && playerStats.rankInfo.prevRank && playerStats.rankInfo.nextRank"
+            <div v-if="playerStats"
               class="progressBarWrapper">
-              <div class="prevRank">
-                <p>{{ playerStats.rankInfo.prevRank.percentile }}%</p>
-                <p class="rank-letter">{{ playerStats.rankInfo.prevRank.ascii }}</p>
+              <div v-if="playerStats.rankInfo.prevRank" class="prevRank">
+                <p v-if="playerStats.rankInfo.prevRank.percentile">{{ playerStats.rankInfo.prevRank.percentile }}%</p>
+                <p v-if="playerStats.rankInfo.prevRank.ascii" class="rank-letter">{{ playerStats.rankInfo.prevRank.ascii }}</p>
               </div>
               <div class="progress">
                 <div class="currentRank">
@@ -27,13 +27,13 @@
                 </div>
                 <div class="progressBar">
                   <div class="progressBarFill"
-                    :style="{ width: (100 - (100 / (playerStats.rankInfo.prevRank.percentile - playerStats.rankInfo.nextRank.percentile) *  (playerStats.percentile - playerStats.rankInfo.nextRank.percentile)))  + '%' }">
+                    :style="{ width: getProgressBarFillWidth() }">
                   </div>
                 </div>
               </div>
-              <div class="nextRank">
-                <p>{{ playerStats.rankInfo.nextRank.percentile }}%</p>
-                <p class="rank-letter">{{ playerStats.rankInfo.nextRank.ascii }}</p>
+              <div class="nextRank" v-if="playerStats.rankInfo.nextRank">
+                <p v-if="playerStats.rankInfo.nextRank.percentile">{{ playerStats.rankInfo.nextRank.percentile }}%</p>
+                <p v-if="playerStats.rankInfo.nextRank.ascii" class="rank-letter">{{ playerStats.rankInfo.nextRank.ascii }}</p>
               </div>
             </div>
 
@@ -140,6 +140,13 @@ export default {
     const hasMatchFound = ref<boolean>(false);
     let passedTimeInterval: ReturnType<typeof setInterval> | undefined = 0;
 
+    function getProgressBarFillWidth() {
+      if (!playerStats.value || !playerStats.value.rankInfo.prevRank || !playerStats.value.rankInfo.nextRank) {
+        return '0%';
+      }
+      return (100 - (100 / (playerStats.value.rankInfo.prevRank.percentile - playerStats.value.rankInfo.nextRank.percentile) *  (playerStats.value.percentile - playerStats.value.rankInfo.nextRank.percentile)))  + '%';
+    }
+
     function toggleQueue() {
       if (isInQueue.value) {
         leaveQueue();
@@ -245,6 +252,7 @@ export default {
       SortDirection,
       LeaderboardCategory,
       userData,
+      getProgressBarFillWidth,
     }
   }
 };
@@ -347,44 +355,45 @@ p {
 
 .currentRank {
   position: absolute;
-  bottom: 80%;
-  /* bottom: 50%;
-  transform: translateY(50%); */
+  bottom: 90%;
 }
 
 .progressBar {
-  background-color: #fff;
+  background-color: #575757;
   height: 100%;
   width: 100%;
   display: flex;
-  border-radius: 15px;
   height: 15px;
 }
 
 .progressBarFill {
-  background-color: rgb(206, 0, 175);
+  background-color: rgb(244, 205, 33);
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  border-top-left-radius: 15px;
-  border-bottom-left-radius: 15px;
+  position: relative;
 }
 
-.prevRank {
-  padding-left: 15px;
-}
-
-.nextRank {
-  padding-right: 15px;
+.progressBarFill::after {
+  content: "";
+  width: 3px;
+  height: 200%;
+  transform: translateY(-50%);
+  position: absolute;
+  right: 0;
+  top: 50%;
+  background-color: rgb(244, 205, 33);
 }
 
 .prevRank,
 .nextRank,
 .currentRank {
   display: flex;
+  width: 10%;
   gap: 10px;
+  justify-content: center;
   align-items: center
 }
 </style>
