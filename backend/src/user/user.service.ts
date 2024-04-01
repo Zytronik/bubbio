@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import axios from 'axios';
 import { FileStorageService } from './file-storage.service';
 import { RanksService } from 'src/ranked/ranks.service';
+import { GlickoService } from 'src/ranked/glicko.service';
 
 @Injectable()
 export class UserService {
@@ -12,6 +13,7 @@ export class UserService {
         private prisma: PrismaService,
         @Inject(forwardRef(() => RanksService))
         private ranksService: RanksService,
+        private glickoService: GlickoService,
         private fileStorageService: FileStorageService,
     ) { }
 
@@ -57,7 +59,8 @@ export class UserService {
                 countryCode,
                 country,
             },
-        });
+        });        
+
         delete user.password;
         return user;
     }
@@ -321,6 +324,37 @@ export class UserService {
         return userIndex + 1;
     }
 
+    async getNationalRank(userId: number): Promise<number> {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                countryCode: true,
+            },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        const users = await this.prisma.user.findMany({
+            where: {
+                countryCode: user.countryCode,
+            },
+            orderBy: [
+                {
+                    rating: 'desc',
+                },
+                {
+                    ratingDeviation: 'asc',
+                },
+            ],
+        });
+
+        const userIndex = users.findIndex(user => user.id === userId);
+
+        return userIndex + 1;
+    }
+
     async getTotalNumberOfRegisteredUsers(): Promise<number> {
         return await this.prisma.user.count();
     }
@@ -348,10 +382,28 @@ export class UserService {
             rating: user.rating,
             ratingDeviation: user.ratingDeviation,
             globalRank: await this.getGlobalRank(userId),
+            nationalRank: await this.getGlobalRank(userId),
             gamesWon: 0,
             gamesCount: 0,
             percentile: await this.getPercentile(userId),
             rankInfo: await this.ranksService.getRankInfo(userId),
         };
+    }
+
+    async getGlickoRatingsByUserId(userId: number) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                rating: true,
+                ratingDeviation: true,
+                volatility: true,
+            },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        return user;
     }
 }

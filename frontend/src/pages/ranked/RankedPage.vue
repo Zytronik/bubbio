@@ -8,32 +8,37 @@
 
             <div class="playerStats" v-if="playerStats">
               <div>
-                <p class="rank">#{{ playerStats.globalRank }}</p>
-                <p class="rating">Elo {{ playerStats.rating }}<span>±{{ playerStats.ratingDeviation }}</span></p>
+                <p v-if="playerStats.rankInfo" class="rank-letter">{{ playerStats.rankInfo.ascii }}</p>
+                <div>
+                  <p class="rating">{{ playerStats.rating }}<span>±{{ playerStats.ratingDeviation }}</span></p>
+                  <p class="gamesWon"><span>Games won: </span>{{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}
+                  </p>
+                </div>
               </div>
-              <p>Games won: {{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}</p>
+              <p class="rank">
+                <span v-if="currentLeaderboard === 'Global'" class="global">#{{ playerStats.globalRank }}</span>
+                <span v-if="currentLeaderboard === 'National'" class="national">#{{ playerStats.nationalRank }}</span>
+              </p>
             </div>
-            
-            <div v-if="playerStats"
-              class="progressBarWrapper">
+
+            <div v-if="playerStats" class="progressBarWrapper">
               <div v-if="playerStats.rankInfo.prevRank" class="prevRank">
-                <p v-if="playerStats.rankInfo.prevRank.percentile">{{ playerStats.rankInfo.prevRank.percentile }}%</p>
-                <p v-if="playerStats.rankInfo.prevRank.ascii" class="rank-letter">{{ playerStats.rankInfo.prevRank.ascii }}</p>
+                <p v-if="playerStats.rankInfo.percentile">{{ playerStats.rankInfo.percentile }}%</p>
+                <p v-if="playerStats.rankInfo.prevRank.ascii" class="rank-letter">{{ playerStats.rankInfo.prevRank.ascii
+                  }}</p>
               </div>
               <div class="progress">
-                <div class="currentRank">
-                  <p>{{ playerStats.percentile }}%</p>
-                  <p class="rank-letter">{{ playerStats.rankInfo.ascii }}</p>
-                </div>
                 <div class="progressBar">
-                  <div class="progressBarFill"
-                    :style="{ width: getProgressBarFillWidth() }">
-                  </div>
+                  <div class="progressBarFill" :style="{
+                    '--percentile-content': `'${playerStats.percentile}%'`,
+                    'width': getProgressBarFillWidth()
+                  }"></div>
                 </div>
               </div>
               <div class="nextRank" v-if="playerStats.rankInfo.nextRank">
                 <p v-if="playerStats.rankInfo.nextRank.percentile">{{ playerStats.rankInfo.nextRank.percentile }}%</p>
-                <p v-if="playerStats.rankInfo.nextRank.ascii" class="rank-letter">{{ playerStats.rankInfo.nextRank.ascii }}</p>
+                <p v-if="playerStats.rankInfo.nextRank.ascii" class="rank-letter">{{ playerStats.rankInfo.nextRank.ascii
+                  }}</p>
               </div>
             </div>
 
@@ -98,6 +103,7 @@ interface PlayerMatchmakingStats {
   rating: number;
   ratingDeviation: number;
   globalRank: number;
+  nationalRank: number;
   gamesWon: number;
   gamesCount: number;
   percentile: number;
@@ -144,7 +150,7 @@ export default {
       if (!playerStats.value || !playerStats.value.rankInfo.prevRank || !playerStats.value.rankInfo.nextRank) {
         return '0%';
       }
-      return (100 - (100 / (playerStats.value.rankInfo.prevRank.percentile - playerStats.value.rankInfo.nextRank.percentile) *  (playerStats.value.percentile - playerStats.value.rankInfo.nextRank.percentile)))  + '%';
+      return (100 - (100 / (playerStats.value.rankInfo.percentile - playerStats.value.rankInfo.nextRank.percentile) *  (playerStats.value.percentile - playerStats.value.rankInfo.nextRank.percentile)))  + '%';
     }
 
     function toggleQueue() {
@@ -301,15 +307,31 @@ p {
 }
 
 .playerStats .rank {
+  margin-left: 30px;
+}
+
+.playerStats .rank-letter {
+  font-size: 290%;
   margin-right: 30px;
+}
+
+.playerStats .gamesWon span {
+  opacity: 0.5;
 }
 
 .playerStats .rating span {
   font-size: 50%;
+  opacity: 0.5;
 }
 
-.playerStats div {
+.playerStats > div {
   display: flex;
+}
+
+.playerStats > div > div{
+  display: flex;
+  flex-direction: column;
+  align-items: center
 }
 
 .queueInfos {
@@ -350,12 +372,6 @@ p {
   flex-direction: column;
   width: 80%;
   align-items: center;
-  position: relative;
-}
-
-.currentRank {
-  position: absolute;
-  bottom: 90%;
 }
 
 .progressBar {
@@ -374,6 +390,15 @@ p {
   align-items: center;
   gap: 10px;
   position: relative;
+  --percentile-content: '';
+}
+
+.progressBarFill::before {
+  content: var(--percentile-content);
+  position: absolute;
+  right: 0;
+  transform: translateX(50%);
+  top: calc(100% + 10px);
 }
 
 .progressBarFill::after {
@@ -388,8 +413,7 @@ p {
 }
 
 .prevRank,
-.nextRank,
-.currentRank {
+.nextRank {
   display: flex;
   width: 10%;
   gap: 10px;

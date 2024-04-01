@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Server,Socket } from 'socket.io';
 import { GameGateway } from 'src/game/game.gateway';
 import { MatchmakingGateway } from './matchmaking.gateway';
+import { GlickoService } from 'src/ranked/glicko.service';
+import { UserService } from 'src/user/user.service';
 
 interface UserMatchmakingData {
     glicko: number;
@@ -27,6 +29,8 @@ export class MatchmakingService {
 
     constructor(
         private prismaService: PrismaService,
+        private userService: UserService,
+        private glickoService: GlickoService,
         private gameGateway: GameGateway,
         @Inject(forwardRef(() => MatchmakingGateway))
         private matchmakingGateway: MatchmakingGateway,
@@ -127,10 +131,36 @@ export class MatchmakingService {
 
         if (user && opponent) {
             this.gameGateway.setupRankedGame(user.client, opponent.client);
+            //this.test(userId, opponentId);
             user.client.emit('matchFound', { userId, opponentId });
             opponent.client.emit('matchFound', { userId, opponentId });
             onMatched();
         }
+    }
+
+    async test(userId: number, opponentId: number){
+        const user = await this.userService.getGlickoRatingsByUserId(userId);
+        const opponent = await this.userService.getGlickoRatingsByUserId(opponentId);
+        const glickoUser = this.glickoService.glicko.makePlayer(user.rating, user.ratingDeviation, user.volatility);
+        const glickoOpponent = this.glickoService.glicko.makePlayer(opponent.rating, opponent.ratingDeviation, opponent.volatility);
+        console.log(glickoUser);
+
+        var expected = this.glickoService.glicko.predict(glickoUser, glickoOpponent);
+        console.log("User1 has " + (expected * 100) + "% chances of winning against User2 in the next match");
+        
+        console.log("User1 old rating: " + glickoUser.getRating());
+        console.log("User1 old rating deviation: " + glickoUser.getRd());
+        console.log("User1 old volatility: " + glickoUser.getVol());
+        console.log("User2 old rating: " + glickoOpponent.getRating());
+        console.log("User2 old rating deviation: " + glickoOpponent.getRd());
+        console.log("User2 old volatility: " + glickoOpponent.getVol());
+        this.glickoService.glicko.updateRatings([[glickoUser, glickoOpponent, 1]]);
+        console.log("User1 new rating: " + glickoUser.getRating());
+        console.log("User1 new rating deviation: " + glickoUser.getRd());
+        console.log("User1 new volatility: " + glickoUser.getVol());
+        console.log("User2 new rating: " + glickoOpponent.getRating());
+        console.log("User2 new rating deviation: " + glickoOpponent.getRd());
+        console.log("User2 new volatility: " + glickoOpponent.getVol());
     }
 
     notifyAllUsersOfQueueSize() {
