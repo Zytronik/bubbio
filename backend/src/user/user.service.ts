@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt';
 import axios from 'axios';
 import { FileStorageService } from './file-storage.service';
 import { RanksService } from 'src/ranked/ranks.service';
-import { GlickoService } from 'src/ranked/glicko.service';
 
 @Injectable()
 export class UserService {
@@ -13,7 +12,6 @@ export class UserService {
         private prisma: PrismaService,
         @Inject(forwardRef(() => RanksService))
         private ranksService: RanksService,
-        private glickoService: GlickoService,
         private fileStorageService: FileStorageService,
     ) { }
 
@@ -201,10 +199,12 @@ export class UserService {
         });
 
         const sprintRank = await this.getUserSprintRank(username);
+        const rankInfos = await this.ranksService.getRankInfo(user.id);
 
         return {
             ...user,
-            rank: (await this.ranksService.getRankInfo(user.id)).ascii,
+            rankIcon: rankInfos.iconName,
+            rankName: rankInfos.name,
             sprintStats: {
                 averageBubblesCleared: sprintStats._avg.bubblesCleared,
                 averageBubblesPerSecond: sprintStats._avg.bubblesPerSecond,

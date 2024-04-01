@@ -183,6 +183,9 @@ export class MatchmakingService {
     }
 
     isLoggedInUser(client: Socket): boolean {
+        if(!client.id){
+            return false;
+        }
         const { token, isGuest } = client.handshake.query;
         return token && token !== "null" && isGuest && isGuest === "null";
     }

@@ -8,7 +8,7 @@
 
             <div class="playerStats" v-if="playerStats">
               <div>
-                <p v-if="playerStats.rankInfo" class="rank-letter">{{ playerStats.rankInfo.ascii }}</p>
+                <img class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)" :alt="playerStats.rankInfo.name">
                 <div>
                   <p class="rating">{{ playerStats.rating }}<span>±{{ playerStats.ratingDeviation }}</span></p>
                   <p class="gamesWon"><span>Games won: </span>{{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}
@@ -24,8 +24,7 @@
             <div v-if="playerStats" class="progressBarWrapper">
               <div class="prevRank">
                 <p v-if="playerStats.rankInfo.prevRank?.ascii">{{ playerStats.rankInfo.percentile }}%</p>
-                <p v-if="playerStats.rankInfo.prevRank?.ascii" class="rank-letter">{{ playerStats.rankInfo.prevRank.ascii
-                  }}</p>
+                <img v-if="playerStats.rankInfo.prevRank?.iconName" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.prevRank.iconName)" :alt="playerStats.rankInfo.prevRank.name">
               </div>
               <div class="progress">
                 <div class="progressBar">
@@ -37,8 +36,7 @@
               </div>
               <div class="nextRank" v-if="playerStats.rankInfo.nextRank">
                 <p v-if="playerStats.rankInfo.nextRank.percentile">{{ playerStats.rankInfo.nextRank.percentile }}%</p>
-                <p v-if="playerStats.rankInfo.nextRank.ascii" class="rank-letter">{{ playerStats.rankInfo.nextRank.ascii
-                  }}</p>
+                <img v-if="playerStats.rankInfo.nextRank?.iconName" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.nextRank.iconName)" :alt="playerStats.rankInfo.nextRank.name">
               </div>
             </div>
 
@@ -98,6 +96,7 @@ import Leaderboard from '@/globalComponents/Leaderboard.vue';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
 import { UserData } from '@/ts/page/i/page.i.user-data';
 import eventBus from '@/ts/page/page.event-bus';
+import { getRankImagePath } from '@/ts/networking/paths';
 
 interface PlayerMatchmakingStats {
   rating: number;
@@ -113,6 +112,7 @@ interface PlayerMatchmakingStats {
 interface RankInfo {
   ascii: string;
   name: string;
+  iconName: string;
   percentile: number;
   prevRank?: Rank;
   nextRank?: Rank;
@@ -122,6 +122,7 @@ interface Rank {
   ascii: string;
   percentile: number;
   name: string;
+  iconName: string;
 }
 
 export default {
@@ -259,6 +260,7 @@ export default {
       LeaderboardCategory,
       userData,
       getProgressBarFillWidth,
+      getRankImagePath,
     }
   }
 };
@@ -299,6 +301,7 @@ p {
   width: 100%;
   align-items: center;
   font-size: 150%;
+  height: 12%;
 }
 
 .playerStats .rating, 
@@ -310,8 +313,8 @@ p {
   margin-left: 30px;
 }
 
-.playerStats .rank-letter {
-  font-size: 290%;
+.playerStats .rank-img {
+  object-fit: contain;
   margin-right: 30px;
 }
 
@@ -326,12 +329,13 @@ p {
 
 .playerStats > div {
   display: flex;
+  height: 100%;
 }
 
 .playerStats > div > div{
   display: flex;
   flex-direction: column;
-  align-items: center
+  justify-content: center;
 }
 
 .queueInfos {
@@ -361,10 +365,6 @@ p {
   align-items: center;
   justify-content: space-between;
   padding: 15px 0;
-}
-
-.progressBarWrapper .rank-letter {
-  font-size: 200%;
 }
 
 .progress {
@@ -418,6 +418,13 @@ p {
   width: 10%;
   gap: 10px;
   justify-content: center;
-  align-items: center
+  align-items: center;
 }
+
+.prevRank .rank-img,
+.nextRank .rank-img {
+  object-fit: contain;
+  height: 40px;
+}
+
 </style>

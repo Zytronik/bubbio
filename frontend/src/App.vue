@@ -7,7 +7,7 @@
           <h3>{{ userData?.username.toUpperCase() }}</h3>
           <div>
             <p>Lv.727</p>
-            <p v-if="userData?.rank" class="rank-letter">{{ userData?.rank }}</p>
+            <img v-if="userData?.rankIcon" class="rank-img" :src="getRankImagePath(userData.rankIcon)" :alt="userData?.rankName">
           </div>
         </div>
       </div>
@@ -38,7 +38,7 @@ import { checkUserAuthentication, clearClientState, clearGuestCookies, logUserOu
 import eventBus from './ts/page/page.event-bus';
 import { attachInputReader } from './ts/input/input.input-reader';
 import { httpClient } from './ts/networking/networking.http-client';
-import { getDefaultProfilePbURL } from './ts/networking/paths';
+import { getDefaultProfilePbURL, getRankImagePath } from './ts/networking/paths';
 import { applySavedInputSettings, enableBackInputs, enableChannelInput, enableNetworkDebugInputs } from './ts/input/input.input-manager';
 import { setupDebugListeners } from "./ts/game/network/game.network.debug";
 
@@ -152,7 +152,8 @@ export default {
       countryCode?: string;
       country?: string;
       pbUrl: string;
-      rank?: string;
+      rankIcon?: string;
+      rankName?: string;
     }
 
     const userData = ref<UserData | null>(null);
@@ -266,6 +267,7 @@ export default {
       isNavigatingForward,
       joinRoomFromHash,
       updateAuthenticatedState,
+      getRankImagePath,
     };
   },
 }
@@ -324,8 +326,10 @@ export default {
   font-size: 20px;
 }
 
-.profile-content > div .rank-letter {
+.profile-content > div .rank-img {
   margin-left: 30px;
+  object-fit: contain;
+  height: 30px;
 }
 
 .profile-content h3 {
