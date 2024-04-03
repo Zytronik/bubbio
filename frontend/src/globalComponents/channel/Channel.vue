@@ -57,8 +57,8 @@
                               <img :src="item.userImg ? item.userImg : getDefaultProfilePbURL()"
                                 alt="User's profile picture">
                               <p>
-                                <span>{{ item.username }}</span> achieved <span>#{{ item.rank }}</span> in <span>{{
-                                  item.type }}</span> with <span>{{ formatTimeNumberToString(item.value) }}</span>
+                                <span class="username" @click="openUserProfile(item.username)">{{ item.username.toUpperCase() }}</span> achieved <span>#{{ item.rank }}</span> in <span>{{
+                                  item.type }} ({{ formatFieldValue(item.mods, "mods") }})</span> with <span>{{ formatTimeNumberToString(item.value) }}</span>
                               </p>
                             </div>
                             <p class="time">{{ formatDateToAgoText(item.createdAt) }}</p>
@@ -98,36 +98,14 @@
             </div>
             <div class="friend-listing">
               <h3 v-if="isAuthenticated">Friend Listing (TODO)</h3>
-              <div class="friend">
-                <p>Friend 1</p>
-                <div>
-                  <span>Invite</span>
-                  <span>Spectate</span>
-                  <span>Message</span>
-                </div>
-              </div>
-              <div class="friend">
-                <p>Friend 2</p>
-                <div>
-                  <span>Invite</span>
-                  <span>Spectate</span>
-                  <span>Message</span>
-                </div>
-              </div>
-              <div class="friend">
-                <p>Friend 3</p>
-                <div>
-                  <span>Invite</span>
-                  <span>Spectate</span>
-                  <span>Message</span>
-                </div>
-              </div>
-              <div class="friend">
-                <p>Friend 4</p>
-                <div>
-                  <span>Invite</span>
-                  <span>Spectate</span>
-                  <span>Message</span>
+              <div class="friendList" v-for="friend in friendsList" :key="friend.id">
+                <div class="friend">
+                  <p>{{ friend.username }}</p>
+                  <div>
+                    <span>Invite</span>
+                    <span>Spectate</span>
+                    <span>Message</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -158,8 +136,10 @@ import { CountUp } from 'countup.js';
 import { getDefaultProfilePbURL } from '@/ts/networking/paths';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
 import { backInput } from '@/ts/input/input.all-inputs';
-import { getFlagImagePath } from '@/ts/page/page.page-requests';
+import { getFlagImagePath, getFriends } from '@/ts/page/page.page-requests';
 import { formatDateToAgoText } from '@/ts/page/page.page-utils';
+import { formatFieldValue } from '@/ts/page/i/page.i.stat-display';
+import eventBus from '@/ts/page/page.event-bus';
 
 export default {
   name: "ChannelOverlay",
@@ -239,6 +219,7 @@ export default {
       showUserProfileOverlay.value = false;
       selectedUsername.value = null;
       history.replaceState(null, '', '/');
+      updateFriendList();
     }
 
     function showUserPageFromURL() {
@@ -335,6 +316,7 @@ export default {
     /* News */
     interface NewsData {
       type: string;
+      mods: string;
       rank: number;
       value: number;
       createdAt: Date;
@@ -349,6 +331,15 @@ export default {
         state.socket.emit('fetchNews');
       }
     }
+
+    /* Friends */
+    const friendsList = ref<User[] | null>(null);
+
+    async function updateFriendList() {
+      friendsList.value = await getFriends();
+    }
+
+    eventBus.on('updateFriendList', updateFriendList);
 
     /* General */
     backInput.fire = slideOverlayOut;
@@ -367,10 +358,12 @@ export default {
         });
       }
 
+
       fetchNews();
       slideOverlayIn();
       showUserPageFromURL();
       await fetchStats();
+      await updateFriendList();
       intervalId = setInterval(async () => {
         await fetchStats();
       }, 30000);
@@ -412,6 +405,9 @@ export default {
       formatDateToAgoText,
       getDefaultProfilePbURL,
       formatTimeNumberToString,
+      formatFieldValue,
+      getFriends,
+      friendsList,
     };
   },
 }
@@ -663,6 +659,14 @@ export default {
   font-weight: bold;
 }
 
+.news-item .username {
+  cursor: pointer;
+}
+
+.news-item .time {
+  white-space: nowrap;
+}
+
 .news-item img {
   width: 30px;
   height: 30px;
@@ -680,7 +684,8 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 15px
+  gap: 15px;
+  max-width: 90%;
 }
 
 .news-wrapper {

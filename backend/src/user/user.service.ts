@@ -3,8 +3,8 @@ import { CreateUserDto } from 'src/auth/dto/auth.dto.create-user';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import axios from 'axios';
-import { FileStorageService } from './file-storage.service';
 import { RanksService } from 'src/ranked/ranks.service';
+import { FileStorageService } from './file-storage.service';
 
 @Injectable()
 export class UserService {

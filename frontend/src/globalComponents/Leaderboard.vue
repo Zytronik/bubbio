@@ -207,7 +207,7 @@ p {
 }
 
 .row .cell:nth-of-type(2) {
-  flex: 2;
+  flex: 1.8;
   text-align: left;
 }
 
@@ -240,7 +240,7 @@ p {
 }
 
 .cell:last-of-type > p {
-  padding-right: 20px;
+  padding-right: 15px;
 }
 
 .user-info {

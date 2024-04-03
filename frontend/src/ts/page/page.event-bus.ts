@@ -72,6 +72,7 @@ const setNavigationDirection: EventBus['setNavigationDirection'] = (direction) =
 
 const setUserData: EventBus['setUserData'] = (data: UserData | null) => {
   state.userData = data;
+  emit('userDataChanged', state.userData);
 };
 
 const getUserData: EventBus['getUserData'] = () => {

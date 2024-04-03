@@ -40,6 +40,7 @@
                   ({{ userData.countryCode }})
                 </span>
               </button>
+              <div class="lModsDisplay">Mods: {{ formatFieldValue(JSON.stringify(enabledToggleMods), "mods") }}</div>
             </div>
             <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
               <Leaderboard :gameMode="GameMode.Sprint" :fields="['gameDuration', 'bubblesPerSecond']"
@@ -646,5 +647,16 @@ export default {
 
 .gameComplete .top {
   height: 15%;
+}
+
+.lModsDisplay {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.l-tab-buttons {
+  position: relative;
 }
 </style>
