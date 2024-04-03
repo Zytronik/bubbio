@@ -87,7 +87,7 @@
         </div>
 
         <div v-if="isGaming">
-          <Game :playerGameVisuals="playerGameVisuals" :areRef="true"/>
+          <Game :playerGameVisuals="playerGameVisuals" :areRef="true" />
         </div>
 
       </div>
@@ -108,7 +108,7 @@ import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e
 import { UserData } from '@/ts/page/i/page.i.user-data';
 import eventBus from '@/ts/page/page.event-bus';
 import { getRankImagePath } from '@/ts/networking/paths';
-import { network_stopListeningToMatchFound } from '@/ts/game/network/game.network.ranked';
+import { scoreScreenData, endScreenData, I_RANKED_READY_FOR_NEXT_ROUND, network_stopListeningToServer } from '@/ts/game/network/game.network.ranked';
 import { network_listenToMatchFound } from '@/ts/game/network/game.network.ranked';
 import { playerGameVisuals } from '@/ts/game/game.master';
 import Game from '@/pages/game/Game.vue';
@@ -183,7 +183,7 @@ export default {
       if (state.socket) {
         stopPassedTimeCountdown();
         state.socket.emit('leaveQueue');
-        network_stopListeningToMatchFound();
+        network_stopListeningToServer();
       }
     }
 
@@ -250,14 +250,23 @@ export default {
       leaveQueue();
       if (state.socket) {
         state.socket.emit('playerLeftMmVue');
-        network_stopListeningToMatchFound()
         state.socket.off('queueSize');
       }
     }
 
     function goToGameView() {
       isGaming.value = true;
-      console.log(playerGameVisuals);
+    }
+
+    function showMatchScore() {
+      console.log('showMatchScore', scoreScreenData);
+      if(state.socket){
+          state.socket.emit(I_RANKED_READY_FOR_NEXT_ROUND, scoreScreenData.matchID);
+        }
+    }
+
+    function showEndScreen() {
+      console.log('showEndScreen', endScreenData);
     }
 
     onMounted(() => {
@@ -266,6 +275,8 @@ export default {
       mountSockets();
       eventBus.on("vue_matchFound", matchFound);
       eventBus.on('vue_goToGameView', goToGameView);
+      eventBus.on('vue_showMatchScore', showMatchScore);
+      eventBus.on('vue_showEndScreen', showEndScreen);
     });
 
     onUnmounted(() => {

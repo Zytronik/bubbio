@@ -4,7 +4,6 @@ import { dto_GameSetup } from './network/dto/game.network.dto.game-setup';
 import { OngoingGame } from './network/i/game.network.i.ongoing-game';
 import { createGameInstance, resetGameInstance } from './logic/game.logic.instance-creator';
 import { GameTransitions } from './i/game.i.game-transitions';
-import { InputFrame } from './i/game.i.game-state-history';
 import { GAME_INPUT } from './network/i/game.network.i.game-input';
 import { executeShot } from './logic/game.logic.shoot';
 import { holdBubble } from './logic/game.logic.bubble-manager';
@@ -15,11 +14,14 @@ import { Match } from './network/i/game.network.i.match';
 import { dto_VersusScreen } from './network/dto/game.network.dto.vs-screen';
 import { defaultHandlingSettings } from './default-values/game.default-values.handling-settings';
 import { GAME_MODE } from './settings/i/game.settings.e.game-modes';
-import { rankedSettings } from './default-values/game.default-values.ranked-settings';
+import { rankedFirstTo, rankedSettings } from './default-values/game.default-values.ranked-settings';
 import { getNextSeed } from './logic/game.logic.random';
 import { dto_Inputs } from './network/dto/game.network.dto.input';
 import { MatchmakingService } from 'src/matchmaking/matchmaking.service';
 import { Inject, forwardRef } from '@nestjs/common';
+import { dto_CountDown } from './network/dto/game.network.dto.count-down';
+import { dto_ScoreScreen } from './network/dto/game.network.dto.score-screen';
+import { dto_EndScreen } from './network/dto/game.network.dto.end-screen';
 
 
 /*
@@ -37,14 +39,20 @@ const O_RANKED_SETUP_GAME_INSTANCE = "output_rankedSetupGameInstance";
 const I_RANKED_MATCH_FOUND_CONFIRMATION = "input_rankedMatchFoundConfirmation";
 const I_RANKED_SETUP_GAME_CONFIRMATION = "input_rankedSetupGameConfirmation";
 const O_RANKED_GO_TO_GAME_VIEW = "output_rankedGoToGameView";
+const I_RANKED_READY_TO_START_GAME = "input_rankedReadyToStartGame";
 const O_RANKED_START_GAME = "output_rankedStartGame";
+const O_RANKED_YOU_WON = "output_rankedYouWon";
 const O_RANKED_SHOW_MATCH_SCORE = "output_rankedShowMatchScore";
+const I_RANKED_READY_FOR_NEXT_ROUND = "input_rankedReadyForNextRound";
+const O_RANKED_PREPARE_NEXT_ROUND = "output_rankedPrepareNextRound";
+const O_RANKED_SHOW_END_SCREEN = "output_rankedShowEndScreen";
 
 const I_QUEUE_INPUTS = "input_queueUpGameInputs";
 const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
+const I_COUNT_DOWN_STATE = "I_COUNT_DOWN_STATE";
+const O_RECEIVE_GARBAGE = "output_receiveGarbage";
 
 const I_SINGLEPLAYER_SETUP_GAME = "I_SINGLEPLAYER_SETUP_GAME";
-const I_SINGLEPLAYER_COUNT_DOWN_STATE = "I_SINGLEPLAYER_COUNT_DOWN_STATE";
 const I_SINGLEPLAYER_RESET_GAME = "I_SINGLEPLAYER_RESET_GAME";
 const I_SINGLEPLAYER_LEAVE_GAME = "I_SINGLEPLAYER_LEAVE_GAME";
 
@@ -102,8 +110,10 @@ export class GameGateway implements OnGatewayDisconnect {
       matchRoomName: matchRoomName,
       vsConfirmationMap: new Map(),
       setupConfirmationMap: new Map(),
+      readyToStartConfirmationMap: new Map(),
       ongoingGamesMap: new Map(),
-      scoresMap: new Map()
+      scoresMap: new Map(),
+      firstTo: rankedFirstTo,
     }
     ongoingRankedMatches.set(rankedMatchId, rankedMatch);
 
@@ -112,24 +122,14 @@ export class GameGateway implements OnGatewayDisconnect {
       player.join(matchRoomName);
       rankedMatch.vsConfirmationMap.set(player.id, false);
       rankedMatch.setupConfirmationMap.set(player.id, false);
+      rankedMatch.readyToStartConfirmationMap.set(player.id, false);
       rankedMatch.scoresMap.set(player.id, 0);
       const transitions: GameTransitions = {
         onGameDefeat: function (): void {
-          const match = ongoingRankedMatches.get(rankedMatchId);
-          match.ongoingGamesMap.get(player.id).gameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
-          const playersAlive: string[] = []
-          match.ongoingGamesMap.forEach((game, playerID) => {
-            if (game.gameInstance.gameState !== GAME_STATE.DEFEAT_SCREEN) {
-              playersAlive.push(playerID);
-            }
-          });
-          if (playersAlive.length === 1) {
-            const winnerID = playersAlive[0];
-            match.ongoingGamesMap.get(winnerID).gameInstance.gameTransitions.onGameVictory();
-          }
+          this.onRankedRoundDefeat(rankedMatchId, player);
         }.bind(this),
         onGameVictory: function (): void {
-          this.updateRankedScore(rankedMatchId, player.id);
+          this.onRankedRoundVictory(rankedMatchId, player);
         }.bind(this)
       };
       const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed);
@@ -137,7 +137,7 @@ export class GameGateway implements OnGatewayDisconnect {
         playerClient: player,
         playerName: player.data.user.username,
         gameInstance: instance,
-        playerSpectators: SPECTATE_PREFIX + player.id,
+        spectatorsRoomName: SPECTATE_PREFIX + player.id,
         queuedInputs: [],
         isProcessing: false,
       }
@@ -145,23 +145,28 @@ export class GameGateway implements OnGatewayDisconnect {
       player.emit(O_RANKED_MATCH_FOUND, vsScreenDTO);
       player.emit(O_RANKED_SETUP_GAME_INSTANCE, gameSetupDTO);
     });
+    players.forEach(player => {
+      this.spectateEnemies(player, rankedMatchId);
+    });
   }
 
   @SubscribeMessage(I_RANKED_MATCH_FOUND_CONFIRMATION)
   playerRankedMatchFoundConfirmation(client: Socket, matchID: string) {
     const match = ongoingRankedMatches.get(matchID);
     match.vsConfirmationMap.set(client.id, true);
-    this.startRankedMatchIfReady(match);
+    console.log("CHECK READY", I_RANKED_MATCH_FOUND_CONFIRMATION);
+    this.loadRankedGameViewIfReady(match);
   }
 
   @SubscribeMessage(I_RANKED_SETUP_GAME_CONFIRMATION)
   playerSetupGameReadyConfirmation(client: Socket, matchID: string) {
     const match = ongoingRankedMatches.get(matchID);
     match.setupConfirmationMap.set(client.id, true);
-    this.startRankedMatchIfReady(match);
+    console.log("CHECK READY", I_RANKED_SETUP_GAME_CONFIRMATION);
+    this.loadRankedGameViewIfReady(match);
   }
 
-  startRankedMatchIfReady(match: Match) {
+  loadRankedGameViewIfReady(match: Match) {
     let allReady = true;
     match.vsConfirmationMap.forEach(ready => {
       if (!ready) {
@@ -178,10 +183,98 @@ export class GameGateway implements OnGatewayDisconnect {
     }
   }
 
-  updateRankedScore(matchID: string, winnerID: string) {
+  @SubscribeMessage(I_RANKED_READY_TO_START_GAME)
+  playerReadyToStartGame(client: Socket, matchID: string) {
+    console.log("CHECK READY", I_RANKED_READY_TO_START_GAME);
+    let allReady = true;
     const match = ongoingRankedMatches.get(matchID);
-    const score = match.scoresMap.get(winnerID);
-    match.scoresMap.set(winnerID, score + 1);
+    match.readyToStartConfirmationMap.set(client.id, true);
+    match.readyToStartConfirmationMap.forEach(ready => {
+      if (!ready) {
+        allReady = false;
+      }
+    });
+    if (allReady) {
+      console.log("ALL READY");
+      this.server.to(match.matchRoomName).emit(O_RANKED_START_GAME);
+    }
+  }
+
+  spectateEnemies(client: Socket, matchID: string) {
+    const match = ongoingRankedMatches.get(matchID);
+    match.ongoingGamesMap.forEach((game, playerID) => {
+      if (playerID !== client.id) {
+        client.join(game.spectatorsRoomName);
+      }
+    });
+  }
+
+  onRankedRoundDefeat(rankedMatchId: string, player: Socket) {
+    const match = ongoingRankedMatches.get(rankedMatchId);
+    match.ongoingGamesMap.get(player.id).gameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
+    this.updatePlayerSpectator(match.ongoingGamesMap.get(player.id));
+    const playersAlive: string[] = []
+    match.ongoingGamesMap.forEach((game, playerID) => {
+      if (game.gameInstance.gameState !== GAME_STATE.DEFEAT_SCREEN) {
+        playersAlive.push(playerID);
+      }
+    });
+    if (playersAlive.length === 1) {
+      const winnerID = playersAlive[0];
+      match.ongoingGamesMap.get(winnerID).gameInstance.gameTransitions.onGameVictory();
+    }
+  }
+
+  onRankedRoundVictory(matchID: string, player: Socket) {
+    const match = ongoingRankedMatches.get(matchID);
+    const score = match.scoresMap.get(player.id);
+    match.scoresMap.set(player.id, score + 1);
+    player.emit(O_RANKED_YOU_WON);
+
+    let matchOver = false;
+    match.scoresMap.forEach(score => {
+      if (score >= match.firstTo) {
+        matchOver = true;
+      }
+    });
+
+    if (!matchOver) {
+      const scoreData: dto_ScoreScreen = {
+        matchID: matchID,
+      }
+      this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_MATCH_SCORE, scoreData);
+      this.prepareNextRound(matchID);
+    } else {
+      const endScreenData: dto_EndScreen = {
+        matchID: matchID,
+      }
+      this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
+    }
+  }
+
+  prepareNextRound(matchID: string) {
+    const match = ongoingRankedMatches.get(matchID);
+    match.setupConfirmationMap.forEach(confirmation => {
+      confirmation = false;
+    });
+    match.readyToStartConfirmationMap.forEach(confirmation => {
+      confirmation = false;
+    });
+    console.log(match.setupConfirmationMap)
+    console.log(match.readyToStartConfirmationMap)
+    const gameSetupDTO: dto_GameSetup = {
+      gameMode: GAME_MODE.RANKED,
+      gameSettings: rankedSettings,
+      seed: getNextSeed(Date.now()),
+      matchID: matchID,
+    }
+    match.ongoingGamesMap.forEach(game => {
+      game.isProcessing = false;
+      game.queuedInputs = [];
+      resetGameInstance(game.gameInstance, gameSetupDTO.seed);
+      this.updatePlayerSpectator(game);
+    });
+    this.server.to(match.matchRoomName).emit(O_RANKED_PREPARE_NEXT_ROUND, gameSetupDTO);
   }
   // #endregion
 
@@ -219,6 +312,19 @@ export class GameGateway implements OnGatewayDisconnect {
       game.isProcessing = false;
     }
   }
+
+  @SubscribeMessage(I_COUNT_DOWN_STATE)
+  countDown(client: Socket, gameStateData: dto_CountDown): void {
+    let game: OngoingGame;
+    if (gameStateData.gameMode === GAME_MODE.RANKED) {
+      const match = ongoingRankedMatches.get(gameStateData.matchID);
+      game = match.ongoingGamesMap.get(client.id);
+    } else if (gameStateData.gameMode === GAME_MODE.SPRINT) {
+      game = ongoingSingeplayerGamesMap.get(client.id);
+    }
+    game.gameInstance.gameState = gameStateData.countDown;
+    this.updatePlayerSpectator(game);
+  }
   // #endregion
 
 
@@ -247,19 +353,12 @@ export class GameGateway implements OnGatewayDisconnect {
       playerClient: client,
       playerName: client.data.user.username,
       gameInstance: createGameInstance(gameMode, gameSettings, handlingSettings, transitions, seed),
-      playerSpectators: SPECTATE_PREFIX + client.id,
+      spectatorsRoomName: SPECTATE_PREFIX + client.id,
       queuedInputs: [],
       isProcessing: false,
     }
     ongoingSingeplayerGamesMap.set(client.id, game);
     this.updateSpectatorEntries();
-  }
-
-  @SubscribeMessage(I_SINGLEPLAYER_COUNT_DOWN_STATE)
-  countDown(client: Socket, gameState: GAME_STATE): void {
-    const game = ongoingSingeplayerGamesMap.get(client.id);
-    game.gameInstance.gameState = gameState;
-    this.updatePlayerSpectator(game);
   }
 
   @SubscribeMessage(I_SINGLEPLAYER_RESET_GAME)
@@ -299,18 +398,18 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(J_PLAYER_SPECTATOR)
   joinPlayerSpectator(client: Socket, playerClientID: string) {
-    const roomname = ongoingSingeplayerGamesMap.get(playerClientID).playerSpectators;
+    const roomname = ongoingSingeplayerGamesMap.get(playerClientID).spectatorsRoomName;
     client.join(roomname);
     client.emit(O_PLAYER_SPECTATOR, this.createGameInstanceDto(playerClientID));
   }
 
   updatePlayerSpectator(game: OngoingGame): void {
-    this.server.to(game.playerSpectators).emit(O_PLAYER_SPECTATOR, this.createGameInstanceDto(game));
+    this.server.to(game.spectatorsRoomName).emit(O_PLAYER_SPECTATOR, this.createGameInstanceDto(game));
   }
 
   @SubscribeMessage(L_PLAYER_SPECTATOR)
   leavePlayerSpectator(client: Socket, playerClientID: string): void {
-    const roomname = ongoingSingeplayerGamesMap.get(playerClientID).playerSpectators;
+    const roomname = ongoingSingeplayerGamesMap.get(playerClientID).spectatorsRoomName;
     client.leave(roomname);
   }
   // #endregion

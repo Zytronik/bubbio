@@ -321,7 +321,6 @@ export default {
         document.body.classList.add('game-view');
         setupSprintGame();
         showGameView();
-        fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
         setTimeout(() => {
           document.body.removeChild(overlay);
           onTransitionEnd();

@@ -51,6 +51,7 @@ export default defineComponent({
 
     onUnmounted(() => {
       network_leaveSpectatorRoom();
+      network_stopSpectating();
       stopSpectatorStatDisplay();
     });
 

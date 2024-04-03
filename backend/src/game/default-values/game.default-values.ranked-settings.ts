@@ -12,7 +12,7 @@ export const rankedSettings: GameSettings = {
     sprintVictoryCondition: Infinity,
     clearFloatingBubbles: true,
     prefillBoard: true,
-    prefillBoardAmount: 0,
+    prefillBoardAmount: 7,
     refillBoard: false,
     refillBoardAtLine: 0,
     refillAmount: 0,
@@ -22,3 +22,5 @@ export const rankedSettings: GameSettings = {
     garbageColorAmount: 3,
     countDownDuration: 3000,
 }
+
+export const rankedFirstTo = 2;

@@ -8,12 +8,14 @@ import { dto_GameSetup } from "./dto/game.network.dto.game-setup";
 import { ToggleMod, MultiMod } from "../settings/ref/i/game.settings.ref.i.mod";
 import { GAME_STATE } from "../i/game.e.state";
 import { dto_Inputs } from "./dto/game.network.dto.input";
+import { dto_CountDown } from "./dto/game.network.dto.count-down";
+import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
 
 const I_QUEUE_INPUTS = "input_queueUpGameInputs";
 const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
+const I_COUNT_DOWN_STATE = "I_COUNT_DOWN_STATE";
 
 const I_SINGLEPLAYER_SETUP_GAME = "I_SINGLEPLAYER_SETUP_GAME";
-const I_SINGLEPLAYER_COUNT_DOWN_STATE = "I_SINGLEPLAYER_COUNT_DOWN_STATE";
 const I_SINGLEPLAYER_RESET_GAME = "I_SINGLEPLAYER_RESET_GAME";
 const I_SINGLEPLAYER_LEAVE_GAME = "I_SINGLEPLAYER_LEAVE_GAME";
 
@@ -27,6 +29,15 @@ export function network_setupGame(playerGameInstance: GameInstance): void {
             matchID: "none",
         }
         state.socket.emit(I_SINGLEPLAYER_SETUP_GAME, networkData);
+        network_listenToQueuedInputsIndex(playerGameInstance);
+        registeredGameEvents.add(O_QUEUE_INPUTS);
+    } else {
+        console.error("YOU DONT HAVE ANY SOCKETS!");
+    }
+}
+
+export function network_listenToQueuedInputsIndex(playerGameInstance: GameInstance): void {
+    if (state.socket && !registeredGameEvents.has(O_QUEUE_INPUTS)) {
         state.socket.on(O_QUEUE_INPUTS, (data: number) => {
             playerGameInstance.processedInputsIndex = data;
         });
@@ -36,9 +47,24 @@ export function network_setupGame(playerGameInstance: GameInstance): void {
     }
 }
 
-export function network_countDownState(gameState: GAME_STATE): void {
+export function network_stopListenToQueuedInputsIndex(): void {
+    if (state.socket && !registeredGameEvents.has(O_QUEUE_INPUTS)) {
+        state.socket.off(O_QUEUE_INPUTS)
+        registeredGameEvents.delete(O_QUEUE_INPUTS);
+    } else {
+        console.error("YOU DONT HAVE ANY SOCKETS!");
+    }
+}
+
+
+export function network_countDownState(matchID: string, gameMode: GAME_MODE, gameState: GAME_STATE): void {
+    const countDownData: dto_CountDown = {
+        matchID: matchID,
+        gameMode: gameMode,
+        countDown: gameState,
+    };
     if (state.socket) {
-        state.socket.emit(I_SINGLEPLAYER_COUNT_DOWN_STATE, gameState);
+        state.socket.emit(I_COUNT_DOWN_STATE, countDownData);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
     }
@@ -73,6 +99,7 @@ export function network_resetGame(seed: number): void {
 export function network_leaveGame(): void {
     if (state.socket) {
         state.socket.emit(I_SINGLEPLAYER_LEAVE_GAME);
+        network_stopListenToQueuedInputsIndex();
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
     }

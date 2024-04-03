@@ -2,19 +2,35 @@ import eventBus from "@/ts/page/page.event-bus";
 import state from "../../networking/networking.client-websocket";
 import { dto_VersusScreen } from "./dto/game.network.dto.vs-screen";
 import { dto_GameSetup } from "./dto/game.network.dto.game-setup";
-import { preparePlayerGameInstance, startGame } from "../game.master";
+import { disableGameplay, playerGameInstance, playerGameVisuals, preparePlayerGameInstance, rankedGameStart, startGame } from "../game.master";
 import { createGameInstance } from "../logic/game.logic.instance-creator";
 import { GameTransitions } from "../i/game.i.game-transitions";
 import { getHandlingSettings } from "../settings/game.settings.handling";
+import { disableBackInputs, disableChannelInput, disableResetInput } from "@/ts/input/input.input-manager";
+import { fillAsciiStrings } from "../visuals/game.visuals.ascii";
+import { GAME_STATE } from "../i/game.e.state";
+import { network_listenToQueuedInputsIndex } from "./game.network.game";
+import { dto_GameInstance } from "./dto/game.network.dto.game-instance";
+import { GameVisuals, getEmptyGameVisuals } from "../visuals/i/game.visuals.i.game-visuals";
+import { fillStatStrings } from "../visuals/game.visuals.stat-display";
+import { dto_EndScreen } from "./dto/game.network.dto.end-screen";
+import { dto_ScoreScreen } from "./dto/game.network.dto.score-screen";
 
 const O_RANKED_MATCH_FOUND = "output_rankedMatchFound";
 const O_RANKED_SETUP_GAME_INSTANCE = "output_rankedSetupGameInstance";
 export const I_RANKED_MATCH_FOUND_CONFIRMATION = "input_rankedMatchFoundConfirmation";
 const I_RANKED_SETUP_GAME_CONFIRMATION = "input_rankedSetupGameConfirmation";
 const O_RANKED_GO_TO_GAME_VIEW = "output_rankedGoToGameView";
+const I_RANKED_READY_TO_START_GAME = "input_rankedReadyToStartGame";
 const O_RANKED_START_GAME = "output_rankedStartGame";
+const O_RANKED_YOU_WON = "output_rankedYouWon";
 const O_RANKED_SHOW_MATCH_SCORE = "output_rankedShowMatchScore";
+export const I_RANKED_READY_FOR_NEXT_ROUND = "input_rankedReadyForNextRound";
+const O_RANKED_PREPARE_NEXT_ROUND = "output_rankedPrepareNextRound";
+const O_RANKED_SHOW_END_SCREEN = "output_rankedShowEndScreen";
 
+const O_PLAYER_SPECTATOR = "update_playerSpectator";
+export const enemyVisuals: GameVisuals = getEmptyGameVisuals();
 export const versusScreenData: dto_VersusScreen = {
     matchID: "",
     player1Data: {
@@ -41,45 +57,31 @@ export const versusScreenData: dto_VersusScreen = {
     },
 
 };
+export const scoreScreenData: dto_ScoreScreen = {
+    matchID: ""
+};
+export const endScreenData: dto_EndScreen = {};
 export function network_listenToMatchFound(): void {
     const socket = state.socket;
     if (socket) {
         socket.on(O_RANKED_MATCH_FOUND, (data: dto_VersusScreen) => {
+            disableResetInput();
+            disableChannelInput();
+            disableBackInputs();
             versusScreenData.matchID = data.matchID;
             versusScreenData.player1Data = data.player1Data;
             versusScreenData.player2Data = data.player2Data;
             eventBus.emit("vue_matchFound");
         });
         socket.on(O_RANKED_SETUP_GAME_INSTANCE, (data: dto_GameSetup) => {
-            const transitions: GameTransitions = {
-                /* eslint-disable @typescript-eslint/no-empty-function */
-                onGameStart: function (): void {
-                    console.log("start");
-                },
-                onGameLeave: () => { },
-                onGameReset: () => { },
-                onGameDefeat: function (): void {
-                    console.log("death");
-                },
-                onGameVictory: function (): void {
-                    console.log("win");
-                },
-                /* eslint-enable @typescript-eslint/no-empty-function */
-            };
-            const instance = createGameInstance(
-                data.gameMode, 
-                data.gameSettings, 
-                getHandlingSettings(), 
-                transitions, 
-                data.seed,
-                data.matchID);
-            preparePlayerGameInstance(instance);
-            //dont forget network_setupGame
+            network_listenToQueuedInputsIndex(playerGameInstance);
+            network_listenToIngameUpdates();
+            setupGameInstance(data);
             socket.emit(I_RANKED_SETUP_GAME_CONFIRMATION, data.matchID);
         });
         socket.on(O_RANKED_GO_TO_GAME_VIEW, () => {
             eventBus.emit("vue_goToGameView");
-            console.log("go to game view")
+            socket.emit(I_RANKED_READY_TO_START_GAME, playerGameInstance.matchID);
         });
         socket.on(O_RANKED_START_GAME, () => {
             startGame();
@@ -89,13 +91,76 @@ export function network_listenToMatchFound(): void {
     }
 }
 
-export function network_stopListeningToMatchFound(): void {
+function network_listenToIngameUpdates(): void {
+    const socket = state.socket;
+    if (socket) {
+        socket.on(O_PLAYER_SPECTATOR, (data: dto_GameInstance) => {
+            fillAsciiStrings(data.gameInstance, enemyVisuals.asciiBoard);
+            fillStatStrings(data.gameInstance, enemyVisuals.statNumbers);
+            enemyVisuals.timeDifference = data.gameInstance.stats.gameDuration - performance.now();
+        });
+        socket.on(O_RANKED_YOU_WON, () => {
+            playerGameInstance.gameTransitions.onGameVictory();
+        });
+        socket.on(O_RANKED_SHOW_MATCH_SCORE, (data: dto_ScoreScreen) => {
+            scoreScreenData.matchID = data.matchID;
+            eventBus.emit("vue_showMatchScore");
+        });
+        socket.on(O_RANKED_SHOW_END_SCREEN, (data: dto_EndScreen) => {
+            // endScreenData.whatever = data.whatever;
+            network_stopListeningToServer();
+            eventBus.emit("vue_showEndScreen");
+        });
+        socket.on(O_RANKED_PREPARE_NEXT_ROUND, (data: dto_GameSetup) => {
+            setupGameInstance(data);
+            socket.emit(I_RANKED_SETUP_GAME_CONFIRMATION, data.matchID);
+        });
+    } else {
+        console.error("YOU DONT HAVE ANY SOCKETS!");
+    }
+}
+
+function setupGameInstance(data: dto_GameSetup): void {
+    const transitions: GameTransitions = {
+        /* eslint-disable @typescript-eslint/no-empty-function */
+        onGameStart: function (): void {
+            rankedGameStart();
+        },
+        onGameLeave: () => { },
+        onGameReset: () => { },
+        onGameDefeat: function (): void {
+            playerGameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
+            disableGameplay();
+        },
+        onGameVictory: function (): void {
+            playerGameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
+            disableGameplay();
+        },
+        /* eslint-enable @typescript-eslint/no-empty-function */
+    };
+    const instance = createGameInstance(
+        data.gameMode, 
+        data.gameSettings, 
+        getHandlingSettings(), 
+        transitions, 
+        data.seed,
+        data.matchID);
+    preparePlayerGameInstance(instance);
+    fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
+    fillAsciiStrings(playerGameInstance, enemyVisuals.asciiBoard);
+}
+
+export function network_stopListeningToServer(): void {
     const socket = state.socket;
     if (socket) {
         socket.off(O_RANKED_MATCH_FOUND);
         socket.off(O_RANKED_SETUP_GAME_INSTANCE);
         socket.off(O_RANKED_GO_TO_GAME_VIEW);
         socket.off(O_RANKED_START_GAME);
+        socket.off(O_RANKED_YOU_WON);
+        socket.off(O_RANKED_SHOW_MATCH_SCORE);
+        socket.off(O_RANKED_SHOW_END_SCREEN);
+        socket.off(O_PLAYER_SPECTATOR);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
     }

@@ -1,4 +1,4 @@
-import { startASCIIAnimation, startCountdownAnimation, stopASCIIAnimation, stopCountdownAnimation } from "./visuals/game.visuals.ascii";
+import { fillAsciiStrings, startASCIIAnimation, startCountdownAnimation, stopASCIIAnimation, stopCountdownAnimation } from "./visuals/game.visuals.ascii";
 import { GameInstance } from "./i/game.i.game-instance";
 import { disableChannelInput, disableGameInputs, disableResetInput, enableChannelInput, enableGameInputs, enableResetInput } from "../input/input.input-manager";
 import { cleanUpAngle } from "./logic/game.logic.angle";
@@ -12,7 +12,7 @@ import { holdBubble } from "./logic/game.logic.bubble-manager";
 import { network_countDownState, network_leaveGame, network_resetGame, network_setupGame, network_sendInputs, submitGameToDB } from "./network/game.network.game";
 import eventBus from "../page/page.event-bus";
 import { getNextSeed } from "./logic/game.logic.random";
-import { GAME_INPUT } from "./network/dto/game.network.dto.game-input";
+import { GAME_INPUT } from "./network/i/game.network.i.game-input";
 import { InputFrame } from "./i/game.i.game-state-history";
 import { GameVisuals } from "./visuals/i/game.visuals.i.game-visuals";
 import { ref } from "vue";
@@ -107,6 +107,7 @@ export function setupSprintGame(): void {
     const startSeed = getNextSeed(Date.now());
     const instance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed, "none");
     preparePlayerGameInstance(instance);
+    fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
     network_setupGame(playerGameInstance)
     function sprintVictory(): void {
         playerGameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
@@ -136,6 +137,7 @@ export function preparePlayerGameInstance(instance: GameInstance): void {
     playerGameInstance.stats = instance.stats;
     playerGameInstance.gameStateHistory = instance.gameStateHistory;
     playerGameInstance.processedInputsIndex = instance.processedInputsIndex;
+    playerGameInstance.matchID = instance.matchID;
     playerGameInstance.gameTransitions = instance.gameTransitions;
 }
 
@@ -148,6 +150,10 @@ export function resetGame(): void {
 }
 export function leaveGame(): void {
     playerGameInstance.gameTransitions.onGameLeave();
+}
+
+export function rankedGameStart(): void {
+    showCountDownAndStart();
 }
 
 
@@ -165,10 +171,10 @@ function showCountDownAndStart(): void {
 export function setGameStateAndNotify(gameState: GAME_STATE): void {
     if (playerGameInstance.gameState != gameState) {
         playerGameInstance.gameState = gameState;
-        network_countDownState(gameState);
+        network_countDownState(playerGameInstance.matchID, playerGameInstance.gameMode, gameState);
     }
 }
-function disableGameplay(): void {
+export function disableGameplay(): void {
     stopCountdownAnimation();
     const stats = playerGameInstance.stats;
     stats.gameEndTime = performance.now();
