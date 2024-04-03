@@ -9,7 +9,7 @@ import { createGameInstance, resetGameInstance } from "./logic/game.logic.instan
 import { GAME_MODE } from "./settings/i/game.settings.e.game-modes";
 import { GameTransitions } from "./i/game.i.game-transitions";
 import { holdBubble } from "./logic/game.logic.bubble-manager";
-import { network_countDownState, network_leaveGame, network_resetGame, network_setupGame, network_synchronizeGame, submitGameToDB } from "./network/game.network.game";
+import { network_countDownState, network_leaveGame, network_resetGame, network_setupGame, network_sendInputs, submitGameToDB } from "./network/game.network.game";
 import { digMod, precisionMod, randomnessMod } from "./settings/ref/game.settings.ref.all-mods";
 import { GameSettings } from "./settings/i/game.settings.i.game-settings";
 import { HandlingSettings } from "./settings/i/game.settings.i.handling-settings";
@@ -106,13 +106,13 @@ function getHandlingSettings(): HandlingSettings {
 
 function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
     if (floating && filled) {
-        return 3;
+        return 200;
     } else if (!floating && filled) {
-        return 3;
+        return 100;
     } else if (floating && !filled) {
-        return 3;
+        return 100;
     } else {
-        return 3;
+        return 50;
     }
 }
 
@@ -196,7 +196,7 @@ export function triggerShoot(): void {
     }
     playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
     executeShot(playerGameInstance);
-    network_synchronizeGame(playerGameInstance);
+    network_sendInputs(playerGameInstance);
 }
 export function triggerHold(): void {
     const inputFrame: InputFrame = {
@@ -207,7 +207,7 @@ export function triggerHold(): void {
     }
     playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
     holdBubble(playerGameInstance);
-    network_synchronizeGame(playerGameInstance);
+    network_sendInputs(playerGameInstance);
 }
 export function debugTriggerGarbage(): void {
     playerGameInstance.queuedGarbage += 1;

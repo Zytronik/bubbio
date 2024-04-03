@@ -209,9 +209,9 @@ export const allInputs: Input[] = [
     backInput,
     channelInput,
     // debugTriggerGarbageInput,
-    debugNetwork1,
-    debugNetwork2,
-    debugNetwork3,
+    // debugNetwork1,
+    // debugNetwork2,
+    // debugNetwork3,
 ]
 
 const allKeyCodes = [

@@ -97,6 +97,8 @@ import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e
 import { UserData } from '@/ts/page/i/page.i.user-data';
 import eventBus from '@/ts/page/page.event-bus';
 import { getRankImagePath } from '@/ts/networking/paths';
+import { network_stopListeningToMatchFound } from '@/ts/game/network/game.network.ranked';
+import { network_listenToMatchFound } from '@/ts/game/network/game.network.ranked';
 
 interface PlayerMatchmakingStats {
   rating: number;
@@ -167,6 +169,7 @@ export default {
       if (state.socket) {
         stopPassedTimeCountdown();
         state.socket.emit('leaveQueue');
+        network_stopListeningToMatchFound();
       }
     }
 
@@ -174,6 +177,7 @@ export default {
       if (state.socket) {
         startPassedTimeCountdown();
         state.socket.emit('enterQueue');
+        network_listenToMatchFound();
       }
     }
 
@@ -214,10 +218,6 @@ export default {
       if (state.socket) {
         state.socket.emit('playerJoinedMmVue');
 
-        state.socket.on('matchFound', () => {
-          matchFound();
-        });
-
         state.socket.on('queueSize', (size: number) => {
           playersInQueue.value = size;
         });
@@ -228,7 +228,7 @@ export default {
       leaveQueue();
       if (state.socket) {
         state.socket.emit('playerLeftMmVue');
-        state.socket.off('matchFound');
+        network_stopListeningToMatchFound()
         state.socket.off('queueSize');
       }
     }
@@ -237,11 +237,13 @@ export default {
       changeBackgroundTo('linear-gradient(45deg, rgba(126,10,41,1) 0%, rgba(144,141,58,1) 100%)');
       fetchPlayerMmStats();
       mountSockets();
+      eventBus.on("vue_matchFound", matchFound);
     });
 
     onUnmounted(() => {
       unmountSockets();
       stopPassedTimeCountdown();
+      eventBus.off("vue_matchFound");
     });
 
     return {

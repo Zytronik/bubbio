@@ -125,17 +125,20 @@ export class MatchmakingService {
         });
     }
 
-    matchFound(userId: number, opponentId: number, onMatched: () => void) {
-        const user = this.queue[userId];
-        const opponent = this.queue[opponentId];
-
-        if (user && opponent) {
-            this.gameGateway.setupRankedGame(user.client, opponent.client);
-            //this.test(userId, opponentId);
-            user.client.emit('matchFound', { userId, opponentId });
-            opponent.client.emit('matchFound', { userId, opponentId });
+    matchFound(player1ID: number, player2ID: number, onMatched: () => void) {
+        const player1 = this.queue[player1ID];
+        const player2 = this.queue[player2ID];
+        if (player1 && player2) {
+            this.gameGateway.setupRankedGame(player1.client, player2.client, player1ID, player1ID);
             onMatched();
         }
+    }
+
+    getVersusScreenDTO(player1ID: number, player1ID: number): dto_VersusScreen {
+        const data: dto_VersusScreen = {
+
+        };
+        return data
     }
 
     async test(userId: number, opponentId: number){

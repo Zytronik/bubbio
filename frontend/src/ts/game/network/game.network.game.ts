@@ -8,12 +8,13 @@ import { dto_GameSetup } from "./dto/game.network.dto.game-setup";
 import { ToggleMod, MultiMod } from "../settings/ref/i/game.settings.ref.i.mod";
 import { GAME_STATE } from "../i/game.e.state";
 
-const I_SETUP_SINGLEPLAYER_GAME = "input_setupSinglePlayerGame";
-const I_COUNT_DOWN_STATE = "input_countDownState";
 const I_QUEUE_INPUTS = "input_queueUpGameInputs";
-const I_RESET_SINGLEPLAYER_GAME = "input_resetSinglePlayerGame";
-const I_LEAVE_SINGLEPLAYER_GAME = "input_leaveSinglePlayerGame";
 const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
+
+const I_SINGLEPLAYER_SETUP_GAME = "I_SINGLEPLAYER_SETUP_GAME";
+const I_SINGLEPLAYER_COUNT_DOWN_STATE = "I_SINGLEPLAYER_COUNT_DOWN_STATE";
+const I_SINGLEPLAYER_RESET_GAME = "I_SINGLEPLAYER_RESET_GAME";
+const I_SINGLEPLAYER_LEAVE_GAME = "I_SINGLEPLAYER_LEAVE_GAME";
 
 const registeredGameEvents: Set<string> = new Set();
 export function network_setupGame(playerGameInstance: GameInstance): void {
@@ -23,7 +24,7 @@ export function network_setupGame(playerGameInstance: GameInstance): void {
             gameSettings: playerGameInstance.gameSettings,
             seed: playerGameInstance.initialSeed,
         }
-        state.socket.emit(I_SETUP_SINGLEPLAYER_GAME, networkData);
+        state.socket.emit(I_SINGLEPLAYER_SETUP_GAME, networkData);
         state.socket.on(O_QUEUE_INPUTS, (data: number) => {
             playerGameInstance.processedInputsIndex = data;
         });
@@ -35,13 +36,13 @@ export function network_setupGame(playerGameInstance: GameInstance): void {
 
 export function network_countDownState(gameState: GAME_STATE): void {
     if (state.socket) {
-        state.socket.emit(I_COUNT_DOWN_STATE, gameState);
+        state.socket.emit(I_SINGLEPLAYER_COUNT_DOWN_STATE, gameState);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
     }
 }
 
-export function network_synchronizeGame(gameInstance: GameInstance): void {
+export function network_sendInputs(gameInstance: GameInstance): void {
     if (state.socket) {
         const history = gameInstance.gameStateHistory.inputHistory;
         for (let i = 0; i < history.length; i++) {
@@ -56,7 +57,7 @@ export function network_synchronizeGame(gameInstance: GameInstance): void {
 
 export function network_resetGame(seed: number): void {
     if (state.socket) {
-        state.socket.emit(I_RESET_SINGLEPLAYER_GAME, seed);
+        state.socket.emit(I_SINGLEPLAYER_RESET_GAME, seed);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
     }
@@ -64,7 +65,7 @@ export function network_resetGame(seed: number): void {
 
 export function network_leaveGame(): void {
     if (state.socket) {
-        state.socket.emit(I_LEAVE_SINGLEPLAYER_GAME);
+        state.socket.emit(I_SINGLEPLAYER_LEAVE_GAME);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
     }
