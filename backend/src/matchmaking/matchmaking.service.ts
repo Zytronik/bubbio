@@ -137,7 +137,7 @@ export class MatchmakingService {
         }
     }
 
-    async getVersusScreenDTO(player1ID: number, player2ID: number): Promise<dto_VersusScreen> {
+    async getVersusScreenDTO(player1ID: number, player2ID: number, givenMatchID): Promise<dto_VersusScreen> {
         const player1Name = await this.userService.getUsernameById(player1ID);
         const player1Profile = await this.userService.getUserProfileByUsername(player1Name);
         const player1Rank = (await this.ranksService.getRankInfo(player1ID)).iconName;
@@ -153,6 +153,7 @@ export class MatchmakingService {
         const player2Glicko = await this.userService.getGlickoRatingsByUserId(player2ID);
 
         const data: dto_VersusScreen = {
+            matchID: givenMatchID,
             player1Data: {
                 playerID: player1ID,
                 playerName: player1Name,

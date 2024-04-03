@@ -90,9 +90,7 @@ export class GameGateway implements OnGatewayDisconnect {
   async setupRankedGame(player1: Socket, player2: Socket, player1ID: number, player2ID: number): Promise<void> {
     const rankedMatchId = player1.id + player2.id;
     const matchRoomName = MATCH_PREFIX + rankedMatchId;
-    const vsScreenDTO: dto_VersusScreen = await this.matchmakingService.{
-      matchID: rankedMatchId,
-    }
+    const vsScreenDTO: dto_VersusScreen = await this.matchmakingService.getVersusScreenDTO(player1ID, player2ID, rankedMatchId)
     const gameSetupDTO: dto_GameSetup = {
       gameMode: GAME_MODE.RANKED,
       gameSettings: rankedSettings,
@@ -166,13 +164,11 @@ export class GameGateway implements OnGatewayDisconnect {
   startRankedMatchIfReady(match: Match) {
     let allReady = true;
     match.vsConfirmationMap.forEach(ready => {
-      console.log("vsConfirmationMap", ready)
       if (!ready) {
         allReady = false;
       }
     });
     match.setupConfirmationMap.forEach(ready => {
-      console.log("setupConfirmationMap", ready)
       if (!ready) {
         allReady = false;
       }
