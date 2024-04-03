@@ -14,8 +14,8 @@ export function createGameInstance(
     gameSettings: GameSettings,
     handlingSettings: HandlingSettings,
     gameTransitions: GameTransitions,
-    startSeed: number): GameInstance {
-
+    startSeed: number,
+    givenMatchID: string): GameInstance {
     const gameInstance: GameInstance = {
         gameMode: gameMode,
         gameSettings: gameSettings,
@@ -46,6 +46,7 @@ export function createGameInstance(
             receivedgarbagehistory: []
         },
         processedInputsIndex: 0,
+        matchID: givenMatchID,
         gameTransitions: gameTransitions,
     }
     if (gameInstance.gameSettings.prefillBoard) {
@@ -85,7 +86,7 @@ export function resetGameInstance(gameInstance: GameInstance, seed: number): voi
     updateBubbleQueueAndCurrent(gameInstance);
 }
 
-function getEmptyStats(gameSettings: GameSettings): GameStats {
+export function getEmptyStats(gameSettings: GameSettings): GameStats {
     const stats: GameStats = {
         gameStartTime: 0,
         gameEndTime: 0,

@@ -7,6 +7,7 @@ import { GameInstance } from "../i/game.i.game-instance";
 import { dto_GameSetup } from "./dto/game.network.dto.game-setup";
 import { ToggleMod, MultiMod } from "../settings/ref/i/game.settings.ref.i.mod";
 import { GAME_STATE } from "../i/game.e.state";
+import { dto_Inputs } from "./dto/game.network.dto.input";
 
 const I_QUEUE_INPUTS = "input_queueUpGameInputs";
 const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
@@ -23,6 +24,7 @@ export function network_setupGame(playerGameInstance: GameInstance): void {
             gameMode: playerGameInstance.gameMode,
             gameSettings: playerGameInstance.gameSettings,
             seed: playerGameInstance.initialSeed,
+            matchID: "none",
         }
         state.socket.emit(I_SINGLEPLAYER_SETUP_GAME, networkData);
         state.socket.on(O_QUEUE_INPUTS, (data: number) => {
@@ -43,13 +45,18 @@ export function network_countDownState(gameState: GAME_STATE): void {
 }
 
 export function network_sendInputs(gameInstance: GameInstance): void {
+    const inputdata: dto_Inputs = {
+        gameMode: gameInstance.gameMode,
+        matchID: gameInstance.matchID,
+        inputs: [],
+    };
     if (state.socket) {
         const history = gameInstance.gameStateHistory.inputHistory;
         for (let i = 0; i < history.length; i++) {
             history[i].indexID = i;
         }
-        const inputQueue = gameInstance.gameStateHistory.inputHistory.slice(gameInstance.processedInputsIndex);
-        state.socket.emit(I_QUEUE_INPUTS, inputQueue);
+        inputdata.inputs = gameInstance.gameStateHistory.inputHistory.slice(gameInstance.processedInputsIndex);
+        state.socket.emit(I_QUEUE_INPUTS, inputdata);
     } else {
         console.error("YOU DONT HAVE ANY SOCKETS!");
     }

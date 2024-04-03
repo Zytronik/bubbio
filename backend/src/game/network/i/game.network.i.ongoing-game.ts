@@ -6,7 +6,6 @@ export interface OngoingGame {
     playerClient: Socket,
     playerName: string,
     gameInstance: GameInstance,
-    enemySpectators: string,
     playerSpectators: string,
     queuedInputs: InputFrame[],
     isProcessing: boolean,

@@ -5,4 +5,5 @@ export interface dto_GameSetup {
     gameMode: GAME_MODE;
     gameSettings: GameSettings;
     seed: number;
+    matchID: string;
 }

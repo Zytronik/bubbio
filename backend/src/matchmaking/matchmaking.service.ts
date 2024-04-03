@@ -134,12 +134,12 @@ export class MatchmakingService {
         }
     }
 
-    getVersusScreenDTO(player1ID: number, player1ID: number): dto_VersusScreen {
-        const data: dto_VersusScreen = {
+    // getVersusScreenDTO(player1ID: number, player1ID: number): dto_VersusScreen {
+    //     const data: dto_VersusScreen = {
 
-        };
-        return data
-    }
+    //     };
+    //     return data
+    // }
 
     async test(userId: number, opponentId: number){
         const user = await this.userService.getGlickoRatingsByUserId(userId);

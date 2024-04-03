@@ -5,16 +5,11 @@ import { cleanUpAngle } from "./logic/game.logic.angle";
 import { angleLeftInput, angleRightInput } from "../input/input.all-inputs";
 import { executeShot } from "./logic/game.logic.shoot";
 import { resetStatDisplays, startStatDisplay, stopStatDisplay } from "./visuals/game.visuals.stat-display";
-import { createGameInstance, resetGameInstance } from "./logic/game.logic.instance-creator";
+import { createGameInstance, getEmptyStats, resetGameInstance } from "./logic/game.logic.instance-creator";
 import { GAME_MODE } from "./settings/i/game.settings.e.game-modes";
 import { GameTransitions } from "./i/game.i.game-transitions";
 import { holdBubble } from "./logic/game.logic.bubble-manager";
 import { network_countDownState, network_leaveGame, network_resetGame, network_setupGame, network_sendInputs, submitGameToDB } from "./network/game.network.game";
-import { digMod, precisionMod, randomnessMod } from "./settings/ref/game.settings.ref.all-mods";
-import { GameSettings } from "./settings/i/game.settings.i.game-settings";
-import { HandlingSettings } from "./settings/i/game.settings.i.handling-settings";
-import { GARBAGE_CLEAN_AMOUNT, COLLISION_DETECTION_FACTOR, GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH, MAX_ANGLE, GARBAGE_MAX_AT_ONCE, MIN_ANGLE, QUEUE_PREVIEW_SIZE, REFILL_AMOUNT, WIDTH_PRECISION_UNITS, GARBAGE_COLOR_AMOUNT, COUNTDOWN_DURATION } from "./settings/ref/game.settings.ref.all-game-settings";
-import { DEFAULT_APS, TOGGLE_APS } from "./settings/ref/game.settings.ref.all-handling-settings";
 import eventBus from "../page/page.event-bus";
 import { getNextSeed } from "./logic/game.logic.random";
 import { GAME_INPUT } from "./network/dto/game.network.dto.game-input";
@@ -23,6 +18,9 @@ import { GameVisuals } from "./visuals/i/game.visuals.i.game-visuals";
 import { ref } from "vue";
 import { createStatGraphData } from "./logic/game.logic.stat-tracker";
 import { GAME_STATE } from "./i/game.e.state";
+import { getSprintSettings } from "./settings/game.settings.sprint";
+import { getHandlingSettings } from "./settings/game.settings.handling";
+import { setupGrid } from "./logic/game.logic.grid-manager";
 
 export const playerGameVisuals: GameVisuals = {
     asciiBoard: {
@@ -42,17 +40,73 @@ export const playerGameVisuals: GameVisuals = {
     },
     timeDifference: 0,
 };
-export let playerGameInstance: GameInstance;
+export const playerGameInstance: GameInstance = {
+    gameMode: GAME_MODE.SPRINT,
+    gameSettings: getSprintSettings(),
+    handlingSettings: getHandlingSettings(),
+    initialSeed: 0,
+    gameState: GAME_STATE.IS_IN_MENU,
+    bubbleSeed: 0,
+    garbageSeed: 0,
+    angle: 0,
+    currentAPS: 0,
+    currentBubble: {
+        color: "",
+        ascii: "",
+        type: 0
+    },
+    bubbleQueue: [],
+    playGrid: setupGrid(getSprintSettings()),
+    queuedGarbage: 0,
+    stats: getEmptyStats(getSprintSettings()),
+    gameStateHistory: {
+        inputHistory: [],
+        boardHistory: [],
+        bubbleQueueHistory: [],
+        angleHistory: [],
+        sentgarbagehistory: [],
+        receivedgarbagehistory: []
+    },
+    processedInputsIndex: 0,
+    matchID: "none",
+    gameTransitions: {
+        /* eslint-disable @typescript-eslint/no-empty-function */
+        onGameStart: () => { },
+        onGameLeave: () => { },
+        onGameReset: () => { },
+        onGameDefeat: () => { },
+        onGameVictory: () => { },
+        /* eslint-enable @typescript-eslint/no-empty-function */
+    },
+};
 export function setupSprintGame(): void {
     const gameMode = GAME_MODE.SPRINT;
-    const transitions: GameTransitions = {
-        onGameDefeat: sprintDeath,
-        onGameVictory: sprintVictory
-    }
     const gameSettings = getSprintSettings();
     const handlingSettings = getHandlingSettings();
+    const transitions: GameTransitions = {
+        onGameStart: function (): void {
+            enableResetInput();
+            disableChannelInput();
+            showCountDownAndStart();
+        },
+        onGameLeave: function (): void {
+            disableResetInput();
+            enableChannelInput();
+            disableGameplay();
+            network_leaveGame();
+        },
+        onGameReset: function (): void {
+            disableGameplay();
+            resetGameInstance(playerGameInstance, getNextSeed(Date.now()));
+            network_resetGame(playerGameInstance.initialSeed);
+            showCountDownAndStart();
+        },
+        onGameDefeat: sprintDeath,
+        onGameVictory: sprintVictory,
+    }
     const startSeed = getNextSeed(Date.now());
-    playerGameInstance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed);
+    const instance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed, "none");
+    preparePlayerGameInstance(instance);
     network_setupGame(playerGameInstance)
     function sprintVictory(): void {
         playerGameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
@@ -65,75 +119,37 @@ export function setupSprintGame(): void {
         disableGameplay();
     }
 }
-
-function getSprintSettings(): GameSettings {
-    const floating = !precisionMod.enabled;
-    const filled = digMod.enabled;
-    const bagSize = randomnessMod.selected;
-    let prefillAmount = Math.floor(GRID_HEIGHT.defaultValue / 2);
-    prefillAmount = (prefillAmount % 2 === 0) ? prefillAmount - 1 : prefillAmount;
-    const refillAmount = Math.ceil(prefillAmount / 2);
-    return {
-        gridWidth: GRID_WIDTH.defaultValue,
-        gridHeight: GRID_HEIGHT.defaultValue,
-        gridExtraHeight: GRID_EXTRA_HEIGHT.defaultValue,
-        minAngle: MIN_ANGLE.defaultValue,
-        maxAngle: MAX_ANGLE.defaultValue,
-        queuePreviewSize: QUEUE_PREVIEW_SIZE.defaultValue,
-        widthPrecisionUnits: WIDTH_PRECISION_UNITS.defaultValue,
-        collisionDetectionFactor: COLLISION_DETECTION_FACTOR.defaultValue,
-        sprintVictoryCondition: getSprintVictoryCondition(filled, floating),
-        clearFloatingBubbles: floating,
-        prefillBoard: filled,
-        prefillBoardAmount: prefillAmount,
-        refillBoard: filled,
-        refillBoardAtLine: refillAmount,
-        refillAmount: REFILL_AMOUNT.defaultValue,
-        bubbleBagSize: bagSize,
-        garbageMaxAtOnce: GARBAGE_MAX_AT_ONCE.defaultValue,
-        garbageCleanAmount: GARBAGE_CLEAN_AMOUNT.defaultValue,
-        garbageColorAmount: GARBAGE_COLOR_AMOUNT.defaultValue,
-        countDownDuration: COUNTDOWN_DURATION.defaultValue,
-    };
-}
-
-function getHandlingSettings(): HandlingSettings {
-    return {
-        defaultAPS: DEFAULT_APS.defaultValue,
-        toggleAPS: TOGGLE_APS.defaultValue,
-    };
-}
-
-function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
-    if (floating && filled) {
-        return 200;
-    } else if (!floating && filled) {
-        return 100;
-    } else if (floating && !filled) {
-        return 100;
-    } else {
-        return 50;
-    }
+export function preparePlayerGameInstance(instance: GameInstance): void {
+    playerGameInstance.gameMode = instance.gameMode;
+    playerGameInstance.gameSettings = instance.gameSettings;
+    playerGameInstance.handlingSettings = instance.handlingSettings;
+    playerGameInstance.initialSeed = instance.initialSeed;
+    playerGameInstance.gameState = instance.gameState;
+    playerGameInstance.bubbleSeed = instance.bubbleSeed;
+    playerGameInstance.garbageSeed = instance.garbageSeed;
+    playerGameInstance.angle = instance.angle;
+    playerGameInstance.currentAPS = instance.currentAPS;
+    playerGameInstance.currentBubble = instance.currentBubble;
+    playerGameInstance.bubbleQueue = instance.bubbleQueue;
+    playerGameInstance.playGrid = instance.playGrid;
+    playerGameInstance.queuedGarbage = instance.queuedGarbage;
+    playerGameInstance.stats = instance.stats;
+    playerGameInstance.gameStateHistory = instance.gameStateHistory;
+    playerGameInstance.processedInputsIndex = instance.processedInputsIndex;
+    playerGameInstance.gameTransitions = instance.gameTransitions;
 }
 
 
 export function startGame(): void {
-    enableResetInput();
-    disableChannelInput();
-    showCountDownAndStart();
+    playerGameInstance.gameTransitions.onGameStart();
 }
 export function resetGame(): void {
-    disableGameplay();
-    resetGameInstance(playerGameInstance, getNextSeed(Date.now()));
-    network_resetGame(playerGameInstance.initialSeed);
-    showCountDownAndStart();
+    playerGameInstance.gameTransitions.onGameReset();
 }
 export function leaveGame(): void {
-    disableResetInput();
-    enableChannelInput();
-    disableGameplay();
-    network_leaveGame();
+    playerGameInstance.gameTransitions.onGameLeave();
 }
+
 
 function showCountDownAndStart(): void {
     resetStatDisplays(playerGameVisuals.statNumbers);

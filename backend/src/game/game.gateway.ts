@@ -5,7 +5,7 @@ import { OngoingGame } from './network/i/game.network.i.ongoing-game';
 import { createGameInstance, resetGameInstance } from './logic/game.logic.instance-creator';
 import { GameTransitions } from './i/game.i.game-transitions';
 import { InputFrame } from './i/game.i.game-state-history';
-import { GAME_INPUT } from './network/dto/game.network.dto.game-input';
+import { GAME_INPUT } from './network/i/game.network.i.game-input';
 import { executeShot } from './logic/game.logic.shoot';
 import { holdBubble } from './logic/game.logic.bubble-manager';
 import { dto_GameInstance } from './network/dto/game.network.dto.game-instance';
@@ -17,6 +17,7 @@ import { defaultHandlingSettings } from './default-values/game.default-values.ha
 import { GAME_MODE } from './settings/i/game.settings.e.game-modes';
 import { rankedSettings } from './default-values/game.default-values.ranked-settings';
 import { getNextSeed } from './logic/game.logic.random';
+import { dto_Inputs } from './network/dto/game.network.dto.input';
 
 
 /*
@@ -33,6 +34,7 @@ const O_RANKED_MATCH_FOUND = "output_rankedMatchFound";
 const O_RANKED_SETUP_GAME_INSTANCE = "output_rankedSetupGameInstance";
 const I_RANKED_MATCH_FOUND_CONFIRMATION = "input_rankedMatchFoundConfirmation";
 const I_RANKED_SETUP_GAME_CONFIRMATION = "input_rankedSetupGameConfirmation";
+const O_RANKED_GO_TO_GAME_VIEW = "output_rankedGoToGameView";
 const O_RANKED_START_GAME = "output_rankedStartGame";
 const O_RANKED_SHOW_MATCH_SCORE = "output_rankedShowMatchScore";
 
@@ -56,8 +58,8 @@ const DI_GET_ONGOING_GAMES = "debugInput_getAllOngoingGames";
 const DO_GET_ONGOING_GAMES = "debugOutput_getAllOngoingGames";
 const DI_CLEAR_ONGOING_GAMES = "debugInput_clearAllOngoingGames";
 
+const MATCH_PREFIX = "match_";
 const SPECTATE_PREFIX = "spectate_";
-const ENEMY_SPECTATE_PREFIX = "enemySpectate_";
 const spectatorRoomName = 'spectatorRoom';
 const ongoingRankedMatches: Map<string, Match> = new Map(); //<client.id + client2.id, RankedMatch
 const ongoingSingeplayerGamesMap: Map<string, OngoingGame> = new Map(); //<client.id: string, OngoingGame>
@@ -79,15 +81,20 @@ export class GameGateway implements OnGatewayDisconnect {
 
   // #region Ranked
   setupRankedGame(player1: Socket, player2: Socket, player1ID: number, player2ID: number): void {
-    const vsScreenDTO: dto_VersusScreen = getVersusScreenDTO(player1ID, player2ID);
+    const rankedMatchId = player1.id + player2.id;
+    const matchRoomName = MATCH_PREFIX + rankedMatchId;
+    const vsScreenDTO: dto_VersusScreen = {
+      matchID: rankedMatchId,
+    }
     const gameSetupDTO: dto_GameSetup = {
       gameMode: GAME_MODE.RANKED,
       gameSettings: rankedSettings,
       seed: getNextSeed(Date.now()),
+      matchID: rankedMatchId,
     }
-    const rankedMatchId = player1.id + player2.id;
     const rankedMatch: Match = {
       matchID: rankedMatchId,
+      matchRoomName: matchRoomName,
       vsConfirmationMap: new Map(),
       setupConfirmationMap: new Map(),
       ongoingGamesMap: new Map(),
@@ -97,11 +104,10 @@ export class GameGateway implements OnGatewayDisconnect {
 
     const players: Socket[] = [player1, player2];
     players.forEach(player => {
-      console.log(player.data.user.username)
+      player.join(matchRoomName);
       rankedMatch.vsConfirmationMap.set(player.id, false);
       rankedMatch.setupConfirmationMap.set(player.id, false);
       rankedMatch.scoresMap.set(player.id, 0);
-
       const transitions: GameTransitions = {
         onGameDefeat: function (): void {
           const match = ongoingRankedMatches.get(rankedMatchId);
@@ -118,7 +124,7 @@ export class GameGateway implements OnGatewayDisconnect {
           }
         }.bind(this),
         onGameVictory: function (): void {
-          throw new Error('Function not implemented.');
+          this.updateRankedScore(rankedMatchId, player.id);
         }.bind(this)
       };
       const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed);
@@ -126,7 +132,6 @@ export class GameGateway implements OnGatewayDisconnect {
         playerClient: player,
         playerName: player.data.user.username,
         gameInstance: instance,
-        enemySpectators: ENEMY_SPECTATE_PREFIX + player.id,
         playerSpectators: SPECTATE_PREFIX + player.id,
         queuedInputs: [],
         isProcessing: false,
@@ -140,35 +145,56 @@ export class GameGateway implements OnGatewayDisconnect {
   @SubscribeMessage(I_RANKED_MATCH_FOUND_CONFIRMATION)
   playerRankedMatchFoundConfirmation(client: Socket, matchID: string) {
     const match = ongoingRankedMatches.get(matchID);
-    match.ongoingGamesMap.forEach((game, key) => {
-      const gameSetupDTO: dto_GameSetup = {
-        gameMode: GAME_MODE.RANKED,
-        gameSettings: rankedSettings,
-        seed: getNextSeed(Date.now()),
-      }
-      game.playerClient.emit(O_SETUP_RANKED_GAME, gameSetupDTO);
-    });
+    match.vsConfirmationMap.set(client.id, true);
+    this.startRankedMatchIfReady(match);
   }
 
-  @SubscribeMessage(I_SETUP_RANKED_GAME_CONFIRMATION)
+  @SubscribeMessage(I_RANKED_SETUP_GAME_CONFIRMATION)
   playerSetupGameReadyConfirmation(client: Socket, matchID: string) {
+    const match = ongoingRankedMatches.get(matchID);
+    match.setupConfirmationMap.set(client.id, true);
+    this.startRankedMatchIfReady(match);
+  }
 
+  startRankedMatchIfReady(match: Match) {
+    let allReady = true;
+    match.vsConfirmationMap.forEach(ready => {
+      console.log("vsConfirmationMap", ready)
+      if (!ready) {
+        allReady = false;
+      }
+    });
+    match.setupConfirmationMap.forEach(ready => {
+      console.log("setupConfirmationMap", ready)
+      if (!ready) {
+        allReady = false;
+      }
+    });
+    if (allReady) {
+      this.server.to(match.matchRoomName).emit(O_RANKED_GO_TO_GAME_VIEW);
+    }
   }
 
   updateRankedScore(matchID: string, winnerID: string) {
     const match = ongoingRankedMatches.get(matchID);
     const score = match.scoresMap.get(winnerID);
     match.scoresMap.set(winnerID, score + 1);
-
   }
   // #endregion
 
 
   // #region Gameplay
   @SubscribeMessage(I_QUEUE_INPUTS)
-  queueUpGameInputs(client: Socket, gameInputs: InputFrame[]): void {
-    const game = ongoingSingeplayerGamesMap.get(client.id);
-    gameInputs.forEach(inputFrame => game.queuedInputs[inputFrame.indexID] = inputFrame);
+  queueUpGameInputs(client: Socket, inputData: dto_Inputs): void {
+    let game: OngoingGame;
+    if (inputData.gameMode === GAME_MODE.RANKED) {
+      const match = ongoingRankedMatches.get(inputData.matchID);
+      game = match.ongoingGamesMap.get(client.id);
+    } else if (inputData.gameMode === GAME_MODE.SPRINT) {
+      game = ongoingSingeplayerGamesMap.get(client.id);
+    }
+
+    inputData.inputs.forEach(inputFrame => game.queuedInputs[inputFrame.indexID] = inputFrame);
     client.emit(O_QUEUE_INPUTS, game.queuedInputs.length);
 
     if (!game.isProcessing) {
@@ -218,7 +244,6 @@ export class GameGateway implements OnGatewayDisconnect {
       playerClient: client,
       playerName: client.data.user.username,
       gameInstance: createGameInstance(gameMode, gameSettings, handlingSettings, transitions, seed),
-      enemySpectators: ENEMY_SPECTATE_PREFIX + client.id,
       playerSpectators: SPECTATE_PREFIX + client.id,
       queuedInputs: [],
       isProcessing: false,
