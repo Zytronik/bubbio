@@ -17,6 +17,8 @@ import { defaultHandlingSettings } from './default-values/game.default-values.ha
 import { GAME_MODE } from './settings/i/game.settings.e.game-modes';
 import { rankedSettings } from './default-values/game.default-values.ranked-settings';
 import { getNextSeed } from './logic/game.logic.random';
+import { MatchmakingService } from 'src/matchmaking/matchmaking.service';
+import { Inject, forwardRef } from '@nestjs/common';
 
 
 /*
@@ -67,6 +69,11 @@ export class GameGateway implements OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
+  constructor(
+    @Inject(forwardRef(() => MatchmakingService))
+    private matchmakingService: MatchmakingService,
+  ) { }
+
   handleDisconnect(client: Socket) {
     const game = ongoingSingeplayerGamesMap.get(client.id);
     if (game) {
@@ -78,8 +85,8 @@ export class GameGateway implements OnGatewayDisconnect {
   }
 
   // #region Ranked
-  setupRankedGame(player1: Socket, player2: Socket, player1ID: number, player2ID: number): void {
-    const vsScreenDTO: dto_VersusScreen = getVersusScreenDTO(player1ID, player2ID);
+  async setupRankedGame(player1: Socket, player2: Socket, player1ID: number, player2ID: number): Promise<void> {
+    const vsScreenDTO: dto_VersusScreen = await this.matchmakingService.getVersusScreenDTO(player1ID, player2ID);
     const gameSetupDTO: dto_GameSetup = {
       gameMode: GAME_MODE.RANKED,
       gameSettings: rankedSettings,
@@ -146,14 +153,14 @@ export class GameGateway implements OnGatewayDisconnect {
         gameSettings: rankedSettings,
         seed: getNextSeed(Date.now()),
       }
-      game.playerClient.emit(O_SETUP_RANKED_GAME, gameSetupDTO);
+      //game.playerClient.emit(O_SETUP_RANKED_GAME, gameSetupDTO);
     });
   }
 
-  @SubscribeMessage(I_SETUP_RANKED_GAME_CONFIRMATION)
+/*   @SubscribeMessage(I_SETUP_RANKED_GAME_CONFIRMATION)
   playerSetupGameReadyConfirmation(client: Socket, matchID: string) {
 
-  }
+  } */
 
   updateRankedScore(matchID: string, winnerID: string) {
     const match = ongoingRankedMatches.get(matchID);

@@ -6,6 +6,11 @@ export interface dto_VersusScreen {
 interface playerData {
     playerID: number;
     playerName: string;
-    playerRank: number;
+    playerRank: string;
+    playerGlobalRank: number;
+    playerNationalRank: number;
     playerGlicko: number;
+    playerRD: number;
+    playerProfilePicture: string;
+    playerCountry: string;
 }

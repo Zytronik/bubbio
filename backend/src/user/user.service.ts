@@ -116,6 +116,19 @@ export class UserService {
         return user;
     }
 
+    async getUsernameById(userId: number): Promise<string> {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { username: true },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        return user.username;
+    }
+
     async getUserSprintRank(username: string): Promise<number | null> {
         // Step 1: Get the user's best sprint time
         const userBestTimeRecord = await this.prisma.sprint.findFirst({
