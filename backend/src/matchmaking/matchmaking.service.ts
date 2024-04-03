@@ -5,6 +5,8 @@ import { GameGateway } from 'src/game/game.gateway';
 import { MatchmakingGateway } from './matchmaking.gateway';
 import { GlickoService } from 'src/ranked/glicko.service';
 import { UserService } from 'src/user/user.service';
+import { dto_VersusScreen } from 'src/game/network/dto/game.network.dto.vs-screen';
+import { RanksService } from 'src/ranked/ranks.service';
 
 interface UserMatchmakingData {
     glicko: number;
@@ -34,6 +36,7 @@ export class MatchmakingService {
         private gameGateway: GameGateway,
         @Inject(forwardRef(() => MatchmakingGateway))
         private matchmakingGateway: MatchmakingGateway,
+        private ranksService: RanksService
     ) { }
 
     userJoinedMmVue(client: Socket){
@@ -134,12 +137,47 @@ export class MatchmakingService {
         }
     }
 
-    // getVersusScreenDTO(player1ID: number, player1ID: number): dto_VersusScreen {
-    //     const data: dto_VersusScreen = {
+    async getVersusScreenDTO(player1ID: number, player2ID: number): Promise<dto_VersusScreen> {
+        const player1Name = await this.userService.getUsernameById(player1ID);
+        const player1Profile = await this.userService.getUserProfileByUsername(player1Name);
+        const player1Rank = (await this.ranksService.getRankInfo(player1ID)).iconName;
+        const player1GlobalRank = await this.userService.getGlobalRank(player1ID);
+        const player1NationalRank = await this.userService.getNationalRank(player1ID);
+        const player1Glicko = await this.userService.getGlickoRatingsByUserId(player1ID);
 
-    //     };
-    //     return data
-    // }
+        const player2Name = await this.userService.getUsernameById(player2ID);
+        const player2Profile = await this.userService.getUserProfileByUsername(player2Name);
+        const player2Rank = (await this.ranksService.getRankInfo(player2ID)).iconName;
+        const player2GlobalRank = await this.userService.getGlobalRank(player2ID);
+        const player2NationalRank = await this.userService.getNationalRank(player2ID);
+        const player2Glicko = await this.userService.getGlickoRatingsByUserId(player2ID);
+
+        const data: dto_VersusScreen = {
+            player1Data: {
+                playerID: player1ID,
+                playerName: player1Name,
+                playerRank: player1Rank,
+                playerGlobalRank: player1GlobalRank,
+                playerNationalRank: player1NationalRank,
+                playerGlicko: player1Glicko.rating,
+                playerRD: player1Glicko.ratingDeviation,
+                playerProfilePicture: player1Profile.pbUrl,
+                playerCountry: player1Profile.country,
+            },
+            player2Data: {
+                playerID: player2ID,
+                playerName: player2Name,
+                playerRank: player2Rank,
+                playerGlobalRank: player2GlobalRank,
+                playerNationalRank: player2NationalRank,
+                playerGlicko: player2Glicko.rating,
+                playerRD: player2Glicko.ratingDeviation,
+                playerProfilePicture: player2Profile.pbUrl,
+                playerCountry: player2Profile.country,
+            }
+        };
+        return data
+    }
 
     async test(userId: number, opponentId: number){
         const user = await this.userService.getGlickoRatingsByUserId(userId);

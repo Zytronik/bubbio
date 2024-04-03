@@ -18,6 +18,8 @@ import { GAME_MODE } from './settings/i/game.settings.e.game-modes';
 import { rankedSettings } from './default-values/game.default-values.ranked-settings';
 import { getNextSeed } from './logic/game.logic.random';
 import { dto_Inputs } from './network/dto/game.network.dto.input';
+import { MatchmakingService } from 'src/matchmaking/matchmaking.service';
+import { Inject, forwardRef } from '@nestjs/common';
 
 
 /*
@@ -69,6 +71,11 @@ export class GameGateway implements OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
+  constructor(
+    @Inject(forwardRef(() => MatchmakingService))
+    private matchmakingService: MatchmakingService,
+  ) { }
+
   handleDisconnect(client: Socket) {
     const game = ongoingSingeplayerGamesMap.get(client.id);
     if (game) {
@@ -80,10 +87,10 @@ export class GameGateway implements OnGatewayDisconnect {
   }
 
   // #region Ranked
-  setupRankedGame(player1: Socket, player2: Socket, player1ID: number, player2ID: number): void {
+  async setupRankedGame(player1: Socket, player2: Socket, player1ID: number, player2ID: number): Promise<void> {
     const rankedMatchId = player1.id + player2.id;
     const matchRoomName = MATCH_PREFIX + rankedMatchId;
-    const vsScreenDTO: dto_VersusScreen = {
+    const vsScreenDTO: dto_VersusScreen = await this.matchmakingService.{
       matchID: rankedMatchId,
     }
     const gameSetupDTO: dto_GameSetup = {

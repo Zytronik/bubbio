@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { MatchmakingGateway } from './matchmaking.gateway';
 import { MatchmakingController } from './matchmaking.controller';
@@ -8,8 +8,9 @@ import { RankedModule } from 'src/ranked/ranked.module';
 import { UsersModule } from 'src/user/user.module';
 
 @Module({
-    imports: [PrismaModule, GameModule, RankedModule, UsersModule],
+    imports: [PrismaModule, forwardRef(() => GameModule), RankedModule, UsersModule],
     controllers: [MatchmakingController],
     providers: [MatchmakingGateway, MatchmakingService],
+    exports: [MatchmakingService],
 })
 export class MatchmakingModule { }
