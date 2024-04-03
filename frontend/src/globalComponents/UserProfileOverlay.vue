@@ -9,13 +9,19 @@
                 <div class="profile-banner" :style="{ backgroundImage: `url(${profileBannerImagePath})` }"></div>
                 <div class="user-profile-inner-container">
                     <div class="user-profile-meta">
+                        <div v-if="isLoggedIn && !isMyProfile" class="friend-toggle">
+                            <button title="add Friend" @click="isFriend ? removeFriend(userData.id) : addFriend(userData.id)">
+                                {{ isFriend ? '♥' : '♡' }}
+                            </button>
+                        </div>
                         <img class="profile-pic" :src="profilePicImagePath" alt="Profile Picture">
                         <h2>{{ userData.username.toUpperCase() }}<span class="online-status"
                                 :title="isUserOnline !== 'notFound' ? 'Online' : ''"
                                 :class="{ 'online': isUserOnline !== 'notFound' }">{{}}</span></h2>
                         <p v-if="userData.id < 4">Since the Beginning</p>
                         <p v-else>Joined: {{ formattedDate }}</p>
-                        <p v-if="isUserOnline !== 'notFound' || userData.LastDisconnectedAt">Last seen: {{ getLastSeenText(userData.LastDisconnectedAt) }}</p>
+                        <p v-if="isUserOnline !== 'notFound' || userData.LastDisconnectedAt">Last seen: {{
+                            getLastSeenText(userData.LastDisconnectedAt) }}</p>
                         <div class="user-country">
                             <p v-if="userData.country">{{ userData.country }}</p>
                             <img class="user-flag" v-if="userData.countryCode && userData.country" :src="flagImagePath"
@@ -26,12 +32,16 @@
                     <h3>Sprint</h3>
                     <div v-if="userData.sprintStats.rank">
                         <p>Leaderboard Rank: {{ userData.sprintStats.rank }}</p>
-                        <p>Average Bubbles Cleared: {{ Math.round(userData.sprintStats.averageBubblesCleared * 100) / 100 }}
+                        <p>Average Bubbles Cleared: {{ Math.round(userData.sprintStats.averageBubblesCleared * 100) /
+                            100 }}
                         </p>
-                        <p>Average Bubbles Per Second: {{ Math.round(userData.sprintStats.averageBubblesPerSecond * 100) /
+                        <p>Average Bubbles Per Second: {{ Math.round(userData.sprintStats.averageBubblesPerSecond * 100)
+                            /
                             100 }}</p>
-                        <p>Average Bubbles Shot: {{ Math.round(userData.sprintStats.averageBubblesShot * 100) / 100 }}</p>
-                        <p>Average Sprint Time: {{ formatTimeNumberToString(userData.sprintStats.averageSprintTime) }}</p>
+                        <p>Average Bubbles Shot: {{ Math.round(userData.sprintStats.averageBubblesShot * 100) / 100 }}
+                        </p>
+                        <p>Average Sprint Time: {{ formatTimeNumberToString(userData.sprintStats.averageSprintTime) }}
+                        </p>
                         <p>Games Played: {{ Math.round(userData.sprintStats.sprintGamesPlayed * 100) / 100 }}</p>
                     </div>
                     <div v-else>
@@ -49,8 +59,13 @@ import { httpClient } from '@/ts/networking/networking.http-client';
 import { getDefaultProfileBannerURL, getDefaultProfilePbURL } from '@/ts/networking/paths';
 import state from '@/ts/networking/networking.client-websocket';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
+import { checkUserAuthentication } from '@/ts/networking/networking.auth';
+import { formatDateToAgoText } from '@/ts/page/page.page-utils';
+import { UserData } from '@/ts/page/i/page.i.user-data';
+import eventBus from '@/ts/page/page.event-bus';
+import { getFriends } from '@/ts/page/page.page-requests';
 
-interface UserData {
+interface ProfileData {
     id: number;
     username: string;
     createdAt: Date;
@@ -59,8 +74,14 @@ interface UserData {
     pbUrl: string;
     bannerUrl: string;
     LastDisconnectedAt: Date;
+    friends: userFriend[];
     sprintStats: SprintStats;
     // ... other user fields
+}
+
+interface userFriend{
+    id: number;
+    username: string;
 }
 
 interface SprintStats {
@@ -79,13 +100,17 @@ export default defineComponent({
     },
     emits: ['close-overlay'],
     setup(props, { emit }) {
-        const userData = ref<UserData | null>(null);
+        const profileData = ref<ProfileData | null>(null);
+        const userData = ref<UserData | null> (eventBus.getUserData());
+        const isFriend = ref(false);
         const userError = ref<string | null>(null);
         const isUserOnline = ref<string>("notFound");
+        const isMyProfile = computed(() => profileData.value && profileData.value.id === userData.value?.id);
+        const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
 
         const formattedDate = computed(() => {
-            if (userData.value && userData.value.createdAt) {
-                const date = new Date(userData.value.createdAt);
+            if (profileData.value && profileData.value.createdAt) {
+                const date = new Date(profileData.value.createdAt);
                 const day = date.getDate().toString().padStart(2, '0');
                 const month = (date.getMonth() + 1).toString().padStart(2, '0');
                 const year = date.getFullYear();
@@ -95,33 +120,43 @@ export default defineComponent({
         });
 
         const profileBannerImagePath = computed(() => {
-            if (userData.value && userData.value.bannerUrl) {
-                return userData.value.bannerUrl;
+            if (profileData.value && profileData.value.bannerUrl) {
+                return profileData.value.bannerUrl;
             }
             return getDefaultProfileBannerURL();
         });
 
         const profilePicImagePath = computed(() => {
-            if (userData.value && userData.value.pbUrl) {
-                return userData.value.pbUrl;
+            if (profileData.value && profileData.value.pbUrl) {
+                return profileData.value.pbUrl;
             }
             return getDefaultProfilePbURL();
         });
 
         const flagImagePath = computed(() => {
-            if (userData.value && userData.value.countryCode) {
-                return userData.value ? require(`@/img/countryFlags/${userData.value.countryCode.toLowerCase()}.svg`) : '';
+            if (profileData.value && profileData.value.countryCode) {
+                return profileData.value ? require(`@/img/countryFlags/${profileData.value.countryCode.toLowerCase()}.svg`) : '';
             }
             return "";
         });
 
         onMounted(async () => {
             if (props.username) {
-                userData.value = await fetchUserData(props.username);
+                profileData.value = await fetchProfileData(props.username);
                 getUserOnlineStatus(props.username);
+                isFriend.value = await checkIfIsFriend();
             }
-
         });
+
+        async function checkIfIsFriend() {
+            const myFriends: userFriend[] = await getFriends();
+            const profile = profileData.value;
+
+            if (profile && profile.id != null) {
+                return myFriends.some(friend => friend.id === profile.id);
+            }
+            return false;
+        }
 
         function getLastSeenText(LastDisconnectedAt: Date) {
             if (isUserOnline.value !== "notFound") {
@@ -132,31 +167,7 @@ export default defineComponent({
                 return '';
             }
 
-            const now = new Date();
-            const lastSeenDate = new Date(LastDisconnectedAt);
-            const seconds = Math.round((now.getTime() - lastSeenDate.getTime()) / 1000);
-            const minutes = Math.round(seconds / 60);
-            const hours = Math.round(minutes / 60);
-            const days = Math.round(hours / 24);
-            const weeks = Math.round(days / 7);
-            const months = Math.round(weeks / 4.345); // Average weeks per month
-            const years = Math.round(months / 12);
-
-            if (seconds < 60) {
-                return 'just now';
-            } else if (minutes < 60) {
-                return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-            } else if (hours < 24) {
-                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-            } else if (days < 7) {
-                return `${days} day${days > 1 ? 's' : ''} ago`;
-            } else if (weeks < 4.345) {
-                return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-            } else if (months < 12) {
-                return `${months} month${months > 1 ? 's' : ''} ago`;
-            } else {
-                return `${years} year${years > 1 ? 's' : ''} ago`;
-            }
+            return formatDateToAgoText(LastDisconnectedAt);
         }
 
 
@@ -172,7 +183,7 @@ export default defineComponent({
             });
         }
 
-        async function fetchUserData(username: string) {
+        async function fetchProfileData(username: string) {
             try {
                 const response = await httpClient.get(`/users/${username}`);
                 return response.data;
@@ -186,8 +197,33 @@ export default defineComponent({
             emit('close-overlay');
         }
 
+        async function addFriend(friendId: number) {
+            const token = localStorage.getItem('authToken');
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+            try {
+                await httpClient.post(`/friends/add`, { friendId }, { headers });
+                eventBus.emit('updateFriendList');
+                isFriend.value = true;
+            } catch (error) {
+                console.error("Error adding friend", error);
+            }
+        }
+
+        async function removeFriend(friendId: number) {
+            const token = localStorage.getItem('authToken');
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+            try {
+                await httpClient.post(`/friends/remove`, { friendId }, { headers });
+                eventBus.emit('updateFriendList');
+                isFriend.value = false;
+            } catch (error) {
+                console.error("Error removing friend", error);
+            }
+        }
+
+
         return {
-            userData,
+            userData: profileData,
             closeUserProfile,
             userError,
             flagImagePath,
@@ -197,6 +233,12 @@ export default defineComponent({
             formatTimeNumberToString,
             isUserOnline,
             getLastSeenText,
+            isFriend,
+            removeFriend,
+            addFriend,
+            isMyProfile,
+            isLoggedIn,
+            getFriends,
         };
     },
 });
@@ -302,4 +344,19 @@ button.goBackButton {
 .online-status.online {
     background-color: green;
 }
+
+.friend-toggle {
+    position: absolute;
+    right: 0;
+    top: 1%;
+}
+
+.friend-toggle button {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 200%;
+    cursor: pointer;
+}
+
 </style>

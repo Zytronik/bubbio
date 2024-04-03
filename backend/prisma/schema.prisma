@@ -18,6 +18,8 @@ model User {
   bannerUrl       String?          
   inputSettings   String?
   LastDisconnectedAt  DateTime?
+  friendsAsUser    UserFriendship[] @relation("UserFriends")
+  friendsAsFriend  UserFriendship[] @relation("FriendUsers")
   rating            Float            @default(1500)
   ratingDeviation   Float            @default(350)
   volatility        Float            @default(0.06)
@@ -27,6 +29,15 @@ model User {
   sprint          Sprint[]
   news          News[]
   passwordResetToken PasswordResetToken[]
+}
+
+model UserFriendship {
+  userId     Int
+  friendId   Int
+  user       User @relation("UserFriends", fields: [userId], references: [id])
+  friend     User @relation("FriendUsers", fields: [friendId], references: [id])
+
+  @@id([userId, friendId])
 }
 
 model PasswordResetToken {

@@ -11,6 +11,7 @@ import { MatchmakingModule } from './matchmaking/matchmaking.module';
 import { GameModule } from './game/game.module';
 import { RankedModule } from './ranked/ranked.module';
 import { UsersModule } from './user/user.module';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UsersModule } from './user/user.module';
     GameModule,
     RankedModule,
     UsersModule,
+    FriendsModule,
   ],
   providers: [LobbyGateway, GlobalChatGateway],
 })

@@ -34,3 +34,17 @@ async function getPersonalBest(mods: ModDetail[]) {
         return undefined;
     }
 }
+
+export async function getFriends() {
+    const token = localStorage.getItem('authToken');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    try {
+        const response =  await httpClient.get("/friends", {
+            headers: headers
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch personal Best: ", error);
+        return undefined;
+    }
+}
