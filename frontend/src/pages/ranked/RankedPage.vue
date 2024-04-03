@@ -3,7 +3,7 @@
     <MenuBackButtons :buttonData="backButtonData" />
     <div class="page-wrapper">
       <div class="page-container">
-        <div v-if="!hasMatchFound" class="page-dashboard ranked-dashboard">
+        <div v-if="!hasMatchFound && !isGaming" class="page-dashboard ranked-dashboard">
           <h2 id="matchFoundText">Match Found!</h2>
           <div id="matchFoundBackground"></div>
           <div class="left-content">
@@ -82,8 +82,12 @@
 
         </div>
 
-        <div v-if="hasMatchFound">
+        <div v-if="hasMatchFound && !isGaming">
           <VsScreen />
+        </div>
+
+        <div v-if="isGaming">
+          <Game :playerGameVisuals="playerGameVisuals" :areRef="true"/>
         </div>
 
       </div>
@@ -106,6 +110,8 @@ import eventBus from '@/ts/page/page.event-bus';
 import { getRankImagePath } from '@/ts/networking/paths';
 import { network_stopListeningToMatchFound } from '@/ts/game/network/game.network.ranked';
 import { network_listenToMatchFound } from '@/ts/game/network/game.network.ranked';
+import { playerGameVisuals } from '@/ts/game/game.master';
+import Game from '@/pages/game/Game.vue';
 
 interface PlayerMatchmakingStats {
   rating: number;
@@ -136,7 +142,7 @@ interface Rank {
 
 export default {
   name: 'RankedPage',
-  components: { MenuBackButtons, VsScreen, Leaderboard },
+  components: { MenuBackButtons, VsScreen, Leaderboard, Game },
   data() {
     return {
       currentLeaderboard: 'Global',
@@ -148,6 +154,7 @@ export default {
       { pageState: PAGE_STATE.multiMenu, iconSrc: require('@/img/icons/ranked.png'), disabled: false },
       { pageState: PAGE_STATE.roomListing, iconSrc: require('@/img/icons/rooms.png'), disabled: true },
     ]);
+    const isGaming = ref(false);
     const isInQueue = ref<boolean>(false);
     const playerStats = ref<PlayerMatchmakingStats | null>(null);
     const playersInQueue = ref<number>(0);
@@ -248,17 +255,24 @@ export default {
       }
     }
 
+    function goToGameView() {
+      isGaming.value = true;
+      console.log(playerGameVisuals);
+    }
+
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(126,10,41,1) 0%, rgba(144,141,58,1) 100%)');
       fetchPlayerMmStats();
       mountSockets();
       eventBus.on("vue_matchFound", matchFound);
+      eventBus.on('vue_goToGameView', goToGameView);
     });
 
     onUnmounted(() => {
       unmountSockets();
       stopPassedTimeCountdown();
       eventBus.off("vue_matchFound");
+      eventBus.off('vue_goToGameView');
     });
 
     return {
@@ -278,6 +292,8 @@ export default {
       userData,
       getProgressBarFillWidth,
       getRankImagePath,
+      isGaming,
+      playerGameVisuals,
     }
   }
 };

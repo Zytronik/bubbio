@@ -63,7 +63,7 @@
               <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}</p>
               <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond }}</p>
             </div>
-            <Game />
+            <Game :playerGameVisuals="playerGameVisuals" :areRef="true"/>
           </div>
         </div>
 

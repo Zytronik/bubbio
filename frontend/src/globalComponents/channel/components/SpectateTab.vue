@@ -16,14 +16,7 @@
           <p>{{ visuals.statNumbers.bubblesCleared }}/{{ visuals.statNumbers.bubbleClearToWin }}</p>
           <p>{{ visuals.statNumbers.bubblesShot }} BPS: {{ visuals.statNumbers.bubblesPerSecond }}</p>
         </div>
-        <div class="gameUI-wrapper">
-          <span class="monospace" v-html="visuals.asciiBoard.incomingGarbage"></span>
-          <span class="monospace" v-html="visuals.asciiBoard.holdString"></span>
-          <span class="monospace remove-whiteSpaces" v-html="visuals.asciiBoard.queueString"></span>
-          <span class="monospace text-center" v-html="visuals.asciiBoard.playGridASCII"></span>
-          <span class="monospace overlap-infos" v-html="visuals.asciiBoard.floatingText"></span>
-          <span class="playerName">{{ playerName.toUpperCase() }}</span>
-        </div>
+        <Game :playerGameVisuals="visuals" :areRef="false"/>
       </div>
     </div>
   </div>
@@ -33,9 +26,11 @@
 import { network_joinSpectatorRoom, network_leaveSpectatorRoom, network_spectatePlayer, network_stopSpectating } from '@/ts/game/network/game.network.spectate';
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import { allSpectationEntries, playerNameVisualsMap, startSpectatorStatDisplay, stopSpectatorStatDisplay } from "@/ts/game/spectate/spectate.spectator";
+import Game from '@/pages/game/Game.vue';
 
 export default defineComponent({
   name: 'SpectateTab',
+  components: {Game},
   setup() {
     const isSpectating = ref(false);
 

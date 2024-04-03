@@ -9,24 +9,46 @@ import { getHandlingSettings } from "../settings/game.settings.handling";
 
 const O_RANKED_MATCH_FOUND = "output_rankedMatchFound";
 const O_RANKED_SETUP_GAME_INSTANCE = "output_rankedSetupGameInstance";
-const I_RANKED_MATCH_FOUND_CONFIRMATION = "input_rankedMatchFoundConfirmation";
+export const I_RANKED_MATCH_FOUND_CONFIRMATION = "input_rankedMatchFoundConfirmation";
 const I_RANKED_SETUP_GAME_CONFIRMATION = "input_rankedSetupGameConfirmation";
 const O_RANKED_GO_TO_GAME_VIEW = "output_rankedGoToGameView";
 const O_RANKED_START_GAME = "output_rankedStartGame";
 const O_RANKED_SHOW_MATCH_SCORE = "output_rankedShowMatchScore";
 
 export const versusScreenData: dto_VersusScreen = {
-    matchID: ""
+    matchID: "",
+    player1Data: {
+        playerID: 0,
+        playerName: "",
+        playerRank: "",
+        playerGlobalRank: 0,
+        playerNationalRank: 0,
+        playerGlicko: 0,
+        playerRD: 0,
+        playerProfilePicture: "",
+        playerCountry: ""
+    },
+    player2Data: {
+        playerID: 0,
+        playerName: "",
+        playerRank: "",
+        playerGlobalRank: 0,
+        playerNationalRank: 0,
+        playerGlicko: 0,
+        playerRD: 0,
+        playerProfilePicture: "",
+        playerCountry: ""
+    },
+
 };
 export function network_listenToMatchFound(): void {
-    console.log("setuplistener")
     const socket = state.socket;
     if (socket) {
         socket.on(O_RANKED_MATCH_FOUND, (data: dto_VersusScreen) => {
-            // versusScreenData = data;
-            console.log("MATCH FOUND!");
+            versusScreenData.matchID = data.matchID;
+            versusScreenData.player1Data = data.player1Data;
+            versusScreenData.player2Data = data.player2Data;
             eventBus.emit("vue_matchFound");
-            socket.emit(I_RANKED_MATCH_FOUND_CONFIRMATION, data.matchID);
         });
         socket.on(O_RANKED_SETUP_GAME_INSTANCE, (data: dto_GameSetup) => {
             const transitions: GameTransitions = {
@@ -56,6 +78,7 @@ export function network_listenToMatchFound(): void {
             socket.emit(I_RANKED_SETUP_GAME_CONFIRMATION, data.matchID);
         });
         socket.on(O_RANKED_GO_TO_GAME_VIEW, () => {
+            eventBus.emit("vue_goToGameView");
             console.log("go to game view")
         });
         socket.on(O_RANKED_START_GAME, () => {
