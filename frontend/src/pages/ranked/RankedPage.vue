@@ -4,11 +4,14 @@
     <div class="page-wrapper">
       <div class="page-container">
         <div v-if="!hasMatchFound" class="page-dashboard ranked-dashboard">
+          <h2 id="matchFoundText">Match Found!</h2>
+          <div id="matchFoundBackground"></div>
           <div class="left-content">
 
             <div class="playerStats" v-if="playerStats">
               <div>
-                <img class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)" :alt="playerStats.rankInfo.name">
+                <img class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)"
+                  :alt="playerStats.rankInfo.name">
                 <div>
                   <p class="rating">{{ playerStats.rating }}<span>±{{ playerStats.ratingDeviation }}</span></p>
                   <p class="gamesWon"><span>Games won: </span>{{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}
@@ -24,19 +27,23 @@
             <div v-if="playerStats" class="progressBarWrapper">
               <div class="prevRank">
                 <p v-if="playerStats.rankInfo.prevRank?.ascii">{{ playerStats.rankInfo.percentile }}%</p>
-                <img v-if="playerStats.rankInfo.prevRank?.iconName" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.prevRank.iconName)" :alt="playerStats.rankInfo.prevRank.name">
+                <img v-if="playerStats.rankInfo.prevRank?.iconName" class="rank-img"
+                  :src="getRankImagePath(playerStats.rankInfo.prevRank.iconName)"
+                  :alt="playerStats.rankInfo.prevRank.name">
               </div>
               <div class="progress">
                 <div class="progressBar">
                   <div class="progressBarFill" :style="{
-                    '--percentile-content': `'${playerStats.percentile}%'`,
-                    'width': getProgressBarFillWidth()
-                  }"></div>
+      '--percentile-content': `'${playerStats.percentile}%'`,
+      'width': getProgressBarFillWidth()
+    }"></div>
                 </div>
               </div>
               <div class="nextRank" v-if="playerStats.rankInfo.nextRank">
                 <p v-if="playerStats.rankInfo.nextRank.percentile">{{ playerStats.rankInfo.nextRank.percentile }}%</p>
-                <img v-if="playerStats.rankInfo.nextRank?.iconName" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.nextRank.iconName)" :alt="playerStats.rankInfo.nextRank.name">
+                <img v-if="playerStats.rankInfo.nextRank?.iconName" class="rank-img"
+                  :src="getRankImagePath(playerStats.rankInfo.nextRank.iconName)"
+                  :alt="playerStats.rankInfo.nextRank.name">
               </div>
             </div>
 
@@ -153,7 +160,7 @@ export default {
       if (!playerStats.value || !playerStats.value.rankInfo.prevRank || !playerStats.value.rankInfo.nextRank) {
         return '0%';
       }
-      return (100 - (100 / (playerStats.value.rankInfo.percentile - playerStats.value.rankInfo.nextRank.percentile) *  (playerStats.value.percentile - playerStats.value.rankInfo.nextRank.percentile)))  + '%';
+      return (100 - (100 / (playerStats.value.rankInfo.percentile - playerStats.value.rankInfo.nextRank.percentile) * (playerStats.value.percentile - playerStats.value.rankInfo.nextRank.percentile))) + '%';
     }
 
     function toggleQueue() {
@@ -211,7 +218,15 @@ export default {
     function matchFound() {
       isInQueue.value = false;
       stopPassedTimeCountdown();
-      hasMatchFound.value = true;
+      playMatchFoundAnimation();
+    }
+
+    function playMatchFoundAnimation() {
+      document.getElementById('matchFoundText')?.classList.add('matchFoundText');
+      document.getElementById('matchFoundBackground')?.classList.add('blackOpacity');
+      setTimeout(() => {
+        hasMatchFound.value = true;
+      }, 1000);
     }
 
     function mountSockets() {
@@ -306,7 +321,7 @@ p {
   height: 12%;
 }
 
-.playerStats .rating, 
+.playerStats .rating,
 .playerStats .rank {
   font-size: 200%;
 }
@@ -329,12 +344,12 @@ p {
   opacity: 0.5;
 }
 
-.playerStats > div {
+.playerStats>div {
   display: flex;
   height: 100%;
 }
 
-.playerStats > div > div{
+.playerStats>div>div {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -429,4 +444,58 @@ p {
   height: 40px;
 }
 
+/* VS Transition */
+@keyframes fadeZoomIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.matchFoundText {
+  display: block !important;
+  font-size: 1300%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.4);
+  animation: fadeZoomIn 1s ease forwards;
+  z-index: 2;
+  width: 100vw;
+  text-align: center;
+}
+
+.blackOpacity {
+  display: block !important;
+  animation: fadeInBlack 1s ease forwards;
+  background-color: black;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+@keyframes fadeInBlack {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 0.8;
+  }
+}
+
+#matchFoundText,
+#matchFoundBackground {
+  display: none;
+}
 </style>

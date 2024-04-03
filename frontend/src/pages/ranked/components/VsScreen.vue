@@ -1,5 +1,5 @@
 <template>
-  <h1>Ich bin der VS screen</h1>
+<p>heyo bin VS Screen</p>
 </template>
   
 <script lang="ts">
@@ -15,5 +15,7 @@ export default defineComponent({
   
 <style scoped>
 
+
 </style>
+
   
