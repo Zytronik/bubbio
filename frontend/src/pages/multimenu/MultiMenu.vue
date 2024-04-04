@@ -11,7 +11,7 @@
         <button class="menu-btn" @click="goToState(PAGE_STATE.roomListing)">
           <img src="@/img/icons/rooms.png" />
           <p>Room Listing</p>
-          <p class="desc">Create or Join  Rooms</p>
+          <p class="desc">Create or Join Rooms</p>
         </button>
       </div>
     </div>
@@ -29,8 +29,8 @@ export default {
   components: { MenuBackButtons },
   setup() {
     const backButtonData = ref([
-      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/solo.png'), disabled: true},
       { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/multi.png'), disabled: false },
+      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/solo.png'), disabled: true },
       { pageState: PAGE_STATE.settingsPage, iconSrc: require('@/img/icons/config.png'), disabled: true },
     ]);
 
@@ -49,7 +49,7 @@ export default {
 </script>
 
 <style scoped>
-.back-buttons::before  {
-  background: linear-gradient(45deg, rgba(181,43,221,1) 0%, rgba(198,63,63,1) 100%); 
+.back-buttons::before {
+  background: linear-gradient(45deg, rgba(181, 43, 221, 1) 0%, rgba(198, 63, 63, 1) 100%);
 }
 </style>
