@@ -83,6 +83,6 @@ export default defineComponent({
 }
 
 .game-wrapper {
-  font-size: 20px;
+  font-size: 130%;
 }
 </style>

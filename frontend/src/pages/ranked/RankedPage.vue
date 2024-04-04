@@ -86,8 +86,9 @@
           <VsScreen />
         </div>
 
-        <div v-if="isGaming">
+        <div v-if="isGaming" class="gaming-wrapper">
           <Game :playerGameVisuals="playerGameVisuals" :areRef="true" />
+          <Game :playerGameVisuals="enemyVisuals" :areRef="true" />
         </div>
 
       </div>
@@ -108,7 +109,7 @@ import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e
 import { UserData } from '@/ts/page/i/page.i.user-data';
 import eventBus from '@/ts/page/page.event-bus';
 import { getRankImagePath } from '@/ts/networking/paths';
-import { scoreScreenData, endScreenData, I_RANKED_READY_FOR_NEXT_ROUND, network_stopListeningToServer } from '@/ts/game/network/game.network.ranked';
+import { scoreScreenData, endScreenData, I_RANKED_READY_FOR_NEXT_ROUND, network_stopListeningToServer, enemyVisuals } from '@/ts/game/network/game.network.ranked';
 import { network_listenToMatchFound } from '@/ts/game/network/game.network.ranked';
 import { playerGameVisuals } from '@/ts/game/game.master';
 import Game from '@/pages/game/Game.vue';
@@ -311,6 +312,7 @@ export default {
       isGaming,
       playerGameVisuals,
       hideMatchmakingScreen,
+      enemyVisuals,
     }
   }
 };
@@ -530,5 +532,19 @@ p {
 #matchFoundText,
 #matchFoundBackground {
   display: none;
+}
+
+.gaming-wrapper {
+  display: flex;
+  flex-direction: row;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  font-size: 160%;
+  gap: 15%;
 }
 </style>
