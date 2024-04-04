@@ -132,7 +132,7 @@ export class MatchmakingService {
         const player1 = this.queue[player1ID];
         const player2 = this.queue[player2ID];
         if (player1 && player2) {
-            this.gameGateway.setupRankedGame(player1.client, player2.client, player1ID, player1ID);
+            this.gameGateway.setupRankedGame(player1.client, player2.client, player1ID, player2ID);
             onMatched();
         }
     }

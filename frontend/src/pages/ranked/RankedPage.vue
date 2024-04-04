@@ -3,7 +3,7 @@
     <MenuBackButtons :buttonData="backButtonData" />
     <div class="page-wrapper">
       <div class="page-container">
-        <div v-if="!hasMatchFound && !isGaming" class="page-dashboard ranked-dashboard">
+        <div v-if="!isGaming && !hideMatchmakingScreen" class="page-dashboard ranked-dashboard">
           <h2 id="matchFoundText">Match Found!</h2>
           <div id="matchFoundBackground"></div>
           <div class="left-content">
@@ -155,6 +155,7 @@ export default {
       { pageState: PAGE_STATE.roomListing, iconSrc: require('@/img/icons/rooms.png'), disabled: true },
     ]);
     const isGaming = ref(false);
+    const hideMatchmakingScreen = ref(false);
     const isInQueue = ref<boolean>(false);
     const playerStats = ref<PlayerMatchmakingStats | null>(null);
     const playersInQueue = ref<number>(0);
@@ -233,6 +234,10 @@ export default {
       document.getElementById('matchFoundBackground')?.classList.add('blackOpacity');
       setTimeout(() => {
         hasMatchFound.value = true;
+
+        setTimeout(() => {
+          hideMatchmakingScreen.value = true;
+        }, 500);
       }, 1000);
     }
 
@@ -305,6 +310,7 @@ export default {
       getRankImagePath,
       isGaming,
       playerGameVisuals,
+      hideMatchmakingScreen,
     }
   }
 };
