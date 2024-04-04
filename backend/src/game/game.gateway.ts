@@ -154,7 +154,6 @@ export class GameGateway implements OnGatewayDisconnect {
   playerRankedMatchFoundConfirmation(client: Socket, matchID: string) {
     const match = ongoingRankedMatches.get(matchID);
     match.vsConfirmationMap.set(client.id, true);
-    console.log("CHECK READY", I_RANKED_MATCH_FOUND_CONFIRMATION);
     this.loadRankedGameViewIfReady(match);
   }
 
@@ -162,7 +161,6 @@ export class GameGateway implements OnGatewayDisconnect {
   playerSetupGameReadyConfirmation(client: Socket, matchID: string) {
     const match = ongoingRankedMatches.get(matchID);
     match.setupConfirmationMap.set(client.id, true);
-    console.log("CHECK READY", I_RANKED_SETUP_GAME_CONFIRMATION);
     this.loadRankedGameViewIfReady(match);
   }
 
@@ -185,7 +183,6 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(I_RANKED_READY_TO_START_GAME)
   playerReadyToStartGame(client: Socket, matchID: string) {
-    console.log("CHECK READY", I_RANKED_READY_TO_START_GAME);
     let allReady = true;
     const match = ongoingRankedMatches.get(matchID);
     match.readyToStartConfirmationMap.set(client.id, true);
@@ -195,7 +192,6 @@ export class GameGateway implements OnGatewayDisconnect {
       }
     });
     if (allReady) {
-      console.log("ALL READY");
       this.server.to(match.matchRoomName).emit(O_RANKED_START_GAME);
     }
   }
@@ -254,14 +250,12 @@ export class GameGateway implements OnGatewayDisconnect {
 
   prepareNextRound(matchID: string) {
     const match = ongoingRankedMatches.get(matchID);
-    match.setupConfirmationMap.forEach(confirmation => {
-      confirmation = false;
+    match.setupConfirmationMap.forEach((confirmation, playerID) => {
+      match.setupConfirmationMap.set(playerID, false);
     });
-    match.readyToStartConfirmationMap.forEach(confirmation => {
-      confirmation = false;
+    match.readyToStartConfirmationMap.forEach((confirmation, playerID) => {
+      match.readyToStartConfirmationMap.set(playerID, false);
     });
-    console.log(match.setupConfirmationMap)
-    console.log(match.readyToStartConfirmationMap)
     const gameSetupDTO: dto_GameSetup = {
       gameMode: GAME_MODE.RANKED,
       gameSettings: rankedSettings,
