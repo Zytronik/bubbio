@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { I_RANKED_MATCH_FOUND_CONFIRMATION, versusScreenData } from '@/ts/game/network/game.network.ranked';
+import { I_RANKED_SCREEN_TRANSITION_CONFIRMATION, versusScreenData } from '@/ts/game/network/game.network.ranked';
 import state from '@/ts/networking/networking.client-websocket';
 import { getRankImagePath } from '@/ts/networking/paths';
 import { defineComponent, onMounted } from 'vue';
@@ -222,7 +222,7 @@ export default defineComponent({
     onMounted(() => {
       playVsAnimation(() => {
         if(state.socket && versusScreenData){
-          state.socket.emit(I_RANKED_MATCH_FOUND_CONFIRMATION, versusScreenData.matchID);
+          state.socket.emit(I_RANKED_SCREEN_TRANSITION_CONFIRMATION, versusScreenData.matchID);
         }
       });
     });

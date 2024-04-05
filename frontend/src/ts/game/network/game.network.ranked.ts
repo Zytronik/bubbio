@@ -18,14 +18,13 @@ import { dto_ScoreScreen } from "./dto/game.network.dto.score-screen";
 
 const O_RANKED_MATCH_FOUND = "output_rankedMatchFound";
 const O_RANKED_SETUP_GAME_INSTANCE = "output_rankedSetupGameInstance";
-export const I_RANKED_MATCH_FOUND_CONFIRMATION = "input_rankedMatchFoundConfirmation";
+export const I_RANKED_SCREEN_TRANSITION_CONFIRMATION = "input_rankedScreenTransitionConfirmation";
 const I_RANKED_SETUP_GAME_CONFIRMATION = "input_rankedSetupGameConfirmation";
 const O_RANKED_GO_TO_GAME_VIEW = "output_rankedGoToGameView";
 const I_RANKED_READY_TO_START_GAME = "input_rankedReadyToStartGame";
 const O_RANKED_START_GAME = "output_rankedStartGame";
 const O_RANKED_YOU_WON = "output_rankedYouWon";
 const O_RANKED_SHOW_MATCH_SCORE = "output_rankedShowMatchScore";
-export const I_RANKED_READY_FOR_NEXT_ROUND = "input_rankedReadyForNextRound";
 const O_RANKED_PREPARE_NEXT_ROUND = "output_rankedPrepareNextRound";
 const O_RANKED_SHOW_END_SCREEN = "output_rankedShowEndScreen";
 
@@ -58,7 +57,17 @@ export const versusScreenData: dto_VersusScreen = {
 
 };
 export const scoreScreenData: dto_ScoreScreen = {
-    matchID: ""
+    matchID: "",
+    player1Data: {
+        playerID: 0,
+        palyerName: "",
+        palyerScore: 0
+    },
+    player2Data: {
+        playerID: 0,
+        palyerName: "",
+        palyerScore: 0
+    },
 };
 export const endScreenData: dto_EndScreen = {};
 export function network_listenToMatchFound(): void {
