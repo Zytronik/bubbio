@@ -131,6 +131,7 @@ export function preparePlayerGameInstance(instance: GameInstance): void {
     playerGameInstance.angle = instance.angle;
     playerGameInstance.currentAPS = instance.currentAPS;
     playerGameInstance.currentBubble = instance.currentBubble;
+    playerGameInstance.holdBubble = instance.holdBubble;
     playerGameInstance.bubbleQueue = instance.bubbleQueue;
     playerGameInstance.playGrid = instance.playGrid;
     playerGameInstance.queuedGarbage = instance.queuedGarbage;

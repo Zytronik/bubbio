@@ -67,6 +67,7 @@ export function resetGameInstance(gameInstance: GameInstance, seed: number): voi
         ascii: "",
         type: 0
     };
+    gameInstance.holdBubble = undefined;
     gameInstance.playGrid.previewBubble = undefined;
     gameInstance.bubbleQueue = [];
     resetGrid(gameInstance.playGrid);

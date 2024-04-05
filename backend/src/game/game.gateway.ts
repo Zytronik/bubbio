@@ -278,9 +278,11 @@ export class GameGateway implements OnGatewayDisconnect {
       matchID: matchID,
     }
     match.ongoingGamesMap.forEach(game => {
+      const transitions = game.gameInstance.gameTransitions;
+      const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed);
       game.isProcessing = false;
       game.queuedInputs = [];
-      resetGameInstance(game.gameInstance, gameSetupDTO.seed);
+      game.gameInstance = instance;
       this.updatePlayerSpectator(game);
     });
     this.server.to(match.matchRoomName).emit(O_RANKED_PREPARE_NEXT_ROUND, gameSetupDTO);
