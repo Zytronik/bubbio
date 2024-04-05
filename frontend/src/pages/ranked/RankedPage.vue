@@ -34,9 +34,9 @@
               <div class="progress">
                 <div class="progressBar">
                   <div class="progressBarFill" :style="{
-      '--percentile-content': `'${playerStats.percentile}%'`,
-      'width': getProgressBarFillWidth()
-    }"></div>
+                    '--percentile-content': `'${playerStats.percentile}%'`,
+                    'width': getProgressBarFillWidth()
+                  }"></div>
                 </div>
               </div>
               <div class="nextRank" v-if="playerStats.rankInfo.nextRank">
@@ -87,7 +87,19 @@
         </div>
 
         <div v-if="showScores" class="scores-wrapper">
-          <p>This are the scores, nice.</p>
+          <div class="player1">
+            <p>{{ scoreScreenData.player1Data.playerName }}</p>
+            <p class="score">{{ scoreScreenData.player1Data.playerScore }}</p>
+          </div>
+          <div class="player2">
+            <p>{{ scoreScreenData.player2Data.playerName }}</p>
+            <p class="score">{{ scoreScreenData.player2Data.playerScore }}</p>
+          </div>
+        </div>
+
+        <div v-if="showEndScreen" class="endScreen-wrapper">
+          <p>Please give me data to display here.</p>
+          <p>TODO: <br>transition to here<br>show data here<br>transition to ranked dashboard</p>
         </div>
 
         <div v-if="isGaming" class="gaming-wrapper">
@@ -103,7 +115,7 @@
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import state from '@/ts/networking/networking.client-websocket';
 import VsScreen from './components/VsScreen.vue';
@@ -162,6 +174,7 @@ export default {
     const isGaming = ref(false);
     const showMatchmakingScreen = ref(false);
     const showScores = ref(false);
+    const showEndScreen = ref(false);
     const isInQueue = ref<boolean>(false);
     const playerStats = ref<PlayerMatchmakingStats | null>(null);
     const playersInQueue = ref<number>(0);
@@ -270,18 +283,39 @@ export default {
       showMatchmakingScreen.value = false;
     }
 
-    function showMatchScore() {
+    async function slideScoresIn(onAnimationnEnd: () => void) {
       showScores.value = true;
-      setTimeout(() => {
+      await nextTick();
+      const player1 = document.querySelector('.scores-wrapper .player1') as HTMLElement;
+      const player2 = document.querySelector('.scores-wrapper .player2') as HTMLElement;
+      if (player1 && player2) {
+        player1.classList.add('slide-in-from-left');
+        player2.classList.add('slide-in-from-right');
+        setTimeout(() => {
+          player1.classList.add('slide-out-to-left');
+          player2.classList.add('slide-out-to-right');
+          setTimeout(() => {
+            player1.classList.remove('slide-in-from-left', 'slide-out-to-left');
+            player2.classList.remove('slide-in-from-right', 'slide-out-to-right');
+            showScores.value = false;
+            onAnimationnEnd();
+          }, 500);//css animation duration
+        }, 5000);
+      }
+    }
+
+    function showMatchScore() {
+      slideScoresIn(() => {
         if (state.socket) {
           state.socket.emit(I_RANKED_SCREEN_TRANSITION_CONFIRMATION, scoreScreenData.matchID);
         }
-        showScores.value = false;
-      }, 3000);
+      });
     }
 
-    function showEndScreen() {
+    function showEndScreenPage() {
       console.log('showEndScreen', endScreenData);
+      showEndScreen.value = true;
+      isGaming.value = false;
     }
 
     onMounted(() => {
@@ -291,7 +325,7 @@ export default {
       eventBus.on("vue_matchFound", matchFound);
       eventBus.on('vue_goToGameView', goToGameView);
       eventBus.on('vue_showMatchScore', showMatchScore);
-      eventBus.on('vue_showEndScreen', showEndScreen);
+      eventBus.on('vue_showEndScreen', showEndScreenPage);
     });
 
     onUnmounted(() => {
@@ -323,6 +357,8 @@ export default {
       showMatchmakingScreen,
       enemyVisuals,
       showScores,
+      showEndScreen,
+      scoreScreenData,
     }
   }
 };
@@ -564,7 +600,63 @@ p {
   left: 0;
   width: 100vw;
   height: 100vh;
+  color: white;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.scores-wrapper>div {
+  width: 50%;
+  height: 100%;
+  font-size: 4em;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-transform: uppercase;
+  position: relative;
+  transition: 0.5s;
   background-color: rgba(0, 0, 0, 0.9);
+}
+
+.scores-wrapper>div::before {
+  content: "";
+  position: absolute;
+  height: 80%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.scores-wrapper .player1 {
+  transform: translateX(-100%);
+}
+
+.scores-wrapper .player2 {
+  transform: translateX(100%);
+}
+
+.scores-wrapper .player1::before {
+  border-right: 1px solid white;
+  right: 0;
+}
+
+.scores-wrapper .player2::before {
+  border-left: 1px solid white;
+  left: 0;
+}
+
+.scores-wrapper .score {
+  font-size: 10em;
+}
+
+.endScreen-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 1);
   color: white;
   z-index: 1;
 }

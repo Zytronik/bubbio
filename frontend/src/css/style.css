@@ -642,3 +642,57 @@ button.retry {
     pointer-events: none;
     z-index: 2;
 }
+
+.slide-in-from-left {
+    animation: slideInFromLeft 0.5s forwards;
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0%);
+    }
+}
+
+.slide-in-from-right {
+    animation: slideInFromRight 0.5s forwards;
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0%);
+    }
+}
+
+.slide-out-to-left {
+    animation: slideOutToLeft 0.5s forwards;
+}
+
+@keyframes slideOutToLeft {
+    from {
+        transform: translateX(0%);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.slide-out-to-right {
+    animation: slideOutToRight 0.5s forwards;
+}
+
+@keyframes slideOutToRight {
+    from {
+        transform: translateX(0%);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
