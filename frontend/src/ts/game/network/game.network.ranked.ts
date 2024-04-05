@@ -60,13 +60,13 @@ export const scoreScreenData: dto_ScoreScreen = {
     matchID: "",
     player1Data: {
         playerID: 0,
-        palyerName: "",
-        palyerScore: 0
+        playerName: "",
+        playerScore: 0
     },
     player2Data: {
         playerID: 0,
-        palyerName: "",
-        palyerScore: 0
+        playerName: "",
+        playerScore: 0
     },
 };
 export const endScreenData: dto_EndScreen = {};
@@ -113,6 +113,8 @@ function network_listenToIngameUpdates(): void {
         });
         socket.on(O_RANKED_SHOW_MATCH_SCORE, (data: dto_ScoreScreen) => {
             scoreScreenData.matchID = data.matchID;
+            scoreScreenData.player1Data = data.player1Data;
+            scoreScreenData.player2Data = data.player2Data;
             eventBus.emit("vue_showMatchScore");
         });
         socket.on(O_RANKED_SHOW_END_SCREEN, (data: dto_EndScreen) => {
