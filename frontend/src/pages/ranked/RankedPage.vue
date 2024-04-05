@@ -98,7 +98,8 @@
         </div>
 
         <div v-if="showEndScreen" class="endScreen-wrapper">
-          <p>This is the end screen, nice.</p>
+          <p>Please give me data to display here.</p>
+          <p>TODO: <br>transition to here<br>show data here<br>transition to ranked dashboard</p>
         </div>
 
         <div v-if="isGaming" class="gaming-wrapper">
@@ -655,7 +656,7 @@ p {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 1);
   color: white;
   z-index: 1;
 }
