@@ -34,9 +34,9 @@
               <div class="progress">
                 <div class="progressBar">
                   <div class="progressBarFill" :style="{
-      '--percentile-content': `'${playerStats.percentile}%'`,
-      'width': getProgressBarFillWidth()
-    }"></div>
+                    '--percentile-content': `'${playerStats.percentile}%'`,
+                    'width': getProgressBarFillWidth()
+                  }"></div>
                 </div>
               </div>
               <div class="nextRank" v-if="playerStats.rankInfo.nextRank">
@@ -87,7 +87,18 @@
         </div>
 
         <div v-if="showScores" class="scores-wrapper">
-          <p>This are the scores, nice.</p>
+          <div class="player1">
+            <p>Player 1</p>
+            <p class="score">0</p>
+          </div>
+          <div class="player2">
+            <p>Player 2</p>
+            <p class="score">0</p>
+          </div>
+        </div>
+
+        <div v-if="showEndScreen" class="endScreen-wrapper">
+          <p>This is the end screen, nice.</p>
         </div>
 
         <div v-if="isGaming" class="gaming-wrapper">
@@ -162,6 +173,7 @@ export default {
     const isGaming = ref(false);
     const showMatchmakingScreen = ref(false);
     const showScores = ref(false);
+    const showEndScreen = ref(false);
     const isInQueue = ref<boolean>(false);
     const playerStats = ref<PlayerMatchmakingStats | null>(null);
     const playersInQueue = ref<number>(0);
@@ -278,11 +290,13 @@ export default {
           state.socket.emit(I_RANKED_READY_FOR_NEXT_ROUND, scoreScreenData.matchID);
         } */
         showScores.value = false;
-      }, 50000);
+      }, 5000);
     }
 
-    function showEndScreen() {
+    function showEndScreenPage() {
       console.log('showEndScreen', endScreenData);
+      showEndScreen.value = true;
+      isGaming.value = false;
     }
 
     onMounted(() => {
@@ -292,7 +306,7 @@ export default {
       eventBus.on("vue_matchFound", matchFound);
       eventBus.on('vue_goToGameView', goToGameView);
       eventBus.on('vue_showMatchScore', showMatchScore);
-      eventBus.on('vue_showEndScreen', showEndScreen);
+      eventBus.on('vue_showEndScreen', showEndScreenPage);
     });
 
     onUnmounted(() => {
@@ -324,6 +338,7 @@ export default {
       showMatchmakingScreen,
       enemyVisuals,
       showScores,
+      showEndScreen,
     }
   }
 };
@@ -560,6 +575,26 @@ p {
 }
 
 .scores-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  z-index: 1;
+}
+
+.scores-wrapper > div {
+  width: 50%;
+  height: 100%;
+}
+
+.scores-wrapper .score {
+  font-size: 300%;
+}
+
+.endScreen-wrapper{
   position: fixed;
   top: 0;
   left: 0;
