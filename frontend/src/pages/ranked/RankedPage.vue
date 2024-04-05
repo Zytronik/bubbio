@@ -113,7 +113,7 @@ import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e
 import { UserData } from '@/ts/page/i/page.i.user-data';
 import eventBus from '@/ts/page/page.event-bus';
 import { getRankImagePath } from '@/ts/networking/paths';
-import { scoreScreenData, endScreenData, I_RANKED_READY_FOR_NEXT_ROUND, network_stopListeningToServer, enemyVisuals } from '@/ts/game/network/game.network.ranked';
+import { scoreScreenData, endScreenData, network_stopListeningToServer, enemyVisuals, I_RANKED_SCREEN_TRANSITION_CONFIRMATION } from '@/ts/game/network/game.network.ranked';
 import { network_listenToMatchFound } from '@/ts/game/network/game.network.ranked';
 import { playerGameVisuals } from '@/ts/game/game.master';
 import Game from '@/pages/game/Game.vue';
@@ -274,11 +274,11 @@ export default {
       console.log('showMatchScore', scoreScreenData);
       showScores.value = true;
       setTimeout(() => {
-       /*  if (state.socket) {
-          state.socket.emit(I_RANKED_READY_FOR_NEXT_ROUND, scoreScreenData.matchID);
-        } */
+        if (state.socket) {
+          state.socket.emit(I_RANKED_SCREEN_TRANSITION_CONFIRMATION, scoreScreenData.matchID);
+        }
         showScores.value = false;
-      }, 50000);
+      }, 3000);
     }
 
     function showEndScreen() {

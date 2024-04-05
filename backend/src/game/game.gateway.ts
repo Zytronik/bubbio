@@ -10,7 +10,7 @@ import { holdBubble } from './logic/game.logic.bubble-manager';
 import { dto_GameInstance } from './network/dto/game.network.dto.game-instance';
 import { dto_SpectationEntry } from './network/dto/game.network.dto.spectation-entry';
 import { GAME_STATE } from './i/game.e.state';
-import { Match } from './network/i/game.network.i.match';
+import { Match, PlayerCredentials } from './network/i/game.network.i.match';
 import { dto_VersusScreen } from './network/dto/game.network.dto.vs-screen';
 import { defaultHandlingSettings } from './default-values/game.default-values.handling-settings';
 import { GAME_MODE } from './settings/i/game.settings.e.game-modes';
@@ -36,14 +36,13 @@ DO: Debug Output
 
 const O_RANKED_MATCH_FOUND = "output_rankedMatchFound";
 const O_RANKED_SETUP_GAME_INSTANCE = "output_rankedSetupGameInstance";
-const I_RANKED_MATCH_FOUND_CONFIRMATION = "input_rankedMatchFoundConfirmation";
+const I_RANKED_SCREEN_TRANSITION_CONFIRMATION = "input_rankedScreenTransitionConfirmation";
 const I_RANKED_SETUP_GAME_CONFIRMATION = "input_rankedSetupGameConfirmation";
 const O_RANKED_GO_TO_GAME_VIEW = "output_rankedGoToGameView";
 const I_RANKED_READY_TO_START_GAME = "input_rankedReadyToStartGame";
 const O_RANKED_START_GAME = "output_rankedStartGame";
 const O_RANKED_YOU_WON = "output_rankedYouWon";
 const O_RANKED_SHOW_MATCH_SCORE = "output_rankedShowMatchScore";
-const I_RANKED_READY_FOR_NEXT_ROUND = "input_rankedReadyForNextRound";
 const O_RANKED_PREPARE_NEXT_ROUND = "output_rankedPrepareNextRound";
 const O_RANKED_SHOW_END_SCREEN = "output_rankedShowEndScreen";
 
@@ -108,19 +107,22 @@ export class GameGateway implements OnGatewayDisconnect {
     const rankedMatch: Match = {
       matchID: rankedMatchId,
       matchRoomName: matchRoomName,
-      vsConfirmationMap: new Map(),
+      transitionConfirmationMap: new Map(),
       setupConfirmationMap: new Map(),
       readyToStartConfirmationMap: new Map(),
       ongoingGamesMap: new Map(),
       scoresMap: new Map(),
       firstTo: rankedFirstTo,
+      players: []
     }
+    rankedMatch.players.push({playerID: player1ID, playerName: player1.data.user.username,})
+    rankedMatch.players.push({playerID: player2ID, playerName: player2.data.user.username,})
     ongoingRankedMatches.set(rankedMatchId, rankedMatch);
 
     const players: Socket[] = [player1, player2];
     players.forEach(player => {
       player.join(matchRoomName);
-      rankedMatch.vsConfirmationMap.set(player.id, false);
+      rankedMatch.transitionConfirmationMap.set(player.id, false);
       rankedMatch.setupConfirmationMap.set(player.id, false);
       rankedMatch.readyToStartConfirmationMap.set(player.id, false);
       rankedMatch.scoresMap.set(player.id, 0);
@@ -150,10 +152,10 @@ export class GameGateway implements OnGatewayDisconnect {
     });
   }
 
-  @SubscribeMessage(I_RANKED_MATCH_FOUND_CONFIRMATION)
+  @SubscribeMessage(I_RANKED_SCREEN_TRANSITION_CONFIRMATION)
   playerRankedMatchFoundConfirmation(client: Socket, matchID: string) {
     const match = ongoingRankedMatches.get(matchID);
-    match.vsConfirmationMap.set(client.id, true);
+    match.transitionConfirmationMap.set(client.id, true);
     this.loadRankedGameViewIfReady(match);
   }
 
@@ -166,7 +168,7 @@ export class GameGateway implements OnGatewayDisconnect {
 
   loadRankedGameViewIfReady(match: Match) {
     let allReady = true;
-    match.vsConfirmationMap.forEach(ready => {
+    match.transitionConfirmationMap.forEach(ready => {
       if (!ready) {
         allReady = false;
       }
@@ -238,13 +240,13 @@ export class GameGateway implements OnGatewayDisconnect {
       const scoreData: dto_ScoreScreen = {
         matchID: matchID,
         player1Data: {
-          playerID: player.id,
-          playerName: player.data.user.username,
+          playerID: match.players[0].playerID,
+          playerName: match.players[0].playerName,
           playerScore: match.scoresMap.get(player.id),
         },
         player2Data: {
-          playerID: player.id,
-          playerName: player.data.user.username,
+          playerID: match.players[1].playerID,
+          playerName: match.players[1].playerName,
           playerScore: match.scoresMap.get(player.id),
         },
       }
@@ -260,6 +262,9 @@ export class GameGateway implements OnGatewayDisconnect {
 
   prepareNextRound(matchID: string) {
     const match = ongoingRankedMatches.get(matchID);
+    match.transitionConfirmationMap.forEach((confirmation, playerID) => {
+      match.transitionConfirmationMap.set(playerID, false);
+    });
     match.setupConfirmationMap.forEach((confirmation, playerID) => {
       match.setupConfirmationMap.set(playerID, false);
     });

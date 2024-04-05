@@ -6,6 +6,6 @@ export interface dto_ScoreScreen {
 
 interface PlayerData {
     playerID: number;
-    palyerName: string;
-    palyerScore: number;
+    playerName: string;
+    playerScore: number;
 }
