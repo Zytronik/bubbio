@@ -13,7 +13,7 @@
         versusScreenData.player1Data.playerGlobalRank }}</p>
         <p>Country: {{ versusScreenData.player1Data.playerCountry }}</p>
       </div>
-      <img class="profilePic" :src="versusScreenData.player1Data.playerProfilePicture">
+      <img class="profilePic" :src="versusScreenData.player1Data.playerProfilePicture ? versusScreenData.player1Data.playerProfilePicture : getDefaultProfilePbURL()">
     </div>
     <div class="diagonal">
       <div class="vs-wrapper">
@@ -33,7 +33,7 @@
         versusScreenData.player2Data.playerGlobalRank }}</p>
         <p>Country: {{ versusScreenData.player2Data.playerCountry }}</p>
       </div>
-      <img class="profilePic" :src="versusScreenData.player2Data.playerProfilePicture">
+      <img class="profilePic" :src="versusScreenData.player2Data.playerProfilePicture ? versusScreenData.player2Data.playerProfilePicture : getDefaultProfilePbURL()">
     </div>
   </div>
 </template>
@@ -41,7 +41,7 @@
 <script lang="ts">
 import { I_RANKED_SCREEN_TRANSITION_CONFIRMATION, versusScreenData } from '@/ts/game/network/game.network.ranked';
 import state from '@/ts/networking/networking.client-websocket';
-import { getRankImagePath } from '@/ts/networking/paths';
+import { getDefaultProfilePbURL, getRankImagePath } from '@/ts/networking/paths';
 import { defineComponent, onMounted } from 'vue';
 
 export default defineComponent({
@@ -230,6 +230,7 @@ export default defineComponent({
     return {
       versusScreenData,
       getRankImagePath,
+      getDefaultProfilePbURL,
     };
   },
 });
