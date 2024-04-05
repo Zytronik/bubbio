@@ -237,6 +237,16 @@ export class GameGateway implements OnGatewayDisconnect {
     if (!matchOver) {
       const scoreData: dto_ScoreScreen = {
         matchID: matchID,
+        player1Data: {
+          playerID: player.id,
+          playerName: player.data.user.username,
+          playerScore: match.scoresMap.get(player.id),
+        },
+        player2Data: {
+          playerID: player.id,
+          playerName: player.data.user.username,
+          playerScore: match.scoresMap.get(player.id),
+        },
       }
       this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_MATCH_SCORE, scoreData);
       this.prepareNextRound(matchID);

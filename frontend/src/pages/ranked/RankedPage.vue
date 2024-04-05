@@ -3,7 +3,7 @@
     <MenuBackButtons :buttonData="backButtonData" />
     <div class="page-wrapper">
       <div class="page-container">
-        <div v-if="!isGaming && !hideMatchmakingScreen" class="page-dashboard ranked-dashboard">
+        <div v-if="!isGaming && !showMatchmakingScreen" class="page-dashboard ranked-dashboard">
           <h2 id="matchFoundText">Match Found!</h2>
           <div id="matchFoundBackground"></div>
           <div class="left-content">
@@ -86,6 +86,10 @@
           <VsScreen />
         </div>
 
+        <div v-if="showScores" class="scores-wrapper">
+          <p>This are the scores, nice.</p>
+        </div>
+
         <div v-if="isGaming" class="gaming-wrapper">
           <Game :playerGameVisuals="playerGameVisuals" :areRef="true" />
           <Game :playerGameVisuals="enemyVisuals" :areRef="true" />
@@ -156,7 +160,8 @@ export default {
       { pageState: PAGE_STATE.roomListing, iconSrc: require('@/img/icons/rooms.png'), disabled: true },
     ]);
     const isGaming = ref(false);
-    const hideMatchmakingScreen = ref(false);
+    const showMatchmakingScreen = ref(false);
+    const showScores = ref(false);
     const isInQueue = ref<boolean>(false);
     const playerStats = ref<PlayerMatchmakingStats | null>(null);
     const playersInQueue = ref<number>(0);
@@ -235,9 +240,8 @@ export default {
       document.getElementById('matchFoundBackground')?.classList.add('blackOpacity');
       setTimeout(() => {
         hasMatchFound.value = true;
-
         setTimeout(() => {
-          hideMatchmakingScreen.value = true;
+          showMatchmakingScreen.value = true;
         }, 500);
       }, 1000);
     }
@@ -262,13 +266,19 @@ export default {
 
     function goToGameView() {
       isGaming.value = true;
+      hasMatchFound.value = false;
+      showMatchmakingScreen.value = false;
     }
 
     function showMatchScore() {
       console.log('showMatchScore', scoreScreenData);
-      if(state.socket){
+      showScores.value = true;
+      setTimeout(() => {
+       /*  if (state.socket) {
           state.socket.emit(I_RANKED_READY_FOR_NEXT_ROUND, scoreScreenData.matchID);
-        }
+        } */
+        showScores.value = false;
+      }, 50000);
     }
 
     function showEndScreen() {
@@ -311,8 +321,9 @@ export default {
       getRankImagePath,
       isGaming,
       playerGameVisuals,
-      hideMatchmakingScreen,
+      showMatchmakingScreen,
       enemyVisuals,
+      showScores,
     }
   }
 };
@@ -546,5 +557,16 @@ p {
   align-items: center;
   font-size: 160%;
   gap: 15%;
+}
+
+.scores-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  z-index: 1;
 }
 </style>

@@ -48,7 +48,7 @@ export default defineComponent({
   name: 'VsScreen',
   data() {
     return {
-      transitionImagePath: require('@/img/vs/transition.png'),
+      transitionImagePath: require('@/img/vs/transition_re.png'),
     };
   },
   setup() {
