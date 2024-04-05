@@ -271,7 +271,6 @@ export default {
     }
 
     function showMatchScore() {
-      console.log('showMatchScore', scoreScreenData);
       showScores.value = true;
       setTimeout(() => {
         if (state.socket) {

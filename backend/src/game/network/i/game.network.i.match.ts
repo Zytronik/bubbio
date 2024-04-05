@@ -15,4 +15,5 @@ export interface Match {
 export interface PlayerCredentials {
     playerID: number;
     playerName: string;
+    playerClientID: string;
 }

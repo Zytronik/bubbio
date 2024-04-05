@@ -115,8 +115,8 @@ export class GameGateway implements OnGatewayDisconnect {
       firstTo: rankedFirstTo,
       players: []
     }
-    rankedMatch.players.push({playerID: player1ID, playerName: player1.data.user.username,})
-    rankedMatch.players.push({playerID: player2ID, playerName: player2.data.user.username,})
+    rankedMatch.players.push({playerID: player1ID, playerName: player1.data.user.username, playerClientID: player1.id,})
+    rankedMatch.players.push({playerID: player2ID, playerName: player2.data.user.username, playerClientID: player2.id,})
     ongoingRankedMatches.set(rankedMatchId, rankedMatch);
 
     const players: Socket[] = [player1, player2];
@@ -242,12 +242,12 @@ export class GameGateway implements OnGatewayDisconnect {
         player1Data: {
           playerID: match.players[0].playerID,
           playerName: match.players[0].playerName,
-          playerScore: match.scoresMap.get(player.id),
+          playerScore: match.scoresMap.get(match.players[0].playerClientID),
         },
         player2Data: {
           playerID: match.players[1].playerID,
           playerName: match.players[1].playerName,
-          playerScore: match.scoresMap.get(player.id),
+          playerScore: match.scoresMap.get(match.players[1].playerClientID),
         },
       }
       this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_MATCH_SCORE, scoreData);
