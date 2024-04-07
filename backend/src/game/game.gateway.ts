@@ -134,7 +134,10 @@ export class GameGateway implements OnGatewayDisconnect {
           this.onRankedRoundVictory(rankedMatchId, player);
         }.bind(this)
       };
-      const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed);
+      const onGarbageSend = function (amount: number): void {
+        this.sendGarbageToEnemies(rankedMatchId, amount, player.id);
+      }
+      const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed, onGarbageSend);
       const game: OngoingGame = {
         playerClient: player,
         playerName: player.data.user.username,
@@ -287,6 +290,17 @@ export class GameGateway implements OnGatewayDisconnect {
     });
     this.server.to(match.matchRoomName).emit(O_RANKED_PREPARE_NEXT_ROUND, gameSetupDTO);
   }
+  
+  sendGarbageToEnemies(matchID: string, garbageAmount: number, byPlayerID: string): void {
+    const match = ongoingRankedMatches.get(matchID);
+    match.ongoingGamesMap.forEach((game, playerID) => {
+      if (playerID !== byPlayerID) {
+        game.gameInstance.queuedGarbage += garbageAmount;
+        this.updatePlayerSpectator(game);
+        this.server.to(game.spectatorsRoomName).emit(O_RECEIVE_GARBAGE, garbageAmount);
+      }
+    });
+  }
   // #endregion
 
 
@@ -389,7 +403,6 @@ export class GameGateway implements OnGatewayDisconnect {
     this.updateSpectatorEntries();
   }
   // #endregion
-
 
   // #region Spectate
   @SubscribeMessage(J_SPECTATOR_ENTRIES)

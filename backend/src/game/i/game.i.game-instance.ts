@@ -30,4 +30,5 @@ export interface GameInstance {
     processedInputsIndex: number,
 
     gameTransitions: GameTransitions,
+    sendGarbage: (amount: number) => void,
 }

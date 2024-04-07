@@ -14,7 +14,8 @@ export function createGameInstance(
     gameSettings: GameSettings,
     handlingSettings: HandlingSettings,
     gameTransitions: GameTransitions,
-    startSeed: number): GameInstance {
+    startSeed: number,
+    onGarbageSend): GameInstance {
 
     const gameInstance: GameInstance = {
         gameMode: gameMode,
@@ -47,6 +48,7 @@ export function createGameInstance(
         },
         processedInputsIndex: 0,
         gameTransitions: gameTransitions,
+        sendGarbage: onGarbageSend,
     }
     if (gameInstance.gameSettings.prefillBoard) {
         prefillBoard(gameInstance);
