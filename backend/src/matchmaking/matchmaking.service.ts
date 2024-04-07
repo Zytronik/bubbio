@@ -171,8 +171,8 @@ export class MatchmakingService {
                 playerRank: player2Rank,
                 playerGlobalRank: player2GlobalRank,
                 playerNationalRank: player2NationalRank,
-                playerGlicko: player2Glicko.rating,
-                playerRD: player2Glicko.ratingDeviation,
+                playerGlicko: Math.round(player2Glicko.rating),
+                playerRD: Math.round(player2Glicko.ratingDeviation),
                 playerProfilePicture: player2Profile.pbUrl,
                 playerCountry: player2Profile.country,
             }
