@@ -344,34 +344,39 @@ export class UserService {
     }
 
     async getNationalRank(userId: number): Promise<number> {
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-                countryCode: true,
-            },
-        });
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { id: userId },
+                select: {
+                    countryCode: true,
+                },
+            });
 
-        if (!user) {
-            throw new NotFoundException('User not found');
+            if (!user) {
+                throw new NotFoundException('User not found');
+            }
+
+            const users = await this.prisma.user.findMany({
+                where: {
+                    countryCode: user.countryCode,
+                },
+                orderBy: [
+                    {
+                        rating: 'desc',
+                    },
+                    {
+                        ratingDeviation: 'asc',
+                    },
+                ],
+            });
+
+            const userIndex = users.findIndex(user => user.id === userId);
+
+            return userIndex + 1;
+        } catch (error) {
+            console.error('Error getting national rank:', error);
+            return null;
         }
-
-        const users = await this.prisma.user.findMany({
-            where: {
-                countryCode: user.countryCode,
-            },
-            orderBy: [
-                {
-                    rating: 'desc',
-                },
-                {
-                    ratingDeviation: 'asc',
-                },
-            ],
-        });
-
-        const userIndex = users.findIndex(user => user.id === userId);
-
-        return userIndex + 1;
     }
 
     async getTotalNumberOfRegisteredUsers(): Promise<number> {
@@ -402,7 +407,7 @@ export class UserService {
             rating: Math.round(user.rating),
             ratingDeviation: Math.round(user.ratingDeviation),
             globalRank: await this.getGlobalRank(userId),
-            nationalRank: await this.getGlobalRank(userId),
+            nationalRank: await this.getNationalRank(userId),
             gamesWon: 0,
             gamesCount: 0,
             percentile: await this.getPercentile(userId),
