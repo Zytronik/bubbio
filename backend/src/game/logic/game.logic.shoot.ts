@@ -50,10 +50,15 @@ export function shootBubble(game: GameInstance): number {
     const gridField = snapToNextEmptyField(grid, bubbleCoords);
     gridField.bubble = bubble;
     const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type);
-    const garbageToSend = getGarbageAmount(bubblesCleared, game.stats.currentCombo, bounceAmount > 0)
-    if (garbageToSend > 0) {
-        game.sendGarbage(garbageToSend)
-        game.stats.attack += garbageToSend;
+    const garbageAmount = getGarbageAmount(bubblesCleared, game.stats.currentCombo, bounceAmount > 0)
+    if (garbageAmount > 0) {
+        game.queuedGarbage -= garbageAmount;
+        if (game.queuedGarbage < 0) {
+            const garbageToSend = Math.abs(game.queuedGarbage);
+            game.sendGarbage(garbageToSend);
+            game.stats.attack += garbageAmount;
+            game.queuedGarbage = 0;
+        }
     }
     trackBubbleShot(game, bounceAmount, bubblesCleared);
 

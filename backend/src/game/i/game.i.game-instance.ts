@@ -28,6 +28,7 @@ export interface GameInstance {
 
     gameStateHistory: GameStateHistory,
     processedInputsIndex: number,
+    matchID: string,
 
     gameTransitions: GameTransitions,
     sendGarbage: (amount: number) => void,

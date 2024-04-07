@@ -84,3 +84,25 @@ function checkIfGarbageKills(gameInstance: GameInstance): boolean {
     }
     return true
 }
+
+export function getGarbageAmount(clearAmount: number, combo: number, wallbounce: boolean): number {
+    if (clearAmount === 3 && !wallbounce) {
+        return Math.floor(combo / 2);
+    } 
+    if (clearAmount === 4 && !wallbounce) {
+        return Math.ceil(Math.floor(combo / 2) + combo + 2);
+    }
+    if (clearAmount >= 5 && !wallbounce) {
+        return combo + 2;
+    }
+    if (clearAmount === 3 && wallbounce) {
+        return Math.ceil(combo / 2);
+    } 
+    if (clearAmount === 4 && wallbounce) {
+        return combo + 2;
+    }
+    if (clearAmount >= 5 && wallbounce) {
+        return Math.floor(combo + 2 * 1.5);
+    }
+    return 0;
+}

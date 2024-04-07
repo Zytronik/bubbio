@@ -5,7 +5,7 @@ import { Field } from "../i/game.i.field";
 import { GameInstance } from "../i/game.i.game-instance";
 import { Grid } from "../i/game.i.grid";
 import { Coordinates } from "../i/game.i.grid-coordinates";
-import { receiveGarbage } from "./game.logic.garbage";
+import { getGarbageAmount, receiveGarbage } from "./game.logic.garbage";
 import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 
 export function executeShot(playerGameInstance: GameInstance): void {
@@ -50,6 +50,16 @@ export function shootBubble(game: GameInstance): number {
     const gridField = snapToNextEmptyField(grid, bubbleCoords);
     gridField.bubble = bubble;
     const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type);
+    const garbageAmount = getGarbageAmount(bubblesCleared, game.stats.currentCombo, bounceAmount > 0)
+    if (garbageAmount > 0) {
+        game.queuedGarbage -= garbageAmount;
+        if (game.queuedGarbage < 0) {
+            const garbageToSend = Math.abs(game.queuedGarbage);
+            game.sendGarbage(garbageToSend);
+            game.stats.attack += garbageAmount;
+            game.queuedGarbage = 0;
+        }
+    }
     trackBubbleShot(game, bounceAmount, bubblesCleared);
 
     if (bubblesCleared < 3 && grid.rows[gridField.coords.y].isInDeathZone) {

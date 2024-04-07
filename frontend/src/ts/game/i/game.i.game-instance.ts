@@ -31,4 +31,5 @@ export interface GameInstance {
     matchID: string,
 
     gameTransitions: GameTransitions,
+sendGarbage: (amount: number) => void,
 }
