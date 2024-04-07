@@ -247,6 +247,7 @@ export class GameGateway implements OnGatewayDisconnect {
     if (!matchOver) {
       const scoreData: dto_ScoreScreen = {
         matchID: matchID,
+        firstTo: match.firstTo,
         player1Data: {
           playerID: player1.playerID,
           playerName: player1.playerName,
@@ -263,27 +264,37 @@ export class GameGateway implements OnGatewayDisconnect {
     } else {
       const endScreenData: dto_EndScreen = {
         matchID: matchID,
+        firstTo: match.firstTo,
         player1Data: {
           playerID: player1.playerID,
           playerName: player1.playerName,
           playerScore: player1Score,
           hasWon: player1Score === match.firstTo,
+          eloDiff: 0
         },
         player2Data: {
           playerID: player2.playerID,
           playerName: player2.playerName,
           playerScore: player2Score,
           hasWon: player2Score === match.firstTo,
+          eloDiff: 0
         },
       }
       this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
-      let winnerID = player2.playerID
-      let loserID = player1.playerID
+      let winnerID, loserID;
       if (player1Score > player2Score) {
         winnerID = player1.playerID
         loserID = player2.playerID
+        const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
+        endScreenData.player1Data.eloDiff = eloDiffs.gainedElo;
+        endScreenData.player2Data.eloDiff = eloDiffs.lostElo;
+      } else {
+        loserID = player1.playerID
+        winnerID = player2.playerID
+        const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
+        endScreenData.player1Data.eloDiff = eloDiffs.lostElo;
+        endScreenData.player2Data.eloDiff = eloDiffs.gainedElo;
       }
-      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
       //TODO: Save match data to database
     }
   }

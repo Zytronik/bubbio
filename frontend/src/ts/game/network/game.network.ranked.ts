@@ -59,6 +59,7 @@ export const versusScreenData: dto_VersusScreen = {
 };
 export const scoreScreenData: dto_ScoreScreen = {
     matchID: "",
+    firstTo: 0,
     player1Data: {
         playerID: 0,
         playerName: "",
@@ -72,17 +73,20 @@ export const scoreScreenData: dto_ScoreScreen = {
 };
 export const endScreenData: dto_EndScreen = {
     matchID: "",
+    firstTo: 0,
     player1Data: {
         playerID: 0,
         playerName: "",
         playerScore: 0,
-        hasWon: false
+        hasWon: false,
+        eloDiff: 0,
     },
     player2Data: {
         playerID: 0,
         playerName: "",
         playerScore: 0,
-        hasWon: false
+        hasWon: false,
+        eloDiff: 0,
     }
 };
 export function network_listenToMatchFound(): void {
@@ -124,7 +128,6 @@ function network_listenToIngameUpdates(): void {
             enemyVisuals.timeDifference = data.gameInstance.stats.gameDuration - performance.now();
         });
         socket.on(O_RECEIVE_GARBAGE, (data: number) => {
-            console.log("asdfa")
             playerGameInstance.queuedGarbage += data;
         });
         socket.on(O_RANKED_YOU_WON, () => {
@@ -132,12 +135,14 @@ function network_listenToIngameUpdates(): void {
         });
         socket.on(O_RANKED_SHOW_MATCH_SCORE, (data: dto_ScoreScreen) => {
             scoreScreenData.matchID = data.matchID;
+            scoreScreenData.firstTo = data.firstTo;
             scoreScreenData.player1Data = data.player1Data;
             scoreScreenData.player2Data = data.player2Data;
             eventBus.emit("vue_showMatchScore");
         });
         socket.on(O_RANKED_SHOW_END_SCREEN, (data: dto_EndScreen) => {
             endScreenData.matchID = data.matchID;
+            endScreenData.firstTo = data.firstTo;
             endScreenData.player1Data = data.player1Data;
             endScreenData.player2Data = data.player2Data;
             network_stopListeningToServer();
