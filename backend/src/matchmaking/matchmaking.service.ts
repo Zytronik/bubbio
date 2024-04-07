@@ -3,7 +3,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Server,Socket } from 'socket.io';
 import { GameGateway } from 'src/game/game.gateway';
 import { MatchmakingGateway } from './matchmaking.gateway';
-import { GlickoService } from 'src/ranked/glicko.service';
 import { UserService } from 'src/user/user.service';
 import { dto_VersusScreen } from 'src/game/network/dto/game.network.dto.vs-screen';
 import { RanksService } from 'src/ranked/ranks.service';
@@ -32,7 +31,6 @@ export class MatchmakingService {
     constructor(
         private prismaService: PrismaService,
         private userService: UserService,
-        private glickoService: GlickoService,
         private gameGateway: GameGateway,
         @Inject(forwardRef(() => MatchmakingGateway))
         private matchmakingGateway: MatchmakingGateway,
@@ -160,8 +158,8 @@ export class MatchmakingService {
                 playerRank: player1Rank,
                 playerGlobalRank: player1GlobalRank,
                 playerNationalRank: player1NationalRank,
-                playerGlicko: player1Glicko.rating,
-                playerRD: player1Glicko.ratingDeviation,
+                playerGlicko: Math.round(player1Glicko.rating),
+                playerRD: Math.round(player1Glicko.ratingDeviation),
                 playerProfilePicture: player1Profile.pbUrl,
                 playerCountry: player1Profile.country,
             },

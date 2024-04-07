@@ -39,6 +39,7 @@ export const playerGameVisuals: GameVisuals = {
         bubblesPerSecond: ref(0),
     },
     timeDifference: 0,
+    playerName: "",
 };
 export const playerGameInstance: GameInstance = {
     gameMode: GAME_MODE.SPRINT,
@@ -110,6 +111,7 @@ export function setupSprintGame(): void {
     const instance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed, "none", onGarbageSend);
     preparePlayerGameInstance(instance);
     fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
+    playerGameVisuals.playerName = eventBus.getUserData()?.username ?? "";
     network_setupGame(playerGameInstance)
     function sprintVictory(): void {
         playerGameInstance.gameState = GAME_STATE.VICTORY_SCREEN;

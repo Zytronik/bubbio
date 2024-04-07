@@ -295,7 +295,7 @@ button.goBackButton:focus {
 
 @keyframes fadeInBackButtons {
     from {
-        opacity: 1;
+        opacity: 0;
     }
 
     to {
@@ -435,6 +435,7 @@ button.retry {
     display: flex;
     flex-direction: column;
     position: relative;
+    z-index: 1;
 }
 
 .game-wrapper .inGameStats {
@@ -746,4 +747,22 @@ button.retry {
     to {
         transform: translateX(100%);
     }
+}
+
+.fadeIn05 {
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.fadeOut05 {
+    animation: fadeOut 0.5s forwards;
 }

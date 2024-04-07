@@ -83,24 +83,25 @@
         </div>
 
         <div v-if="hasMatchFound && !isGaming">
-          <VsScreen />
+          <VsScreen/>
         </div>
 
-        <div v-if="showScores" class="scores-wrapper">
-          <div class="player1">
+        <div v-if="showScores && playerStats" class="scores-wrapper">
+          <div :class="playerStats.userId === scoreScreenData.player1Data.playerID ? 'player1' : 'player2'"> 
             <p>{{ scoreScreenData.player1Data.playerName }}</p>
             <p class="score">{{ scoreScreenData.player1Data.playerScore }}</p>
           </div>
-          <div class="player2">
+          <div :class="playerStats.userId === scoreScreenData.player2Data.playerID ? 'player1' : 'player2'"> 
             <p>{{ scoreScreenData.player2Data.playerName }}</p>
             <p class="score">{{ scoreScreenData.player2Data.playerScore }}</p>
           </div>
+          <p class="firstTo">FT{{ scoreScreenData.firstTo }}</p>
         </div>
 
         <div v-if="showEndScreen" class="endScreen-wrapper">
           <button class="backButton" @click="goBackToRankedPage()">Back</button>
           <p>Please give me data to display here.</p>
-          <p>TODO: <br>show data here<br>transfer Elo</p>
+          <p>TODO: <br>show data here</p>
         </div>
 
         <div v-if="isGaming" class="gaming-wrapper">
@@ -134,6 +135,7 @@ import { backInput } from '@/ts/input/input.all-inputs';
 import { disableResetInput, enableBackInputs } from '@/ts/input/input.input-manager';
 
 interface PlayerMatchmakingStats {
+  userId: number;
   rating: number;
   ratingDeviation: number;
   globalRank: number;
@@ -292,18 +294,26 @@ export default {
       await nextTick();
       const player1 = document.querySelector('.scores-wrapper .player1') as HTMLElement;
       const player2 = document.querySelector('.scores-wrapper .player2') as HTMLElement;
+      const firstTo = document.querySelector('.scores-wrapper .firstTo') as HTMLElement;
       if (player1 && player2) {
         player1.classList.add('slide-in-from-left');
         player2.classList.add('slide-in-from-right');
         setTimeout(() => {
-          player1.classList.add('slide-out-to-left');
-          player2.classList.add('slide-out-to-right');
+          firstTo.classList.add('fadeIn05');
+        }, 500); // css duration
+        setTimeout(() => {
+          firstTo.classList.add('fadeOut05');
           setTimeout(() => {
-            player1.classList.remove('slide-in-from-left', 'slide-out-to-left');
-            player2.classList.remove('slide-in-from-right', 'slide-out-to-right');
-            showScores.value = false;
-            onAnimationnEnd();
-          }, 500);//css animation duration
+            player1.classList.add('slide-out-to-left');
+            player2.classList.add('slide-out-to-right');
+            setTimeout(() => {
+              player1.classList.remove('slide-in-from-left', 'slide-out-to-left');
+              player2.classList.remove('slide-in-from-right', 'slide-out-to-right');
+              firstTo.classList.remove('fadeIn05', 'fadeOut05');
+              showScores.value = false;
+              onAnimationnEnd();
+            }, 500);//css animation duration
+          }, 500); // css duration
         }, 5000);
       }
     }
@@ -654,6 +664,26 @@ p {
   gap: 15%;
 }
 
+.gaming-wrapper::before,
+.gaming-wrapper::after {
+  content: "";
+  width: 50vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+}
+
+.gaming-wrapper::before {
+  left: 0;
+  background: linear-gradient(45deg, rgba(126,10,41,1) 0%, rgba(144,141,58,1) 100%);
+}
+
+.gaming-wrapper::after {
+  right: 0;
+  background: linear-gradient(45deg, rgb(10, 126, 88) 0%, rgb(144, 141, 58) 100%);
+}
+
 .scores-wrapper {
   position: fixed;
   top: 0;
@@ -664,6 +694,15 @@ p {
   z-index: 1;
   display: flex;
   flex-direction: row;
+}
+
+.scores-wrapper .firstTo {
+  position: absolute;
+  left: 50%;
+  top: 1%;
+  font-size: 2.2em;
+  transform: translateX(-50%);
+  opacity: 0;
 }
 
 .scores-wrapper>div {
@@ -689,10 +728,12 @@ p {
 }
 
 .scores-wrapper .player1 {
+  order: 1;
   transform: translateX(-100%);
 }
 
 .scores-wrapper .player2 {
+  order: 2;
   transform: translateX(100%);
 }
 

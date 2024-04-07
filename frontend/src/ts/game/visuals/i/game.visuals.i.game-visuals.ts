@@ -6,6 +6,7 @@ export interface GameVisuals {
     asciiBoard: AsciiBoardRefs,
     statNumbers: StatNumberRefs,
     timeDifference: number,
+    playerName: string,
 }
 
 export function getEmptyGameVisuals(): GameVisuals {
@@ -26,5 +27,6 @@ export function getEmptyGameVisuals(): GameVisuals {
             bubblesPerSecond: ref(0)
         },
         timeDifference: 0,
+        playerName: "",
     }
 }

@@ -393,6 +393,7 @@ export class UserService {
         }
 
         return {
+            userId,
             rating: Math.round(user.rating),
             ratingDeviation: Math.round(user.ratingDeviation),
             globalRank: await this.getGlobalRank(userId),

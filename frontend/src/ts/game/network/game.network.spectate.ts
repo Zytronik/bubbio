@@ -49,6 +49,7 @@ export function network_spectatePlayer(clientID: string): void {
             const visuals = getEmptyGameVisuals();
             fillAsciiStrings(data.gameInstance, visuals.asciiBoard);
             fillStatStrings(data.gameInstance, visuals.statNumbers);
+            visuals.playerName = data.playerName;
             visuals.timeDifference = data.gameInstance.stats.gameDuration - performance.now();
             playerNameVisualsMap.set(data.playerName, reactive(visuals));
         });

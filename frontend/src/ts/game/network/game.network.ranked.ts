@@ -125,6 +125,7 @@ function network_listenToIngameUpdates(): void {
         socket.on(O_PLAYER_SPECTATOR, (data: dto_GameInstance) => {
             fillAsciiStrings(data.gameInstance, enemyVisuals.asciiBoard);
             fillStatStrings(data.gameInstance, enemyVisuals.statNumbers);
+            enemyVisuals.playerName = data.playerName;
             enemyVisuals.timeDifference = data.gameInstance.stats.gameDuration - performance.now();
         });
         socket.on(O_RECEIVE_GARBAGE, (data: number) => {
@@ -187,6 +188,7 @@ function setupGameInstance(data: dto_GameSetup): void {
     preparePlayerGameInstance(instance);
     fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
     fillAsciiStrings(playerGameInstance, enemyVisuals.asciiBoard);
+    playerGameVisuals.playerName = eventBus.getUserData()?.username ?? "";
 }
 
 export function network_stopListeningToServer(): void {
