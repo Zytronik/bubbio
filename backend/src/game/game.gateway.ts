@@ -10,7 +10,7 @@ import { holdBubble } from './logic/game.logic.bubble-manager';
 import { dto_GameInstance } from './network/dto/game.network.dto.game-instance';
 import { dto_SpectationEntry } from './network/dto/game.network.dto.spectation-entry';
 import { GAME_STATE } from './i/game.e.state';
-import { Match, PlayerCredentials } from './network/i/game.network.i.match';
+import { Match } from './network/i/game.network.i.match';
 import { dto_VersusScreen } from './network/dto/game.network.dto.vs-screen';
 import { defaultHandlingSettings } from './default-values/game.default-values.handling-settings';
 import { GAME_MODE } from './settings/i/game.settings.e.game-modes';
@@ -32,7 +32,6 @@ O: Output Data
 DI: Debug Input
 DO: Debug Output
 */
-
 
 const O_RANKED_MATCH_FOUND = "output_rankedMatchFound";
 const O_RANKED_SETUP_GAME_INSTANCE = "output_rankedSetupGameInstance";
@@ -94,8 +93,8 @@ export class GameGateway implements OnGatewayDisconnect {
   }
 
   // #region Ranked
-  async setupRankedGame(player1: Socket, player2: Socket, player1ID: number, player2ID: number): Promise<void> {
-    const rankedMatchId = player1.id + player2.id;
+  async setupRankedGame(player1Client: Socket, player2Client: Socket, player1ID: number, player2ID: number): Promise<void> {
+    const rankedMatchId = player1Client.id + player2Client.id;
     const matchRoomName = MATCH_PREFIX + rankedMatchId;
     const vsScreenDTO: dto_VersusScreen = await this.matchmakingService.getVersusScreenDTO(player1ID, player2ID, rankedMatchId)
     const gameSetupDTO: dto_GameSetup = {
@@ -115,11 +114,11 @@ export class GameGateway implements OnGatewayDisconnect {
       firstTo: rankedFirstTo,
       players: []
     }
-    rankedMatch.players.push({playerID: player1ID, playerName: player1.data.user.username, playerClientID: player1.id,})
-    rankedMatch.players.push({playerID: player2ID, playerName: player2.data.user.username, playerClientID: player2.id,})
+    rankedMatch.players.push({playerID: player1ID, playerName: player1Client.data.user.username, playerClientID: player1Client.id,})
+    rankedMatch.players.push({playerID: player2ID, playerName: player2Client.data.user.username, playerClientID: player2Client.id,})
     ongoingRankedMatches.set(rankedMatchId, rankedMatch);
 
-    const players: Socket[] = [player1, player2];
+    const players: Socket[] = [player1Client, player2Client];
     players.forEach(player => {
       player.join(matchRoomName);
       rankedMatch.transitionConfirmationMap.set(player.id, false);
@@ -136,7 +135,7 @@ export class GameGateway implements OnGatewayDisconnect {
       };
       const onGarbageSend = function (amount: number): void {
         this.sendGarbageToEnemies(rankedMatchId, amount, player.id);
-      }
+      }.bind(this)
       const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed, onGarbageSend);
       const game: OngoingGame = {
         playerClient: player,
@@ -203,17 +202,17 @@ export class GameGateway implements OnGatewayDisconnect {
 
   spectateEnemies(client: Socket, matchID: string) {
     const match = ongoingRankedMatches.get(matchID);
-    match.ongoingGamesMap.forEach((game, playerID) => {
-      if (playerID !== client.id) {
+    match.ongoingGamesMap.forEach((game, playerClientID) => {
+      if (playerClientID !== client.id) {
         client.join(game.spectatorsRoomName);
       }
     });
   }
 
-  onRankedRoundDefeat(rankedMatchId: string, player: Socket) {
+  onRankedRoundDefeat(rankedMatchId: string, playerClient: Socket) {
     const match = ongoingRankedMatches.get(rankedMatchId);
-    match.ongoingGamesMap.get(player.id).gameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
-    this.updatePlayerSpectator(match.ongoingGamesMap.get(player.id));
+    match.ongoingGamesMap.get(playerClient.id).gameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
+    this.updatePlayerSpectator(match.ongoingGamesMap.get(playerClient.id));
     const playersAlive: string[] = []
     match.ongoingGamesMap.forEach((game, playerID) => {
       if (game.gameInstance.gameState !== GAME_STATE.DEFEAT_SCREEN) {
@@ -226,11 +225,11 @@ export class GameGateway implements OnGatewayDisconnect {
     }
   }
 
-  onRankedRoundVictory(matchID: string, player: Socket) {
+  onRankedRoundVictory(matchID: string, playerClient: Socket) {
     const match = ongoingRankedMatches.get(matchID);
-    const score = match.scoresMap.get(player.id);
-    match.scoresMap.set(player.id, score + 1);
-    player.emit(O_RANKED_YOU_WON);
+    const score = match.scoresMap.get(playerClient.id);
+    match.scoresMap.set(playerClient.id, score + 1);
+    playerClient.emit(O_RANKED_YOU_WON);
 
     let matchOver = false;
     match.scoresMap.forEach(score => {
@@ -239,18 +238,22 @@ export class GameGateway implements OnGatewayDisconnect {
       }
     });
 
+    const player1 = match.players[0]
+    const player1Score = match.scoresMap.get(player1.playerClientID)
+    const player2 = match.players[1]
+    const player2Score = match.scoresMap.get(player2.playerClientID)
     if (!matchOver) {
       const scoreData: dto_ScoreScreen = {
         matchID: matchID,
         player1Data: {
-          playerID: match.players[0].playerID,
-          playerName: match.players[0].playerName,
-          playerScore: match.scoresMap.get(match.players[0].playerClientID),
+          playerID: player1.playerID,
+          playerName: player1.playerName,
+          playerScore: player1Score,
         },
         player2Data: {
-          playerID: match.players[1].playerID,
-          playerName: match.players[1].playerName,
-          playerScore: match.scoresMap.get(match.players[1].playerClientID),
+          playerID: player2.playerID,
+          playerName: player2.playerName,
+          playerScore: player2Score,
         },
       }
       this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_MATCH_SCORE, scoreData);
@@ -258,12 +261,28 @@ export class GameGateway implements OnGatewayDisconnect {
     } else {
       const endScreenData: dto_EndScreen = {
         matchID: matchID,
+        player1Data: {
+          playerID: player1.playerID,
+          playerName: player1.playerName,
+          playerScore: player1Score,
+          hasWon: player1Score === match.firstTo,
+        },
+        player2Data: {
+          playerID: player2.playerID,
+          playerName: player2.playerName,
+          playerScore: player2Score,
+          hasWon: player2Score === match.firstTo,
+        },
       }
       this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
       //TODO: Save match data to database
-      //update Elo winner:
-      //winnerID = gimmi this
-      //loserID = gimmi this
+      if (player1Score > player2Score) {
+        const winnerID = player1.playerID
+        const loserID = player2.playerID
+      } else {
+        const winnerID = player2.playerID
+        const loserID = player1.playerID
+      }
     }
   }
 
@@ -286,7 +305,8 @@ export class GameGateway implements OnGatewayDisconnect {
     }
     match.ongoingGamesMap.forEach(game => {
       const transitions = game.gameInstance.gameTransitions;
-      const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed);
+      const onGarbageSend = game.gameInstance.sendGarbage;
+      const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed, onGarbageSend);
       game.isProcessing = false;
       game.queuedInputs = [];
       game.gameInstance = instance;
@@ -296,6 +316,7 @@ export class GameGateway implements OnGatewayDisconnect {
   }
   
   sendGarbageToEnemies(matchID: string, garbageAmount: number, byPlayerID: string): void {
+    console.log(garbageAmount, byPlayerID)
     const match = ongoingRankedMatches.get(matchID);
     match.ongoingGamesMap.forEach((game, playerID) => {
       if (playerID !== byPlayerID) {
@@ -378,10 +399,11 @@ export class GameGateway implements OnGatewayDisconnect {
         this.updateSpectatorEntries();
       }.bind(this)
     }
+    const onGarbageSend = function (amount: number): void {}
     const game: OngoingGame = {
       playerClient: client,
       playerName: client.data.user.username,
-      gameInstance: createGameInstance(gameMode, gameSettings, handlingSettings, transitions, seed),
+      gameInstance: createGameInstance(gameMode, gameSettings, handlingSettings, transitions, seed, onGarbageSend),
       spectatorsRoomName: SPECTATE_PREFIX + client.id,
       queuedInputs: [],
       isProcessing: false,

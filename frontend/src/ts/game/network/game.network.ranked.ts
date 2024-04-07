@@ -29,6 +29,7 @@ const O_RANKED_PREPARE_NEXT_ROUND = "output_rankedPrepareNextRound";
 const O_RANKED_SHOW_END_SCREEN = "output_rankedShowEndScreen";
 
 const O_PLAYER_SPECTATOR = "update_playerSpectator";
+const O_RECEIVE_GARBAGE = "output_receiveGarbage";
 export const enemyVisuals: GameVisuals = getEmptyGameVisuals();
 export const versusScreenData: dto_VersusScreen = {
     matchID: "",
@@ -69,7 +70,21 @@ export const scoreScreenData: dto_ScoreScreen = {
         playerScore: 0
     },
 };
-export const endScreenData: dto_EndScreen = {};
+export const endScreenData: dto_EndScreen = {
+    matchID: "",
+    player1Data: {
+        playerID: 0,
+        playerName: "",
+        playerScore: 0,
+        hasWon: false
+    },
+    player2Data: {
+        playerID: 0,
+        playerName: "",
+        playerScore: 0,
+        hasWon: false
+    }
+};
 export function network_listenToMatchFound(): void {
     const socket = state.socket;
     if (socket) {
@@ -108,6 +123,10 @@ function network_listenToIngameUpdates(): void {
             fillStatStrings(data.gameInstance, enemyVisuals.statNumbers);
             enemyVisuals.timeDifference = data.gameInstance.stats.gameDuration - performance.now();
         });
+        socket.on(O_RECEIVE_GARBAGE, (data: number) => {
+            console.log("asdfa")
+            playerGameInstance.queuedGarbage += data;
+        });
         socket.on(O_RANKED_YOU_WON, () => {
             playerGameInstance.gameTransitions.onGameVictory();
         });
@@ -118,7 +137,9 @@ function network_listenToIngameUpdates(): void {
             eventBus.emit("vue_showMatchScore");
         });
         socket.on(O_RANKED_SHOW_END_SCREEN, (data: dto_EndScreen) => {
-            // endScreenData.whatever = data.whatever;
+            endScreenData.matchID = data.matchID;
+            endScreenData.player1Data = data.player1Data;
+            endScreenData.player2Data = data.player2Data;
             network_stopListeningToServer();
             eventBus.emit("vue_showEndScreen");
         });
