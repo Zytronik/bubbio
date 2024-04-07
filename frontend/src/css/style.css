@@ -84,6 +84,7 @@ section .page-container {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .backButton {
@@ -335,6 +336,16 @@ button.retry {
     width: 10%;
 }
 
+.page-wrapper .moveResultScreen-left {
+    position: absolute;
+    top: 80px;
+    bottom: 80px;
+    height: calc(100% - 160px);
+    left: 15px;
+    width: calc(100% - 30px);
+    transform: translateX(-110%);
+}
+
 .loader {
     width: 80px;
     aspect-ratio: 2;
@@ -547,6 +558,15 @@ button.retry {
 }
 
 /* Game Pages */
+
+.flex-row {
+    flex-direction: row !important;
+}
+
+.flex-column {
+    flex-direction: column !important;
+}
+
 .page-dashboard {
     display: flex;
     flex-direction: row;
@@ -616,6 +636,35 @@ button.retry {
     font-size: 140%;
 }
 
+.page-wrapper .slideToRight {
+    animation: slideToRight 0.5s forwards;
+}
+
+.page-wrapper .slideLeftToCenter {
+    animation: slideLeftToCenter 0.5s forwards;
+}
+
+@keyframes slideToRight {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(110%);
+    }
+}
+
+@keyframes slideLeftToCenter {
+    from {
+        transform: translateX(-110%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+
 /* Ranked */
 .slide-out-vs-left-to-black {
     animation: slideOutToLeft 0.5s forwards;
@@ -679,6 +728,7 @@ button.retry {
     from {
         transform: translateX(0%);
     }
+
     to {
         transform: translateX(-100%);
     }
@@ -692,6 +742,7 @@ button.retry {
     from {
         transform: translateX(0%);
     }
+
     to {
         transform: translateX(100%);
     }

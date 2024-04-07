@@ -3,7 +3,7 @@
     <MenuBackButtons :buttonData="backButtonData" />
     <div class="page-wrapper">
       <div class="page-container">
-        <div v-if="!isGaming && !showMatchmakingScreen" class="page-dashboard ranked-dashboard">
+        <div v-if="!isGaming && showMatchmakingScreen" class="page-dashboard ranked-dashboard">
           <h2 id="matchFoundText">Match Found!</h2>
           <div id="matchFoundBackground"></div>
           <div class="left-content">
@@ -98,8 +98,9 @@
         </div>
 
         <div v-if="showEndScreen" class="endScreen-wrapper">
+          <button class="backButton" @click="goBackToRankedPage()">Back</button>
           <p>Please give me data to display here.</p>
-          <p>TODO: <br>transition to here<br>show data here<br>transition to ranked dashboard</p>
+          <p>TODO: <br>show data here<br>transfer Elo</p>
         </div>
 
         <div v-if="isGaming" class="gaming-wrapper">
@@ -129,6 +130,8 @@ import { scoreScreenData, endScreenData, network_stopListeningToServer, enemyVis
 import { network_listenToMatchFound } from '@/ts/game/network/game.network.ranked';
 import { playerGameVisuals } from '@/ts/game/game.master';
 import Game from '@/pages/game/Game.vue';
+import { backInput } from '@/ts/input/input.all-inputs';
+import { disableResetInput, enableBackInputs } from '@/ts/input/input.input-manager';
 
 interface PlayerMatchmakingStats {
   rating: number;
@@ -172,7 +175,7 @@ export default {
       { pageState: PAGE_STATE.roomListing, iconSrc: require('@/img/icons/rooms.png'), disabled: true },
     ]);
     const isGaming = ref(false);
-    const showMatchmakingScreen = ref(false);
+    const showMatchmakingScreen = ref(true);
     const showScores = ref(false);
     const showEndScreen = ref(false);
     const isInQueue = ref<boolean>(false);
@@ -181,6 +184,7 @@ export default {
     const passedTime = ref<number>(0);
     const userData: UserData | null = eventBus.getUserData();
     const hasMatchFound = ref<boolean>(false);
+    const backInputOnLoad = ref<() => void>(() => "");
     let passedTimeInterval: ReturnType<typeof setInterval> | undefined = 0;
 
     function getProgressBarFillWidth() {
@@ -254,7 +258,7 @@ export default {
       setTimeout(() => {
         hasMatchFound.value = true;
         setTimeout(() => {
-          showMatchmakingScreen.value = true;
+          showMatchmakingScreen.value = false;
         }, 500);
       }, 1000);
     }
@@ -304,6 +308,28 @@ export default {
       }
     }
 
+    function transitionOutOfGame(onTransitionHidden: () => void): void {
+      setTimeout(() => {
+        document.body.classList.add('slide-out-right-off-game');
+        const overlay = document.createElement('div');
+        overlay.className = 'black-overlay-left';
+        document.body.appendChild(overlay);
+        setTimeout(() => {
+          overlay.classList.add('black-overlay-cover');
+          onTransitionHidden();
+          overlay.classList.remove('black-overlay-left');
+          document.body.classList.remove('slide-out-right-off-game');
+          document.body.classList.remove('game-view');
+          setTimeout(() => {
+            disableResetInput();
+            backInput.fire = goBackToRankedPage;
+            enableBackInputs();
+            document.body.removeChild(overlay);
+          }, 1000);
+        }, 500);
+      }, 1500);
+    }
+
     function showMatchScore() {
       slideScoresIn(() => {
         if (state.socket) {
@@ -312,14 +338,46 @@ export default {
       });
     }
 
+    function goBackToRankedPage(){
+      if (showEndScreen.value) {
+        transitionEndScreenPageToDashboard();
+        backInput.fire = backInputOnLoad.value;
+      }
+    }
+
     function showEndScreenPage() {
       console.log('showEndScreen', endScreenData);
-      showEndScreen.value = true;
+      transitionOutOfGame(() => {
+        isGaming.value = false;
+        showMatchmakingScreen.value = false;
+        showEndScreen.value = true;
+      });
+    }
+
+    async function transitionEndScreenPageToDashboard() {
       isGaming.value = false;
+      showEndScreen.value = true;
+      showMatchmakingScreen.value = true;
+      await nextTick(); // if i dont do this, dashboard is undefined
+      const dashboard = document.querySelector('.ranked-dashboard') as HTMLElement;
+      const resultScreen = document.querySelector('.endScreen-wrapper') as HTMLElement;
+      const container = document.querySelector('.page-container') as HTMLElement;
+      container.classList.add('flex-row'); //add flex-row to container
+      dashboard.classList.add('moveResultScreen-left'); //position dashboard to the left
+      resultScreen.classList.add('slideToRight'); //slide result screen to the left
+      dashboard.classList.add('slideLeftToCenter'); //slide dashboard to the left
+      setTimeout(() => {
+        resultScreen.classList.remove('slideToRight'); //reset styles
+        showEndScreen.value = false; //remove result screen
+        dashboard.classList.remove('moveResultScreen-left'); //reset styles
+        dashboard.classList.remove('slideLeftToCenter'); //reset styles
+        container.classList.remove('flex-row') //remove flex-row from container
+      }, 500);
     }
 
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(126,10,41,1) 0%, rgba(144,141,58,1) 100%)');
+      backInputOnLoad.value = backInput.fire;
       fetchPlayerMmStats();
       mountSockets();
       eventBus.on("vue_matchFound", matchFound);
@@ -359,6 +417,7 @@ export default {
       showScores,
       showEndScreen,
       scoreScreenData,
+      goBackToRankedPage,
     }
   }
 };
@@ -651,13 +710,10 @@ p {
 }
 
 .endScreen-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 1);
-  color: white;
-  z-index: 1;
+  background-color: rgb(30, 30, 30);
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  box-sizing: border-box;
 }
 </style>

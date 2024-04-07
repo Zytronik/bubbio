@@ -35,12 +35,12 @@ export function getSprintSettings(): GameSettings {
 
 function getSprintVictoryCondition(floating: boolean, filled: boolean): number {
     if (floating && filled) {
-        return 200;
+        return 3;
     } else if (!floating && filled) {
-        return 100;
+        return 3;
     } else if (floating && !filled) {
-        return 100;
+        return 3;
     } else {
-        return 50;
+        return 3;
     }
 }

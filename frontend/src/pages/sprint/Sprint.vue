@@ -281,14 +281,14 @@ export default {
       const resultScreen = document.querySelector('.gameComplete') as HTMLElement;
       const container = document.querySelector('.page-container') as HTMLElement;
       container.classList.add('flex-row'); //add flex-row to container
-      dashboard.classList.add('move-left'); //position dashboard to the left
+      dashboard.classList.add('moveResultScreen-left'); //position dashboard to the left
       resultScreen.classList.add('slideToRight'); //slide result screen to the left
       dashboard.classList.add('slideLeftToCenter'); //slide dashboard to the left
       setTimeout(() => {
         leaveGame();
         resultScreen.classList.remove('slideToRight'); //reset styles
         isResultView.value = false; //remove result screen
-        dashboard.classList.remove('move-left'); //reset styles
+        dashboard.classList.remove('moveResultScreen-left'); //reset styles
         dashboard.classList.remove('slideLeftToCenter'); //reset styles
         container.classList.remove('flex-row') //remove flex-row from container
       }, 500);
@@ -528,67 +528,12 @@ export default {
   height: 100vh;
 }
 
-.inGame .backButton {
-  position: absolute;
-  left: 30px;
-  top: 30px;
-}
-
 .gameComplete {
   background-color: rgb(30, 30, 30);
   width: 100%;
   height: 100%;
   padding: 15px;
-}
-
-.flex-row {
-  flex-direction: row;
-}
-
-.flex-column {
-  flex-direction: column;
-}
-
-.slideToRight {
-  animation: slideToRight 0.5s forwards;
-}
-
-.slideLeftToCenter {
-  animation: slideLeftToCenter 0.5s forwards;
-}
-
-@keyframes slideToRight {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(110%);
-  }
-}
-
-@keyframes slideLeftToCenter {
-  from {
-    transform: translateX(-110%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
-.page-container {
-  position: relative;
-}
-
-.move-left {
-  position: absolute;
-  top: 80px;
-  bottom: 80px;
-  height: calc(100% - 160px);
-  left: 15px;
-  width: calc(100% - 30px);
-  transform: translateX(-110%);
+  box-sizing: border-box;
 }
 
 .columns {
