@@ -260,6 +260,10 @@ export class GameGateway implements OnGatewayDisconnect {
         matchID: matchID,
       }
       this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
+      //TODO: Save match data to database
+      //update Elo winner:
+      //winnerID = gimmi this
+      //loserID = gimmi this
     }
   }
 
