@@ -13,6 +13,9 @@ export interface GameStats {
     bubblesShot: number,
     bubblesPerSecond: number,
     bpsGraph: number[],
+    attack: number,
+    attackPerMinute: number,
+    attackPerBubble: number
     
     clear3: number,
     clear4: number,

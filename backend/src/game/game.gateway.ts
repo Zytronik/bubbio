@@ -114,8 +114,8 @@ export class GameGateway implements OnGatewayDisconnect {
       firstTo: rankedFirstTo,
       players: []
     }
-    rankedMatch.players.push({playerID: player1ID, playerName: player1Client.data.user.username, playerClientID: player1Client.id,})
-    rankedMatch.players.push({playerID: player2ID, playerName: player2Client.data.user.username, playerClientID: player2Client.id,})
+    rankedMatch.players.push({ playerID: player1ID, playerName: player1Client.data.user.username, playerClientID: player1Client.id, })
+    rankedMatch.players.push({ playerID: player2ID, playerName: player2Client.data.user.username, playerClientID: player2Client.id, })
     ongoingRankedMatches.set(rankedMatchId, rankedMatch);
 
     const players: Socket[] = [player1Client, player2Client];
@@ -136,7 +136,7 @@ export class GameGateway implements OnGatewayDisconnect {
       const onGarbageSend = function (amount: number): void {
         this.sendGarbageToEnemies(rankedMatchId, amount, player.id);
       }.bind(this)
-      const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed, onGarbageSend);
+      const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed, rankedMatchId, onGarbageSend);
       const game: OngoingGame = {
         playerClient: player,
         playerName: player.data.user.username,
@@ -306,7 +306,7 @@ export class GameGateway implements OnGatewayDisconnect {
     match.ongoingGamesMap.forEach(game => {
       const transitions = game.gameInstance.gameTransitions;
       const onGarbageSend = game.gameInstance.sendGarbage;
-      const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed, onGarbageSend);
+      const instance = createGameInstance(GAME_MODE.RANKED, rankedSettings, defaultHandlingSettings, transitions, gameSetupDTO.seed, match.matchID, onGarbageSend);
       game.isProcessing = false;
       game.queuedInputs = [];
       game.gameInstance = instance;
@@ -314,16 +314,17 @@ export class GameGateway implements OnGatewayDisconnect {
     });
     this.server.to(match.matchRoomName).emit(O_RANKED_PREPARE_NEXT_ROUND, gameSetupDTO);
   }
-  
-  sendGarbageToEnemies(matchID: string, garbageAmount: number, byPlayerID: string): void {
-    console.log(garbageAmount, byPlayerID)
+
+  sendGarbageToEnemies(matchID: string, garbageAmount: number, playerClientID: string): void {
+    console.log("sendGarbageToEnemies", garbageAmount, playerClientID)
     const match = ongoingRankedMatches.get(matchID);
-    match.ongoingGamesMap.forEach((game, playerID) => {
-      if (playerID !== byPlayerID) {
+    const gameOfSender = match.ongoingGamesMap.get(playerClientID);
+    this.server.to(gameOfSender.spectatorsRoomName).emit(O_RECEIVE_GARBAGE, garbageAmount);
+    match.ongoingGamesMap.forEach((game) => {
+      if (game.playerClient.id !== playerClientID) {
         game.gameInstance.queuedGarbage += garbageAmount;
-        this.updatePlayerSpectator(game);
-        this.server.to(game.spectatorsRoomName).emit(O_RECEIVE_GARBAGE, garbageAmount);
       }
+      this.updatePlayerSpectator(game);
     });
   }
   // #endregion
@@ -399,11 +400,11 @@ export class GameGateway implements OnGatewayDisconnect {
         this.updateSpectatorEntries();
       }.bind(this)
     }
-    const onGarbageSend = function (amount: number): void {}
+    const onGarbageSend = function (amount: number): void { }
     const game: OngoingGame = {
       playerClient: client,
       playerName: client.data.user.username,
-      gameInstance: createGameInstance(gameMode, gameSettings, handlingSettings, transitions, seed, onGarbageSend),
+      gameInstance: createGameInstance(gameMode, gameSettings, handlingSettings, transitions, seed, "none", onGarbageSend),
       spectatorsRoomName: SPECTATE_PREFIX + client.id,
       queuedInputs: [],
       isProcessing: false,
@@ -514,7 +515,6 @@ export class GameGateway implements OnGatewayDisconnect {
   // #region Debug
   @SubscribeMessage(DI_GET_ONGOING_GAMES)
   logOngoingGames(client: Socket): void {
-    console.log(DI_GET_ONGOING_GAMES, ongoingSingeplayerGamesMap);
     const allData: dto_GameInstance[] = []
     for (const [key, value] of ongoingSingeplayerGamesMap.entries()) {
       allData.push(this.createGameInstanceDto(value));
@@ -524,7 +524,6 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(DI_CLEAR_ONGOING_GAMES)
   clearOngoingGames(): void {
-    console.log(DI_CLEAR_ONGOING_GAMES);
     ongoingSingeplayerGamesMap.clear();
   }
   // #endregion

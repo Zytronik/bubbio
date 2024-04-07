@@ -76,8 +76,9 @@ export const playerGameInstance: GameInstance = {
         onGameReset: () => { },
         onGameDefeat: () => { },
         onGameVictory: () => { },
-        /* eslint-enable @typescript-eslint/no-empty-function */
     },
+    sendGarbage: (garbageAmount: number) => { }
+    /* eslint-enable @typescript-eslint/no-empty-function */
 };
 export function setupSprintGame(): void {
     const gameMode = GAME_MODE.SPRINT;
@@ -104,8 +105,9 @@ export function setupSprintGame(): void {
         onGameDefeat: sprintDeath,
         onGameVictory: sprintVictory,
     }
+    const onGarbageSend = function (garbageAmount: number): void {console.log("show fancy grafix")}
     const startSeed = getNextSeed(Date.now());
-    const instance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed, "none");
+    const instance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed, "none", onGarbageSend);
     preparePlayerGameInstance(instance);
     fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
     network_setupGame(playerGameInstance)

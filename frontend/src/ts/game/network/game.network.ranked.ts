@@ -168,15 +168,17 @@ function setupGameInstance(data: dto_GameSetup): void {
             playerGameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
             disableGameplay();
         },
-        /* eslint-enable @typescript-eslint/no-empty-function */
     };
+    const onGarbageSend = function (amount: number): void { }
+    /* eslint-enable @typescript-eslint/no-empty-function */
     const instance = createGameInstance(
         data.gameMode, 
         data.gameSettings, 
         getHandlingSettings(), 
         transitions, 
         data.seed,
-        data.matchID);
+        data.matchID,
+        onGarbageSend);
     preparePlayerGameInstance(instance);
     fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
     fillAsciiStrings(playerGameInstance, enemyVisuals.asciiBoard);

@@ -15,7 +15,9 @@ export function createGameInstance(
     handlingSettings: HandlingSettings,
     gameTransitions: GameTransitions,
     startSeed: number,
-    givenMatchID: string): GameInstance {
+    givenMatchID: string,
+    onGarbageSend: (amount: number) => void): GameInstance {
+
     const gameInstance: GameInstance = {
         gameMode: gameMode,
         gameSettings: gameSettings,
@@ -48,6 +50,7 @@ export function createGameInstance(
         processedInputsIndex: 0,
         matchID: givenMatchID,
         gameTransitions: gameTransitions,
+        sendGarbage: onGarbageSend,
     }
     if (gameInstance.gameSettings.prefillBoard) {
         prefillBoard(gameInstance);
@@ -58,7 +61,7 @@ export function createGameInstance(
 
 export function resetGameInstance(gameInstance: GameInstance, seed: number): void {
     gameInstance.initialSeed = seed;
-    gameInstance.gameState = GAME_STATE.READY,
+    gameInstance.gameState = GAME_STATE.READY;
     gameInstance.bubbleSeed = seed;
     gameInstance.garbageSeed = seed;
     gameInstance.angle = 90;
@@ -98,6 +101,9 @@ export function getEmptyStats(gameSettings: GameSettings): GameStats {
         bubblesShot: 0,
         bubblesPerSecond: 0,
         bpsGraph: [],
+        attack: 0,
+        attackPerMinute: 0,
+        attackPerBubble: 0,
         clear3: 0,
         clear4: 0,
         clear5: 0,
