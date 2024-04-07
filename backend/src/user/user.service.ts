@@ -323,19 +323,24 @@ export class UserService {
     }
 
     async getGlobalRank(userId: number): Promise<number> {
-        const users = await this.prisma.user.findMany({
-            orderBy: [
-                {
-                    rating: 'desc',
-                },
-                {
-                    ratingDeviation: 'asc',
-                },
-            ]
-        });
-        const userIndex = users.findIndex(user => user.id === userId);
+        try {
+            const users = await this.prisma.user.findMany({
+                orderBy: [
+                    {
+                        rating: 'desc',
+                    },
+                    {
+                        ratingDeviation: 'asc',
+                    },
+                ]
+            });
+            const userIndex = users.findIndex(user => user.id === userId);
 
-        return userIndex + 1;
+            return userIndex + 1;
+        } catch (error) {
+            console.error('Error getting global rank:', error);
+            return null;
+        }
     }
 
     async getNationalRank(userId: number): Promise<number> {
