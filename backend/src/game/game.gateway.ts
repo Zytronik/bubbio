@@ -84,14 +84,21 @@ export class GameGateway implements OnGatewayDisconnect {
     private glickoService: GlickoService,
   ) { }
 
-  handleDisconnect(client: Socket) {
-    const game = ongoingSingeplayerGamesMap.get(client.id);
-    if (game) {
-      game.gameInstance.gameState = GAME_STATE.DISCONNECTED;
-      this.updatePlayerSpectator(game)
+  handleDisconnect(client: Socket): void {
+    const singeplayerGame = ongoingSingeplayerGamesMap.get(client.id);
+    if (singeplayerGame) {
+      singeplayerGame.gameInstance.gameState = GAME_STATE.DISCONNECTED;
+      this.updatePlayerSpectator(singeplayerGame)
       ongoingSingeplayerGamesMap.delete(client.id);
       this.updateSpectatorEntries();
     }
+    ongoingRankedMatches.forEach(match => {
+      match.players.forEach(player => {
+        if (player.playerClientID === client.id) {
+          this.closeRankedMatch(match.matchID, client);
+        }
+      });
+    });
   }
 
   // #region Ranked
@@ -157,20 +164,20 @@ export class GameGateway implements OnGatewayDisconnect {
   }
 
   @SubscribeMessage(I_RANKED_SCREEN_TRANSITION_CONFIRMATION)
-  playerRankedMatchFoundConfirmation(client: Socket, matchID: string) {
+  playerRankedMatchFoundConfirmation(client: Socket, matchID: string): void {
     const match = ongoingRankedMatches.get(matchID);
     match.transitionConfirmationMap.set(client.id, true);
     this.loadRankedGameViewIfReady(match);
   }
 
   @SubscribeMessage(I_RANKED_SETUP_GAME_CONFIRMATION)
-  playerSetupGameReadyConfirmation(client: Socket, matchID: string) {
+  playerSetupGameReadyConfirmation(client: Socket, matchID: string): void {
     const match = ongoingRankedMatches.get(matchID);
     match.setupConfirmationMap.set(client.id, true);
     this.loadRankedGameViewIfReady(match);
   }
 
-  loadRankedGameViewIfReady(match: Match) {
+  loadRankedGameViewIfReady(match: Match): void {
     let allReady = true;
     match.transitionConfirmationMap.forEach(ready => {
       if (!ready) {
@@ -188,7 +195,7 @@ export class GameGateway implements OnGatewayDisconnect {
   }
 
   @SubscribeMessage(I_RANKED_READY_TO_START_GAME)
-  playerReadyToStartGame(client: Socket, matchID: string) {
+  playerReadyToStartGame(client: Socket, matchID: string): void {
     let allReady = true;
     const match = ongoingRankedMatches.get(matchID);
     match.readyToStartConfirmationMap.set(client.id, true);
@@ -202,7 +209,7 @@ export class GameGateway implements OnGatewayDisconnect {
     }
   }
 
-  spectateEnemies(client: Socket, matchID: string) {
+  spectateEnemies(client: Socket, matchID: string): void {
     const match = ongoingRankedMatches.get(matchID);
     match.ongoingGamesMap.forEach((game, playerClientID) => {
       if (playerClientID !== client.id) {
@@ -211,7 +218,7 @@ export class GameGateway implements OnGatewayDisconnect {
     });
   }
 
-  onRankedRoundDefeat(rankedMatchId: string, playerClient: Socket) {
+  onRankedRoundDefeat(rankedMatchId: string, playerClient: Socket): void {
     const match = ongoingRankedMatches.get(rankedMatchId);
     match.ongoingGamesMap.get(playerClient.id).gameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
     this.updatePlayerSpectator(match.ongoingGamesMap.get(playerClient.id));
@@ -227,7 +234,7 @@ export class GameGateway implements OnGatewayDisconnect {
     }
   }
 
-  async onRankedRoundVictory(matchID: string, playerClient: Socket) {
+  onRankedRoundVictory(matchID: string, playerClient: Socket): void {
     const match = ongoingRankedMatches.get(matchID);
     const score = match.scoresMap.get(playerClient.id);
     match.scoresMap.set(playerClient.id, score + 1);
@@ -244,6 +251,7 @@ export class GameGateway implements OnGatewayDisconnect {
     const player1Score = match.scoresMap.get(player1.playerClientID)
     const player2 = match.players[1]
     const player2Score = match.scoresMap.get(player2.playerClientID)
+
     if (!matchOver) {
       const scoreData: dto_ScoreScreen = {
         matchID: matchID,
@@ -262,44 +270,11 @@ export class GameGateway implements OnGatewayDisconnect {
       this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_MATCH_SCORE, scoreData);
       this.prepareNextRound(matchID);
     } else {
-      const endScreenData: dto_EndScreen = {
-        matchID: matchID,
-        firstTo: match.firstTo,
-        player1Data: {
-          playerID: player1.playerID,
-          playerName: player1.playerName,
-          playerScore: player1Score,
-          hasWon: player1Score === match.firstTo,
-          eloDiff: 0
-        },
-        player2Data: {
-          playerID: player2.playerID,
-          playerName: player2.playerName,
-          playerScore: player2Score,
-          hasWon: player2Score === match.firstTo,
-          eloDiff: 0
-        },
-      }
-      this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
-      let winnerID, loserID;
-      if (player1Score > player2Score) {
-        winnerID = player1.playerID
-        loserID = player2.playerID
-        const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
-        endScreenData.player1Data.eloDiff = eloDiffs.gainedElo;
-        endScreenData.player2Data.eloDiff = eloDiffs.lostElo;
-      } else {
-        loserID = player1.playerID
-        winnerID = player2.playerID
-        const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
-        endScreenData.player1Data.eloDiff = eloDiffs.lostElo;
-        endScreenData.player2Data.eloDiff = eloDiffs.gainedElo;
-      }
-      //TODO: Save match data to database
+      this.closeRankedMatch(matchID);
     }
   }
 
-  prepareNextRound(matchID: string) {
+  prepareNextRound(matchID: string): void {
     const match = ongoingRankedMatches.get(matchID);
     match.transitionConfirmationMap.forEach((confirmation, playerID) => {
       match.transitionConfirmationMap.set(playerID, false);
@@ -326,6 +301,53 @@ export class GameGateway implements OnGatewayDisconnect {
       this.updatePlayerSpectator(game);
     });
     this.server.to(match.matchRoomName).emit(O_RANKED_PREPARE_NEXT_ROUND, gameSetupDTO);
+  }
+
+  async closeRankedMatch(matchID: string, clientQuit?: Socket): Promise<void> {
+    const match = ongoingRankedMatches.get(matchID);
+    const player1 = match.players[0]
+    const player1Score = match.scoresMap.get(player1.playerClientID)
+    const player2 = match.players[1]
+    const player2Score = match.scoresMap.get(player2.playerClientID)
+    const endScreenData: dto_EndScreen = {
+      matchID: matchID,
+      firstTo: match.firstTo,
+      player1Data: {
+        playerID: player1.playerID,
+        playerName: player1.playerName,
+        playerScore: player1Score,
+        hasWon: player1Score === match.firstTo,
+        eloDiff: 0
+      },
+      player2Data: {
+        playerID: player2.playerID,
+        playerName: player2.playerName,
+        playerScore: player2Score,
+        hasWon: player2Score === match.firstTo,
+        eloDiff: 0
+      },
+    }
+    if (clientQuit) {
+      endScreenData.player1Data.hasWon = !(player1.playerClientID === clientQuit.id);
+      endScreenData.player2Data.hasWon = !(player2.playerClientID === clientQuit.id);
+    }
+    this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
+    let winnerID, loserID;
+    if (endScreenData.player1Data.hasWon) {
+      winnerID = player1.playerID
+      loserID = player2.playerID
+      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
+      endScreenData.player1Data.eloDiff = eloDiffs.gainedElo;
+      endScreenData.player2Data.eloDiff = eloDiffs.lostElo;
+    } else {
+      loserID = player1.playerID
+      winnerID = player2.playerID
+      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
+      endScreenData.player1Data.eloDiff = eloDiffs.lostElo;
+      endScreenData.player2Data.eloDiff = eloDiffs.gainedElo;
+    }
+    //TODO: Save match data to database
+    ongoingRankedMatches.delete(matchID);
   }
 
   sendGarbageToEnemies(matchID: string, garbageAmount: number, playerClientID: string): void {
