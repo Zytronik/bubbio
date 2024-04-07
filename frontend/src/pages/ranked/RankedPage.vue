@@ -351,6 +351,7 @@ export default {
         isGaming.value = false;
         showMatchmakingScreen.value = false;
         showEndScreen.value = true;
+        fetchPlayerMmStats();
       });
     }
 

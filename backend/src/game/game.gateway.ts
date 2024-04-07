@@ -22,6 +22,7 @@ import { Inject, forwardRef } from '@nestjs/common';
 import { dto_CountDown } from './network/dto/game.network.dto.count-down';
 import { dto_ScoreScreen } from './network/dto/game.network.dto.score-screen';
 import { dto_EndScreen } from './network/dto/game.network.dto.end-screen';
+import { GlickoService } from 'src/ranked/glicko.service';
 
 
 /*
@@ -80,6 +81,7 @@ export class GameGateway implements OnGatewayDisconnect {
   constructor(
     @Inject(forwardRef(() => MatchmakingService))
     private matchmakingService: MatchmakingService,
+    private glickoService: GlickoService,
   ) { }
 
   handleDisconnect(client: Socket) {
@@ -225,7 +227,7 @@ export class GameGateway implements OnGatewayDisconnect {
     }
   }
 
-  onRankedRoundVictory(matchID: string, playerClient: Socket) {
+  async onRankedRoundVictory(matchID: string, playerClient: Socket) {
     const match = ongoingRankedMatches.get(matchID);
     const score = match.scoresMap.get(playerClient.id);
     match.scoresMap.set(playerClient.id, score + 1);
@@ -275,14 +277,14 @@ export class GameGateway implements OnGatewayDisconnect {
         },
       }
       this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
-      //TODO: Save match data to database
+      let winnerID = player2.playerID
+      let loserID = player1.playerID
       if (player1Score > player2Score) {
-        const winnerID = player1.playerID
-        const loserID = player2.playerID
-      } else {
-        const winnerID = player2.playerID
-        const loserID = player1.playerID
+        winnerID = player1.playerID
+        loserID = player2.playerID
       }
+      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
+      //TODO: Save match data to database
     }
   }
 

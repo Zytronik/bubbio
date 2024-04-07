@@ -130,7 +130,7 @@ export class LeaderboardService {
                     },
                     userId: record.id,
                     rank: rankName,
-                    rating: `${record.rating} Elo`,
+                    rating: `${Math.round(record.rating)} Elo`,
                 };
             }));
 

@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import axios from 'axios';
 import { RanksService } from 'src/ranked/ranks.service';
 import { FileStorageService } from './file-storage.service';
+import { Ratings } from 'src/ranked/i/ranked.i.ratings';
 
 @Injectable()
 export class UserService {
@@ -57,7 +58,7 @@ export class UserService {
                 countryCode,
                 country,
             },
-        });        
+        });
 
         delete user.password;
         return user;
@@ -392,8 +393,8 @@ export class UserService {
         }
 
         return {
-            rating: user.rating,
-            ratingDeviation: user.ratingDeviation,
+            rating: Math.round(user.rating),
+            ratingDeviation: Math.round(user.ratingDeviation),
             globalRank: await this.getGlobalRank(userId),
             nationalRank: await this.getGlobalRank(userId),
             gamesWon: 0,
@@ -418,5 +419,26 @@ export class UserService {
         }
 
         return user;
+    }
+
+    updateGlickoRating(winnerID: number, winnerRatings: Ratings, loserID: number, loserRatings: Ratings): Promise<any> {
+        return this.prisma.$transaction([
+            this.prisma.user.update({
+                where: { id: winnerID },
+                data: {
+                    rating: winnerRatings.rating,
+                    ratingDeviation: winnerRatings.ratingDeviation,
+                    volatility: winnerRatings.volatility,
+                },
+            }),
+            this.prisma.user.update({
+                where: { id: loserID },
+                data: {
+                    rating: loserRatings.rating,
+                    ratingDeviation: loserRatings.ratingDeviation,
+                    volatility: loserRatings.volatility,
+                },
+            }),
+        ]);
     }
 }
