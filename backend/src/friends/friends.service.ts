@@ -8,23 +8,27 @@ export class FriendsService {
     ) { }
 
     async getFriends(userId: number) {
-        return this.prismaService.user.findUnique({
-            where: { id: userId },
-            select: {
-                friendsAsUser: {
-                    select: {
-                        friend: {
-                            select: {
-                                id: true,
-                                username: true,
-                            }
+        try {
+            return this.prismaService.user.findUnique({
+                where: { id: userId },
+                select: {
+                    friendsAsUser: {
+                        select: {
+                            friend: {
+                                select: {
+                                    id: true,
+                                    username: true,
+                                }
+                            },
                         },
                     },
                 },
-            },
-        }).then(result => {
-            return result.friendsAsUser.map(f => f.friend);
-        });
+            }).then(result => {
+                return result.friendsAsUser.map(f => f.friend);
+            });
+        } catch (error) {
+            throw new Error('Could not get friends.');
+        }
     }
 
     async addFriend(userId: number, friendId: number): Promise<void> {
