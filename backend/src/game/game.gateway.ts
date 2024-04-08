@@ -430,21 +430,23 @@ export class GameGateway implements OnGatewayDisconnect {
           const processedInputs = game.gameInstance.gameStateHistory.inputHistory;
           while (queuedInputs.length > processedInputs.length) {
             const inputFrame = queuedInputs[processedInputs.length];
-            if (inputFrame.input === GAME_INPUT.SHOOT) {
-              game.gameInstance.angle = inputFrame.angle;
-              executeShot(game.gameInstance);
-            } else if (inputFrame.input === GAME_INPUT.HOLD) {
-              holdBubble(game.gameInstance);
-            } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
-              game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
+            if (inputFrame) {
+              if (inputFrame.input === GAME_INPUT.SHOOT) {
+                game.gameInstance.angle = inputFrame.angle;
+                executeShot(game.gameInstance);
+              } else if (inputFrame.input === GAME_INPUT.HOLD) {
+                holdBubble(game.gameInstance);
+              } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
+                game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
+              }
+              processedInputs[inputFrame.indexID] = inputFrame;
+              game.gameInstance.stats.gameDuration = inputFrame.frameTime;
             }
-            processedInputs[inputFrame.indexID] = inputFrame;
-            game.gameInstance.stats.gameDuration = inputFrame.frameTime;
           }
           this.updatePlayerSpectator(game)
           game.isProcessing = false;
         } catch (error) {
-          client.emit(DO_LOG_ERROR, error);
+          client.emit(DO_LOG_ERROR, error.message);
           console.log(error)
         }
       }
