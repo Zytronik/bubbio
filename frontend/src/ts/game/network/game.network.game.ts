@@ -32,7 +32,7 @@ export function network_setupGame(playerGameInstance: GameInstance): void {
         network_listenToQueuedInputsIndex(playerGameInstance);
         registeredGameEvents.add(O_QUEUE_INPUTS);
     } else {
-        console.error("YOU DONT HAVE ANY SOCKETS!");
+        console.error("network_setupGame()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }
 
@@ -43,7 +43,7 @@ export function network_listenToQueuedInputsIndex(playerGameInstance: GameInstan
         });
         registeredGameEvents.add(O_QUEUE_INPUTS);
     } else {
-        console.error("YOU DONT HAVE ANY SOCKETS!");
+        console.error("network_listenToQueuedInputsIndex()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }
 
@@ -52,7 +52,7 @@ export function network_stopListenToQueuedInputsIndex(): void {
         state.socket.off(O_QUEUE_INPUTS)
         registeredGameEvents.delete(O_QUEUE_INPUTS);
     } else {
-        console.error("YOU DONT HAVE ANY SOCKETS!");
+        console.error("network_stopListenToQueuedInputsIndex()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }
 
@@ -66,7 +66,7 @@ export function network_countDownState(matchID: string, gameMode: GAME_MODE, gam
     if (state.socket) {
         state.socket.emit(I_COUNT_DOWN_STATE, countDownData);
     } else {
-        console.error("YOU DONT HAVE ANY SOCKETS!");
+        console.error("network_countDownState()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }
 
@@ -84,7 +84,7 @@ export function network_sendInputs(gameInstance: GameInstance): void {
         inputdata.inputs = gameInstance.gameStateHistory.inputHistory.slice(gameInstance.processedInputsIndex);
         state.socket.emit(I_QUEUE_INPUTS, inputdata);
     } else {
-        console.error("YOU DONT HAVE ANY SOCKETS!");
+        console.error("network_sendInputs()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }
 
@@ -92,7 +92,7 @@ export function network_resetGame(seed: number): void {
     if (state.socket) {
         state.socket.emit(I_SINGLEPLAYER_RESET_GAME, seed);
     } else {
-        console.error("YOU DONT HAVE ANY SOCKETS!");
+        console.error("network_resetGame()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }
 
@@ -101,7 +101,7 @@ export function network_leaveGame(): void {
         state.socket.emit(I_SINGLEPLAYER_LEAVE_GAME);
         network_stopListenToQueuedInputsIndex();
     } else {
-        console.error("YOU DONT HAVE ANY SOCKETS!");
+        console.error("network_leaveGame()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }
 

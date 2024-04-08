@@ -117,7 +117,7 @@ export function network_listenToMatchFound(): void {
             startGame();
         });
     } else {
-        console.error("YOU DONT HAVE ANY SOCKETS!");
+        console.error("network_listenToMatchFound()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }
 
@@ -165,7 +165,7 @@ function network_listenToIngameUpdates(): void {
             socket.emit(I_RANKED_SETUP_GAME_CONFIRMATION, data.matchID);
         });
     } else {
-        console.error("YOU DONT HAVE ANY SOCKETS!");
+        console.error("network_listenToIngameUpdates()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }
 
@@ -214,6 +214,6 @@ export function network_stopListeningToServer(): void {
         socket.off(O_RANKED_SHOW_END_SCREEN);
         socket.off(O_PLAYER_SPECTATOR);
     } else {
-        console.error("YOU DONT HAVE ANY SOCKETS!");
+        console.error("network_stopListeningToServer()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }
