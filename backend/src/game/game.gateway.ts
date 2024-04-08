@@ -72,7 +72,7 @@ const DI_CLEAR_ONGOING_GAMES = "debugInput_clearAllOngoingGames";
 const MATCH_PREFIX = "match_";
 const SPECTATE_PREFIX = "spectate_";
 const spectatorRoomName = 'spectatorRoom';
-const ongoingRankedMatches: Map<string, Match> = new Map(); //<client.id + client2.id, RankedMatch
+const ongoingRankedMatches: Map<string, Match> = new Map(); //<rankedMatchId: (client.id + client2.id), RankedMatch
 const ongoingSingeplayerGamesMap: Map<string, OngoingGame> = new Map(); //<client.id: string, OngoingGame>
 @WebSocketGateway()
 export class GameGateway implements OnGatewayDisconnect {
@@ -230,6 +230,7 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(I_RANKED_SCREEN_TRANSITION_CONFIRMATION)
   playerRankedMatchFoundConfirmation(client: Socket, matchID: string): void {
+    this.logOngoingMatches(client, matchID, "I_RANKED_SCREEN_TRANSITION_CONFIRMATION")
     const match = ongoingRankedMatches.get(matchID);
     match.transitionConfirmationMap.set(client.id, true);
     this.loadRankedGameViewIfReady(match);
@@ -237,6 +238,7 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(I_RANKED_SETUP_GAME_CONFIRMATION)
   playerSetupGameReadyConfirmation(client: Socket, matchID: string): void {
+    this.logOngoingMatches(client, matchID, "I_RANKED_SETUP_GAME_CONFIRMATION")
     const match = ongoingRankedMatches.get(matchID);
     match.setupConfirmationMap.set(client.id, true);
     this.loadRankedGameViewIfReady(match);
@@ -261,6 +263,7 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(I_RANKED_READY_TO_START_GAME)
   playerReadyToStartGame(client: Socket, matchID: string): void {
+    this.logOngoingMatches(client, matchID, "I_RANKED_READY_TO_START_GAME")
     let allReady = true;
     const match = ongoingRankedMatches.get(matchID);
     match.readyToStartConfirmationMap.set(client.id, true);
@@ -357,6 +360,15 @@ export class GameGateway implements OnGatewayDisconnect {
     }
     //TODO: Save match data to database
     ongoingRankedMatches.delete(matchID);
+  }
+
+  logOngoingMatches(client: Socket, matchID: string, caller: string): void {
+    console.log(caller)
+    console.log("client.id: ", client.id, "matchID: ", matchID)
+    console.log("ongoingRankedMatches: ")
+    ongoingRankedMatches.forEach((match, rankedMatchId) => {
+      console.log(rankedMatchId)
+    });
   }
   // #endregion
 

@@ -57,7 +57,7 @@ export function network_listenToQueuedInputsIndex(playerGameInstance: GameInstan
 }
 
 export function network_stopListenToQueuedInputsIndex(): void {
-    if (state.socket && !registeredGameEvents.has(O_QUEUE_INPUTS)) {
+    if (state.socket) {
         state.socket.off(O_QUEUE_INPUTS);
         state.socket.off(DO_LOG_ERROR);
         state.socket.off(O_DISCONNECTED);
