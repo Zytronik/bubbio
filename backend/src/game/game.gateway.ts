@@ -96,7 +96,7 @@ export class GameGateway implements OnGatewayDisconnect {
     }
     ongoingRankedMatches.forEach(match => {
       match.players.forEach(player => {
-        if (player.playerClientID === client.id) {
+        if (player.playerClient.id === client.id) {
           this.closeRankedMatch(match.matchID, client);
         }
       });
@@ -125,8 +125,8 @@ export class GameGateway implements OnGatewayDisconnect {
       firstTo: rankedFirstTo,
       players: []
     }
-    rankedMatch.players.push({ playerID: player1ID, playerName: player1Client.data.user.username, playerClientID: player1Client.id, })
-    rankedMatch.players.push({ playerID: player2ID, playerName: player2Client.data.user.username, playerClientID: player2Client.id, })
+    rankedMatch.players.push({ playerID: player1ID, playerName: player1Client.data.user.username, playerClient: player1Client, })
+    rankedMatch.players.push({ playerID: player2ID, playerName: player2Client.data.user.username, playerClient: player2Client, })
     ongoingRankedMatches.set(rankedMatchId, rankedMatch);
 
     const players: Socket[] = [player1Client, player2Client];
@@ -196,9 +196,9 @@ export class GameGateway implements OnGatewayDisconnect {
     });
 
     const player1 = match.players[0]
-    const player1Score = match.scoresMap.get(player1.playerClientID)
+    const player1Score = match.scoresMap.get(player1.playerClient.id)
     const player2 = match.players[1]
-    const player2Score = match.scoresMap.get(player2.playerClientID)
+    const player2Score = match.scoresMap.get(player2.playerClient.id)
 
     if (!matchOver) {
       const scoreData: dto_ScoreScreen = {
@@ -301,6 +301,14 @@ export class GameGateway implements OnGatewayDisconnect {
     });
   }
 
+  stopSpectatingEnemies(client: Socket, match: Match): void {
+    match.ongoingGamesMap.forEach((game, playerClientID) => {
+      if (playerClientID !== client.id) {
+        client.leave(game.spectatorsRoomName);
+      }
+    });
+  }
+
   prepareNextRound(matchID: string): void {
     const match = ongoingRankedMatches.get(matchID);
     match.transitionConfirmationMap.forEach((confirmation, playerID) => {
@@ -333,9 +341,9 @@ export class GameGateway implements OnGatewayDisconnect {
   async closeRankedMatch(matchID: string, clientQuit?: Socket): Promise<void> {
     const match = ongoingRankedMatches.get(matchID);
     const player1 = match.players[0]
-    const player1Score = match.scoresMap.get(player1.playerClientID)
+    const player1Score = match.scoresMap.get(player1.playerClient.id)
     const player2 = match.players[1]
-    const player2Score = match.scoresMap.get(player2.playerClientID)
+    const player2Score = match.scoresMap.get(player2.playerClient.id)
     const endScreenData: dto_EndScreen = {
       matchID: matchID,
       firstTo: match.firstTo,
@@ -355,8 +363,8 @@ export class GameGateway implements OnGatewayDisconnect {
       },
     }
     if (clientQuit) {
-      endScreenData.player1Data.hasWon = !(player1.playerClientID === clientQuit.id);
-      endScreenData.player2Data.hasWon = !(player2.playerClientID === clientQuit.id);
+      endScreenData.player1Data.hasWon = !(player1.playerClient.id === clientQuit.id);
+      endScreenData.player2Data.hasWon = !(player2.playerClient.id === clientQuit.id);
     }
     this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
     let winnerID, loserID;
@@ -373,6 +381,10 @@ export class GameGateway implements OnGatewayDisconnect {
       endScreenData.player1Data.eloDiff = eloDiffs.lostElo;
       endScreenData.player2Data.eloDiff = eloDiffs.gainedElo;
     }
+    match.players.forEach(player => {
+      player.playerClient.leave(match.matchRoomName);
+      this.stopSpectatingEnemies(player.playerClient, match);
+    });
     //TODO: Save match data to database
     ongoingRankedMatches.delete(matchID);
   }
@@ -418,21 +430,23 @@ export class GameGateway implements OnGatewayDisconnect {
           const processedInputs = game.gameInstance.gameStateHistory.inputHistory;
           while (queuedInputs.length > processedInputs.length) {
             const inputFrame = queuedInputs[processedInputs.length];
-            if (inputFrame.input === GAME_INPUT.SHOOT) {
-              game.gameInstance.angle = inputFrame.angle;
-              executeShot(game.gameInstance);
-            } else if (inputFrame.input === GAME_INPUT.HOLD) {
-              holdBubble(game.gameInstance);
-            } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
-              game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
+            if (inputFrame) {
+              if (inputFrame.input === GAME_INPUT.SHOOT) {
+                game.gameInstance.angle = inputFrame.angle;
+                executeShot(game.gameInstance);
+              } else if (inputFrame.input === GAME_INPUT.HOLD) {
+                holdBubble(game.gameInstance);
+              } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
+                game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
+              }
+              processedInputs[inputFrame.indexID] = inputFrame;
+              game.gameInstance.stats.gameDuration = inputFrame.frameTime;
             }
-            processedInputs[inputFrame.indexID] = inputFrame;
-            game.gameInstance.stats.gameDuration = inputFrame.frameTime;
           }
           this.updatePlayerSpectator(game)
           game.isProcessing = false;
         } catch (error) {
-          client.emit(DO_LOG_ERROR, error);
+          client.emit(DO_LOG_ERROR, error.message);
           console.log(error)
         }
       }

@@ -1,4 +1,5 @@
 import { OngoingGame } from "./game.network.i.ongoing-game";
+import { Socket } from 'socket.io';
 
 export interface Match {
     matchID: string,
@@ -15,5 +16,5 @@ export interface Match {
 export interface PlayerCredentials {
     playerID: number;
     playerName: string;
-    playerClientID: string;
+    playerClient: Socket;
 }
