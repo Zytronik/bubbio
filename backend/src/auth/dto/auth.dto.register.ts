@@ -5,8 +5,8 @@ export class RegisterDto {
     @IsNotEmpty()
     @MaxLength(15)
     @MinLength(2)
-    @Matches(/^[a-z0-9-_]+$/, {
-        message: 'Username must contain only lowercase letters, numbers, hyphens, and underscores.',
+    @Matches(/^[a-zA-Z0-9-_]+$/, {
+        message: 'Username must contain, numbers, hyphens, and underscores.',
     })
     readonly username: string;
 
