@@ -10,9 +10,9 @@
                 <div class="user-profile-inner-container">
                     <div class="user-profile-meta">
                         <div v-if="isLoggedIn && !isMyProfile" class="friend-toggle">
-                            <button title="add Friend" @click="isFriend ? removeFriend(userData.id) : addFriend(userData.id)">
+                            <!-- <button title="add Friend" @click="isFriend ? removeFriend(userData.id) : addFriend(userData.id)">
                                 {{ isFriend ? '♥' : '♡' }}
-                            </button>
+                            </button> -->
                         </div>
                         <img class="profile-pic" :src="profilePicImagePath" alt="Profile Picture">
                         <h2>{{ userData.username.toUpperCase() }}<span class="online-status"
@@ -149,12 +149,12 @@ export default defineComponent({
         });
 
         async function checkIfIsFriend() {
-            const myFriends: userFriend[] = await getFriends();
+            /* const myFriends: userFriend[] = await getFriends();
             const profile = profileData.value;
 
             if (profile && profile.id != null) {
                 return myFriends.some(friend => friend.id === profile.id);
-            }
+            } */
             return false;
         }
 
@@ -198,7 +198,7 @@ export default defineComponent({
         }
 
         async function addFriend(friendId: number) {
-            const token = localStorage.getItem('authToken');
+            /* const token = localStorage.getItem('authToken');
             const headers = token ? { Authorization: `Bearer ${token}` } : {};
             try {
                 await httpClient.post(`/friends/add`, { friendId }, { headers });
@@ -206,11 +206,11 @@ export default defineComponent({
                 isFriend.value = true;
             } catch (error) {
                 console.error("Error adding friend", error);
-            }
+            } */
         }
 
         async function removeFriend(friendId: number) {
-            const token = localStorage.getItem('authToken');
+            /* const token = localStorage.getItem('authToken');
             const headers = token ? { Authorization: `Bearer ${token}` } : {};
             try {
                 await httpClient.post(`/friends/remove`, { friendId }, { headers });
@@ -218,7 +218,7 @@ export default defineComponent({
                 isFriend.value = false;
             } catch (error) {
                 console.error("Error removing friend", error);
-            }
+            } */
         }
 
 

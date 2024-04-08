@@ -325,6 +325,9 @@ export class UserService {
     async getGlobalRank(userId: number): Promise<number> {
         try {
             const users = await this.prisma.user.findMany({
+                select: {
+                    id: true,
+                },
                 orderBy: [
                     {
                         rating: 'desc',
@@ -337,6 +340,8 @@ export class UserService {
                     }, 
                 ]
             });
+            console.log("called once");
+            console.log(users);
             const userIndex = users.findIndex(user => user.id === userId);
             return userIndex + 1;
         } catch (error) {

@@ -336,7 +336,7 @@ export default {
     const friendsList = ref<User[] | null>(null);
 
     async function updateFriendList() {
-      friendsList.value = await getFriends();
+      friendsList.value = [];//await getFriends();
     }
 
     eventBus.on('updateFriendList', updateFriendList);
