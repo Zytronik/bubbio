@@ -50,6 +50,7 @@ const I_QUEUE_INPUTS = "input_queueUpGameInputs";
 const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
 const I_COUNT_DOWN_STATE = "I_COUNT_DOWN_STATE";
 const O_RECEIVE_GARBAGE = "output_receiveGarbage";
+const O_DISCONNECTED = "output_disconnected";
 
 const I_SINGLEPLAYER_SETUP_GAME = "I_SINGLEPLAYER_SETUP_GAME";
 const I_SINGLEPLAYER_RESET_GAME = "I_SINGLEPLAYER_RESET_GAME";
@@ -63,6 +64,7 @@ const J_PLAYER_SPECTATOR = "join_playerSpectatorRoom";
 const L_PLAYER_SPECTATOR = "leave_playerSpectatorRoom";
 const O_PLAYER_SPECTATOR = "update_playerSpectator";
 
+const DO_LOG_ERROR = "debugOutput_logError";
 const DI_GET_ONGOING_GAMES = "debugInput_getAllOngoingGames";
 const DO_GET_ONGOING_GAMES = "debugOutput_getAllOngoingGames";
 const DI_CLEAR_ONGOING_GAMES = "debugInput_clearAllOngoingGames";
@@ -70,7 +72,7 @@ const DI_CLEAR_ONGOING_GAMES = "debugInput_clearAllOngoingGames";
 const MATCH_PREFIX = "match_";
 const SPECTATE_PREFIX = "spectate_";
 const spectatorRoomName = 'spectatorRoom';
-const ongoingRankedMatches: Map<string, Match> = new Map(); //<client.id + client2.id, RankedMatch
+const ongoingRankedMatches: Map<string, Match> = new Map(); //<rankedMatchId: (client.id + client2.id), RankedMatch
 const ongoingSingeplayerGamesMap: Map<string, OngoingGame> = new Map(); //<client.id: string, OngoingGame>
 @WebSocketGateway()
 export class GameGateway implements OnGatewayDisconnect {
@@ -163,62 +165,8 @@ export class GameGateway implements OnGatewayDisconnect {
     });
   }
 
-  @SubscribeMessage(I_RANKED_SCREEN_TRANSITION_CONFIRMATION)
-  playerRankedMatchFoundConfirmation(client: Socket, matchID: string): void {
-    const match = ongoingRankedMatches.get(matchID);
-    match.transitionConfirmationMap.set(client.id, true);
-    this.loadRankedGameViewIfReady(match);
-  }
-
-  @SubscribeMessage(I_RANKED_SETUP_GAME_CONFIRMATION)
-  playerSetupGameReadyConfirmation(client: Socket, matchID: string): void {
-    const match = ongoingRankedMatches.get(matchID);
-    match.setupConfirmationMap.set(client.id, true);
-    this.loadRankedGameViewIfReady(match);
-  }
-
-  loadRankedGameViewIfReady(match: Match): void {
-    let allReady = true;
-    match.transitionConfirmationMap.forEach(ready => {
-      if (!ready) {
-        allReady = false;
-      }
-    });
-    match.setupConfirmationMap.forEach(ready => {
-      if (!ready) {
-        allReady = false;
-      }
-    });
-    if (allReady) {
-      this.server.to(match.matchRoomName).emit(O_RANKED_GO_TO_GAME_VIEW);
-    }
-  }
-
-  @SubscribeMessage(I_RANKED_READY_TO_START_GAME)
-  playerReadyToStartGame(client: Socket, matchID: string): void {
-    let allReady = true;
-    const match = ongoingRankedMatches.get(matchID);
-    match.readyToStartConfirmationMap.set(client.id, true);
-    match.readyToStartConfirmationMap.forEach(ready => {
-      if (!ready) {
-        allReady = false;
-      }
-    });
-    if (allReady) {
-      this.server.to(match.matchRoomName).emit(O_RANKED_START_GAME);
-    }
-  }
-
-  spectateEnemies(client: Socket, matchID: string): void {
-    const match = ongoingRankedMatches.get(matchID);
-    match.ongoingGamesMap.forEach((game, playerClientID) => {
-      if (playerClientID !== client.id) {
-        client.join(game.spectatorsRoomName);
-      }
-    });
-  }
-
   onRankedRoundDefeat(rankedMatchId: string, playerClient: Socket): void {
+    console.log("onRankedRoundDefeat", playerClient.id)
     const match = ongoingRankedMatches.get(rankedMatchId);
     match.ongoingGamesMap.get(playerClient.id).gameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
     this.updatePlayerSpectator(match.ongoingGamesMap.get(playerClient.id));
@@ -272,6 +220,70 @@ export class GameGateway implements OnGatewayDisconnect {
     } else {
       this.closeRankedMatch(matchID);
     }
+  }
+
+  sendGarbageToEnemies(matchID: string, garbageAmount: number, playerClientID: string): void {
+    const match = ongoingRankedMatches.get(matchID);
+    const gameOfSender = match.ongoingGamesMap.get(playerClientID);
+    this.server.to(gameOfSender.spectatorsRoomName).emit(O_RECEIVE_GARBAGE, garbageAmount);
+  }
+
+  @SubscribeMessage(I_RANKED_SCREEN_TRANSITION_CONFIRMATION)
+  playerRankedMatchFoundConfirmation(client: Socket, matchID: string): void {
+    this.logOngoingMatches(client, matchID, "I_RANKED_SCREEN_TRANSITION_CONFIRMATION")
+    const match = ongoingRankedMatches.get(matchID);
+    match.transitionConfirmationMap.set(client.id, true);
+    this.loadRankedGameViewIfReady(match);
+  }
+
+  @SubscribeMessage(I_RANKED_SETUP_GAME_CONFIRMATION)
+  playerSetupGameReadyConfirmation(client: Socket, matchID: string): void {
+    this.logOngoingMatches(client, matchID, "I_RANKED_SETUP_GAME_CONFIRMATION")
+    const match = ongoingRankedMatches.get(matchID);
+    match.setupConfirmationMap.set(client.id, true);
+    this.loadRankedGameViewIfReady(match);
+  }
+
+  loadRankedGameViewIfReady(match: Match): void {
+    let allReady = true;
+    match.transitionConfirmationMap.forEach(ready => {
+      if (!ready) {
+        allReady = false;
+      }
+    });
+    match.setupConfirmationMap.forEach(ready => {
+      if (!ready) {
+        allReady = false;
+      }
+    });
+    if (allReady) {
+      this.server.to(match.matchRoomName).emit(O_RANKED_GO_TO_GAME_VIEW);
+    }
+  }
+
+  @SubscribeMessage(I_RANKED_READY_TO_START_GAME)
+  playerReadyToStartGame(client: Socket, matchID: string): void {
+    this.logOngoingMatches(client, matchID, "I_RANKED_READY_TO_START_GAME")
+    let allReady = true;
+    const match = ongoingRankedMatches.get(matchID);
+    match.readyToStartConfirmationMap.set(client.id, true);
+    match.readyToStartConfirmationMap.forEach(ready => {
+      if (!ready) {
+        allReady = false;
+      }
+    });
+    if (allReady) {
+      this.server.to(match.matchRoomName).emit(O_RANKED_START_GAME);
+    }
+  }
+
+  spectateEnemies(client: Socket, matchID: string): void {
+    const match = ongoingRankedMatches.get(matchID);
+    match.ongoingGamesMap.forEach((game, playerClientID) => {
+      if (playerClientID !== client.id) {
+        client.join(game.spectatorsRoomName);
+      }
+    });
   }
 
   prepareNextRound(matchID: string): void {
@@ -349,13 +361,21 @@ export class GameGateway implements OnGatewayDisconnect {
     //TODO: Save match data to database
     ongoingRankedMatches.delete(matchID);
   }
+
+  logOngoingMatches(client: Socket, matchID: string, caller: string): void {
+    console.log(caller)
+    console.log("client.id: ", client.id, "matchID: ", matchID)
+    console.log("ongoingRankedMatches: ")
+    ongoingRankedMatches.forEach((match, rankedMatchId) => {
+      console.log(rankedMatchId)
+    });
+  }
   // #endregion
 
 
   // #region Gameplay
   @SubscribeMessage(I_QUEUE_INPUTS)
   queueUpGameInputs(client: Socket, inputData: dto_Inputs): void {
-    console.log("ongoingRankedMatches.size", ongoingRankedMatches.size)
     let game: OngoingGame;
     if (inputData.gameMode === GAME_MODE.RANKED) {
       const match = ongoingRankedMatches.get(inputData.matchID);
@@ -364,36 +384,39 @@ export class GameGateway implements OnGatewayDisconnect {
       game = ongoingSingeplayerGamesMap.get(client.id);
     }
 
-    inputData.inputs.forEach(inputFrame => game.queuedInputs[inputFrame.indexID] = inputFrame);
-    client.emit(O_QUEUE_INPUTS, game.queuedInputs.length);
+    if (game === undefined) {
+      client.emit(O_DISCONNECTED)
+    } else {
 
-    if (!game.isProcessing) {
-      game.isProcessing = true;
-      const queuedInputs = game.queuedInputs;
-      const processedInputs = game.gameInstance.gameStateHistory.inputHistory;
-      while (queuedInputs.length > processedInputs.length) {
-        const inputFrame = queuedInputs[processedInputs.length];
-        console.log("inputFrame", inputFrame)
-        if (inputFrame.input === GAME_INPUT.SHOOT) {
-          game.gameInstance.angle = inputFrame.angle;
-          executeShot(game.gameInstance);
-        } else if (inputFrame.input === GAME_INPUT.HOLD) {
-          holdBubble(game.gameInstance);
-        } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
-          game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
+      inputData.inputs.forEach(inputFrame => game.queuedInputs[inputFrame.indexID] = inputFrame);
+      client.emit(O_QUEUE_INPUTS, game.queuedInputs.length);
+
+      if (!game.isProcessing) {
+        try {
+          game.isProcessing = true;
+          const queuedInputs = game.queuedInputs;
+          const processedInputs = game.gameInstance.gameStateHistory.inputHistory;
+          while (queuedInputs.length > processedInputs.length) {
+            const inputFrame = queuedInputs[processedInputs.length];
+            if (inputFrame.input === GAME_INPUT.SHOOT) {
+              game.gameInstance.angle = inputFrame.angle;
+              executeShot(game.gameInstance);
+            } else if (inputFrame.input === GAME_INPUT.HOLD) {
+              holdBubble(game.gameInstance);
+            } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
+              game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
+            }
+            processedInputs[inputFrame.indexID] = inputFrame;
+            game.gameInstance.stats.gameDuration = inputFrame.frameTime;
+          }
+          this.updatePlayerSpectator(game)
+          game.isProcessing = false;
+        } catch (error) {
+          client.emit(DO_LOG_ERROR, error);
+          console.log(error)
         }
-        processedInputs[inputFrame.indexID] = inputFrame;
-        game.gameInstance.stats.gameDuration = inputFrame.frameTime;
       }
-      this.updatePlayerSpectator(game)
-      game.isProcessing = false;
     }
-  }
-
-  sendGarbageToEnemies(matchID: string, garbageAmount: number, playerClientID: string): void {
-    const match = ongoingRankedMatches.get(matchID);
-    const gameOfSender = match.ongoingGamesMap.get(playerClientID);
-    this.server.to(gameOfSender.spectatorsRoomName).emit(O_RECEIVE_GARBAGE, garbageAmount);
   }
 
   @SubscribeMessage(I_COUNT_DOWN_STATE)

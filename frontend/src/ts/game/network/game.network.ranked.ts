@@ -9,7 +9,7 @@ import { getHandlingSettings } from "../settings/game.settings.handling";
 import { disableBackInputs, disableChannelInput, disableResetInput } from "@/ts/input/input.input-manager";
 import { fillAsciiStrings } from "../visuals/game.visuals.ascii";
 import { GAME_STATE } from "../i/game.e.state";
-import { network_listenToQueuedInputsIndex, network_sendInputs } from "./game.network.game";
+import { network_listenToQueuedInputsIndex, network_sendInputs, network_stopListenToQueuedInputsIndex } from "./game.network.game";
 import { dto_GameInstance } from "./dto/game.network.dto.game-instance";
 import { GameVisuals, getEmptyGameVisuals } from "../visuals/i/game.visuals.i.game-visuals";
 import { fillStatStrings } from "../visuals/game.visuals.stat-display";
@@ -92,6 +92,7 @@ export const endScreenData: dto_EndScreen = {
     }
 };
 export function network_listenToMatchFound(): void {
+    console.log("network_listenToMatchFound")
     const socket = state.socket;
     if (socket) {
         socket.on(O_RANKED_MATCH_FOUND, (data: dto_VersusScreen) => {
@@ -122,6 +123,7 @@ export function network_listenToMatchFound(): void {
 }
 
 function network_listenToIngameUpdates(): void {
+    console.log("network_listenToIngameUpdates")
     const socket = state.socket;
     if (socket) {
         socket.on(O_PLAYER_SPECTATOR, (data: dto_GameInstance) => {
@@ -203,6 +205,7 @@ function setupGameInstance(data: dto_GameSetup): void {
 }
 
 export function network_stopListeningToServer(): void {
+    console.log("game finished, stop listening to server")
     const socket = state.socket;
     if (socket) {
         socket.off(O_RANKED_MATCH_FOUND);
@@ -213,6 +216,8 @@ export function network_stopListeningToServer(): void {
         socket.off(O_RANKED_SHOW_MATCH_SCORE);
         socket.off(O_RANKED_SHOW_END_SCREEN);
         socket.off(O_PLAYER_SPECTATOR);
+        socket.off(O_RECEIVE_GARBAGE);
+        network_stopListenToQueuedInputsIndex()
     } else {
         console.error("network_stopListeningToServer()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
