@@ -379,6 +379,11 @@ export class GameGateway implements OnGatewayDisconnect {
     let game: OngoingGame;
     if (inputData.gameMode === GAME_MODE.RANKED) {
       const match = ongoingRankedMatches.get(inputData.matchID);
+      if (match === undefined) {
+        client.emit(O_DISCONNECTED)
+        console.log("match is undefined": ongoingRankedMatches)
+        return;
+      }
       game = match.ongoingGamesMap.get(client.id);
     } else if (inputData.gameMode === GAME_MODE.SPRINT) {
       game = ongoingSingeplayerGamesMap.get(client.id);
