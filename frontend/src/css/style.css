@@ -458,7 +458,7 @@ button.retry {
     align-items: flex-end;
     position: relative;
     width: 40%;
-    font-size: 160%;
+    font-size: 1.4em;
 }
 
 .gameUI-wrapper .playerName {

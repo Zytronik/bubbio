@@ -332,13 +332,15 @@ export class UserService {
                     {
                         ratingDeviation: 'asc',
                     },
+                    {
+                        username: 'asc',
+                    }, 
                 ]
             });
             const userIndex = users.findIndex(user => user.id === userId);
-
             return userIndex + 1;
         } catch (error) {
-            console.error('Error getting global rank:', error);
+            console.error('Error getting global rank.');
             return null;
         }
     }

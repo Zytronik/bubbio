@@ -27,7 +27,8 @@ export class FriendsService {
                 return result.friendsAsUser.map(f => f.friend);
             });
         } catch (error) {
-            throw new Error('Could not get friends.');
+            console.error('Could not get friends.');
+            return [];
         }
     }
 
