@@ -9,12 +9,14 @@ import { getHandlingSettings } from "../settings/game.settings.handling";
 import { disableBackInputs, disableChannelInput, disableResetInput } from "@/ts/input/input.input-manager";
 import { fillAsciiStrings } from "../visuals/game.visuals.ascii";
 import { GAME_STATE } from "../i/game.e.state";
-import { network_listenToQueuedInputsIndex } from "./game.network.game";
+import { network_listenToQueuedInputsIndex, network_sendInputs } from "./game.network.game";
 import { dto_GameInstance } from "./dto/game.network.dto.game-instance";
 import { GameVisuals, getEmptyGameVisuals } from "../visuals/i/game.visuals.i.game-visuals";
 import { fillStatStrings } from "../visuals/game.visuals.stat-display";
 import { dto_EndScreen } from "./dto/game.network.dto.end-screen";
 import { dto_ScoreScreen } from "./dto/game.network.dto.score-screen";
+import { GAME_INPUT } from "./i/game.network.i.game-input";
+import { InputFrame } from "../i/game.i.game-state-history";
 
 const O_RANKED_MATCH_FOUND = "output_rankedMatchFound";
 const O_RANKED_SETUP_GAME_INSTANCE = "output_rankedSetupGameInstance";
@@ -130,6 +132,15 @@ function network_listenToIngameUpdates(): void {
         });
         socket.on(O_RECEIVE_GARBAGE, (data: number) => {
             playerGameInstance.queuedGarbage += data;
+            const inputFrame: InputFrame = {
+                indexID: playerGameInstance.gameStateHistory.inputHistory.length,
+                frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
+                input: GAME_INPUT.GARBAGE_RECEIVED,
+                angle: playerGameInstance.angle,
+                garbageAmount: data,
+            }
+            playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
+            network_sendInputs(playerGameInstance);
         });
         socket.on(O_RANKED_YOU_WON, () => {
             playerGameInstance.gameTransitions.onGameVictory();

@@ -15,6 +15,7 @@ export interface InputFrame {
     frameTime: number,
     input: GAME_INPUT,
     angle: number,
+    garbageAmount: number,
 }
 
 interface BoardHistoryFrame {

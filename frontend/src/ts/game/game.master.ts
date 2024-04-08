@@ -220,6 +220,7 @@ export function triggerShoot(): void {
         frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
         input: GAME_INPUT.SHOOT,
         angle: playerGameInstance.angle,
+        garbageAmount: 0,
     }
     playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
     executeShot(playerGameInstance);
@@ -231,6 +232,7 @@ export function triggerHold(): void {
         frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
         input: GAME_INPUT.HOLD,
         angle: playerGameInstance.angle,
+        garbageAmount: 0,
     }
     playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
     holdBubble(playerGameInstance);
