@@ -107,7 +107,17 @@ export class LeaderboardService {
 
         let queryOptions = {
             where: whereClause,
-            orderBy: { rating: sortDirection },
+            orderBy: [
+                {
+                    rating: 'desc',
+                },
+                {
+                    ratingDeviation: 'asc',
+                },
+                {
+                    username: 'asc',
+                }, 
+            ],
             take: limit,
             select: {
                 username: true,
