@@ -164,7 +164,7 @@ interface Rank {
 
 export default {
   name: 'RankedPage',
-  components: { MenuBackButtons, VsScreen, Leaderboard, Game },
+  components: { MenuBackButtons, VsScreen/* , Leaderboard */, Game },
   data() {
     return {
       currentLeaderboard: 'Global',
