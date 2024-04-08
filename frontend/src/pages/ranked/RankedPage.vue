@@ -356,7 +356,7 @@ export default {
     }
 
     function showEndScreenPage() {
-      console.log('showEndScreen', endScreenData);
+      //console.log('showEndScreen', endScreenData);
       transitionOutOfGame(() => {
         isGaming.value = false;
         showMatchmakingScreen.value = false;
