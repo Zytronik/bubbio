@@ -314,7 +314,7 @@ export default {
               onAnimationnEnd();
             }, 500);//css animation duration
           }, 500); // css duration
-        }, 5000);
+        }, 3000);
       }
     }
 
