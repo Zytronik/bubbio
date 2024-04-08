@@ -70,14 +70,14 @@
                 </span>
               </button>
             </div>
-            <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
+            <!--<div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
               <Leaderboard :gameMode="GameMode.Ranked" :fields="['rank', 'rating']" :sortBy="'rating'"
                 :sortDirection="SortDirection.Desc" :leaderboardCategory="LeaderboardCategory.Global" :limit="30" />
             </div>
             <div v-if="currentLeaderboard === 'National'" class="l-tab national-tab">
               <Leaderboard :gameMode="GameMode.Ranked" :fields="['rank', 'rating']" :sortBy="'rating'"
                 :sortDirection="SortDirection.Desc" :leaderboardCategory="LeaderboardCategory.National" :limit="30" />
-            </div>
+            </div>-->
           </div>
 
         </div>
@@ -164,7 +164,7 @@ interface Rank {
 
 export default {
   name: 'RankedPage',
-  components: { MenuBackButtons, VsScreen, Leaderboard, Game },
+  components: { MenuBackButtons, VsScreen/* , Leaderboard */, Game },
   data() {
     return {
       currentLeaderboard: 'Global',
