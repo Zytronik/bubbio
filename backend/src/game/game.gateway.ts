@@ -381,7 +381,7 @@ export class GameGateway implements OnGatewayDisconnect {
       const match = ongoingRankedMatches.get(inputData.matchID);
       if (match === undefined) {
         client.emit(O_DISCONNECTED)
-        console.log("match is undefined": ongoingRankedMatches)
+        console.log("match is undefined", ongoingRankedMatches)
         return;
       }
       game = match.ongoingGamesMap.get(client.id);
