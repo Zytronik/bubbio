@@ -373,7 +373,6 @@ export class UserService {
                     {
                         ratingDeviation: 'asc',
                     },
-                    ,
                     {
                         username: 'asc',
                     },
