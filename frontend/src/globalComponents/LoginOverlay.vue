@@ -324,6 +324,14 @@ export default defineComponent({
   z-index: 100;
 }
 
+input {
+  text-transform: uppercase;
+}
+
+input[type="password"]{
+  text-transform: none;
+}
+
 form {
   display: flex;
   flex-direction: column;

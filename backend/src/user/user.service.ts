@@ -340,8 +340,6 @@ export class UserService {
                     }, 
                 ]
             });
-            console.log("called once");
-            console.log(users);
             const userIndex = users.findIndex(user => user.id === userId);
             return userIndex + 1;
         } catch (error) {
