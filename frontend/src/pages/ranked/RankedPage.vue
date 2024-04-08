@@ -236,9 +236,7 @@ export default {
     }
 
     async function fetchPlayerMmStats() {
-      console.log('fetching player stats');
       const token = localStorage.getItem('authToken');
-      console.log('token', token);
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       try {
         const response = await httpClient.get("/users/matchmaking/stats", {
