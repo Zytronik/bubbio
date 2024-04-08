@@ -128,7 +128,6 @@ export class LeaderboardService {
         };
 
         try {
-            console.log("Fetching ranked leaderboard data with query options:", queryOptions);
             const leaderboardRecords = await this.prisma.user.findMany(queryOptions as unknown);
 
             const formattedLeaderboard = await Promise.all(leaderboardRecords.map(async (record) => {
@@ -147,8 +146,7 @@ export class LeaderboardService {
 
             return formattedLeaderboard;
         } catch (error) {
-            console.error("Failed to fetch ranked leaderboard data:", error);
-            throw new Error("An error occurred while fetching the ranked leaderboard data.");
+            console.error("Failed to fetch ranked leaderboard data.");
         }
     }
 
