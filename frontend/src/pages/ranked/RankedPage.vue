@@ -703,6 +703,7 @@ p {
   font-size: 2.2em;
   transform: translateX(-50%);
   opacity: 0;
+  z-index: 1;
 }
 
 .scores-wrapper>div {

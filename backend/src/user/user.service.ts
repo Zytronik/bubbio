@@ -384,9 +384,15 @@ export class UserService {
         }
     }
 
-    async getTotalNumberOfRegisteredUsers(): Promise<number> {
-        return await this.prisma.user.count();
-    }
+    async getTotalNumberOfRegisteredUsers(): Promise<number | null> {
+        try {
+            const count = await this.prisma.user.count();
+            return count;
+        } catch (error) {
+            console.error('Error retrieving total number of registered users.');
+            return null;
+        }
+    }    
 
     async getPercentile(userId: number): Promise<number> {
         const rank = await this.getGlobalRank(userId);
@@ -406,17 +412,21 @@ export class UserService {
         if (!user) {
             throw new NotFoundException('User not found');
         }
+        const globalRank = await this.getGlobalRank(userId);
+        const nationalRank = await this.getNationalRank(userId);
+        const percentile = await this.getPercentile(userId);
+        const rankInfo = await this.ranksService.getRankInfo(userId);
 
         return {
             userId,
             rating: Math.round(user.rating),
             ratingDeviation: Math.round(user.ratingDeviation),
-            globalRank: await this.getGlobalRank(userId),
-            nationalRank: await this.getNationalRank(userId),
+            globalRank: globalRank,
+            nationalRank: nationalRank,
             gamesWon: 0,
             gamesCount: 0,
-            percentile: await this.getPercentile(userId),
-            rankInfo: await this.ranksService.getRankInfo(userId),
+            percentile: percentile,
+            rankInfo: rankInfo,
         };
     }
 

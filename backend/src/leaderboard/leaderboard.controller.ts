@@ -4,6 +4,7 @@ import { UserService } from 'src/user/user.service';
 import { AuthenticatedRequest } from 'src/auth/e/auth.e-auth-request';
 import { OptionalJwtAuthGuard } from 'src/auth/jwt/auth.jwt.optional-guard';
 import { ModDetail } from './i/leaderboard.i.mod-detail';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('leaderboard')
 export class LeaderboardController {
@@ -24,6 +25,7 @@ export class LeaderboardController {
         @Query('limit') limit: string,
         @Req() req: AuthenticatedRequest
     ) {
+        console.log('getLeaderboard');
         if(!mods){
             mods = [];
         }

@@ -12,6 +12,8 @@ import { GameModule } from './game/game.module';
 import { RankedModule } from './ranked/ranked.module';
 import { UsersModule } from './user/user.module';
 import { FriendsModule } from './friends/friends.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -29,6 +31,6 @@ import { FriendsModule } from './friends/friends.module';
     UsersModule,
     FriendsModule,
   ],
-  providers: [LobbyGateway, GlobalChatGateway],
+  providers: [LobbyGateway, GlobalChatGateway,],
 })
 export class AppModule { }
