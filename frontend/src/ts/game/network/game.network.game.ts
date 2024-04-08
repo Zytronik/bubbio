@@ -14,6 +14,7 @@ import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
 const I_QUEUE_INPUTS = "input_queueUpGameInputs";
 const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
 const I_COUNT_DOWN_STATE = "I_COUNT_DOWN_STATE";
+const O_DISCONNECTED = "output_disconnected";
 
 const I_SINGLEPLAYER_SETUP_GAME = "I_SINGLEPLAYER_SETUP_GAME";
 const I_SINGLEPLAYER_RESET_GAME = "I_SINGLEPLAYER_RESET_GAME";
@@ -46,6 +47,9 @@ export function network_listenToQueuedInputsIndex(playerGameInstance: GameInstan
         state.socket.on(DO_LOG_ERROR, (data) => {
             console.error("backend error: ", data);
         });
+        state.socket.on(O_DISCONNECTED, () => {
+            eventBus.emit("show-info-message", { message: "You have been disconnected from the server.", type: "error" });
+        });
         registeredGameEvents.add(O_QUEUE_INPUTS);
     } else {
         console.error("network_listenToQueuedInputsIndex()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
@@ -56,6 +60,7 @@ export function network_stopListenToQueuedInputsIndex(): void {
     if (state.socket && !registeredGameEvents.has(O_QUEUE_INPUTS)) {
         state.socket.off(O_QUEUE_INPUTS);
         state.socket.off(DO_LOG_ERROR);
+        state.socket.off(O_DISCONNECTED);
         registeredGameEvents.delete(O_QUEUE_INPUTS);
     } else {
         console.error("network_stopListenToQueuedInputsIndex()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
