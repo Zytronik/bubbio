@@ -28,7 +28,7 @@ export class LeaderboardService {
         limit: number;
     }) {
         if (criteria.gameMode === "ranked") {
-            return this.getRankedLeaderboard(criteria.sortDirection, criteria.category, criteria.country, criteria.limit);
+            return this.getRankedLeaderboard(criteria.category, criteria.country, criteria.limit);
         }
         const prismaModel = this.getPrismaModelForGameMode(criteria.gameMode);
 
@@ -98,7 +98,7 @@ export class LeaderboardService {
         return filteredRecords;
     }
 
-    async getRankedLeaderboard(sortDirection: string, category: string, country: string, limit: number) {
+    async getRankedLeaderboard(category: string, country: string, limit: number) {
         let whereClause: Record<string, string> = {};
 
         if (category === 'national' && country) {
@@ -128,6 +128,7 @@ export class LeaderboardService {
         };
 
         try {
+            console.log("Fetching ranked leaderboard data with query options:", queryOptions);
             const leaderboardRecords = await this.prisma.user.findMany(queryOptions as unknown);
 
             const formattedLeaderboard = await Promise.all(leaderboardRecords.map(async (record) => {

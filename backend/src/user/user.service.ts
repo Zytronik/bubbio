@@ -340,6 +340,7 @@ export class UserService {
                     }, 
                 ]
             });
+            console.log('users global rank:', users);
             const userIndex = users.findIndex(user => user.id === userId);
             return userIndex + 1;
         } catch (error) {
@@ -371,6 +372,10 @@ export class UserService {
                     },
                     {
                         ratingDeviation: 'asc',
+                    },
+                    ,
+                    {
+                        username: 'asc',
                     },
                 ],
             });
