@@ -163,62 +163,8 @@ export class GameGateway implements OnGatewayDisconnect {
     });
   }
 
-  @SubscribeMessage(I_RANKED_SCREEN_TRANSITION_CONFIRMATION)
-  playerRankedMatchFoundConfirmation(client: Socket, matchID: string): void {
-    const match = ongoingRankedMatches.get(matchID);
-    match.transitionConfirmationMap.set(client.id, true);
-    this.loadRankedGameViewIfReady(match);
-  }
-
-  @SubscribeMessage(I_RANKED_SETUP_GAME_CONFIRMATION)
-  playerSetupGameReadyConfirmation(client: Socket, matchID: string): void {
-    const match = ongoingRankedMatches.get(matchID);
-    match.setupConfirmationMap.set(client.id, true);
-    this.loadRankedGameViewIfReady(match);
-  }
-
-  loadRankedGameViewIfReady(match: Match): void {
-    let allReady = true;
-    match.transitionConfirmationMap.forEach(ready => {
-      if (!ready) {
-        allReady = false;
-      }
-    });
-    match.setupConfirmationMap.forEach(ready => {
-      if (!ready) {
-        allReady = false;
-      }
-    });
-    if (allReady) {
-      this.server.to(match.matchRoomName).emit(O_RANKED_GO_TO_GAME_VIEW);
-    }
-  }
-
-  @SubscribeMessage(I_RANKED_READY_TO_START_GAME)
-  playerReadyToStartGame(client: Socket, matchID: string): void {
-    let allReady = true;
-    const match = ongoingRankedMatches.get(matchID);
-    match.readyToStartConfirmationMap.set(client.id, true);
-    match.readyToStartConfirmationMap.forEach(ready => {
-      if (!ready) {
-        allReady = false;
-      }
-    });
-    if (allReady) {
-      this.server.to(match.matchRoomName).emit(O_RANKED_START_GAME);
-    }
-  }
-
-  spectateEnemies(client: Socket, matchID: string): void {
-    const match = ongoingRankedMatches.get(matchID);
-    match.ongoingGamesMap.forEach((game, playerClientID) => {
-      if (playerClientID !== client.id) {
-        client.join(game.spectatorsRoomName);
-      }
-    });
-  }
-
   onRankedRoundDefeat(rankedMatchId: string, playerClient: Socket): void {
+    console.log("onRankedRoundDefeat", playerClient.id)
     const match = ongoingRankedMatches.get(rankedMatchId);
     match.ongoingGamesMap.get(playerClient.id).gameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
     this.updatePlayerSpectator(match.ongoingGamesMap.get(playerClient.id));
@@ -272,6 +218,67 @@ export class GameGateway implements OnGatewayDisconnect {
     } else {
       this.closeRankedMatch(matchID);
     }
+  }
+
+  sendGarbageToEnemies(matchID: string, garbageAmount: number, playerClientID: string): void {
+    const match = ongoingRankedMatches.get(matchID);
+    const gameOfSender = match.ongoingGamesMap.get(playerClientID);
+    this.server.to(gameOfSender.spectatorsRoomName).emit(O_RECEIVE_GARBAGE, garbageAmount);
+  }
+
+  @SubscribeMessage(I_RANKED_SCREEN_TRANSITION_CONFIRMATION)
+  playerRankedMatchFoundConfirmation(client: Socket, matchID: string): void {
+    const match = ongoingRankedMatches.get(matchID);
+    match.transitionConfirmationMap.set(client.id, true);
+    this.loadRankedGameViewIfReady(match);
+  }
+
+  @SubscribeMessage(I_RANKED_SETUP_GAME_CONFIRMATION)
+  playerSetupGameReadyConfirmation(client: Socket, matchID: string): void {
+    const match = ongoingRankedMatches.get(matchID);
+    match.setupConfirmationMap.set(client.id, true);
+    this.loadRankedGameViewIfReady(match);
+  }
+
+  loadRankedGameViewIfReady(match: Match): void {
+    let allReady = true;
+    match.transitionConfirmationMap.forEach(ready => {
+      if (!ready) {
+        allReady = false;
+      }
+    });
+    match.setupConfirmationMap.forEach(ready => {
+      if (!ready) {
+        allReady = false;
+      }
+    });
+    if (allReady) {
+      this.server.to(match.matchRoomName).emit(O_RANKED_GO_TO_GAME_VIEW);
+    }
+  }
+
+  @SubscribeMessage(I_RANKED_READY_TO_START_GAME)
+  playerReadyToStartGame(client: Socket, matchID: string): void {
+    let allReady = true;
+    const match = ongoingRankedMatches.get(matchID);
+    match.readyToStartConfirmationMap.set(client.id, true);
+    match.readyToStartConfirmationMap.forEach(ready => {
+      if (!ready) {
+        allReady = false;
+      }
+    });
+    if (allReady) {
+      this.server.to(match.matchRoomName).emit(O_RANKED_START_GAME);
+    }
+  }
+
+  spectateEnemies(client: Socket, matchID: string): void {
+    const match = ongoingRankedMatches.get(matchID);
+    match.ongoingGamesMap.forEach((game, playerClientID) => {
+      if (playerClientID !== client.id) {
+        client.join(game.spectatorsRoomName);
+      }
+    });
   }
 
   prepareNextRound(matchID: string): void {
@@ -373,7 +380,6 @@ export class GameGateway implements OnGatewayDisconnect {
       const processedInputs = game.gameInstance.gameStateHistory.inputHistory;
       while (queuedInputs.length > processedInputs.length) {
         const inputFrame = queuedInputs[processedInputs.length];
-        console.log("inputFrame", inputFrame)
         if (inputFrame.input === GAME_INPUT.SHOOT) {
           game.gameInstance.angle = inputFrame.angle;
           executeShot(game.gameInstance);
@@ -388,12 +394,6 @@ export class GameGateway implements OnGatewayDisconnect {
       this.updatePlayerSpectator(game)
       game.isProcessing = false;
     }
-  }
-
-  sendGarbageToEnemies(matchID: string, garbageAmount: number, playerClientID: string): void {
-    const match = ongoingRankedMatches.get(matchID);
-    const gameOfSender = match.ongoingGamesMap.get(playerClientID);
-    this.server.to(gameOfSender.spectatorsRoomName).emit(O_RECEIVE_GARBAGE, garbageAmount);
   }
 
   @SubscribeMessage(I_COUNT_DOWN_STATE)

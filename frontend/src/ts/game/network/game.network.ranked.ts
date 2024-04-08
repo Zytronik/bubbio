@@ -92,6 +92,7 @@ export const endScreenData: dto_EndScreen = {
     }
 };
 export function network_listenToMatchFound(): void {
+    console.log("network_listenToMatchFound")
     const socket = state.socket;
     if (socket) {
         socket.on(O_RANKED_MATCH_FOUND, (data: dto_VersusScreen) => {
@@ -122,6 +123,7 @@ export function network_listenToMatchFound(): void {
 }
 
 function network_listenToIngameUpdates(): void {
+    console.log("network_listenToIngameUpdates")
     const socket = state.socket;
     if (socket) {
         socket.on(O_PLAYER_SPECTATOR, (data: dto_GameInstance) => {
@@ -203,6 +205,7 @@ function setupGameInstance(data: dto_GameSetup): void {
 }
 
 export function network_stopListeningToServer(): void {
+    console.log("game finished, stop listening to server")
     const socket = state.socket;
     if (socket) {
         socket.off(O_RANKED_MATCH_FOUND);
@@ -213,6 +216,7 @@ export function network_stopListeningToServer(): void {
         socket.off(O_RANKED_SHOW_MATCH_SCORE);
         socket.off(O_RANKED_SHOW_END_SCREEN);
         socket.off(O_PLAYER_SPECTATOR);
+        socket.off(O_RECEIVE_GARBAGE);
     } else {
         console.error("network_stopListeningToServer()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
