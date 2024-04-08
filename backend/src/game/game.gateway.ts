@@ -232,6 +232,11 @@ export class GameGateway implements OnGatewayDisconnect {
   playerRankedMatchFoundConfirmation(client: Socket, matchID: string): void {
     this.logOngoingMatches(client, matchID, "I_RANKED_SCREEN_TRANSITION_CONFIRMATION")
     const match = ongoingRankedMatches.get(matchID);
+    if (match === undefined) {
+      client.emit(O_DISCONNECTED)
+      console.log("match is undefined", ongoingRankedMatches)
+      return;
+    }
     match.transitionConfirmationMap.set(client.id, true);
     this.loadRankedGameViewIfReady(match);
   }
@@ -240,6 +245,11 @@ export class GameGateway implements OnGatewayDisconnect {
   playerSetupGameReadyConfirmation(client: Socket, matchID: string): void {
     this.logOngoingMatches(client, matchID, "I_RANKED_SETUP_GAME_CONFIRMATION")
     const match = ongoingRankedMatches.get(matchID);
+    if (match === undefined) {
+      client.emit(O_DISCONNECTED)
+      console.log("match is undefined", ongoingRankedMatches)
+      return;
+    }
     match.setupConfirmationMap.set(client.id, true);
     this.loadRankedGameViewIfReady(match);
   }
@@ -266,6 +276,11 @@ export class GameGateway implements OnGatewayDisconnect {
     this.logOngoingMatches(client, matchID, "I_RANKED_READY_TO_START_GAME")
     let allReady = true;
     const match = ongoingRankedMatches.get(matchID);
+    if (match === undefined) {
+      client.emit(O_DISCONNECTED)
+      console.log("match is undefined", ongoingRankedMatches)
+      return;
+    }
     match.readyToStartConfirmationMap.set(client.id, true);
     match.readyToStartConfirmationMap.forEach(ready => {
       if (!ready) {
@@ -429,6 +444,11 @@ export class GameGateway implements OnGatewayDisconnect {
     let game: OngoingGame;
     if (gameStateData.gameMode === GAME_MODE.RANKED) {
       const match = ongoingRankedMatches.get(gameStateData.matchID);
+      if (match === undefined) {
+        client.emit(O_DISCONNECTED)
+        console.log("match is undefined", ongoingRankedMatches)
+        return;
+      }
       game = match.ongoingGamesMap.get(client.id);
     } else if (gameStateData.gameMode === GAME_MODE.SPRINT) {
       game = ongoingSingeplayerGamesMap.get(client.id);
