@@ -349,19 +349,6 @@ export class GameGateway implements OnGatewayDisconnect {
     //TODO: Save match data to database
     ongoingRankedMatches.delete(matchID);
   }
-
-  sendGarbageToEnemies(matchID: string, garbageAmount: number, playerClientID: string): void {
-    console.log("sendGarbageToEnemies", garbageAmount, playerClientID)
-    const match = ongoingRankedMatches.get(matchID);
-    const gameOfSender = match.ongoingGamesMap.get(playerClientID);
-    this.server.to(gameOfSender.spectatorsRoomName).emit(O_RECEIVE_GARBAGE, garbageAmount);
-    match.ongoingGamesMap.forEach((game) => {
-      if (game.playerClient.id !== playerClientID) {
-        game.gameInstance.queuedGarbage += garbageAmount;
-      }
-      this.updatePlayerSpectator(game);
-    });
-  }
   // #endregion
 
 
@@ -390,6 +377,8 @@ export class GameGateway implements OnGatewayDisconnect {
           executeShot(game.gameInstance);
         } else if (inputFrame.input === GAME_INPUT.HOLD) {
           holdBubble(game.gameInstance);
+        } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
+          game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
         }
         processedInputs[inputFrame.indexID] = inputFrame;
         game.gameInstance.stats.gameDuration = inputFrame.frameTime;
@@ -397,6 +386,12 @@ export class GameGateway implements OnGatewayDisconnect {
       this.updatePlayerSpectator(game)
       game.isProcessing = false;
     }
+  }
+
+  sendGarbageToEnemies(matchID: string, garbageAmount: number, playerClientID: string): void {
+    const match = ongoingRankedMatches.get(matchID);
+    const gameOfSender = match.ongoingGamesMap.get(playerClientID);
+    this.server.to(gameOfSender.spectatorsRoomName).emit(O_RECEIVE_GARBAGE, garbageAmount);
   }
 
   @SubscribeMessage(I_COUNT_DOWN_STATE)

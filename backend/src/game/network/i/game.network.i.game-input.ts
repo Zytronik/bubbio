@@ -1,4 +1,5 @@
 export enum GAME_INPUT {
     SHOOT = 'SHOOT',
     HOLD = 'HOLD',
+    GARBAGE_RECEIVED = 'GARBAGE_RECEIVED',
 }
