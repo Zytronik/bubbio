@@ -355,6 +355,7 @@ export class GameGateway implements OnGatewayDisconnect {
   // #region Gameplay
   @SubscribeMessage(I_QUEUE_INPUTS)
   queueUpGameInputs(client: Socket, inputData: dto_Inputs): void {
+    console.log("ongoingRankedMatches.size", ongoingRankedMatches.size)
     let game: OngoingGame;
     if (inputData.gameMode === GAME_MODE.RANKED) {
       const match = ongoingRankedMatches.get(inputData.matchID);
@@ -372,6 +373,7 @@ export class GameGateway implements OnGatewayDisconnect {
       const processedInputs = game.gameInstance.gameStateHistory.inputHistory;
       while (queuedInputs.length > processedInputs.length) {
         const inputFrame = queuedInputs[processedInputs.length];
+        console.log("inputFrame", inputFrame)
         if (inputFrame.input === GAME_INPUT.SHOOT) {
           game.gameInstance.angle = inputFrame.angle;
           executeShot(game.gameInstance);
