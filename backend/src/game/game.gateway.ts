@@ -63,6 +63,7 @@ const J_PLAYER_SPECTATOR = "join_playerSpectatorRoom";
 const L_PLAYER_SPECTATOR = "leave_playerSpectatorRoom";
 const O_PLAYER_SPECTATOR = "update_playerSpectator";
 
+const DO_LOG_ERROR = "debugOutput_logError";
 const DI_GET_ONGOING_GAMES = "debugInput_getAllOngoingGames";
 const DO_GET_ONGOING_GAMES = "debugOutput_getAllOngoingGames";
 const DI_CLEAR_ONGOING_GAMES = "debugInput_clearAllOngoingGames";
@@ -362,7 +363,6 @@ export class GameGateway implements OnGatewayDisconnect {
   // #region Gameplay
   @SubscribeMessage(I_QUEUE_INPUTS)
   queueUpGameInputs(client: Socket, inputData: dto_Inputs): void {
-    console.log("ongoingRankedMatches.size", ongoingRankedMatches.size)
     let game: OngoingGame;
     if (inputData.gameMode === GAME_MODE.RANKED) {
       const match = ongoingRankedMatches.get(inputData.matchID);
@@ -375,24 +375,29 @@ export class GameGateway implements OnGatewayDisconnect {
     client.emit(O_QUEUE_INPUTS, game.queuedInputs.length);
 
     if (!game.isProcessing) {
-      game.isProcessing = true;
-      const queuedInputs = game.queuedInputs;
-      const processedInputs = game.gameInstance.gameStateHistory.inputHistory;
-      while (queuedInputs.length > processedInputs.length) {
-        const inputFrame = queuedInputs[processedInputs.length];
-        if (inputFrame.input === GAME_INPUT.SHOOT) {
-          game.gameInstance.angle = inputFrame.angle;
-          executeShot(game.gameInstance);
-        } else if (inputFrame.input === GAME_INPUT.HOLD) {
-          holdBubble(game.gameInstance);
-        } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
-          game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
+      try {
+        game.isProcessing = true;
+        const queuedInputs = game.queuedInputs;
+        const processedInputs = game.gameInstance.gameStateHistory.inputHistory;
+        while (queuedInputs.length > processedInputs.length) {
+          const inputFrame = queuedInputs[processedInputs.length];
+          if (inputFrame.input === GAME_INPUT.SHOOT) {
+            game.gameInstance.angle = inputFrame.angle;
+            executeShot(game.gameInstance);
+          } else if (inputFrame.input === GAME_INPUT.HOLD) {
+            holdBubble(game.gameInstance);
+          } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
+            game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
+          }
+          processedInputs[inputFrame.indexID] = inputFrame;
+          game.gameInstance.stats.gameDuration = inputFrame.frameTime;
         }
-        processedInputs[inputFrame.indexID] = inputFrame;
-        game.gameInstance.stats.gameDuration = inputFrame.frameTime;
+        this.updatePlayerSpectator(game)
+        game.isProcessing = false;
+      } catch (error) {
+        client.emit(DO_LOG_ERROR, error);
+        console.log(error)
       }
-      this.updatePlayerSpectator(game)
-      game.isProcessing = false;
     }
   }
 

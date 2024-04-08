@@ -9,7 +9,7 @@ import { getHandlingSettings } from "../settings/game.settings.handling";
 import { disableBackInputs, disableChannelInput, disableResetInput } from "@/ts/input/input.input-manager";
 import { fillAsciiStrings } from "../visuals/game.visuals.ascii";
 import { GAME_STATE } from "../i/game.e.state";
-import { network_listenToQueuedInputsIndex, network_sendInputs } from "./game.network.game";
+import { network_listenToQueuedInputsIndex, network_sendInputs, network_stopListenToQueuedInputsIndex } from "./game.network.game";
 import { dto_GameInstance } from "./dto/game.network.dto.game-instance";
 import { GameVisuals, getEmptyGameVisuals } from "../visuals/i/game.visuals.i.game-visuals";
 import { fillStatStrings } from "../visuals/game.visuals.stat-display";
@@ -217,6 +217,7 @@ export function network_stopListeningToServer(): void {
         socket.off(O_RANKED_SHOW_END_SCREEN);
         socket.off(O_PLAYER_SPECTATOR);
         socket.off(O_RECEIVE_GARBAGE);
+        network_stopListenToQueuedInputsIndex()
     } else {
         console.error("network_stopListeningToServer()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
