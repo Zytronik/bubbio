@@ -69,7 +69,7 @@ export default defineComponent({
 
       setTimeout(() => {
         slideInProfileInfo();
-      }, 1600); 
+      }, 500 + 500 + 600); 
 
       setTimeout(() => {
         slideOutProfileInfo();
@@ -81,12 +81,12 @@ export default defineComponent({
 
       setTimeout(() => {
         fadeOutVsText();
-      }, 5500 + 500);
+      }, 5000 + 500 + 500);
 
       setTimeout(() => {
         onTransitionEnd();
         fadeOutVSScreen();
-      }, 6000 + 500);
+      }, 5000 + 500 + 500 + 500);
     }
 
     function fadeOutVSScreen() {
@@ -334,7 +334,7 @@ export default defineComponent({
   position: absolute;
   z-index: 5;
   color: white;
-  width: 120%;
+  width: 125%;
 }
 
 .left .profile > * {
@@ -348,15 +348,21 @@ export default defineComponent({
 }
 
 .profile .name img {
-  height: 6vw;
+  height: 4vw;
 }
 
 .profile .name {
-  font-size: 300%;
   position: relative;
   margin-bottom: 4%;
   display: flex;
   gap: 3%;
+}
+
+.profile .name p {
+  display: flex;
+  align-items: center;
+  font-size: 3.1em;
+  margin-bottom: unset;
 }
 
 .left .profile .name {
@@ -388,7 +394,7 @@ export default defineComponent({
 
 .profile p {
   margin-bottom: 10px;
-  font-size: 220%;
+  font-size: 2.2em;
 }
 
 .profile p span {

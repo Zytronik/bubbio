@@ -6,6 +6,7 @@ import axios from 'axios';
 import { RanksService } from 'src/ranked/ranks.service';
 import { FileStorageService } from './file-storage.service';
 import { Ratings } from 'src/ranked/i/ranked.i.ratings';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -348,6 +349,33 @@ export class UserService {
         }
     }
 
+    async getGlobalRanks(userIds: number[]): Promise<{ [userId: number]: number }> {
+        try {
+            // Fetch the sorted list of all users by their ranking criteria
+            const users = await this.prisma.user.findMany({
+                orderBy: [
+                    { rating: 'desc' },
+                    { ratingDeviation: 'asc' },
+                    { username: 'asc' },
+                ],
+                select: { id: true, rating: true, ratingDeviation: true } // Select only necessary fields
+            });
+    
+            // Convert the sorted list into a map for faster lookup
+            const rankMap = new Map(users.map((user, index) => [user.id, index + 1]));
+    
+            // Create a result object to store the rank of each requested userId
+            const ranks = {};
+            userIds.forEach(userId => {
+                ranks[userId] = rankMap.get(userId) || null; // Use null or appropriate value for users not found
+            });
+            return ranks;
+        } catch (error) {
+            console.error('Error getting global ranks:', error);
+            throw error; // Rethrow or handle as needed
+        }
+    }
+
     async getNationalRank(userId: number): Promise<number> {
         try {
             const user = await this.prisma.user.findUnique({
@@ -395,12 +423,24 @@ export class UserService {
             console.error('Error retrieving total number of registered users.');
             return null;
         }
-    }    
+    }
 
     async getPercentile(userId: number): Promise<number> {
         const rank = await this.getGlobalRank(userId);
         const totalUsers = await this.getTotalNumberOfRegisteredUsers();
         return Math.round((rank / totalUsers * 100 + Number.EPSILON) * 100) / 100;
+    }
+
+    async getPercentiles(userIds: number[]): Promise<{ [userId: number]: number }> {
+        const userRanks = await this.getGlobalRanks(userIds);
+        const totalUsers = await this.getTotalNumberOfRegisteredUsers();
+        const percentiles = {};
+        userIds.forEach(userId => {
+            const rank = userRanks[userId];
+            const percentile = Math.round((rank / totalUsers * 100 + Number.EPSILON) * 100) / 100;
+            percentiles[userId] = percentile;
+        });
+        return percentiles;
     }
 
     async getMatchmakingStats(userId: number): Promise<any> {

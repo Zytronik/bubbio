@@ -116,7 +116,7 @@ export class LeaderboardService {
                 },
                 {
                     username: 'asc',
-                }, 
+                },
             ],
             take: limit,
             select: {
@@ -131,7 +131,7 @@ export class LeaderboardService {
             const leaderboardRecords = await this.prisma.user.findMany(queryOptions as unknown);
 
             const formattedLeaderboard = await Promise.all(leaderboardRecords.map(async (record) => {
-                const rankName = (await this.ranksService.getRankInfo(record.id)).ascii;
+                /* const rankName = (await this.ranksService.getRankInfo(record.id)).ascii; */
 
                 return {
                     user: {
@@ -139,12 +139,21 @@ export class LeaderboardService {
                         pbUrl: record.pbUrl,
                     },
                     userId: record.id,
-                    rank: rankName,
+                    /* rank: rankName, */
                     rating: `${Math.round(record.rating)} Elo`,
                 };
             }));
+            const ranksOfUsers = await this.ranksService.getRanksOfUsers(formattedLeaderboard.map(record => record.userId));
 
-            return formattedLeaderboard;
+            const leaderboardWithRanks = formattedLeaderboard.map(leaderboardEntry => {
+                const userRankInfo = ranksOfUsers[leaderboardEntry.userId];
+                return {
+                    ...leaderboardEntry,
+                    rank: userRankInfo ? userRankInfo.ascii : 'Unknown',
+                };
+            });
+            return leaderboardWithRanks;
+
         } catch (error) {
             console.error("Failed to fetch ranked leaderboard data.");
         }
