@@ -25,7 +25,6 @@ export class LeaderboardController {
         @Query('limit') limit: string,
         @Req() req: AuthenticatedRequest
     ) {
-        console.log('getLeaderboard');
         if(!mods){
             mods = [];
         }

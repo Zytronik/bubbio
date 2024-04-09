@@ -6,10 +6,26 @@ import { ranks } from "./ranks";
 export class RanksService {
     constructor(
         @Inject(forwardRef(() => UserService))
-        private userService: UserService
+        private userService: UserService,
     ) { }
+
+    async getRanksOfUsers(userIds: number[]) {
+        const userPercentiles = await this.userService.getPercentiles(userIds);
+        const userRanks = {};
+        for (let userId of userIds) {
+            const percentile = userPercentiles[userId];
+            const rankInfo = this.getRankFromPercentile(percentile);
+            userRanks[userId] = rankInfo;
+        }
+        return userRanks;
+    }
+
     async getRankInfo(userId: number) {
         const percentile = await this.userService.getPercentile(userId);
+        return this.getRankFromPercentile(percentile);
+    }
+
+    getRankFromPercentile(percentile: number) {
         if (percentile < ranks.p_plus.percentile) {
             return {
                 name: ranks.p_plus.name,
