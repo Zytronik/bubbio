@@ -352,14 +352,16 @@ export class GameGateway implements OnGatewayDisconnect {
         playerName: player1.playerName,
         playerScore: player1Score,
         hasWon: player1Score === match.firstTo,
-        eloDiff: 0
+        eloDiff: 0,
+        playerStats: match.ongoingGamesMap.get(player1.playerClient.id).gameInstance.stats
       },
       player2Data: {
         playerID: player2.playerID,
         playerName: player2.playerName,
         playerScore: player2Score,
         hasWon: player2Score === match.firstTo,
-        eloDiff: 0
+        eloDiff: 0,
+        playerStats: match.ongoingGamesMap.get(player2.playerClient.id).gameInstance.stats
       },
     }
     if (clientQuit) {
@@ -371,13 +373,13 @@ export class GameGateway implements OnGatewayDisconnect {
     if (endScreenData.player1Data.hasWon) {
       winnerID = player1.playerID
       loserID = player2.playerID
-      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
+      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID);
       endScreenData.player1Data.eloDiff = eloDiffs.gainedElo;
       endScreenData.player2Data.eloDiff = eloDiffs.lostElo;
     } else {
       loserID = player1.playerID
       winnerID = player2.playerID
-      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
+      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID);
       endScreenData.player1Data.eloDiff = eloDiffs.lostElo;
       endScreenData.player2Data.eloDiff = eloDiffs.gainedElo;
     }
