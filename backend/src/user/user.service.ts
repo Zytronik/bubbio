@@ -7,6 +7,7 @@ import { RanksService } from 'src/ranked/ranks.service';
 import { FileStorageService } from './file-storage.service';
 import { Ratings } from 'src/ranked/i/ranked.i.ratings';
 import { Prisma } from '@prisma/client';
+import { unrankedRatingDeviation } from 'src/ranked/ranks';
 
 @Injectable()
 export class UserService {
@@ -187,6 +188,7 @@ export class UserService {
                 pbUrl: true,
                 bannerUrl: true,
                 LastDisconnectedAt: true,
+                ratingDeviation: true,
             },
         });
 
@@ -214,12 +216,16 @@ export class UserService {
         });
 
         const sprintRank = await this.getUserSprintRank(username);
-        const rankInfos = await this.ranksService.getRankInfo(user.id);
+        let rankInfos = await this.ranksService.getRankInfo(user.id);
+        if (user.ratingDeviation >= unrankedRatingDeviation) {
+            rankInfos.isRanked = false;
+        }
 
         return {
             ...user,
             rankIcon: rankInfos.iconName,
             rankName: rankInfos.name,
+            isRanked: rankInfos.isRanked,
             sprintStats: {
                 averageBubblesCleared: sprintStats._avg.bubblesCleared,
                 averageBubblesPerSecond: sprintStats._avg.bubblesPerSecond,
@@ -323,9 +329,48 @@ export class UserService {
         });
     }
 
+    async getProbableGlobalRank(userId: number): Promise<number> {
+        try {
+            const users = await this.prisma.user.findMany({
+                where: {
+                    OR: [
+                        { ratingDeviation: { lte: unrankedRatingDeviation - 1 } },
+                        { id: userId } // Ensure the specified user is always included
+                    ]
+                },
+                select: {
+                    id: true,
+                    rating: true, // Needed for ordering
+                    ratingDeviation: true, // Needed for ordering
+                    username: true, // Needed for ordering
+                },
+                orderBy: [
+                    { rating: 'desc' },
+                    { ratingDeviation: 'asc' },
+                    { username: 'asc' },
+                ],
+            });
+
+            // Calculate rank based on position in sorted list
+            const userIndex = users.findIndex(user => user.id === userId);
+            if (userIndex === -1) {
+                return null; // User not found in the list, which shouldn't happen but good to handle
+            }
+            return userIndex + 1; // Adjusting for zero-based index to get the rank
+        } catch (error) {
+            console.error('Error getting global rank:', error);
+            return null;
+        }
+    }
+
     async getGlobalRank(userId: number): Promise<number> {
         try {
             const users = await this.prisma.user.findMany({
+                where: {
+                    ratingDeviation: {
+                        lte: unrankedRatingDeviation - 1,
+                    }
+                },
                 select: {
                     id: true,
                 },
@@ -338,7 +383,7 @@ export class UserService {
                     },
                     {
                         username: 'asc',
-                    }, 
+                    },
                 ]
             });
             const userIndex = users.findIndex(user => user.id === userId);
@@ -353,6 +398,11 @@ export class UserService {
         try {
             // Fetch the sorted list of all users by their ranking criteria
             const users = await this.prisma.user.findMany({
+                where: {
+                    ratingDeviation: {
+                        lte: unrankedRatingDeviation - 1,
+                    }
+                },
                 orderBy: [
                     { rating: 'desc' },
                     { ratingDeviation: 'asc' },
@@ -360,10 +410,10 @@ export class UserService {
                 ],
                 select: { id: true, rating: true, ratingDeviation: true } // Select only necessary fields
             });
-    
+
             // Convert the sorted list into a map for faster lookup
             const rankMap = new Map(users.map((user, index) => [user.id, index + 1]));
-    
+
             // Create a result object to store the rank of each requested userId
             const ranks = {};
             userIds.forEach(userId => {
@@ -392,6 +442,9 @@ export class UserService {
             const users = await this.prisma.user.findMany({
                 where: {
                     countryCode: user.countryCode,
+                    ratingDeviation: {
+                        lte: unrankedRatingDeviation - 1,
+                    },
                 },
                 orderBy: [
                     {
@@ -425,19 +478,41 @@ export class UserService {
         }
     }
 
+    async getNumberOfRankedPlayers(): Promise<number | null> {
+        try {
+            const count = await this.prisma.user.count({
+                where: {
+                    ratingDeviation: {
+                        lte: unrankedRatingDeviation - 1,
+                    }
+                }
+            });
+            return count;
+        } catch (error) {
+            console.error('Error retrieving number of ranked players.');
+            return null;
+        }
+    }
+
+    async getProbablyAroundPercentile(userId: number): Promise<number> {
+        const probablyRank = await this.getProbableGlobalRank(userId);
+        const totalUsersAndMe = await this.getNumberOfRankedPlayers() + 1;
+        return Math.round((probablyRank / totalUsersAndMe * 100 + Number.EPSILON) * 100) / 100;
+    }
+
     async getPercentile(userId: number): Promise<number> {
         const rank = await this.getGlobalRank(userId);
-        const totalUsers = await this.getTotalNumberOfRegisteredUsers();
+        const totalUsers = await this.getNumberOfRankedPlayers();
         return Math.round((rank / totalUsers * 100 + Number.EPSILON) * 100) / 100;
     }
 
     async getPercentiles(userIds: number[]): Promise<{ [userId: number]: number }> {
         const userRanks = await this.getGlobalRanks(userIds);
-        const totalUsers = await this.getTotalNumberOfRegisteredUsers();
+        const rankedUsers = await this.getNumberOfRankedPlayers();
         const percentiles = {};
         userIds.forEach(userId => {
             const rank = userRanks[userId];
-            const percentile = Math.round((rank / totalUsers * 100 + Number.EPSILON) * 100) / 100;
+            const percentile = Math.round((rank / rankedUsers * 100 + Number.EPSILON) * 100) / 100;
             percentiles[userId] = percentile;
         });
         return percentiles;
@@ -455,10 +530,20 @@ export class UserService {
         if (!user) {
             throw new NotFoundException('User not found');
         }
-        const globalRank = await this.getGlobalRank(userId);
-        const nationalRank = await this.getNationalRank(userId);
-        const percentile = await this.getPercentile(userId);
-        const rankInfo = await this.ranksService.getRankInfo(userId);
+        let globalRank = null;
+        let nationalRank = null;
+        let percentile = null;
+
+        let rankInfo = await this.ranksService.getRankInfo(userId);
+        if (user.ratingDeviation >= unrankedRatingDeviation) {
+            const probablyAroundRank = await this.ranksService.getProbablyAroundRank(userId);
+            rankInfo = probablyAroundRank;
+            rankInfo.isRanked = false;
+        } else {
+            globalRank = await this.getGlobalRank(userId);
+            nationalRank = await this.getNationalRank(userId);
+            percentile = await this.getPercentile(userId);
+        }
 
         return {
             userId,

@@ -7,7 +7,8 @@
           <h3>{{ userData?.username.toUpperCase() }}</h3>
           <div>
             <p>Lv.727</p>
-            <img v-if="userData?.rankIcon" class="rank-img" :src="getRankImagePath(userData.rankIcon)" :alt="userData?.rankName">
+            <img v-if="userData?.rankIcon && userData.isRanked" class="rank-img" :src="getRankImagePath(userData.rankIcon)" :alt="userData?.rankName">
+            <p v-else class="unranked">Unranked</p>
           </div>
         </div>
       </div>
@@ -154,6 +155,7 @@ export default {
       pbUrl: string;
       rankIcon?: string;
       rankName?: string;
+      isRanked?: boolean;
     }
 
     const userData = ref<UserData | null>(null);
@@ -332,6 +334,10 @@ export default {
   height: 30px;
 }
 
+.profile-content > div .unranked {
+  margin-left: 30px;
+}
+
 .profile-content h3 {
   margin: unset;
   font-size: 20px;
@@ -408,4 +414,4 @@ export default {
 
 
 
-</style>./ts/game/network/game.network.commands./ts/game/network/game.network.game
+</style>

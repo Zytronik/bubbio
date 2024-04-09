@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ModDetail } from './i/leaderboard.i.mod-detail';
 import { RanksService } from 'src/ranked/ranks.service';
+import { unrankedRatingDeviation } from 'src/ranked/ranks';
 
 @Injectable()
 export class LeaderboardService {
@@ -99,7 +100,11 @@ export class LeaderboardService {
     }
 
     async getRankedLeaderboard(category: string, country: string, limit: number) {
-        let whereClause: Record<string, string> = {};
+        let whereClause: Record<string, any> = {
+            ratingDeviation: {
+                lte: unrankedRatingDeviation - 1,
+            }
+        };
 
         if (category === 'national' && country) {
             whereClause.country = country;

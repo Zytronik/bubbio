@@ -10,21 +10,21 @@
 
             <div class="playerStats" v-if="playerStats">
               <div>
-                <img class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)"
+                <img v-if="playerStats.rankInfo.iconName && playerStats.rankInfo.isRanked" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)"
                   :alt="playerStats.rankInfo.name">
                 <div>
                   <p class="rating">{{ playerStats.rating }}<span>±{{ playerStats.ratingDeviation }}</span></p>
-                  <p class="gamesWon"><span>Games won: </span>{{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}
+                  <p v-if="playerStats.rankInfo.isRanked" class="gamesWon"><span>Games won: </span>{{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}
                   </p>
                 </div>
               </div>
-              <p class="rank">
+              <p v-if="playerStats.rankInfo.isRanked" class="rank">
                 <span v-if="currentLeaderboard === 'Global'" class="global">#{{ playerStats.globalRank }}</span>
                 <span v-if="currentLeaderboard === 'National'" class="national">#{{ playerStats.nationalRank }}</span>
               </p>
             </div>
 
-            <div v-if="playerStats" class="progressBarWrapper">
+            <div v-if="playerStats && playerStats.rankInfo.isRanked" class="progressBarWrapper">
               <div class="prevRank">
                 <p v-if="playerStats.rankInfo.prevRank?.ascii">{{ playerStats.rankInfo.percentile }}%</p>
                 <img v-if="playerStats.rankInfo.prevRank?.iconName" class="rank-img"
@@ -44,6 +44,13 @@
                 <img v-if="playerStats.rankInfo.nextRank?.iconName" class="rank-img"
                   :src="getRankImagePath(playerStats.rankInfo.nextRank.iconName)"
                   :alt="playerStats.rankInfo.nextRank.name">
+              </div>
+            </div>
+            <div v-else>
+              <p>Play some Ranked Games to get Ranked.</p>
+              <div v-if="playerStats" class="probablyAroundRank">
+                <p>Probably around:</p>
+                <img v-if="playerStats.rankInfo.iconName" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)">
               </div>
             </div>
 
@@ -153,6 +160,7 @@ interface RankInfo {
   percentile: number;
   prevRank?: Rank;
   nextRank?: Rank;
+  isRanked: boolean;
 }
 
 interface Rank {
@@ -484,6 +492,18 @@ p {
 .playerStats .rank-img {
   object-fit: contain;
   margin-right: 30px;
+}
+
+.probablyAroundRank {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.probablyAroundRank .rank-img {
+  height: 15px;
+  margin-left: 5px;
 }
 
 .playerStats .gamesWon span {

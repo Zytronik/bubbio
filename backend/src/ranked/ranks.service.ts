@@ -25,6 +25,11 @@ export class RanksService {
         return this.getRankFromPercentile(percentile);
     }
 
+    async getProbablyAroundRank(userId: number) {
+        const percentile = await this.userService.getProbablyAroundPercentile(userId);
+        return this.getRankFromPercentile(percentile);
+    }
+
     getRankFromPercentile(percentile: number) {
         if (percentile < ranks.p_plus.percentile) {
             return {
@@ -33,7 +38,8 @@ export class RanksService {
                 percentile: ranks.p_plus.percentile,
                 iconName: ranks.p_plus.iconName,
                 nextRank: {},
-                prevRank: ranks.p_minus
+                prevRank: ranks.p_minus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.p_minus.percentile) {
@@ -43,7 +49,8 @@ export class RanksService {
                 percentile: ranks.p_minus.percentile,
                 iconName: ranks.p_minus.iconName,
                 nextRank: ranks.p_plus,
-                prevRank: ranks.w_plus
+                prevRank: ranks.w_plus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.w_plus.percentile) {
@@ -53,7 +60,8 @@ export class RanksService {
                 percentile: ranks.w_plus.percentile,
                 iconName: ranks.w_plus.iconName,
                 nextRank: ranks.p_minus,
-                prevRank: ranks.w_minus
+                prevRank: ranks.w_minus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.w_minus.percentile) {
@@ -63,7 +71,8 @@ export class RanksService {
                 percentile: ranks.w_minus.percentile,
                 iconName: ranks.w_minus.iconName,
                 nextRank: ranks.w_plus,
-                prevRank: ranks.s_plus
+                prevRank: ranks.s_plus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.s_plus.percentile) {
@@ -73,7 +82,8 @@ export class RanksService {
                 percentile: ranks.s_plus.percentile,
                 iconName: ranks.s_plus.iconName,
                 nextRank: ranks.w_minus,
-                prevRank: ranks.s_minus
+                prevRank: ranks.s_minus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.s_minus.percentile) {
@@ -83,7 +93,8 @@ export class RanksService {
                 percentile: ranks.s_minus.percentile,
                 iconName: ranks.s_minus.iconName,
                 nextRank: ranks.s_plus,
-                prevRank: ranks.a_plus
+                prevRank: ranks.a_plus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.a_plus.percentile) {
@@ -93,7 +104,8 @@ export class RanksService {
                 percentile: ranks.a_plus.percentile,
                 iconName: ranks.a_plus.iconName,
                 nextRank: ranks.s_minus,
-                prevRank: ranks.a_minus
+                prevRank: ranks.a_minus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.a_minus.percentile) {
@@ -103,7 +115,8 @@ export class RanksService {
                 percentile: ranks.a_minus.percentile,
                 iconName: ranks.a_minus.iconName,
                 nextRank: ranks.a_plus,
-                prevRank: ranks.b_plus
+                prevRank: ranks.b_plus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.b_plus.percentile) {
@@ -113,7 +126,8 @@ export class RanksService {
                 percentile: ranks.b_plus.percentile,
                 iconName: ranks.b_plus.iconName,
                 nextRank: ranks.a_minus,
-                prevRank: ranks.b_minus
+                prevRank: ranks.b_minus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.b_minus.percentile) {
@@ -123,7 +137,8 @@ export class RanksService {
                 percentile: ranks.b_minus.percentile,
                 iconName: ranks.b_minus.iconName,
                 nextRank: ranks.b_plus,
-                prevRank: ranks.c_plus
+                prevRank: ranks.c_plus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.c_plus.percentile) {
@@ -133,7 +148,8 @@ export class RanksService {
                 percentile: ranks.c_plus.percentile,
                 iconName: ranks.c_plus.iconName,
                 nextRank: ranks.b_minus,
-                prevRank: ranks.c_minus
+                prevRank: ranks.c_minus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.c_minus.percentile) {
@@ -143,7 +159,8 @@ export class RanksService {
                 percentile: ranks.c_minus.percentile,
                 iconName: ranks.c_minus.iconName,
                 nextRank: ranks.c_plus,
-                prevRank: ranks.d_plus
+                prevRank: ranks.d_plus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.d_plus.percentile) {
@@ -153,7 +170,8 @@ export class RanksService {
                 percentile: ranks.d_plus.percentile,
                 iconName: ranks.d_plus.iconName,
                 nextRank: ranks.c_minus,
-                prevRank: ranks.d_minus
+                prevRank: ranks.d_minus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.d_minus.percentile) {
@@ -163,7 +181,8 @@ export class RanksService {
                 percentile: ranks.d_minus.percentile,
                 iconName: ranks.d_minus.iconName,
                 nextRank: ranks.d_plus,
-                prevRank: ranks.e_plus
+                prevRank: ranks.e_plus,
+                isRanked: true,
             };
         }
         if (percentile < ranks.e_plus.percentile) {
@@ -173,7 +192,8 @@ export class RanksService {
                 percentile: ranks.e_plus.percentile,
                 iconName: ranks.e_plus.iconName,
                 nextRank: ranks.d_minus,
-                prevRank: ranks.e_minus
+                prevRank: ranks.e_minus,
+                isRanked: true,
             };
         }
         return {
@@ -182,7 +202,8 @@ export class RanksService {
             percentile: ranks.e_minus.percentile,
             iconName: ranks.e_minus.iconName,
             nextRank: ranks.e_plus,
-            prevRank: {}
+            prevRank: {},
+            isRanked: true,
         };
     }
 }
