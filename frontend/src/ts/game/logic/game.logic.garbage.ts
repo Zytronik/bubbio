@@ -17,7 +17,7 @@ export function prefillBoard(gameInstance: GameInstance): void {
     }
 }
 
-export function receiveGarbage(gameInstance: GameInstance): void {
+export function receiveGarbageAndCheckDead(gameInstance: GameInstance): boolean {
     if (gameInstance.queuedGarbage > 0) {
         const colors = selectColors(gameInstance);
         const maxAtOnce = gameInstance.gameSettings.garbageMaxAtOnce;
@@ -31,12 +31,13 @@ export function receiveGarbage(gameInstance: GameInstance): void {
             hasDied = checkIfGarbageKills(gameInstance);
             if (hasDied && (i === maxAtOnce - 1 || gameInstance.queuedGarbage === 0)) {
                 gameInstance.gameTransitions.onGameDefeat();
-                break;
+                return true;
             } else if (gameInstance.queuedGarbage === 0) {
-                break;
+                return false;
             }
         }
     }
+    return false;
 }
 
 function selectColors(gameInstance: GameInstance): Bubble[] {

@@ -1,4 +1,4 @@
-import { GameStats } from "src/game/i/game.i.game-stats";
+import { GameStats } from "../../i/game.i.game-stats";
 
 export interface dto_EndScreen {
     matchID: string;
@@ -13,5 +13,5 @@ interface PlayerData {
     playerScore: number;
     hasWon: boolean;
     eloDiff: number;
-    playerStats: GameStats;
+    playerStats: GameStats[];
 }

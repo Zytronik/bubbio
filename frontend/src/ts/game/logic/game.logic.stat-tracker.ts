@@ -15,7 +15,6 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
     gameStats.bubblesLeftToClear = gameStats.bubbleClearToWin - gameStats.bubblesCleared;
 
     if (game.gameMode === GAME_MODE.SPRINT && gameStats.bubblesCleared >= gameStats.bubbleClearToWin) {
-        console.log("cleared:", gameStats.bubblesCleared, "ToWin:", gameStats.bubbleClearToWin)
         game.gameTransitions.onGameVictory();
     }
 
@@ -23,25 +22,25 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
         gameStats.currentCombo++;
         gameStats.bubblesCleared += amountCleared;
         gameStats.highestBubbleClear = (gameStats.highestBubbleClear > amountCleared) ? gameStats.highestBubbleClear : amountCleared;
-        
+
         if (wallBounces === 0 && amountCleared === 3) {
             gameStats.clear3++;
-        } 
+        }
         if (wallBounces === 0 && amountCleared === 4) {
             gameStats.clear4++;
-        } 
+        }
         if (wallBounces === 0 && amountCleared >= 5) {
             gameStats.clear5++;
-        } 
+        }
         if (wallBounces > 0 && amountCleared === 3) {
             gameStats.clear3++;
-        } 
+        }
         if (wallBounces > 0 && amountCleared === 4) {
             gameStats.clear4wb++;
-        } 
+        }
         if (wallBounces > 0 && amountCleared >= 5) {
             gameStats.clear5wb++;
-        } 
+        }
     }
 
     function breakCombo(): void {
@@ -72,6 +71,6 @@ export function createStatGraphData(game: GameInstance): void {
         if (duration > gameDuration) {
             duration = gameDuration;
         }
-        graph[i] = Number((inputCount/duration).toFixed(2));
+        graph[i] = Number((inputCount / duration).toFixed(2));
     }
 }

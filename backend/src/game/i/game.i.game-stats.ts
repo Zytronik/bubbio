@@ -15,7 +15,7 @@ export interface GameStats {
     bpsGraph: number[],
     attack: number,
     attackPerMinute: number,
-    attackPerBubble: number
+    attackPerBubble: number,
     defense: number,
     defensePerMinute: number,
     defensePerBubble: number,
