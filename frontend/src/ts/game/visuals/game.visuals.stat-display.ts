@@ -33,14 +33,10 @@ export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNum
     const currentTime = performance.now() - gameStats.gameStartTime;
     const formattedCurrentTimeString = formatTimeNumberToString(currentTime);
     gameStats.bubblesPerSecond = Number((gameStats.bubblesShot / currentTime * 1000).toFixed(2));
-    //keysPressed
-    //keysPerSecond
-    //keysPerBubble
-
-    //angleChanged
-    //angleChangePerBubble
-
-    //holds
+    gameStats.attackPerMinute = Number((gameStats.attack / currentTime * 60000).toFixed(2));
+    gameStats.attackPerBubble = Number((gameStats.attack / gameStats.bubblesShot).toFixed(2));
+    gameStats.defensePerMinute = Number((gameStats.defense / currentTime * 60000).toFixed(2));
+    gameStats.defensePerBubble = Number((gameStats.defense / gameStats.bubblesShot).toFixed(2));
     statStrings.formattedCurrentTime.value = formattedCurrentTimeString;
     statStrings.bubbleClearToWin.value = gameStats.bubbleClearToWin;
     statStrings.bubblesCleared.value = gameStats.bubblesCleared;

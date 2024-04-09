@@ -114,7 +114,6 @@ export function dissolveBubbles(playGrid: Grid, collidedAtField: Field, colorToC
             const x = parseInt(xyString.split(komma)[0]);
             const y = parseInt(xyString.split(komma)[1]);
             getField(x, y).bubble = undefined;
-            dissolvedBubblesAmount++;
         })
     }
     return dissolvedBubblesAmount;

@@ -1,3 +1,4 @@
+import { GameStats } from "src/game/i/game.i.game-stats";
 import { OngoingGame } from "./game.network.i.ongoing-game";
 import { Socket } from 'socket.io';
 
@@ -11,6 +12,7 @@ export interface Match {
     scoresMap: Map<string, number>, //<client.id, number>
     firstTo: number,
     players: PlayerCredentials[],
+    roundStats: Map<string, GameStats[]>, //<client.id, GameStats[]>
 }
 
 export interface PlayerCredentials {

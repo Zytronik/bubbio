@@ -15,7 +15,10 @@ export interface GameStats {
     bpsGraph: number[],
     attack: number,
     attackPerMinute: number,
-    attackPerBubble: number
+    attackPerBubble: number,
+    defense: number,
+    defensePerMinute: number,
+    defensePerBubble: number,
     
     clear3: number,
     clear4: number,
@@ -30,16 +33,4 @@ export interface GameStats {
 
     currentCombo: number,
     highestCombo: number,
-
-    keysPressed: number,
-    keysPerSecond: number,
-    keysPerBubble: number,
-
-    angleChanged: number,
-    angleChangePerBubble: number,
-
-    holds: number,
-
-    // handlingsUsed: dont know yet xd
-    // gameSubmittedAtTime: number
 }

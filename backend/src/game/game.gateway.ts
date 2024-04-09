@@ -123,7 +123,8 @@ export class GameGateway implements OnGatewayDisconnect {
       ongoingGamesMap: new Map(),
       scoresMap: new Map(),
       firstTo: rankedFirstTo,
-      players: []
+      players: [],
+      roundStats: new Map(),
     }
     rankedMatch.players.push({ playerID: player1ID, playerName: player1Client.data.user.username, playerClient: player1Client, })
     rankedMatch.players.push({ playerID: player2ID, playerName: player2Client.data.user.username, playerClient: player2Client, })
@@ -197,8 +198,12 @@ export class GameGateway implements OnGatewayDisconnect {
 
     const player1 = match.players[0]
     const player1Score = match.scoresMap.get(player1.playerClient.id)
+    const player1Stats = match.ongoingGamesMap.get(player1.playerClient.id).gameInstance.stats;
+    match.roundStats.get(player1.playerClient.id).push(player1Stats);
     const player2 = match.players[1]
     const player2Score = match.scoresMap.get(player2.playerClient.id)
+    const player2Stats = match.ongoingGamesMap.get(player2.playerClient.id).gameInstance.stats;
+    match.roundStats.get(player2.playerClient.id).push(player2Stats);
 
     if (!matchOver) {
       const scoreData: dto_ScoreScreen = {
@@ -352,14 +357,16 @@ export class GameGateway implements OnGatewayDisconnect {
         playerName: player1.playerName,
         playerScore: player1Score,
         hasWon: player1Score === match.firstTo,
-        eloDiff: 0
+        eloDiff: 0,
+        playerStats: match.roundStats.get(player1.playerClient.id)
       },
       player2Data: {
         playerID: player2.playerID,
         playerName: player2.playerName,
         playerScore: player2Score,
         hasWon: player2Score === match.firstTo,
-        eloDiff: 0
+        eloDiff: 0,
+        playerStats: match.roundStats.get(player2.playerClient.id)
       },
     }
     if (clientQuit) {
@@ -371,13 +378,13 @@ export class GameGateway implements OnGatewayDisconnect {
     if (endScreenData.player1Data.hasWon) {
       winnerID = player1.playerID
       loserID = player2.playerID
-      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
+      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID);
       endScreenData.player1Data.eloDiff = eloDiffs.gainedElo;
       endScreenData.player2Data.eloDiff = eloDiffs.lostElo;
     } else {
       loserID = player1.playerID
       winnerID = player2.playerID
-      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID); //send eloDiffs to player End screens
+      const eloDiffs = await this.glickoService.updateRatings(winnerID, loserID);
       endScreenData.player1Data.eloDiff = eloDiffs.lostElo;
       endScreenData.player2Data.eloDiff = eloDiffs.gainedElo;
     }

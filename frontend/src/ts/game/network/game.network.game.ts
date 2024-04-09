@@ -136,12 +136,12 @@ export async function submitGameToDB(gameStats: GameStats) {
             "wallBounces": gameStats.wallBounces,
             "wallBounceClears": gameStats.wallBounceClears,
             "highestCombo": gameStats.highestCombo,
-            "keysPressed": gameStats.keysPressed,
-            "keysPerSecond": gameStats.keysPerSecond,
-            "keysPerBubble": gameStats.keysPerBubble,
-            "angleChanged": gameStats.angleChanged,
-            "angleChangePerBubble": gameStats.angleChangePerBubble,
-            "holds": gameStats.holds
+            "keysPressed": 0,
+            "keysPerSecond": 0,
+            "keysPerBubble": 0,
+            "angleChanged": 0,
+            "angleChangePerBubble": 0,
+            "holds": 0,
         };
         const convertedMods = allMods.map(mod => {
             if (isMultiMod(mod)) {

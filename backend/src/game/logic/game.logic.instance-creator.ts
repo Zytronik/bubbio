@@ -104,6 +104,9 @@ export function getEmptyStats(gameSettings: GameSettings): GameStats {
         attack: 0,
         attackPerMinute: 0,
         attackPerBubble: 0,
+        defense: 0,
+        defensePerMinute: 0,
+        defensePerBubble: 0,
         clear3: 0,
         clear4: 0,
         clear5: 0,
@@ -115,12 +118,6 @@ export function getEmptyStats(gameSettings: GameSettings): GameStats {
         wallBounceClears: 0,
         currentCombo: 0,
         highestCombo: 0,
-        keysPressed: 0,
-        keysPerSecond: 0,
-        keysPerBubble: 0,
-        angleChanged: 0,
-        angleChangePerBubble: 0,
-        holds: 0,
     }
     return stats;
 }

@@ -3,7 +3,7 @@ import state from "../../networking/networking.client-websocket";
 import { dto_VersusScreen } from "./dto/game.network.dto.vs-screen";
 import { dto_GameSetup } from "./dto/game.network.dto.game-setup";
 import { disableGameplay, playerGameInstance, playerGameVisuals, preparePlayerGameInstance, rankedGameStart, startGame } from "../game.master";
-import { createGameInstance } from "../logic/game.logic.instance-creator";
+import { createGameInstance, getEmptyStats } from "../logic/game.logic.instance-creator";
 import { GameTransitions } from "../i/game.i.game-transitions";
 import { getHandlingSettings } from "../settings/game.settings.handling";
 import { disableBackInputs, disableChannelInput, disableResetInput } from "@/ts/input/input.input-manager";
@@ -82,6 +82,7 @@ export const endScreenData: dto_EndScreen = {
         playerScore: 0,
         hasWon: false,
         eloDiff: 0,
+        playerStats: undefined,
     },
     player2Data: {
         playerID: 0,
@@ -89,6 +90,7 @@ export const endScreenData: dto_EndScreen = {
         playerScore: 0,
         hasWon: false,
         eloDiff: 0,
+        playerStats: undefined,
     }
 };
 export function network_listenToMatchFound(): void {

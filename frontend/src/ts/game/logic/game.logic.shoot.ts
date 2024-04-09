@@ -5,13 +5,17 @@ import { Field } from "../i/game.i.field";
 import { GameInstance } from "../i/game.i.game-instance";
 import { Grid } from "../i/game.i.grid";
 import { Coordinates } from "../i/game.i.grid-coordinates";
-import { getGarbageAmount, receiveGarbage } from "./game.logic.garbage";
+import { getGarbageAmount, receiveGarbageAndCheckDead } from "./game.logic.garbage";
 import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 
 export function executeShot(playerGameInstance: GameInstance): void {
     const bubblesCleared = shootBubble(playerGameInstance);
+    let hasDied = false;
     if (!(bubblesCleared > 0)) {
-        receiveGarbage(playerGameInstance);
+        hasDied = receiveGarbageAndCheckDead(playerGameInstance);
+        if (hasDied) {
+            return;
+        }
     }
     if (playerGameInstance.gameSettings.refillBoard && playerGameInstance.queuedGarbage === 0) {
         const refillBoardAtLine = playerGameInstance.gameSettings.refillBoardAtLine;
@@ -51,12 +55,13 @@ export function shootBubble(game: GameInstance): number {
     gridField.bubble = bubble;
     const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type);
     const garbageAmount = getGarbageAmount(bubblesCleared, game.stats.currentCombo, bounceAmount > 0)
+    game.stats.attack += garbageAmount;
     if (garbageAmount > 0) {
         game.queuedGarbage -= garbageAmount;
         if (game.queuedGarbage < 0) {
             const garbageToSend = Math.abs(game.queuedGarbage);
             game.sendGarbage(garbageToSend);
-            game.stats.attack += garbageAmount;
+            game.stats.defense += garbageToSend;
             game.queuedGarbage = 0;
         }
     }
