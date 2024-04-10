@@ -21,7 +21,7 @@
             <div class="user-info" @click="openProfile(entry.user.username)">
               <img :src="entry.user.pbUrl ? entry.user.pbUrl : getDefaultProfilePbURL()" alt="flag" width="30"
                 height="30" />
-              <p>{{ truncateString(entry.user.username, 11).toUpperCase() }}</p>
+              <p>{{ truncateString(entry.user.username, 10).toUpperCase() }}</p>
             </div>
           </div>
           <div class="cell" v-for="field in orderedFields" :key="field">

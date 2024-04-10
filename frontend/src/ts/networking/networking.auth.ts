@@ -127,7 +127,7 @@ function generateRandomString(length: number): string {
 
 export async function checkIfUsernameIsTakenAndValid(username: string): Promise<{success: boolean, error: string}> {
   try {
-    const resp = await httpClient.get('/users/userExists', { params: { username } });
+    const resp = await httpClient.get('/users/usernameIsValid', { params: { username } });
     return { success: resp.data, error: '' };
   } catch (error) {
     if (axios.isAxiosError(error)) {

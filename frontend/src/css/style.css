@@ -79,30 +79,12 @@ section .page-wrapper {
 section .page-container {
     padding: 80px 15px 80px;
     margin: 0 auto;
-    max-width: 90%;
+    max-width: 92%;
     height: 100%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     position: relative;
-}
-
-.backButton {
-    position: fixed;
-    left: 0;
-    top: 10vh;
-    z-index: 1;
-    background-color: rgb(30, 30, 30);
-    color: white;
-    border: unset;
-    width: calc(7% / 100 * 120 - 10px);
-    height: 5vh;
-    padding: unset;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 120%;
 }
 
 .text-center {
@@ -585,11 +567,11 @@ button.retry {
 }
 
 .page-dashboard .left-content {
-    width: 72%;
+    width: 70%;
 }
 
 .page-dashboard .right-content {
-    width: 28%;
+    width: 30%;
 }
 
 .page-dashboard .right-content .l-tab {

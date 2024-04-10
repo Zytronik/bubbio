@@ -1,6 +1,6 @@
 <template>
   <section id="template" class="page">
-    <MenuBackButtons :buttonData="backButtonData" />
+    <MenuBackButtons :buttonData="backButtonData" :specialBehavior="specialBackButtonBehavior" @special-click-event="goBack" />
     <div class="page-wrapper">
       <div class="page-container">
 
@@ -9,8 +9,8 @@
             <div class="playMods">
               <button class="playButton" @click="play()">Play!</button>
               <div class="cat-wrapper">
-                <div class="cat" v-for="mod in modsCheckboxDisplay" :key="mod.abr.toString()" @click="toggleMod(mod.abr)"
-                  :class="{ 'active': mod.type === 'toggle' && mod.enabled }">
+                <div class="cat" v-for="mod in modsCheckboxDisplay" :key="mod.abr.toString()"
+                  @click="toggleMod(mod.abr)" :class="{ 'active': mod.type === 'toggle' && mod.enabled }">
                   <!-- ToggleMod -->
                   <div v-if="mod.type === 'toggle'">
                     <img v-if="mod.enabled" :src="getModIconPath(mod.icon[0])" alt="Enabled Icon" />
@@ -60,15 +60,16 @@
           <div class="game-wrapper">
             <div class="inGameStats">
               <p v-html="playerGameVisuals.statNumbers.formattedCurrentTime.value"></p>
-              <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}</p>
-              <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond }}</p>
+              <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}
+              </p>
+              <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond
+                }}</p>
             </div>
-            <Game :playerGameVisuals="playerGameVisuals" :areRef="true"/>
+            <Game :playerGameVisuals="playerGameVisuals" :areRef="true" />
           </div>
         </div>
 
         <div v-if="isResultView" class="gameComplete">
-          <button class="backButton" @click="goBack()">Back</button>
           <div class="top">
             <div class="sprintTime">
               <p v-if="resultStats" class="time">{{ formatTimeNumberToString(resultStats.gameDuration ?? 0) }}</p>
@@ -111,6 +112,8 @@
                   <div class="col">{{ getFullName("clear3wb") }}</div>
                   <div class="col">{{ formatFieldValue(resultStats.clear3wb ?? '', "clear3wb") }}</div>
                 </div>
+              </div>
+              <div class="column">
                 <div class="row" key="clear4wb">
                   <div class="col">{{ getFullName("clear4wb") }}</div>
                   <div class="col">{{ formatFieldValue(resultStats.clear4wb ?? '', "clear4wb") }}</div>
@@ -121,10 +124,9 @@
                 </div>
                 <div class="row" key="highestBubbleClear">
                   <div class="col">{{ getFullName("highestBubbleClear") }}</div>
-                  <div class="col">{{ formatFieldValue(resultStats.highestBubbleClear ?? '', "highestBubbleClear") }}</div>
+                  <div class="col">{{ formatFieldValue(resultStats.highestBubbleClear ?? '', "highestBubbleClear") }}
+                  </div>
                 </div>
-              </div>
-              <div class="column">
                 <div class="row" key="wallBounces">
                   <div class="col">{{ getFullName("wallBounces") }}</div>
                   <div class="col">{{ formatFieldValue(resultStats.wallBounces ?? '', "wallBounces") }}</div>
@@ -136,30 +138,6 @@
                 <div class="row" key="highestCombo">
                   <div class="col">{{ getFullName("highestCombo") }}</div>
                   <div class="col">{{ formatFieldValue(resultStats.highestCombo ?? '', "highestCombo") }}</div>
-                </div>
-                <div class="row" key="keysPressed">
-                  <div class="col">{{ getFullName("keysPressed") }}</div>
-                  <div class="col">{{ formatFieldValue(resultStats.keysPressed ?? '', "keysPressed") }}</div>
-                </div>
-                <div class="row" key="keysPerSecond">
-                  <div class="col">{{ getFullName("keysPerSecond") }}</div>
-                  <div class="col">{{ formatFieldValue(resultStats.keysPerSecond ?? '', "keysPerSecond") }}</div>
-                </div>
-                <div class="row" key="keysPerBubble">
-                  <div class="col">{{ getFullName("keysPerBubble") }}</div>
-                  <div class="col">{{ formatFieldValue(resultStats.keysPerBubble ?? '', "keysPerBubble") }}</div>
-                </div>
-                <div class="row" key="angleChanged">
-                  <div class="col">{{ getFullName("angleChanged") }}</div>
-                  <div class="col">{{ formatFieldValue(resultStats.angleChanged ?? '', "angleChanged") }}</div>
-                </div>
-                <div class="row" key="angleChangePerBubble">
-                  <div class="col">{{ getFullName("angleChangePerBubble") }}</div>
-                  <div class="col">{{ formatFieldValue(resultStats.angleChangePerBubble ?? '', "angleChangePerBubble") }}</div>
-                </div>
-                <div class="row" key="holds">
-                  <div class="col">{{ getFullName("holds") }}</div>
-                  <div class="col">{{ formatFieldValue(resultStats.holds ?? '', "holds") }}</div>
                 </div>
               </div>
             </div>
@@ -210,6 +188,7 @@ export default {
   },
   setup() {
     const mods = ref<(ToggleMod | MultiMod)[]>(allMods);
+    const specialBackButtonBehavior = ref(false);
     const isGaming = ref<boolean>(false);
     const isDashboard = ref<boolean>(true);
     const isResultView = ref<boolean>(false);
@@ -273,9 +252,8 @@ export default {
 
     async function transitionResultViewToDashboard() {
       disableResetInput();
-      isGaming.value = false;
+      showDashboard();
       isResultView.value = true;
-      isDashboard.value = true;
       await nextTick(); // if i dont do this, dashboard is undefined
       const dashboard = document.querySelector('.sprintDashboard') as HTMLElement;
       const resultScreen = document.querySelector('.gameComplete') as HTMLElement;
@@ -357,12 +335,14 @@ export default {
       isGaming.value = false;
       isDashboard.value = true;
       isResultView.value = false;
+      specialBackButtonBehavior.value = false;
     }
 
     function showGameView() {
       isGaming.value = true;
       isDashboard.value = false;
       isResultView.value = false;
+      specialBackButtonBehavior.value = false;
     }
 
     async function showResultView() {
@@ -373,6 +353,7 @@ export default {
       if (diffToPb.value === 0) {
         triggerConfettiAnimation(".page-container");
       }
+      specialBackButtonBehavior.value = true;
       isGaming.value = false;
       isDashboard.value = false;
       isResultView.value = true;
@@ -446,6 +427,7 @@ export default {
       diffToPb,
       convertModToModDetail,
       LineChart,
+      specialBackButtonBehavior,
     };
   },
 };

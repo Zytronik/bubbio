@@ -24,12 +24,17 @@ export default defineComponent({
   props: {
     buttonData: Array as PropType<ButtonData[]>,
     default: () => [],
+    specialBehavior: Boolean,
   },
-  setup(props) {
+  setup(props, {emit}) {
     function handleButtonClick(btn: ButtonData) {
       if (btn.disabled) {
         goToState(btn.pageState);
       } else {
+        if (props.specialBehavior) {
+          emit('special-click-event');
+          return;
+        }
         goToState(btn.pageState, false);
         let backButtons = document.querySelector("div.back-buttons");
         if (backButtons) {
@@ -43,6 +48,10 @@ export default defineComponent({
     });
 
     function getGoBackState() {
+      if (props.specialBehavior) {
+        emit('special-click-event');
+        return;
+      }
       const activeButton = (props.buttonData as ButtonData[]).find(btn => !btn.disabled);
       if (activeButton) {
         goToState(activeButton.pageState, false);

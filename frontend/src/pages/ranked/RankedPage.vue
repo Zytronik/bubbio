@@ -1,6 +1,6 @@
 <template>
   <section id="multiMenu" class="page menu">
-    <MenuBackButtons :buttonData="backButtonData" />
+    <MenuBackButtons :buttonData="backButtonData" :specialBehavior="specialBackButtonBehavior" @special-click-event="goBackToRankedPage" />
     <div class="page-wrapper">
       <div class="page-container">
         <div v-if="!isGaming && showMatchmakingScreen" class="page-dashboard ranked-dashboard">
@@ -106,7 +106,6 @@
         </div>
 
         <div v-if="showEndScreen" class="endScreen-wrapper">
-          <button class="backButton" @click="goBackToRankedPage()">Back</button>
           <p>Please give me data to display here.</p>
           <p>TODO: <br>show data here</p>
         </div>
@@ -185,6 +184,7 @@ export default {
       { pageState: PAGE_STATE.roomListing, iconSrc: require('@/img/icons/rooms.png'), disabled: true },
     ]);
     const isGaming = ref(false);
+    const specialBackButtonBehavior = ref(false);
     const showMatchmakingScreen = ref(true);
     const showScores = ref(false);
     const showEndScreen = ref(false);
@@ -295,6 +295,7 @@ export default {
       isGaming.value = true;
       hasMatchFound.value = false;
       showMatchmakingScreen.value = false;
+      specialBackButtonBehavior.value = false;
     }
 
     async function slideScoresIn(onAnimationnEnd: () => void) {
@@ -370,6 +371,7 @@ export default {
         showMatchmakingScreen.value = false;
         showEndScreen.value = true;
         fetchPlayerMmStats();
+        specialBackButtonBehavior.value = true;
       });
     }
 
@@ -377,6 +379,7 @@ export default {
       isGaming.value = false;
       showEndScreen.value = true;
       showMatchmakingScreen.value = true;
+      specialBackButtonBehavior.value = false;
       await nextTick(); // if i dont do this, dashboard is undefined
       const dashboard = document.querySelector('.ranked-dashboard') as HTMLElement;
       const resultScreen = document.querySelector('.endScreen-wrapper') as HTMLElement;
@@ -406,6 +409,7 @@ export default {
     });
 
     onUnmounted(() => {
+      leaveQueue();
       unmountSockets();
       stopPassedTimeCountdown();
       eventBus.off("vue_matchFound");
@@ -437,6 +441,7 @@ export default {
       showEndScreen,
       scoreScreenData,
       goBackToRankedPage,
+      specialBackButtonBehavior,
     }
   }
 };

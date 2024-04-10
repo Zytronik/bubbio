@@ -5,7 +5,7 @@
       <div class="profile">
         <div class="name">
           <p>{{ versusScreenData.player1Data.playerName.toUpperCase() }}</p>
-          <img class="rank-img" :src="getRankImagePath(versusScreenData.player1Data.playerRank)" :alt="versusScreenData.player1Data.playerRank">
+          <img v-if="versusScreenData.player1Data.playerRank" class="rank-img" :src="getRankImagePath(versusScreenData.player1Data.playerRank)" :alt="versusScreenData.player1Data.playerRank">
         </div>
         <p class="elo">Elo: {{ versusScreenData.player1Data.playerGlicko }}<span>±{{
         versusScreenData.player1Data.playerRD }}</span></p>
@@ -21,10 +21,10 @@
       </div>
     </div>
     <div class="diagonal-wrapper right">
-      <img class="transition" :src="transitionImagePath">
+      <img v-if="transitionImagePath" class="transition" :src="transitionImagePath">
       <div class="profile">
         <div class="name">
-          <img class="rank-img" :src="getRankImagePath(versusScreenData.player2Data.playerRank)" :alt="versusScreenData.player2Data.playerRank">
+          <img class="rank-img" v-if="versusScreenData.player2Data.playerRank" :src="getRankImagePath(versusScreenData.player2Data.playerRank)" :alt="versusScreenData.player2Data.playerRank">
           <p>{{ versusScreenData.player2Data.playerName.toUpperCase() }}</p>
         </div>
         <p class="elo">Elo: {{ versusScreenData.player2Data.playerGlicko }}<span>±{{
@@ -157,8 +157,8 @@ export default defineComponent({
       const imagLeft = document.querySelector('.diagonal-wrapper.left .transition') as HTMLElement;
       const imagRight = document.querySelector('.diagonal-wrapper.right .transition') as HTMLElement;
       if (imagLeft && imagRight) {
-        imagLeft.style.objectPosition = '100% -50%';
-        imagRight.style.objectPosition = '100% 150%';
+        imagLeft.style.objectPosition = '100% -60%';
+        imagRight.style.objectPosition = '100% 160%';
       }
     }
 
@@ -271,22 +271,22 @@ export default defineComponent({
 
 .diagonal-wrapper .transition {
   width: 130%;
-  height: 120%;
+  height: 122%;
   object-fit: cover;
   position: absolute;
   z-index: 3;
   transform: rotate(13deg);
   top: -11%;
-  left: -14%;
+  left: -16%;
   transition: object-position 1s ease;
 }
 
 .diagonal-wrapper.left .transition {
-  object-position: 100% 150%;
+  object-position: 100% 160%;
 }
 
 .diagonal-wrapper.right .transition {
-  object-position: 100% -50%;
+  object-position: 100% -60%;
 }
 
 .diagonal-wrapper.left {

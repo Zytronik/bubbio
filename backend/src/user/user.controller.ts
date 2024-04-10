@@ -19,8 +19,8 @@ export class UserController {
     return this.userService.getUserProfileByUsername(req.user.username);
   }
 
-  @Get('userExists')
-  async checkUsernameExists(@Query() checkUsernameDto: CheckUsernameDto) {
+  @Get('usernameIsValid')
+  async checkUsernameIsValid(@Query() checkUsernameDto: CheckUsernameDto) {
     return await this.userService.userExists(checkUsernameDto.username);
   }
 
