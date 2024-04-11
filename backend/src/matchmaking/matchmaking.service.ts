@@ -139,19 +139,19 @@ export class MatchmakingService {
     async getVersusScreenDTO(player1ID: number, player2ID: number, givenMatchID): Promise<dto_VersusScreen> {
         const player1Name = await this.userService.getUsernameById(player1ID);
         const player1Profile = await this.userService.getUserProfileByUsername(player1Name);
-        const player1Rank = (await this.ranksService.getRankInfo(player1ID)).iconName;
+        const player1Rank = await this.ranksService.getRankInfo(player1ID);
         const player1GlobalRank = await this.userService.getGlobalRank(player1ID);
         const player1NationalRank = await this.userService.getNationalRank(player1ID);
         const player1Glicko = await this.userService.getGlickoRatingsByUserId(player1ID);
-        const player1RankMaybeUnranked = player1Glicko.ratingDeviation < unrankedRatingDeviation ? null : player1Rank;
+        const player1RankMaybeUnranked = player1Glicko.ratingDeviation < unrankedRatingDeviation ? player1Rank.iconName : null;
 
         const player2Name = await this.userService.getUsernameById(player2ID);
         const player2Profile = await this.userService.getUserProfileByUsername(player2Name);
-        const player2Rank = (await this.ranksService.getRankInfo(player2ID)).iconName;
+        const player2Rank = await this.ranksService.getRankInfo(player2ID);
         const player2GlobalRank = await this.userService.getGlobalRank(player2ID);
         const player2NationalRank = await this.userService.getNationalRank(player2ID);
         const player2Glicko = await this.userService.getGlickoRatingsByUserId(player2ID);
-        const player2RankMaybeUnranked = player2Glicko.ratingDeviation < unrankedRatingDeviation ? null : player2Rank;
+        const player2RankMaybeUnranked = player2Glicko.ratingDeviation < unrankedRatingDeviation ? player2Rank.iconName : null;
 
         const data: dto_VersusScreen = {
             matchID: givenMatchID,
