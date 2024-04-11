@@ -11,11 +11,10 @@ export class NewsService {
         private newsGateway: NewsGateway,
     ) { }
 
-    async createNews(type: string, sprintMods: string[], userId: number, rank: number, value: number): Promise<any> {
+    async createNews(type: string, userId: number, rank: number, value: number): Promise<any> {
         const newsEntry = await this.prisma.news.create({
             data: {
                 type: type,
-                mods: JSON.stringify(sprintMods),
                 userId: userId,
                 rank: rank,
                 value: value,

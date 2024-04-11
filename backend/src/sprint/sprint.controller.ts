@@ -3,7 +3,6 @@ import { SprintService } from './sprint.service';
 import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
 import { AuthenticatedRequest } from 'src/auth/e/auth.e-auth-request';
 import { SubmitSprintDto } from './dto/sprint.dto.submit-sprint-dto';
-import { ModDetail } from 'src/leaderboard/i/leaderboard.i.mod-detail';
 
 @Controller('sprint')
 export class SprintController {
@@ -39,7 +38,7 @@ export class SprintController {
 
   @UseGuards(JwtAuthGuard)
   @Get('personalBest')
-  async getPersonalBest(@Query('mods') mods: ModDetail[], @Request() req: AuthenticatedRequest) {
-    return await this.sprintService.getPersonalBest(req.user.userId, mods);
+  async getPersonalBest(@Request() req: AuthenticatedRequest) {
+    return await this.sprintService.getPersonalBest(req.user.userId);
   }
 }

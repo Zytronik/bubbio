@@ -14,11 +14,6 @@ export const statDisplays: Record<string, StatDisplay> = {
         shortName: "",
         isTime: true,
     },
-    mods: {
-        fullName: "Mods",
-        shortName: "",
-        isTime: false,
-    },
     gameDuration: {
         fullName: "Game Duration",
         shortName: "",
@@ -142,17 +137,6 @@ export function formatFieldValue(value: string | number, fieldName: string): str
     if (statDisplay && statDisplay.isTime && fieldName === 'submittedAt') {
         formattedValue = formatDateToAgoText(new Date(value));
     }
-
-    if (statDisplay && typeof value === 'string' && fieldName === 'mods') {
-        try {
-            const modsArray = JSON.parse(value);
-            const modsString = modsArray.map((mod: { abr: string; type: string }) => mod.abr).join(', ');
-            formattedValue = modsString;
-        } catch (error) {
-            console.error('Error parsing mods JSON:', error);
-        }
-    }
-
 
     if (statDisplay && statDisplay.shortName) {
         formattedValue += ` ${statDisplay.shortName}`;

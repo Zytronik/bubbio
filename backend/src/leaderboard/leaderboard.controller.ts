@@ -3,7 +3,6 @@ import { LeaderboardService } from './leaderboard.service';
 import { UserService } from 'src/user/user.service';
 import { AuthenticatedRequest } from 'src/auth/e/auth.e-auth-request';
 import { OptionalJwtAuthGuard } from 'src/auth/jwt/auth.jwt.optional-guard';
-import { ModDetail } from './i/leaderboard.i.mod-detail';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('leaderboard')
@@ -21,13 +20,9 @@ export class LeaderboardController {
         @Query('sortDirection') sortDirection: string,
         @Query('category') category: string,
         @Query('country') country: string,
-        @Query('mods') mods: ModDetail[],
         @Query('limit') limit: string,
         @Req() req: AuthenticatedRequest
     ) {
-        if(!mods){
-            mods = [];
-        }
         const limitInt = parseInt(limit);
         if (!country && req.user && req.user.userId) { //if user is logged in and not country is specified
             country = await this.userService.getUserCountry(req.user.userId);
@@ -41,7 +36,6 @@ export class LeaderboardController {
             sortDirection,
             category,
             country,
-            mods,
             limit: limitInt,
         });
     }

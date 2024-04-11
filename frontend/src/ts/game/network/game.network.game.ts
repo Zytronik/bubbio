@@ -136,31 +136,11 @@ export async function submitGameToDB(gameStats: GameStats) {
             "wallBounces": gameStats.wallBounces,
             "wallBounceClears": gameStats.wallBounceClears,
             "highestCombo": gameStats.highestCombo,
-            "keysPressed": 0,
-            "keysPerSecond": 0,
-            "keysPerBubble": 0,
-            "angleChanged": 0,
-            "angleChangePerBubble": 0,
-            "holds": 0,
         };
-        const convertedMods = allMods.map(mod => {
-            if (isMultiMod(mod)) {
-                return {
-                    abr: mod.abr[mod.modValues.indexOf(mod.selected)],
-                    type: 'multi'
-                };
-            } else {
-                return {
-                    abr: mod.abr,
-                    type: 'toggle',
-                    enabled: mod.enabled
-                };
-            }
-        });
-        const modsJsonString = JSON.stringify(convertedMods);
+    
         try {
             const token = localStorage.getItem('authToken');
-            await httpClient.post('/sprint/submit', { submitStats, mods: modsJsonString }, {
+            await httpClient.post('/sprint/submit', submitStats, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 },
@@ -171,7 +151,4 @@ export async function submitGameToDB(gameStats: GameStats) {
         }
     }
 
-    function isMultiMod(mod: ToggleMod | MultiMod): mod is MultiMod {
-        return 'modValues' in mod;
-    }
 }

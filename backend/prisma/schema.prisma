@@ -53,7 +53,6 @@ model PasswordResetToken {
 model News {
   id                  Int             @id @default(autoincrement())
   type                String
-  mods                String          @default("[]")
   rank                Int
   value               Int             
   createdAt           DateTime        @default(now())
@@ -75,7 +74,6 @@ model Sprint {
   submittedAt         DateTime        @default(now())
   user                User            @relation(fields: [userId], references: [id])
   userId              Int            
-  mods                String          @default("[]")
   bpsGraph            String          @default("[]")
   bubblesCleared      Int             
   bubblesShot         Int                
@@ -84,13 +82,7 @@ model Sprint {
   highestBubbleClear  Int             
   wallBounces         Int             
   wallBounceClears    Int             
-  highestCombo        Int             
-  keysPressed         Int             
-  keysPerSecond       Float           
-  keysPerBubble       Float           
-  angleChanged        Float           
-  angleChangePerBubble  Float         
-  holds               Int             
+  highestCombo        Int               
   bubbleClearToWin    Int             
   clear3              Int             @default(0)
   clear4              Int             @default(0)

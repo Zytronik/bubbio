@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, PropType, ref, watch  } from 'vue';
+import { computed, defineComponent, onMounted, PropType, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
@@ -45,7 +45,6 @@ import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { getDefaultProfilePbURL } from '@/ts/networking/paths';
 import { formatFieldValue, getFullName } from '@/ts/page/i/page.i.stat-display';
 import { openProfile } from '@/ts/page/page.page-manager';
-import { ModDetail } from '@/ts/page/i/page.i.mod-detail';
 import { truncateString } from '@/ts/page/page.page-utils';
 
 interface LeaderboardEntry extends GameStats {
@@ -92,11 +91,6 @@ export default defineComponent({
       type: String,
       required: false,
     },
-    mods: {
-      type: Array as PropType<ModDetail[]>,
-      required: false,
-      default: () => [],
-    },
     limit: {
       type: Number,
       default: 20,
@@ -113,13 +107,6 @@ export default defineComponent({
       return [props.sortBy, ...fieldsWithoutSortBy];
     });
 
-    watch(() => props.mods, async () => {
-      loading.value = true;
-      await fetchLeaderboardData();
-    }, {
-      deep: true,
-    });
-
     async function fetchLeaderboardData() {
       const token = localStorage.getItem('authToken');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
@@ -131,7 +118,6 @@ export default defineComponent({
             sortDirection: props.sortDirection,
             category: props.leaderboardCategory,
             country: props.country,
-            mods: props.mods,
             limit: props.limit,
           },
           headers: headers
@@ -258,4 +244,3 @@ p {
   opacity: 0.7;
 }
 </style>
-@/ts/page/i/page.i-user-data@/ts/page/i/page.i.mod-detail

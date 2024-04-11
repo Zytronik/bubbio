@@ -1,7 +1,6 @@
-import { Type } from 'class-transformer';
-import { IsBoolean, IsInt, IsJSON, IsNumber, IsString, Min, ValidateNested } from 'class-validator';
+import { IsInt, IsJSON, IsNumber, IsString, Min } from 'class-validator';
 
-export class SprintStatsDto {
+export class SubmitSprintDto {
     @IsInt()
     @Min(0)
     bubblesCleared: number;
@@ -36,30 +35,6 @@ export class SprintStatsDto {
 
     @IsInt()
     @Min(0)
-    keysPressed: number;
-
-    @IsNumber()
-    @Min(0)
-    keysPerSecond: number;
-
-    @IsNumber()
-    @Min(0)
-    keysPerBubble: number;
-
-    @IsNumber()
-    @Min(0)
-    angleChanged: number;
-
-    @IsNumber()
-    @Min(0)
-    angleChangePerBubble: number;
-
-    @IsInt()
-    @Min(0)
-    holds: number;
-
-    @IsInt()
-    @Min(0)
     bubbleClearToWin: number;
 
     @IsInt()
@@ -88,13 +63,4 @@ export class SprintStatsDto {
 
     @IsJSON()
     bpsGraph: string;
-}
-
-export class SubmitSprintDto {
-    @ValidateNested()
-    @Type(() => SprintStatsDto)
-    submitStats: SprintStatsDto;
-
-    @IsJSON()
-    mods: string;
 }

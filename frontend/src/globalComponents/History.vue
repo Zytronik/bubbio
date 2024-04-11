@@ -4,8 +4,8 @@
     <table v-if="historyData.length > 0" class="history">
       <thead>
         <tr>
-          <th v-for="field in orderedFields" :key="field" :class="{ 'non-sortable': field === 'mods' }"
-            @click="field !== 'mods' && updateSort(field)">
+          <th v-for="field in orderedFields" :key="field"
+            @click="updateSort(field)">
             {{ getFullName(field) }}
             <span v-if="sortByVal === field">
               <span v-if="sortDirectionVal === 'asc'">▲</span>
@@ -75,11 +75,6 @@ export default defineComponent({
     const orderedFields = ref<string[]>([]);
 
     async function updateSort(newSortBy: string) {
-      if (newSortBy === 'mods') {
-        console.warn("Sorting by 'mods' is not allowed.");
-        return;
-      }
-
       let newSortDirection = sortDirectionVal.value === SortDirection.Asc ? SortDirection.Desc : SortDirection.Asc;
       if (sortByVal.value !== newSortBy) {
         newSortDirection = SortDirection.Asc;
@@ -171,7 +166,4 @@ td p {
   align-items: flex-start;
 }
 
-.non-sortable {
-  cursor: auto;
-}
 </style>

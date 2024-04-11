@@ -1,32 +1,17 @@
 <template>
   <section id="template" class="page">
-    <MenuBackButtons :buttonData="backButtonData" :specialBehavior="specialBackButtonBehavior" @special-click-event="goBack" />
+    <MenuBackButtons :buttonData="backButtonData" :specialBehavior="specialBackButtonBehavior"
+      @special-click-event="goBack" />
     <div class="page-wrapper">
       <div class="page-container">
 
         <div v-if="isDashboard" class="sprintDashboard page-dashboard">
           <div class="left-content">
-            <div class="playMods">
+            <div class="play-wrapper">
               <button class="playButton" @click="play()">Play!</button>
-              <div class="cat-wrapper">
-                <div class="cat" v-for="mod in modsCheckboxDisplay" :key="mod.abr.toString()"
-                  @click="toggleMod(mod.abr)" :class="{ 'active': mod.type === 'toggle' && mod.enabled }">
-                  <!-- ToggleMod -->
-                  <div v-if="mod.type === 'toggle'">
-                    <img v-if="mod.enabled" :src="getModIconPath(mod.icon[0])" alt="Enabled Icon" />
-                    <img v-else :src="getModIconPath(mod.icon[1])" alt="Disabled Icon" />
-                    <span>{{ mod.title }}</span>
-                  </div>
-                  <!-- MultiMod -->
-                  <div v-else-if="mod.type === 'multi'">
-                    <img v-if="mod.index != null" :src="getModIconPath(mod.icon[mod.index])" alt="Enabled Icon" />
-                    <span>{{ mod.title }}</span>
-                  </div>
-                </div>
-              </div>
             </div>
             <History v-if="!isGuest" :gameMode="GameMode.Sprint"
-              :fields="['gameDuration', 'bubblesShot', 'bubblesPerSecond', 'bubblesCleared', 'submittedAt', 'mods']"
+              :fields="['gameDuration', 'bubblesShot', 'bubblesPerSecond', 'bubblesCleared', 'submittedAt']"
               :sortBy="'submittedAt'" :sortDirection="SortDirection.Desc" :limit="10" />
             <h4 v-else><br>Log in for Stats and Submit Scores.</h4>
           </div>
@@ -40,17 +25,16 @@
                   ({{ userData.countryCode }})
                 </span>
               </button>
-              <div class="lModsDisplay">Mods: {{ formatFieldValue(JSON.stringify(enabledToggleMods), "mods") }}</div>
             </div>
             <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
               <Leaderboard :gameMode="GameMode.Sprint" :fields="['gameDuration', 'bubblesPerSecond']"
                 :sortBy="'gameDuration'" :sortDirection="SortDirection.Asc"
-                :leaderboardCategory="LeaderboardCategory.Global" :limit="30" :mods="enabledToggleMods" />
+                :leaderboardCategory="LeaderboardCategory.Global" :limit="30" />
             </div>
             <div v-if="currentLeaderboard === 'National'" class="l-tab national-tab">
               <Leaderboard :gameMode="GameMode.Sprint" :fields="['gameDuration', 'bubblesPerSecond']"
                 :sortBy="'gameDuration'" :sortDirection="SortDirection.Asc"
-                :leaderboardCategory="LeaderboardCategory.National" :limit="30" :mods="enabledToggleMods" />
+                :leaderboardCategory="LeaderboardCategory.National" :limit="30" />
             </div>
           </div>
 
@@ -153,9 +137,9 @@
 <script lang="ts">
 import Game from '../game/Game.vue';
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
-import { formatDateTime, getCookie, setCookie } from '@/ts/page/page.page-utils';
+import { formatDateTime } from '@/ts/page/page.page-utils';
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
-import { ComputedRef, computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 import { playerGameInstance, leaveGame, playerGameVisuals, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
@@ -167,13 +151,8 @@ import eventBus from '@/ts/page/page.event-bus';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { backInput, resetInput } from '@/ts/input/input.all-inputs';
 import { formatFieldValue, getFullName } from '@/ts/page/i/page.i.stat-display';
-import { fillAsciiStrings } from '@/ts/game/visuals/game.visuals.ascii';
-import { MultiMod, ToggleMod } from '@/ts/game/settings/ref/i/game.settings.ref.i.mod';
-import { allMods } from '@/ts/game/settings/ref/game.settings.ref.all-mods';
 import { triggerConfettiAnimation } from '@/ts/page/page.visuals';
-import { getDifferenceToPB } from '@/ts/page/page.page-requests';
-import { convertModToModDetail, getModIconPath } from '@/ts/page/page.mods';
-import { ModDetail } from '@/ts/page/i/page.i.mod-detail';
+import { getSprintDifferenceToPB } from '@/ts/page/page.page-requests';
 import LineChart from '@/globalComponents/LineChart.vue';
 import { disableBackInputs, disableResetInput, enableBackInputs, enableResetInput } from '@/ts/input/input.input-manager';
 
@@ -187,7 +166,6 @@ export default {
     };
   },
   setup() {
-    const mods = ref<(ToggleMod | MultiMod)[]>(allMods);
     const specialBackButtonBehavior = ref(false);
     const isGaming = ref<boolean>(false);
     const isDashboard = ref<boolean>(true);
@@ -210,31 +188,8 @@ export default {
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
       eventBus.on("sprintVictory", transitionToResultView);
-      applyMods();
       backInputOnLoad.value = backInput.fire;
     });
-
-    function applyMods() {
-      const savedModsJson = getCookie('mods');
-      if (savedModsJson) {
-        try {
-          const savedMods: (ToggleMod | MultiMod)[] = JSON.parse(savedModsJson);
-          mods.value.forEach(mod => {
-            const savedMod = savedMods.find(savedMod => savedMod.abr === mod.abr || savedMod.title === mod.title);
-            if (savedMod) {
-              if ('enabled' in mod && 'enabled' in savedMod) {
-                mod.enabled = savedMod.enabled;
-              }
-              if ('selected' in mod && 'selected' in savedMod) {
-                mod.selected = savedMod.selected;
-              }
-            }
-          });
-        } catch (error) {
-          console.error('Error parsing mods from cookie:', error);
-        }
-      }
-    }
 
     function goBack() {
       if (isGaming.value) {
@@ -348,7 +303,7 @@ export default {
     async function showResultView() {
       resultStats.value = playerGameInstance.stats;
       if (resultStats.value.gameDuration !== undefined) {
-        diffToPb.value = await getDifferenceToPB(resultStats.value.gameDuration, enabledToggleMods.value);
+        diffToPb.value = await getSprintDifferenceToPB(resultStats.value.gameDuration);
       }
       if (diffToPb.value === 0) {
         triggerConfettiAnimation(".page-container");
@@ -358,44 +313,6 @@ export default {
       isDashboard.value = false;
       isResultView.value = true;
     }
-
-    function toggleMod(modAbr: string) {
-      mods.value.forEach((mod) => {
-        if ('enabled' in mod && mod.abr === modAbr) {
-          mod.enabled = !mod.enabled;
-        } else if ('selected' in mod && mod.abr.includes(modAbr)) {
-          const currentIndex = mod.abr.findIndex(abr => abr === modAbr);
-          const nextIndex = (currentIndex + 1) % mod.abr.length;
-          mod.selected = mod.modValues[nextIndex];
-        }
-      });
-      setCookie('mods', JSON.stringify(mods.value), 365);
-    }
-
-    const modsCheckboxDisplay = computed(() => mods.value.map(mod => {
-      if ('enabled' in mod) {
-        return {
-          type: 'toggle',
-          icon: mod.icon,
-          abr: mod.abr,
-          title: mod.title,
-          enabled: mod.enabled,
-        };
-      } else {
-        return {
-          type: 'multi',
-          icon: mod.icon,
-          index: mod.modValues.indexOf(mod.selected),
-          abr: mod.abr[mod.modValues.indexOf(mod.selected)],
-          title: mod.title,
-          selected: mod.selected,
-        };
-      }
-    }));
-
-    const enabledToggleMods: ComputedRef<ModDetail[]> = computed(() => {
-      return convertModToModDetail(mods.value);
-    });
 
     return {
       playerGameVisuals,
@@ -414,18 +331,13 @@ export default {
       LeaderboardCategory,
       SortDirection,
       userData,
-      toggleMod,
-      modsCheckboxDisplay,
-      enabledToggleMods,
       goBack,
       resultStats,
       formatFieldValue,
       getFullName,
-      getModIconPath,
       isResultView,
       sprintResultTime,
       diffToPb,
-      convertModToModDetail,
       LineChart,
       specialBackButtonBehavior,
     };
@@ -438,64 +350,8 @@ export default {
   background: linear-gradient(45deg, rgba(96, 221, 43, 1) 0%, rgba(198, 63, 135, 1) 100%);
 }
 
-.playMods {
-  display: flex;
-  flex-direction: row;
-  gap: 15px;
-}
-
-.cat-wrapper {
-  display: flex;
-  flex-direction: row;
-  gap: 15px;
-  box-sizing: border-box;
-}
-
-.cat-wrapper .cat {
-  width: 6vw;
+.play-wrapper {
   height: 6vw;
-  font-size: 100%;
-  cursor: pointer;
-  border: none;
-  transition: 0.2s;
-  background-color: white;
-  color: black;
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.cat-wrapper .cat>div {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  position: relative;
-}
-
-.cat-wrapper .cat img {
-  height: 100%;
-  filter: invert(1);
-}
-
-.cat-wrapper .cat span {
-  position: absolute;
-  padding: 0 5px;
-  top: 75%;
-  left: 10%;
-  font-weight: bold;
-  background-color: rgba(255, 255, 255, 0.7);
-}
-
-.cat-wrapper .cat:hover {
-  opacity: 0.7;
-}
-
-.cat-wrapper .cat.active {
-  transform: rotate(5deg);
 }
 
 .inGame {
@@ -576,16 +432,5 @@ export default {
 
 .gameComplete .top {
   height: 15%;
-}
-
-.lModsDisplay {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.l-tab-buttons {
-  position: relative;
 }
 </style>

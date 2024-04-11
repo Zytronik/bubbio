@@ -58,7 +58,7 @@
                                 alt="User's profile picture">
                               <p>
                                 <span class="username" @click="openUserProfile(item.username)">{{ item.username.toUpperCase() }}</span> achieved <span>#{{ item.rank }}</span> in <span>{{
-                                  item.type }} ({{ formatFieldValue(item.mods, "mods") }})</span> with <span>{{ formatTimeNumberToString(item.value) }}</span>
+                                  item.type }}</span> with <span>{{ formatTimeNumberToString(item.value) }}</span>
                               </p>
                             </div>
                             <p class="time">{{ formatDateToAgoText(item.createdAt) }}</p>
@@ -316,7 +316,6 @@ export default {
     /* News */
     interface NewsData {
       type: string;
-      mods: string;
       rank: number;
       value: number;
       createdAt: Date;

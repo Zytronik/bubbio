@@ -313,11 +313,6 @@ button.retry {
     margin-top: 30px;
 }
 
-.sprintDashboard .history-wrapper table tr td:last-of-type,
-.sprintDashboard .history-wrapper table tr th:last-of-type {
-    width: 10%;
-}
-
 .page-wrapper .moveResultScreen-left {
     position: absolute;
     top: 80px;

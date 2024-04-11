@@ -1,5 +1,4 @@
 import { httpClient } from "../networking/networking.http-client";
-import { ModDetail } from '@/ts/page/i/page.i.mod-detail';
 
 export function getFlagImagePath(countryCode: string) {
     if (countryCode) {
@@ -7,8 +6,8 @@ export function getFlagImagePath(countryCode: string) {
     }
 }
 
-export async function getDifferenceToPB(currentTime: number, mods: ModDetail[]) {
-    const pb = await getPersonalBest(mods);
+export async function getSprintDifferenceToPB(currentTime: number) {
+    const pb = await getSprintPersonalBest();
     const pbTime = pb?.gameDuration;
 
     if (pbTime !== undefined && currentTime !== undefined) {
@@ -18,14 +17,11 @@ export async function getDifferenceToPB(currentTime: number, mods: ModDetail[]) 
     }
 }
 
-async function getPersonalBest(mods: ModDetail[]) {
+async function getSprintPersonalBest() {
     const token = localStorage.getItem('authToken');
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     try {
         const response =  await httpClient.get("/sprint/personalBest", {
-            params: {
-                mods: JSON.stringify(mods),
-            },
             headers: headers
         });
         return response.data;
