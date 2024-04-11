@@ -42,7 +42,8 @@
 import { I_RANKED_SCREEN_TRANSITION_CONFIRMATION, versusScreenData } from '@/ts/game/network/game.network.ranked';
 import state from '@/ts/networking/networking.client-websocket';
 import { getDefaultProfilePbURL, getRankImagePath } from '@/ts/networking/paths';
-import { defineComponent, onMounted } from 'vue';
+import eventBus from '@/ts/page/page.event-bus';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 
 export default defineComponent({
   name: 'VsScreen',
@@ -52,6 +53,27 @@ export default defineComponent({
     };
   },
   setup() {
+    const loggedInUserId = ref(eventBus.getUserData()?.id);
+
+    const computedVersusData = computed(() => {
+      // Default assignment
+      let player1Data = versusScreenData.player1Data;
+      let player2Data = versusScreenData.player2Data;
+
+      // Check if the logged-in user is player2
+      if (versusScreenData.player2Data.playerID === loggedInUserId.value) {
+        // Swap the data if the logged-in user is supposed to be on the left
+        player1Data = versusScreenData.player2Data;
+        player2Data = versusScreenData.player1Data;
+      }
+
+      return {
+        matchID: versusScreenData.matchID,
+        player1Data: player1Data,
+        player2Data: player2Data,
+      };
+    });
+    
     function playVsAnimation(onTransitionEnd: () => void) {
       const container = document.querySelector('#vue') as HTMLElement;
       const blackOverlay = document.createElement('div');
@@ -151,8 +173,6 @@ export default defineComponent({
       }
     }
 
-    
-
     function animateImageTransitionIn() {
       const imagLeft = document.querySelector('.diagonal-wrapper.left .transition') as HTMLElement;
       const imagRight = document.querySelector('.diagonal-wrapper.right .transition') as HTMLElement;
@@ -228,7 +248,7 @@ export default defineComponent({
     });
 
     return {
-      versusScreenData,
+      versusScreenData: computedVersusData,
       getRankImagePath,
       getDefaultProfilePbURL,
     };
