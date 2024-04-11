@@ -199,11 +199,21 @@ export class GameGateway implements OnGatewayDisconnect {
     const player1 = match.players[0]
     const player1Score = match.scoresMap.get(player1.playerClient.id)
     const player1Stats = match.ongoingGamesMap.get(player1.playerClient.id).gameInstance.stats;
-    match.roundStats.get(player1.playerClient.id).push(player1Stats);
+    let player1StatsArray = match.roundStats.get(player1.playerClient.id);
+    if (!player1StatsArray) {
+      player1StatsArray = [];
+      match.roundStats.set(player1.playerClient.id, player1StatsArray);
+    }
+    player1StatsArray.push(player1Stats);
     const player2 = match.players[1]
     const player2Score = match.scoresMap.get(player2.playerClient.id)
     const player2Stats = match.ongoingGamesMap.get(player2.playerClient.id).gameInstance.stats;
-    match.roundStats.get(player2.playerClient.id).push(player2Stats);
+    let player2StatsArray = match.roundStats.get(player1.playerClient.id);
+    if (!player2StatsArray) {
+      player2StatsArray = [];
+      match.roundStats.set(player2.playerClient.id, player2StatsArray);
+    }
+    player1StatsArray.push(player2Stats);
 
     if (!matchOver) {
       const scoreData: dto_ScoreScreen = {
