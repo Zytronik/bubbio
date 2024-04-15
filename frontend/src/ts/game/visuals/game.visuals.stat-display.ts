@@ -1,5 +1,6 @@
 import { playerGameInstance, playerGameVisuals } from "../game.master";
 import { GameInstance } from "../i/game.i.game-instance";
+import { calculateTimeStats } from "../logic/game.logic.stat-tracker";
 import { StatNumberRefs } from "./i/game.visuals.i.stat-numberscopy";
 
 let trackingFrameId: number | null = null;
@@ -30,13 +31,9 @@ function statDisplayAnimation(): void {
 
 export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNumberRefs): void {
     const gameStats = gameInstance.stats;
-    const currentTime = performance.now() - gameStats.gameStartTime;
-    const formattedCurrentTimeString = formatTimeNumberToString(currentTime);
-    gameStats.bubblesPerSecond = Number((gameStats.bubblesShot / currentTime * 1000).toFixed(2));
-    gameStats.attackPerMinute = Number((gameStats.attack / currentTime * 60000).toFixed(2));
-    gameStats.attackPerBubble = Number((gameStats.attack / gameStats.bubblesShot).toFixed(2));
-    gameStats.defensePerMinute = Number((gameStats.defense / currentTime * 60000).toFixed(2));
-    gameStats.defensePerBubble = Number((gameStats.defense / gameStats.bubblesShot).toFixed(2));
+    const gameDuration = performance.now() - gameStats.gameStartTime;
+    const formattedCurrentTimeString = formatTimeNumberToString(gameDuration);
+    calculateTimeStats(gameInstance.stats, gameDuration)
     statStrings.formattedCurrentTime.value = formattedCurrentTimeString;
     statStrings.bubbleClearToWin.value = gameStats.bubbleClearToWin;
     statStrings.bubblesCleared.value = gameStats.bubblesCleared;

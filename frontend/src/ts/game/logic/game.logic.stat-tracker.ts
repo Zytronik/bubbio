@@ -1,4 +1,5 @@
 import { GameInstance } from "../i/game.i.game-instance";
+import { GameStats } from "../i/game.i.game-stats";
 import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
 
 export function trackBubbleShot(game: GameInstance, wallBounces: number, amountCleared: number): void {
@@ -72,5 +73,18 @@ export function createStatGraphData(game: GameInstance): void {
             duration = gameDuration;
         }
         graph[i] = Number((inputCount / duration).toFixed(2));
+    }
+}
+
+export function calculateTimeStats(gameStats: GameStats, gameDuration: number): void {
+    gameStats.bubblesPerSecond = Number((gameStats.bubblesShot / gameDuration * 1000).toFixed(2));
+    gameStats.attackPerMinute = Number((gameStats.attack / gameDuration * 60000).toFixed(2));
+    gameStats.defensePerMinute = Number((gameStats.defense / gameDuration * 60000).toFixed(2));
+    if (gameStats.bubblesShot === 0) {
+        gameStats.attackPerBubble = 0;
+        gameStats.defensePerBubble = 0;
+    } else {
+        gameStats.attackPerBubble = Number((gameStats.attack / gameStats.bubblesShot).toFixed(2));
+        gameStats.defensePerBubble = Number((gameStats.defense / gameStats.bubblesShot).toFixed(2));
     }
 }

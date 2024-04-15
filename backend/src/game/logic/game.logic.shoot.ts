@@ -61,7 +61,7 @@ export function shootBubble(game: GameInstance): number {
         if (game.queuedGarbage < 0) {
             const garbageToSend = Math.abs(game.queuedGarbage);
             game.sendGarbage(garbageToSend);
-            game.stats.defense += garbageToSend;
+            game.stats.defense += garbageAmount - garbageToSend;
             game.queuedGarbage = 0;
         }
     }

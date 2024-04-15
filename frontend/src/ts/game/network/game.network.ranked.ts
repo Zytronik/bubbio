@@ -94,7 +94,6 @@ export const endScreenData: dto_EndScreen = {
     }
 };
 export function network_listenToMatchFound(): void {
-    console.log("network_listenToMatchFound")
     const socket = state.socket;
     if (socket) {
         socket.on(O_RANKED_MATCH_FOUND, (data: dto_VersusScreen) => {
@@ -107,7 +106,6 @@ export function network_listenToMatchFound(): void {
             eventBus.emit("vue_matchFound");
         });
         socket.on(O_RANKED_SETUP_GAME_INSTANCE, (data: dto_GameSetup) => {
-            console.log(data.matchID);
             network_listenToQueuedInputsIndex(playerGameInstance);
             network_listenToIngameUpdates();
             setupGameInstance(data);
@@ -126,7 +124,6 @@ export function network_listenToMatchFound(): void {
 }
 
 function network_listenToIngameUpdates(): void {
-    console.log("network_listenToIngameUpdates")
     const socket = state.socket;
     if (socket) {
         socket.on(O_PLAYER_SPECTATOR, (data: dto_GameInstance) => {
@@ -155,7 +152,6 @@ function network_listenToIngameUpdates(): void {
             scoreScreenData.firstTo = data.firstTo;
             scoreScreenData.player1Data = data.player1Data;
             scoreScreenData.player2Data = data.player2Data;
-            console.log(scoreScreenData.matchID);
             eventBus.emit("vue_showMatchScore");
         });
         socket.on(O_RANKED_SHOW_END_SCREEN, (data: dto_EndScreen) => {
@@ -165,7 +161,6 @@ function network_listenToIngameUpdates(): void {
             endScreenData.player2Data = data.player2Data;
             network_stopListeningToServer();
             eventBus.emit("vue_showEndScreen");
-            console.log("vue_showEndScreen emited", endScreenData);
         });
         socket.on(O_RANKED_PREPARE_NEXT_ROUND, (data: dto_GameSetup) => {
             setupGameInstance(data);
@@ -210,10 +205,8 @@ function setupGameInstance(data: dto_GameSetup): void {
 }
 
 export function network_stopListeningToServer(): void {
-    console.log("game finished, stop listening to server")
     const socket = state.socket;
     if (socket) {
-        console.log("stop listening to server, for real")
         socket.off(O_RANKED_MATCH_FOUND);
         socket.off(O_RANKED_SETUP_GAME_INSTANCE);
         socket.off(O_RANKED_GO_TO_GAME_VIEW);
