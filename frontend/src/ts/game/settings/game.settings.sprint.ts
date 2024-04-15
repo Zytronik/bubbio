@@ -5,7 +5,7 @@ export function getSprintSettings(): GameSettings {
     const bagSize = 10;
     let prefillAmount = Math.floor(GRID_HEIGHT.defaultValue / 2);
     prefillAmount = (prefillAmount % 2 === 0) ? prefillAmount - 1 : prefillAmount;
-    const refillAmount = Math.ceil(prefillAmount / 2);
+    const refillAmount = Math.ceil(prefillAmount / 3);
     return {
         gridWidth: GRID_WIDTH.defaultValue,
         gridHeight: GRID_HEIGHT.defaultValue,
@@ -15,11 +15,11 @@ export function getSprintSettings(): GameSettings {
         queuePreviewSize: QUEUE_PREVIEW_SIZE.defaultValue,
         widthPrecisionUnits: WIDTH_PRECISION_UNITS.defaultValue,
         collisionDetectionFactor: COLLISION_DETECTION_FACTOR.defaultValue,
-        sprintVictoryCondition: 100,
+        sprintVictoryCondition: 200,
         clearFloatingBubbles: true,
         prefillBoard: true,
         prefillBoardAmount: prefillAmount,
-        refillBoard: false,
+        refillBoard: true,
         refillBoardAtLine: refillAmount,
         refillAmount: REFILL_AMOUNT.defaultValue,
         bubbleBagSize: bagSize,

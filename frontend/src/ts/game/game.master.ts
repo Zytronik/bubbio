@@ -182,8 +182,10 @@ export function setGameStateAndNotify(gameState: GAME_STATE): void {
 export function disableGameplay(): void {
     stopCountdownAnimation();
     const stats = playerGameInstance.stats;
-    stats.gameEndTime = performance.now();
-    stats.gameDuration = stats.gameEndTime - stats.gameStartTime;
+    const winningMoveAtTime = playerGameInstance.gameStateHistory.inputHistory[playerGameInstance.gameStateHistory.inputHistory.length - 1].frameTime;
+    console.log(winningMoveAtTime)
+    stats.gameEndTime = winningMoveAtTime;
+    stats.gameDuration = stats.gameEndTime;
     stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
     createStatGraphData(playerGameInstance);
     disableGameInputs();

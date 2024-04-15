@@ -23,6 +23,7 @@ import { dto_CountDown } from './network/dto/game.network.dto.count-down';
 import { dto_ScoreScreen } from './network/dto/game.network.dto.score-screen';
 import { dto_EndScreen } from './network/dto/game.network.dto.end-screen';
 import { GlickoService } from 'src/ranked/glicko.service';
+import { calculateTimeStats } from './logic/game.logic.stat-tracker';
 import { RankedService } from 'src/ranked/ranked.service';
 
 
@@ -169,7 +170,6 @@ export class GameGateway implements OnGatewayDisconnect {
   }
 
   onRankedRoundDefeat(rankedMatchId: string, playerClient: Socket): void {
-    console.log("onRankedRoundDefeat", playerClient.id)
     const match = ongoingRankedMatches.get(rankedMatchId);
     match.ongoingGamesMap.get(playerClient.id).gameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
     this.updatePlayerSpectator(match.ongoingGamesMap.get(playerClient.id));
@@ -201,21 +201,30 @@ export class GameGateway implements OnGatewayDisconnect {
     const player1 = match.players[0]
     const player1Score = match.scoresMap.get(player1.playerClient.id)
     const player1Stats = match.ongoingGamesMap.get(player1.playerClient.id).gameInstance.stats;
+    const gameEndTime = Date.now();
+    const gameDuration = Date.now() - player1Stats.gameStartTime;
+    player1Stats.gameEndTime = gameEndTime;
+    player1Stats.gameDuration = gameEndTime - player1Stats.gameStartTime;
+    calculateTimeStats(player1Stats, gameDuration);
     let player1StatsArray = match.roundStats.get(player1.playerClient.id);
     if (!player1StatsArray) {
       player1StatsArray = [];
       match.roundStats.set(player1.playerClient.id, player1StatsArray);
     }
     player1StatsArray.push(player1Stats);
+
     const player2 = match.players[1]
     const player2Score = match.scoresMap.get(player2.playerClient.id)
     const player2Stats = match.ongoingGamesMap.get(player2.playerClient.id).gameInstance.stats;
-    let player2StatsArray = match.roundStats.get(player1.playerClient.id);
+    player2Stats.gameEndTime = gameEndTime;
+    player2Stats.gameDuration = gameEndTime - player2Stats.gameStartTime;
+    calculateTimeStats(player2Stats, gameDuration);
+    let player2StatsArray = match.roundStats.get(player2.playerClient.id);
     if (!player2StatsArray) {
       player2StatsArray = [];
       match.roundStats.set(player2.playerClient.id, player2StatsArray);
     }
-    player1StatsArray.push(player2Stats);
+    player2StatsArray.push(player2Stats);
 
     if (!matchOver) {
       const scoreData: dto_ScoreScreen = {
@@ -247,11 +256,10 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(I_RANKED_SCREEN_TRANSITION_CONFIRMATION)
   playerRankedMatchFoundConfirmation(client: Socket, matchID: string): void {
-    this.logOngoingMatches(client, matchID, "I_RANKED_SCREEN_TRANSITION_CONFIRMATION")
     const match = ongoingRankedMatches.get(matchID);
     if (match === undefined) {
       client.emit(O_DISCONNECTED)
-      console.log("match is undefined", ongoingRankedMatches)
+      console.error("match is undefined", ongoingRankedMatches)
       return;
     }
     match.transitionConfirmationMap.set(client.id, true);
@@ -260,11 +268,10 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(I_RANKED_SETUP_GAME_CONFIRMATION)
   playerSetupGameReadyConfirmation(client: Socket, matchID: string): void {
-    this.logOngoingMatches(client, matchID, "I_RANKED_SETUP_GAME_CONFIRMATION")
     const match = ongoingRankedMatches.get(matchID);
     if (match === undefined) {
       client.emit(O_DISCONNECTED)
-      console.log("match is undefined", ongoingRankedMatches)
+      console.error("match is undefined", ongoingRankedMatches)
       return;
     }
     match.setupConfirmationMap.set(client.id, true);
@@ -290,12 +297,11 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(I_RANKED_READY_TO_START_GAME)
   playerReadyToStartGame(client: Socket, matchID: string): void {
-    this.logOngoingMatches(client, matchID, "I_RANKED_READY_TO_START_GAME")
     let allReady = true;
     const match = ongoingRankedMatches.get(matchID);
     if (match === undefined) {
       client.emit(O_DISCONNECTED)
-      console.log("match is undefined", ongoingRankedMatches)
+      console.error("match is undefined", ongoingRankedMatches)
       return;
     }
     match.readyToStartConfirmationMap.set(client.id, true);
@@ -306,6 +312,10 @@ export class GameGateway implements OnGatewayDisconnect {
     });
     if (allReady) {
       this.server.to(match.matchRoomName).emit(O_RANKED_START_GAME);
+      const now = Date.now()
+      match.ongoingGamesMap.forEach(game => {
+        game.gameInstance.stats.gameStartTime = now + game.gameInstance.gameSettings.countDownDuration;
+      });
     }
   }
 
@@ -408,15 +418,6 @@ export class GameGateway implements OnGatewayDisconnect {
     //this.rankedService.saveMatchToDatabase(endScreenData);
     ongoingRankedMatches.delete(matchID);
   }
-
-  logOngoingMatches(client: Socket, matchID: string, caller: string): void {
-    console.log(caller)
-    console.log("client.id: ", client.id, "matchID: ", matchID)
-    console.log("ongoingRankedMatches: ")
-    ongoingRankedMatches.forEach((match, rankedMatchId) => {
-      console.log(rankedMatchId)
-    });
-  }
   // #endregion
 
 
@@ -428,7 +429,7 @@ export class GameGateway implements OnGatewayDisconnect {
       const match = ongoingRankedMatches.get(inputData.matchID);
       if (match === undefined) {
         client.emit(O_DISCONNECTED)
-        console.log("match is undefined", ongoingRankedMatches)
+        console.error("match is undefined", ongoingRankedMatches)
         return;
       }
       game = match.ongoingGamesMap.get(client.id);
@@ -450,6 +451,7 @@ export class GameGateway implements OnGatewayDisconnect {
           const processedInputs = game.gameInstance.gameStateHistory.inputHistory;
           while (queuedInputs.length > processedInputs.length) {
             const inputFrame = queuedInputs[processedInputs.length];
+            processedInputs[inputFrame.indexID] = inputFrame;
             if (inputFrame) {
               if (inputFrame.input === GAME_INPUT.SHOOT) {
                 game.gameInstance.angle = inputFrame.angle;
@@ -459,7 +461,6 @@ export class GameGateway implements OnGatewayDisconnect {
               } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
                 game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
               }
-              processedInputs[inputFrame.indexID] = inputFrame;
               game.gameInstance.stats.gameDuration = inputFrame.frameTime;
             }
           }
@@ -467,7 +468,7 @@ export class GameGateway implements OnGatewayDisconnect {
           game.isProcessing = false;
         } catch (error) {
           client.emit(DO_LOG_ERROR, error.message);
-          console.log(error)
+          console.error(error)
         }
       }
     }
@@ -480,7 +481,7 @@ export class GameGateway implements OnGatewayDisconnect {
       const match = ongoingRankedMatches.get(gameStateData.matchID);
       if (match === undefined) {
         client.emit(O_DISCONNECTED)
-        console.log("match is undefined", ongoingRankedMatches)
+        console.error("match is undefined", ongoingRankedMatches)
         return;
       }
       game = match.ongoingGamesMap.get(client.id);
@@ -512,6 +513,10 @@ export class GameGateway implements OnGatewayDisconnect {
         game.gameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
         this.updatePlayerSpectator(game);
         this.updateSpectatorEntries();
+        const winningMoveAtTime = game.gameInstance.gameStateHistory.inputHistory[game.gameInstance.gameStateHistory.inputHistory.length - 1].frameTime;
+        game.gameInstance.stats.gameEndTime = winningMoveAtTime;
+        game.gameInstance.stats.gameDuration = winningMoveAtTime;
+        calculateTimeStats(game.gameInstance.stats, winningMoveAtTime);
         //TODO: Save game stats to database
       }.bind(this)
     }
