@@ -5,19 +5,27 @@
         <img class="profile-pic" :src="userData?.pbUrl" alt="Profile Picture">
         <div class="profile-content">
           <h3>{{ userData?.username.toUpperCase() }}</h3>
-          <div>
-            <p>Lv.727</p>
-            <img v-if="userData?.rankIcon && userData.isRanked" class="rank-img" :src="getRankImagePath(userData.rankIcon)" :alt="userData?.rankName">
+          <div class="ratingDetails">
+            <p v-if="userData.isRanked" class="rating">{{ userData.rating }}<span>±{{ userData.ratingDeviation }}</span></p>
+            <img v-if="userData?.rankInfos && userData.isRanked" class="rank-img"
+              :src="getRankImagePath(userData.rankInfos.iconName)" :alt="userData?.rankInfos.name">
             <p v-else class="unranked">Unranked</p>
+          </div>
+          <div v-if="userData.isRanked" class="progressBar">
+            <div class="progressBarFill" :style="{
+              'width': getProgressBarFillWidth()
+            }"></div>
           </div>
         </div>
       </div>
     </div>
     <InfoMessages ref="infoMessageRef" />
-    <LoginOverlay v-if="showLogin" @joinRoomFromHash="joinRoomFromHash" @updateAuthenticatedState="updateAuthenticatedState" />
+    <LoginOverlay v-if="showLogin" @joinRoomFromHash="joinRoomFromHash"
+      @updateAuthenticatedState="updateAuthenticatedState" />
     <Channel v-if="isChannelOpen" />
     <transition :name="isNavigatingForward ? 'slide-left' : 'slide-right'" mode="out-in">
-      <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom" @updateProfileData="updateProfileData" :key="currentComponentKey">
+      <component :is="currentComponent" :room-id="roomId" @joinedRoom="handleJoinRoom" @leftRoom="handleLeaveRoom"
+        @updateProfileData="updateProfileData" :key="currentComponentKey">
       </component>
     </transition>
     <div class="bottomBar">
@@ -42,6 +50,7 @@ import { httpClient } from './ts/networking/networking.http-client';
 import { getDefaultProfilePbURL, getRankImagePath } from './ts/networking/paths';
 import { applySavedInputSettings, enableBackInputs, enableChannelInput, enableNetworkDebugInputs } from './ts/input/input.input-manager';
 import { setupDebugListeners } from "./ts/game/network/game.network.debug";
+import { RankInfo } from './ts/page/i/page.i-rank-info';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -153,9 +162,11 @@ export default {
       countryCode?: string;
       country?: string;
       pbUrl: string;
-      rankIcon?: string;
-      rankName?: string;
+      rankInfos?: RankInfo;
       isRanked?: boolean;
+      rating?: number;
+      ratingDeviation?: number;
+      percentile?: number;
     }
 
     const userData = ref<UserData | null>(null);
@@ -192,6 +203,13 @@ export default {
       if (isAuthenticated.value && !isGuest && userData.value && userData.value.username) {
         openProfile(userData.value.username);
       }
+    }
+
+    function getProgressBarFillWidth() {
+      if (!userData?.value || !userData?.value.rankInfos || !userData?.value.rankInfos.prevRank || !userData?.value.rankInfos.nextRank || !userData?.value.percentile) {
+        return '0%';
+      }
+      return (100 - (100 / (userData?.value.rankInfos.percentile - userData?.value.rankInfos.nextRank.percentile) * (userData?.value.percentile - userData?.value.rankInfos.nextRank.percentile))) + '%';
     }
 
     async function fetchUserData() {
@@ -261,6 +279,7 @@ export default {
       joinRoomFromHash,
       updateAuthenticatedState,
       getRankImagePath,
+      getProgressBarFillWidth,
     };
   },
 }
@@ -312,21 +331,35 @@ export default {
   padding: 0 30px 0 15px;
 }
 
-.profile-content > div {
+.profile-content .ratingDetails {
   display: flex;
   flex-direction: row;
   margin-top: 8px;
   font-size: 20px;
+  align-items: center;
 }
 
-.profile-content > div .rank-img {
-  margin-left: 30px;
+.profile-content .progressBar {
+  width: 90%;
+  height: 4px;
+  background-color: #575757;
+  margin-top: 5px;
+}
+
+.profile-content .progressBar .progressBarFill {
+  height: 100%;
+  background-color: rgb(244, 205, 33);
+}
+
+.profile-content .rating span {
+  font-size: 80%;
+  opacity: 0.5;
+}
+
+.profile-content .ratingDetails .rank-img {
+  margin-left: 5px;
   object-fit: contain;
-  height: 30px;
-}
-
-.profile-content > div .unranked {
-  margin-left: 30px;
+  height: 25px;
 }
 
 .profile-content h3 {
@@ -338,7 +371,7 @@ export default {
   margin: unset;
 }
 
-.profile-wrapper img {
+.profile-pic {
   height: 100%;
   width: 10vh;
   object-fit: cover;

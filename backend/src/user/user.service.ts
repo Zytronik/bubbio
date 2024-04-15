@@ -171,6 +171,42 @@ export class UserService {
         return rank;
     }
 
+    async getMyProfileDetails(userId: number): Promise<any> {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+            select: {
+                id: true,
+                username: true,
+                countryCode: true,
+                country: true,
+                pbUrl: true,
+                ratingDeviation: true,
+                rating: true,
+            },
+        });
+
+        if(!user) {
+            throw new NotFoundException('User not found');
+        }
+        
+        const percentile = await this.getPercentile(userId);
+        let rankInfos = await this.ranksService.getRankInfo(user.id);
+        if (user.ratingDeviation >= unrankedRatingDeviation) {
+            rankInfos.isRanked = false;
+        }
+
+        return {
+            ...user,
+            percentile,
+            rankInfos,
+            rating: Math.round(user.rating),
+            ratingDeviation: Math.round(user.ratingDeviation),
+            isRanked: rankInfos.isRanked,
+        };
+    }
+
     async getUserProfileByUsername(username: string): Promise<any> {
         const user = await this.prisma.user.findFirst({
             where: {
@@ -189,6 +225,7 @@ export class UserService {
                 bannerUrl: true,
                 LastDisconnectedAt: true,
                 ratingDeviation: true,
+                rating: true,
             },
         });
 
@@ -225,6 +262,8 @@ export class UserService {
             ...user,
             rankIcon: rankInfos.iconName,
             rankName: rankInfos.name,
+            rating: Math.round(user.rating),
+            ratingDeviation: Math.round(user.ratingDeviation),
             isRanked: rankInfos.isRanked,
             sprintStats: {
                 averageBubblesCleared: sprintStats._avg.bubblesCleared,

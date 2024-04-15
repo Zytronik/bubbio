@@ -1,6 +1,5 @@
-import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -16,7 +15,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMyProfile(@Req() req: AuthenticatedRequest) {
-    return this.userService.getUserProfileByUsername(req.user.username);
+    return this.userService.getMyProfileDetails(req.user.userId);
   }
 
   @Get('usernameIsValid')

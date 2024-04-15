@@ -1,5 +1,5 @@
 <template>
-  <section id="multiMenu" class="page menu">
+  <section id="rankedPage" class="page menu">
     <MenuBackButtons :buttonData="backButtonData" :specialBehavior="specialBackButtonBehavior" @special-click-event="goBackToRankedPage" />
     <div class="page-wrapper">
       <div class="page-container">
@@ -8,7 +8,7 @@
           <div id="matchFoundBackground"></div>
           <div class="left-content">
 
-            <div class="playerStats" v-if="playerStats">
+            <div class="playerStats" v-if="playerStats && isLoggedIn">
               <div>
                 <img v-if="playerStats.rankInfo.iconName && playerStats.rankInfo.isRanked" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)"
                   :alt="playerStats.rankInfo.name">
@@ -24,7 +24,7 @@
               </p>
             </div>
 
-            <div v-if="playerStats && playerStats.rankInfo.isRanked" class="progressBarWrapper">
+            <div v-if="playerStats && playerStats.rankInfo.isRanked && isLoggedIn" class="progressBarWrapper">
               <div class="prevRank">
                 <p v-if="playerStats.rankInfo.prevRank?.ascii">{{ playerStats.rankInfo.percentile }}%</p>
                 <img v-if="playerStats.rankInfo.prevRank?.iconName" class="rank-img"
@@ -47,19 +47,22 @@
               </div>
             </div>
             <div v-else>
-              <p>Play some Ranked Games to get Ranked.</p>
-              <div v-if="playerStats" class="probablyAroundRank">
-                <p>Probably around:</p>
-                <img v-if="playerStats.rankInfo.iconName" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)">
+              <div v-if="!isLoggedIn">Please Log In or Sign Up to Play Ranked</div>
+              <div v-else>
+                <p>Play some Ranked Games to get Ranked.</p>
+                <div v-if="playerStats" class="probablyAroundRank">
+                  <p>Probably around:</p>
+                  <img v-if="playerStats.rankInfo.iconName" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)">
+                </div>
               </div>
             </div>
 
-            <div class="queueInfos">
+            <div class="queueInfos" v-if="isLoggedIn">
               <p><span>{{ playersInQueue }}</span> in Queue</p>
               <p><span>0</span> in Games</p>
             </div>
 
-            <div class="matchmakingButton" @click="toggleQueue" :class="{ 'in-queue': isInQueue }">
+            <div v-if="isLoggedIn" class="matchmakingButton" @click="toggleQueue" :class="{ 'in-queue': isInQueue }">
               <div v-if="isInQueue">
                 <p>Leave Queue | Passed Time: {{ passedTime }}s</p>
               </div>
@@ -123,7 +126,7 @@
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
-import { nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import state from '@/ts/networking/networking.client-websocket';
 import VsScreen from './components/VsScreen.vue';
@@ -139,6 +142,8 @@ import { playerGameVisuals } from '@/ts/game/game.master';
 import Game from '@/pages/game/Game.vue';
 import { backInput } from '@/ts/input/input.all-inputs';
 import { disableResetInput, enableBackInputs } from '@/ts/input/input.input-manager';
+import { RankInfo } from '@/ts/page/i/page.i-rank-info';
+import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 
 interface PlayerMatchmakingStats {
   userId: number;
@@ -150,23 +155,6 @@ interface PlayerMatchmakingStats {
   gamesCount: number;
   percentile: number;
   rankInfo: RankInfo;
-}
-
-interface RankInfo {
-  ascii: string;
-  name: string;
-  iconName: string;
-  percentile: number;
-  prevRank?: Rank;
-  nextRank?: Rank;
-  isRanked: boolean;
-}
-
-interface Rank {
-  ascii: string;
-  percentile: number;
-  name: string;
-  iconName: string;
 }
 
 export default {
@@ -196,6 +184,7 @@ export default {
     const hasMatchFound = ref<boolean>(false);
     const backInputOnLoad = ref<() => void>(() => "");
     let passedTimeInterval: ReturnType<typeof setInterval> | undefined = 0;
+    const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
 
     function getProgressBarFillWidth() {
       if (!playerStats.value || !playerStats.value.rankInfo.prevRank || !playerStats.value.rankInfo.nextRank) {
@@ -400,12 +389,14 @@ export default {
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(126,10,41,1) 0%, rgba(144,141,58,1) 100%)');
       backInputOnLoad.value = backInput.fire;
-      fetchPlayerMmStats();
-      mountSockets();
-      eventBus.on("vue_matchFound", matchFound);
-      eventBus.on('vue_goToGameView', goToGameView);
-      eventBus.on('vue_showMatchScore', showMatchScore);
-      eventBus.on('vue_showEndScreen', showEndScreenPage);
+      if(isLoggedIn.value){
+        fetchPlayerMmStats();
+        mountSockets();
+        eventBus.on("vue_matchFound", matchFound);
+        eventBus.on('vue_goToGameView', goToGameView);
+        eventBus.on('vue_showMatchScore', showMatchScore);
+        eventBus.on('vue_showEndScreen', showEndScreenPage);
+      }
     });
 
     onUnmounted(() => {
@@ -442,6 +433,7 @@ export default {
       scoreScreenData,
       goBackToRankedPage,
       specialBackButtonBehavior,
+      isLoggedIn,
     }
   }
 };
@@ -784,4 +776,5 @@ p {
   padding: 15px;
   box-sizing: border-box;
 }
-</style>
+</style>computed, import { checkUserAuthentication } from '@/ts/networking/networking.auth';computed, import { checkUserAuthentication } from '@/ts/networking/networking.auth';
+
