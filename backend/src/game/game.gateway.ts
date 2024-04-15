@@ -23,6 +23,7 @@ import { dto_CountDown } from './network/dto/game.network.dto.count-down';
 import { dto_ScoreScreen } from './network/dto/game.network.dto.score-screen';
 import { dto_EndScreen } from './network/dto/game.network.dto.end-screen';
 import { GlickoService } from 'src/ranked/glicko.service';
+import { RankedService } from 'src/ranked/ranked.service';
 
 
 /*
@@ -84,6 +85,7 @@ export class GameGateway implements OnGatewayDisconnect {
     @Inject(forwardRef(() => MatchmakingService))
     private matchmakingService: MatchmakingService,
     private glickoService: GlickoService,
+    private rankedService: RankedService,
   ) { }
 
   handleDisconnect(client: Socket): void {
@@ -403,6 +405,7 @@ export class GameGateway implements OnGatewayDisconnect {
       this.stopSpectatingEnemies(player.playerClient, match);
     });
     //TODO: Save match data to database
+    //this.rankedService.saveMatchToDatabase(endScreenData);
     ongoingRankedMatches.delete(matchID);
   }
 
@@ -509,6 +512,7 @@ export class GameGateway implements OnGatewayDisconnect {
         game.gameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
         this.updatePlayerSpectator(game);
         this.updateSpectatorEntries();
+        //TODO: Save game stats to database
       }.bind(this)
     }
     const onGarbageSend = function (amount: number): void { }
