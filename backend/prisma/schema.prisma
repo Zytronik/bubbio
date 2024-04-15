@@ -29,6 +29,8 @@ model User {
   sprint          Sprint[]
   news          News[]
   passwordResetToken PasswordResetToken[]
+  rankedGamesAsUser1  Ranked[]        @relation("User1Ranked")
+  rankedGamesAsUser2  Ranked[]        @relation("User2Ranked")
 }
 
 model UserFriendship {
@@ -90,4 +92,23 @@ model Sprint {
   clear3wb            Int             @default(0)
   clear4wb            Int             @default(0)
   clear5wb            Int             @default(0)
+}
+
+model Ranked {
+  id                   Int             @id @default(autoincrement())
+  submittedAt          DateTime        @default(now())
+  matchId              String
+  firstTo              Int
+  user1                User            @relation("User1Ranked", fields: [userId1], references: [id])
+  userId1              Int
+  user1Score           Int
+  user1HasWon          Boolean
+  user1EloDiff         Float
+  user1Stats           String
+  user2                User            @relation("User2Ranked", fields: [userId2], references: [id])
+  userId2              Int
+  user2Score           Int
+  user2HasWon          Boolean
+  user2EloDiff         Float
+  user2Stats           String
 }
