@@ -104,7 +104,7 @@ export default defineComponent({
 .toast-container {
   position: fixed;
   bottom: 7%;
-  right: 30px;
+  right: 15px;
   z-index: 1000;
 }
 
