@@ -210,14 +210,6 @@ export default {
     }
 
     /* General */
-    function initOnSocketDisconnect(){
-      if(state.socket){
-        state.socket.on('disconnect', () => {
-          //showInfoMessage('Disconnected from server. Reconnecting...', 'info');
-        });
-      }
-    }
-
     onMounted(async () => {
       addSocketConnectListener(setupDebugListeners);
       enableBackInputs();
@@ -234,7 +226,6 @@ export default {
       }
       showUserPageFromURL();
       addSocketConnectListener(initOnIsUserInRoomAlready);
-      addSocketConnectListener(initOnSocketDisconnect);
       eventBus.on('navigationDirectionChanged', updateDirection);
       eventBus.on('show-info-message', (infoMessageData: InfoMessageData) => {
         showInfoMessage(infoMessageData.message, infoMessageData.type);
