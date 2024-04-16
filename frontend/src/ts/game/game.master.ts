@@ -184,13 +184,14 @@ export function setGameStateAndNotify(gameState: GAME_STATE): void {
 }
 export function disableGameplay(): void {
     stopCountdownAnimation();
-    const stats = playerGameInstance.stats;
-    const winningMoveAtTime = playerGameInstance.gameStateHistory.inputHistory[playerGameInstance.gameStateHistory.inputHistory.length - 1].frameTime;
-    console.log(winningMoveAtTime)
-    stats.gameEndTime = winningMoveAtTime;
-    stats.gameDuration = stats.gameEndTime;
-    stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
-    createStatGraphData(playerGameInstance);
+    if (playerGameInstance.gameMode === GAME_MODE.SPRINT) {
+        const stats = playerGameInstance.stats;
+        const winningMoveAtTime = playerGameInstance.gameStateHistory.inputHistory[playerGameInstance.gameStateHistory.inputHistory.length - 1].frameTime;
+        stats.gameEndTime = winningMoveAtTime;
+        stats.gameDuration = stats.gameEndTime;
+        stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
+        createStatGraphData(playerGameInstance);
+    }
     disableGameInputs();
     stopASCIIAnimation();
     stopStatDisplay();
