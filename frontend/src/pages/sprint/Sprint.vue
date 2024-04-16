@@ -41,16 +41,7 @@
         </div>
 
         <div v-if="isGaming" class="inGame">
-          <div class="game-wrapper">
-            <div class="inGameStats">
-              <p v-html="playerGameVisuals.statNumbers.formattedCurrentTime.value"></p>
-              <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}
-              </p>
-              <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond
-                }}</p>
-            </div>
             <Game :playerGameVisuals="playerGameVisuals" :areRef="true" />
-          </div>
         </div>
 
         <div v-if="isResultView" class="gameComplete">

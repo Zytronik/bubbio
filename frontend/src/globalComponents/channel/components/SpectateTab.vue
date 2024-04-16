@@ -9,15 +9,7 @@
   <div class="spectating" v-if="isSpectating">
     <button @click="showSpectationEntries();">Switch back to old view</button>
     <div class="game" v-for="[playerName, visuals] in playerNameVisualsMap" :key="playerName">
-
-      <div class="game-wrapper">
-        <div class="inGameStats">
-          <p>{{ visuals.statNumbers.formattedCurrentTime }}</p>
-          <p>{{ visuals.statNumbers.bubblesCleared }}/{{ visuals.statNumbers.bubbleClearToWin }}</p>
-          <p>{{ visuals.statNumbers.bubblesShot }} BPS: {{ visuals.statNumbers.bubblesPerSecond }}</p>
-        </div>
-        <Game :playerGameVisuals="visuals" :areRef="false"/>
-      </div>
+      <Game :playerGameVisuals="visuals" :areRef="false" />
     </div>
   </div>
 </template>
@@ -30,7 +22,7 @@ import Game from '@/pages/game/Game.vue';
 
 export default defineComponent({
   name: 'SpectateTab',
-  components: {Game},
+  components: { Game },
   setup() {
     const isSpectating = ref(false);
 
@@ -83,6 +75,6 @@ export default defineComponent({
 }
 
 .game-wrapper {
-  font-size: 130%;
+  font-size: 2vh;
 }
 </style>

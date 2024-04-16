@@ -675,10 +675,8 @@ p {
   left: 0;
   width: 100vw;
   height: 100vh;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
-  font-size: 160%;
-  gap: 15%;
 }
 
 .gaming-wrapper::before,
