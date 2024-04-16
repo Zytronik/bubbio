@@ -24,7 +24,10 @@ export function getEmptyGameVisuals(): GameVisuals {
             bubblesCleared: ref(0),
             bubblesLeftToClear: ref(0),
             bubblesShot: ref(0),
-            bubblesPerSecond: ref(0)
+            bubblesPerSecond: ref(0),
+            attackPerMinute: ref(0),
+            currentCombo: ref(0),
+            spikeNumber: ref(""),
         },
         timeDifference: 0,
         playerName: "",
