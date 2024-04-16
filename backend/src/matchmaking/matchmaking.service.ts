@@ -40,12 +40,12 @@ export class MatchmakingService {
 
     userJoinedMmVue(client: Socket){
         client.join(this.socketMmRoomName);
-        this.notifyAllUsersOfQueueSize();
+        this.notifyAllUsersOfCurrentQueue();
     }
 
     userLeftMmVue(client: Socket){
         client.leave(this.socketMmRoomName);
-        this.notifyAllUsersOfQueueSize();
+        this.notifyAllUsersOfCurrentQueue();
     }
 
     removeUserFromQueue(userId: number) {
@@ -54,7 +54,7 @@ export class MatchmakingService {
             if (this.checkIfMatchmakingQueueIsEmpty()) {
                 this.stopMatchmakingInterval();
             }
-            this.notifyAllUsersOfQueueSize();
+            this.notifyAllUsersOfCurrentQueue();
         }
     }
 
@@ -62,7 +62,7 @@ export class MatchmakingService {
         if (!this.checkIfUserIsInQueue(userId)) {
             this.queue[userId] = { glicko, searchStart: Date.now(), client };
             this.startMatchmakingInterval();
-            this.notifyAllUsersOfQueueSize();
+            this.notifyAllUsersOfCurrentQueue();
         }
     }
 
@@ -181,8 +181,9 @@ export class MatchmakingService {
         return data
     }
 
-    notifyAllUsersOfQueueSize() {
+    notifyAllUsersOfCurrentQueue() {
         this.matchmakingGateway.server.to(this.socketMmRoomName).emit('queueSize', this.getQueueSize());
+        this.matchmakingGateway.server.to(this.socketMmRoomName).emit('rankedGamesCount', this.gameGateway.getOngoingRankedMatchAmount());
     }
 
     getQueueSize(){

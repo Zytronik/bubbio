@@ -59,7 +59,7 @@
 
             <div class="queueInfos" v-if="isLoggedIn">
               <p><span>{{ playersInQueue }}</span> in Queue</p>
-              <p><span>0</span> in Games</p>
+              <p><span>{{ rankedMatchesCount }}</span> in Games</p>
             </div>
 
             <div v-if="isLoggedIn" class="matchmakingButton" @click="toggleQueue" :class="{ 'in-queue': isInQueue }">
@@ -179,6 +179,7 @@ export default {
     const isInQueue = ref<boolean>(false);
     const playerStats = ref<PlayerMatchmakingStats | null>(null);
     const playersInQueue = ref<number>(0);
+    const rankedMatchesCount = ref<number>(0);
     const passedTime = ref<number>(0);
     const userData: UserData | null = eventBus.getUserData();
     const hasMatchFound = ref<boolean>(false);
@@ -269,6 +270,9 @@ export default {
         state.socket.on('queueSize', (size: number) => {
           playersInQueue.value = size;
         });
+        state.socket.on('rankedGamesCount', (amount: number) => {
+          rankedMatchesCount.value = amount;
+        });
       }
     }
 
@@ -277,6 +281,7 @@ export default {
       if (state.socket) {
         state.socket.emit('playerLeftMmVue');
         state.socket.off('queueSize');
+        state.socket.off('rankedGamesCount');
       }
     }
 
@@ -416,6 +421,7 @@ export default {
       isInQueue,
       playerStats,
       playersInQueue,
+      rankedMatchesCount,
       passedTime,
       hasMatchFound,
       GameMode,

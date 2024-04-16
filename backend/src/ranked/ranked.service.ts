@@ -17,12 +17,12 @@ export class RankedService {
                     user1Score: player1Data.playerScore,
                     user1HasWon: player1Data.hasWon,
                     user1EloDiff: player1Data.eloDiff,
-                    user1Stats: JSON.stringify(player1Data.playerStats),
+                    user1Stats: player1Data.playerStats ? JSON.stringify(player1Data.playerStats) : null,
                     userId2: player2Data.playerID,
                     user2Score: player2Data.playerScore,
                     user2HasWon: player2Data.hasWon,
                     user2EloDiff: player2Data.eloDiff,
-                    user2Stats: JSON.stringify(player2Data.playerStats),
+                    user2Stats: player2Data.playerStats ? JSON.stringify(player2Data.playerStats) : null,
                 }
             });
 

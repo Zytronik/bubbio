@@ -25,6 +25,7 @@ import { dto_EndScreen } from './network/dto/game.network.dto.end-screen';
 import { GlickoService } from 'src/ranked/glicko.service';
 import { calculateTimeStats } from './logic/game.logic.stat-tracker';
 import { RankedService } from 'src/ranked/ranked.service';
+import { on } from 'events';
 
 
 /*
@@ -132,6 +133,7 @@ export class GameGateway implements OnGatewayDisconnect {
     rankedMatch.players.push({ playerID: player1ID, playerName: player1Client.data.user.username, playerClient: player1Client, })
     rankedMatch.players.push({ playerID: player2ID, playerName: player2Client.data.user.username, playerClient: player2Client, })
     ongoingRankedMatches.set(rankedMatchId, rankedMatch);
+    this.matchmakingService.notifyAllUsersOfCurrentQueue();
 
     const players: Socket[] = [player1Client, player2Client];
     players.forEach(player => {
@@ -414,9 +416,13 @@ export class GameGateway implements OnGatewayDisconnect {
       player.playerClient.leave(match.matchRoomName);
       this.stopSpectatingEnemies(player.playerClient, match);
     });
-    //TODO: Save match data to database
-    //this.rankedService.saveMatchToDatabase(endScreenData);
+    this.rankedService.saveMatchToDatabase(endScreenData);
     ongoingRankedMatches.delete(matchID);
+    this.matchmakingService.notifyAllUsersOfCurrentQueue();
+  }
+
+  getOngoingRankedMatchAmount(): number {
+    return ongoingRankedMatches.size;
   }
   // #endregion
 

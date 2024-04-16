@@ -5,7 +5,7 @@ import { StatNumberRefs } from "./i/game.visuals.i.stat-numberscopy";
 
 let trackingFrameId: number | null = null;
 let statTrackingRunning = false;
-
+const SPIKE_COUNTER_TIMEFRAME = 1500;
 export function startStatDisplay(): void {
     if (!statTrackingRunning) {
         statTrackingRunning = true;
@@ -40,6 +40,13 @@ export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNum
     statStrings.bubblesLeftToClear.value = gameStats.bubblesLeftToClear;
     statStrings.bubblesShot.value = gameStats.bubblesShot;
     statStrings.bubblesPerSecond.value = gameStats.bubblesPerSecond;
+    statStrings.attackPerMinute.value = gameStats.attackPerMinute;
+    statStrings.currentCombo.value = gameStats.currentCombo;
+    if (gameStats.spikeAnimationStart + SPIKE_COUNTER_TIMEFRAME < performance.now()) {
+        statStrings.spikeNumber.value = "" + gameStats.spikeNumber;
+    } else {
+        statStrings.spikeNumber.value = "";
+    }
 }
 
 export function resetStatDisplays(statStrings: StatNumberRefs): void {
