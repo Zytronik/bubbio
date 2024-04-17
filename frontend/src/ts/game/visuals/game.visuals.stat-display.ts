@@ -1,6 +1,7 @@
 import { playerGameInstance, playerGameVisuals } from "../game.master";
 import { GameInstance } from "../i/game.i.game-instance";
 import { calculateTimeStats } from "../logic/game.logic.stat-tracker";
+import { enemyGameInstance, enemyVisuals } from "../network/game.network.ranked";
 import { StatNumberRefs } from "./i/game.visuals.i.stat-numberscopy";
 
 let trackingFrameId: number | null = null;
@@ -24,6 +25,9 @@ export function stopStatDisplay(): void {
 
 function statDisplayAnimation(): void {
     fillStatStrings(playerGameInstance, playerGameVisuals.statNumbers);
+    if (enemyGameInstance) {
+        fillStatStrings(enemyGameInstance, enemyVisuals.statNumbers);
+    }
     if (statTrackingRunning) {
         trackingFrameId = requestAnimationFrame(() => statDisplayAnimation());
     }

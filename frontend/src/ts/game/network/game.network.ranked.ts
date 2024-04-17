@@ -17,6 +17,7 @@ import { dto_EndScreen } from "./dto/game.network.dto.end-screen";
 import { dto_ScoreScreen } from "./dto/game.network.dto.score-screen";
 import { GAME_INPUT } from "./i/game.network.i.game-input";
 import { InputFrame } from "../i/game.i.game-state-history";
+import { GameInstance } from "../i/game.i.game-instance";
 
 const O_RANKED_MATCH_FOUND = "output_rankedMatchFound";
 const O_RANKED_SETUP_GAME_INSTANCE = "output_rankedSetupGameInstance";
@@ -32,6 +33,7 @@ const O_RANKED_SHOW_END_SCREEN = "output_rankedShowEndScreen";
 
 const O_PLAYER_SPECTATOR = "update_playerSpectator";
 const O_RECEIVE_GARBAGE = "output_receiveGarbage";
+export let enemyGameInstance: GameInstance
 export const enemyVisuals: GameVisuals = getEmptyGameVisuals();
 export const versusScreenData: dto_VersusScreen = {
     matchID: "",
@@ -129,6 +131,7 @@ function network_listenToIngameUpdates(): void {
         socket.on(O_PLAYER_SPECTATOR, (data: dto_GameInstance) => {
             fillAsciiStrings(data.gameInstance, enemyVisuals.asciiBoard);
             fillStatStrings(data.gameInstance, enemyVisuals.statNumbers);
+            enemyGameInstance = data.gameInstance;
             enemyVisuals.playerName = data.playerName;
             enemyVisuals.timeDifference = data.gameInstance.stats.gameDuration - performance.now();
         });
