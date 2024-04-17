@@ -7,4 +7,7 @@ export interface StatNumberRefs {
     bubblesLeftToClear: Ref<number>,
     bubblesShot: Ref<number>,
     bubblesPerSecond: Ref<number>,
+    attackPerMinute: Ref<number>,
+    currentCombo: Ref<number>,
+    spikeNumber: Ref<string>,
 }

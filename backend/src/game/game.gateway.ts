@@ -25,6 +25,8 @@ import { dto_EndScreen } from './network/dto/game.network.dto.end-screen';
 import { GlickoService } from 'src/ranked/glicko.service';
 import { calculateTimeStats } from './logic/game.logic.stat-tracker';
 import { RankedService } from 'src/ranked/ranked.service';
+import { on } from 'events';
+import { UserService } from 'src/user/user.service';
 
 
 /*
@@ -87,6 +89,7 @@ export class GameGateway implements OnGatewayDisconnect {
     private matchmakingService: MatchmakingService,
     private glickoService: GlickoService,
     private rankedService: RankedService,
+    private userService: UserService,
   ) { }
 
   handleDisconnect(client: Socket): void {
@@ -132,6 +135,7 @@ export class GameGateway implements OnGatewayDisconnect {
     rankedMatch.players.push({ playerID: player1ID, playerName: player1Client.data.user.username, playerClient: player1Client, })
     rankedMatch.players.push({ playerID: player2ID, playerName: player2Client.data.user.username, playerClient: player2Client, })
     ongoingRankedMatches.set(rankedMatchId, rankedMatch);
+    this.matchmakingService.notifyAllUsersOfCurrentQueue();
 
     const players: Socket[] = [player1Client, player2Client];
     players.forEach(player => {
@@ -371,12 +375,15 @@ export class GameGateway implements OnGatewayDisconnect {
     const player1Score = match.scoresMap.get(player1.playerClient.id)
     const player2 = match.players[1]
     const player2Score = match.scoresMap.get(player2.playerClient.id)
+    const player1Pb = await this.userService.getProfilePicById(player1.playerID);
+    const player2Pb = await this.userService.getProfilePicById(player2.playerID);
     const endScreenData: dto_EndScreen = {
       matchID: matchID,
       firstTo: match.firstTo,
       player1Data: {
         playerID: player1.playerID,
         playerName: player1.playerName,
+        playerProfilePic: player1Pb,
         playerScore: player1Score,
         hasWon: player1Score === match.firstTo,
         eloDiff: 0,
@@ -385,6 +392,7 @@ export class GameGateway implements OnGatewayDisconnect {
       player2Data: {
         playerID: player2.playerID,
         playerName: player2.playerName,
+        playerProfilePic: player2Pb,
         playerScore: player2Score,
         hasWon: player2Score === match.firstTo,
         eloDiff: 0,
@@ -414,9 +422,13 @@ export class GameGateway implements OnGatewayDisconnect {
       player.playerClient.leave(match.matchRoomName);
       this.stopSpectatingEnemies(player.playerClient, match);
     });
-    //TODO: Save match data to database
-    //this.rankedService.saveMatchToDatabase(endScreenData);
+    this.rankedService.saveMatchToDatabase(endScreenData);
     ongoingRankedMatches.delete(matchID);
+    this.matchmakingService.notifyAllUsersOfCurrentQueue();
+  }
+
+  getOngoingRankedMatchAmount(): number {
+    return ongoingRankedMatches.size;
   }
   // #endregion
 

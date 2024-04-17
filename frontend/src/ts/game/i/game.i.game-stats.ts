@@ -19,6 +19,9 @@ export interface GameStats {
     defense: number,
     defensePerMinute: number,
     defensePerBubble: number,
+
+    spikeNumber: number,
+    spikeAnimationStart: number,
     
     clear3: number,
     clear4: number,

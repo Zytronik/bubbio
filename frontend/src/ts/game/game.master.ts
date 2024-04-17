@@ -37,6 +37,9 @@ export const playerGameVisuals: GameVisuals = {
         bubblesLeftToClear: ref(0),
         bubblesShot: ref(0),
         bubblesPerSecond: ref(0),
+        attackPerMinute: ref(0),
+        currentCombo: ref(0),
+        spikeNumber: ref(""),
     },
     timeDifference: 0,
     playerName: "",
@@ -181,13 +184,14 @@ export function setGameStateAndNotify(gameState: GAME_STATE): void {
 }
 export function disableGameplay(): void {
     stopCountdownAnimation();
-    const stats = playerGameInstance.stats;
-    const winningMoveAtTime = playerGameInstance.gameStateHistory.inputHistory[playerGameInstance.gameStateHistory.inputHistory.length - 1].frameTime;
-    console.log(winningMoveAtTime)
-    stats.gameEndTime = winningMoveAtTime;
-    stats.gameDuration = stats.gameEndTime;
-    stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
-    createStatGraphData(playerGameInstance);
+    if (playerGameInstance.gameMode === GAME_MODE.SPRINT) {
+        const stats = playerGameInstance.stats;
+        const winningMoveAtTime = playerGameInstance.gameStateHistory.inputHistory[playerGameInstance.gameStateHistory.inputHistory.length - 1].frameTime;
+        stats.gameEndTime = winningMoveAtTime;
+        stats.gameDuration = stats.gameEndTime;
+        stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
+        createStatGraphData(playerGameInstance);
+    }
     disableGameInputs();
     stopASCIIAnimation();
     stopStatDisplay();

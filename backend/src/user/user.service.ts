@@ -8,6 +8,7 @@ import { FileStorageService } from './file-storage.service';
 import { Ratings } from 'src/ranked/i/ranked.i.ratings';
 import { Prisma } from '@prisma/client';
 import { unrankedRatingDeviation } from 'src/ranked/ranks';
+import { RankedService } from 'src/ranked/ranked.service';
 
 @Injectable()
 export class UserService {
@@ -16,6 +17,7 @@ export class UserService {
         @Inject(forwardRef(() => RanksService))
         private ranksService: RanksService,
         private fileStorageService: FileStorageService,
+        private rankedService: RankedService,
     ) { }
 
     async createUser(createUserDto: CreateUserDto, clientIp: string): Promise<any> {
@@ -583,6 +585,8 @@ export class UserService {
             nationalRank = await this.getNationalRank(userId);
             percentile = await this.getPercentile(userId);
         }
+        const gamesPlayed = await this.rankedService.getPlayedMatchesByUserID(userId);
+        const gamesWon = await this.rankedService.getWonMatchesByUserID(userId);
 
         return {
             userId,
@@ -590,10 +594,10 @@ export class UserService {
             ratingDeviation: Math.round(user.ratingDeviation),
             globalRank: globalRank,
             nationalRank: nationalRank,
-            gamesWon: 0,
-            gamesCount: 0,
             percentile: percentile,
             rankInfo: rankInfo,
+            gamesPlayed: gamesPlayed.length,
+            gamesWon: gamesWon.length,
         };
     }
 
@@ -633,5 +637,13 @@ export class UserService {
                 },
             }),
         ]);
+    }
+
+    async getProfilePicById(userId: number): Promise<string> {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { pbUrl: true },
+        });
+        return user.pbUrl;
     }
 }

@@ -107,6 +107,8 @@ export function getEmptyStats(gameSettings: GameSettings): GameStats {
         defense: 0,
         defensePerMinute: 0,
         defensePerBubble: 0,
+        spikeNumber: 0,
+        spikeAnimationStart: 0,
         clear3: 0,
         clear4: 0,
         clear5: 0,

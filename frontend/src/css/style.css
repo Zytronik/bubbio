@@ -417,9 +417,10 @@ button.retry {
 
 .game-wrapper .inGameStats {
     position: absolute;
-    right: 90%;
-    bottom: 10px;
+    left: -210px;
+    bottom: 40px;
     width: 200px;
+    z-index: 2;
     text-align: right;
 }
 
@@ -429,12 +430,15 @@ button.retry {
     font-size: 20px;
 }
 
+#rankedPage .game-wrapper {
+    font-size: 160%;
+}
+
 .game-wrapper {
     display: flex;
     justify-content: center;
     align-items: flex-end;
     position: relative;
-    width: 40%;
     font-size: 1.4em;
 }
 
@@ -457,7 +461,7 @@ button.retry {
     left: 50%;
     text-align: center;
     transform: translate(-50%, -50%);
-    width: 200%;
+    width: 250%;
 }
 
 .gameUI-wrapper .remove-whiteSpaces {
