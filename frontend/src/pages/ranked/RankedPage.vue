@@ -138,8 +138,8 @@
         </div>
 
         <div v-if="isGaming" class="gaming-wrapper">
-          <Game :playerGameVisuals="playerGameVisuals" :areRef="true" />
-          <Game :playerGameVisuals="enemyVisuals" :areRef="true" />
+          <Game :playerGameVisuals="playerGameVisuals" :areRef="true" :gameMode="GameMode.Ranked" />
+          <Game :playerGameVisuals="enemyVisuals" :areRef="true" :gameMode="GameMode.Ranked" />
         </div>
 
       </div>

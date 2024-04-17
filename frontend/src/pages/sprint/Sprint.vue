@@ -41,7 +41,7 @@
         </div>
 
         <div v-if="isGaming" class="inGame">
-            <Game :playerGameVisuals="playerGameVisuals" :areRef="true" />
+            <Game :playerGameVisuals="playerGameVisuals" :areRef="true" :gameMode="GameMode.Sprint" />
         </div>
 
         <div v-if="isResultView" class="gameComplete">
