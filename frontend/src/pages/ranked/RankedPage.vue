@@ -1,6 +1,7 @@
 <template>
   <section id="rankedPage" class="page menu">
-    <MenuBackButtons :buttonData="backButtonData" :specialBehavior="specialBackButtonBehavior" @special-click-event="goBackToRankedPage" />
+    <MenuBackButtons :buttonData="backButtonData" :specialBehavior="specialBackButtonBehavior"
+      @special-click-event="goBackToRankedPage" />
     <div class="page-wrapper">
       <div class="page-container">
         <div v-if="!isGaming && showMatchmakingScreen" class="page-dashboard ranked-dashboard">
@@ -10,11 +11,12 @@
 
             <div class="playerStats" v-if="playerStats && isLoggedIn">
               <div>
-                <img v-if="playerStats.rankInfo.iconName && playerStats.rankInfo.isRanked" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)"
-                  :alt="playerStats.rankInfo.name">
+                <img v-if="playerStats.rankInfo.iconName && playerStats.rankInfo.isRanked" class="rank-img"
+                  :src="getRankImagePath(playerStats.rankInfo.iconName)" :alt="playerStats.rankInfo.name">
                 <div>
                   <p class="rating">{{ playerStats.rating }}<span>±{{ playerStats.ratingDeviation }}</span></p>
-                  <p v-if="playerStats.rankInfo.isRanked" class="gamesWon"><span>Games won: </span>{{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}
+                  <p v-if="playerStats.rankInfo.isRanked" class="gamesWon"><span>Games won: </span>{{
+                    playerStats.gamesWon }}/{{ playerStats.gamesPlayed }}
                   </p>
                 </div>
               </div>
@@ -52,7 +54,8 @@
                 <p>Play some Ranked Games to get Ranked.</p>
                 <div v-if="playerStats" class="probablyAroundRank">
                   <p>Probably around:</p>
-                  <img v-if="playerStats.rankInfo.iconName" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)">
+                  <img v-if="playerStats.rankInfo.iconName" class="rank-img"
+                    :src="getRankImagePath(playerStats.rankInfo.iconName)">
                 </div>
               </div>
             </div>
@@ -93,15 +96,15 @@
         </div>
 
         <div v-if="hasMatchFound && !isGaming">
-          <VsScreen/>
+          <VsScreen />
         </div>
 
         <div v-if="showScores && playerStats" class="scores-wrapper">
-          <div :class="playerStats.userId === scoreScreenData.player1Data.playerID ? 'player1' : 'player2'"> 
+          <div :class="playerStats.userId === scoreScreenData.player1Data.playerID ? 'player1' : 'player2'">
             <p>{{ scoreScreenData.player1Data.playerName }}</p>
             <p class="score">{{ scoreScreenData.player1Data.playerScore }}</p>
           </div>
-          <div :class="playerStats.userId === scoreScreenData.player2Data.playerID ? 'player1' : 'player2'"> 
+          <div :class="playerStats.userId === scoreScreenData.player2Data.playerID ? 'player1' : 'player2'">
             <p>{{ scoreScreenData.player2Data.playerName }}</p>
             <p class="score">{{ scoreScreenData.player2Data.playerScore }}</p>
           </div>
@@ -109,8 +112,29 @@
         </div>
 
         <div v-if="showEndScreen" class="endScreen-wrapper">
-          <p>Please give me data to display here.</p>
-          <p>TODO: <br>show data here</p>
+          <div class="player1 player">
+            <div>
+              <p>{{ endScreenData.player1Data.playerName.toUpperCase() }}</p>
+            </div>
+            <img class="profile-pic" :src="endScreenData.player1Data.playerProfilePic ?? getDefaultProfilePbURL()"
+              alt="profile-pic">
+          </div>
+          <div class="rounds-wrapper">
+            <div class="total">
+              <p>{{ endScreenData.player1Data.playerScore }}</p>
+              <p>{{ endScreenData.player2Data.playerScore }}</p>
+            </div>
+            <div class="rounds">
+              
+            </div>
+          </div>
+          <div class="player2 player">
+            <div>
+              <p>{{ endScreenData.player2Data.playerName.toUpperCase() }}</p>
+            </div>
+            <img class="profile-pic" :src="endScreenData.player2Data.playerProfilePic ?? getDefaultProfilePbURL()"
+              alt="profile-pic">
+          </div>
         </div>
 
         <div v-if="isGaming" class="gaming-wrapper">
@@ -135,7 +159,7 @@ import Leaderboard from '@/globalComponents/Leaderboard.vue';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
 import { UserData } from '@/ts/page/i/page.i.user-data';
 import eventBus from '@/ts/page/page.event-bus';
-import { getRankImagePath } from '@/ts/networking/paths';
+import { getDefaultProfilePbURL, getRankImagePath } from '@/ts/networking/paths';
 import { scoreScreenData, endScreenData, network_stopListeningToServer, enemyVisuals, I_RANKED_SCREEN_TRANSITION_CONFIRMATION } from '@/ts/game/network/game.network.ranked';
 import { network_listenToMatchFound } from '@/ts/game/network/game.network.ranked';
 import { playerGameVisuals } from '@/ts/game/game.master';
@@ -152,7 +176,7 @@ interface PlayerMatchmakingStats {
   globalRank: number;
   nationalRank: number;
   gamesWon: number;
-  gamesCount: number;
+  gamesPlayed: number;
   percentile: number;
   rankInfo: RankInfo;
 }
@@ -351,7 +375,7 @@ export default {
       });
     }
 
-    function goBackToRankedPage(){
+    function goBackToRankedPage() {
       if (showEndScreen.value) {
         transitionEndScreenPageToDashboard();
         backInput.fire = backInputOnLoad.value;
@@ -394,7 +418,7 @@ export default {
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(126,10,41,1) 0%, rgba(144,141,58,1) 100%)');
       backInputOnLoad.value = backInput.fire;
-      if(isLoggedIn.value){
+      if (isLoggedIn.value) {
         fetchPlayerMmStats();
         mountSockets();
         eventBus.on("vue_matchFound", matchFound);
@@ -440,6 +464,8 @@ export default {
       goBackToRankedPage,
       specialBackButtonBehavior,
       isLoggedIn,
+      endScreenData,
+      getDefaultProfilePbURL,
     }
   }
 };
@@ -697,7 +723,7 @@ p {
 
 .gaming-wrapper::before {
   left: 0;
-  background: linear-gradient(45deg, rgba(126,10,41,1) 0%, rgba(144,141,58,1) 100%);
+  background: linear-gradient(45deg, rgba(126, 10, 41, 1) 0%, rgba(144, 141, 58, 1) 100%);
 }
 
 .gaming-wrapper::after {
@@ -779,6 +805,48 @@ p {
   height: 100%;
   padding: 15px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
 }
-</style>computed, import { checkUserAuthentication } from '@/ts/networking/networking.auth';computed, import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 
+.endScreen-wrapper .player {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.endScreen-wrapper .player1 {
+  flex-direction: column-reverse;
+}
+
+.endScreen-wrapper .profile-pic {
+  width: 100%;
+  height: 92%;
+  object-fit: cover;
+}
+
+.endScreen-wrapper .player div p {
+  font-size: 1.77em;
+}
+.endScreen-wrapper .rounds-wrapper {
+  width: 40%;
+}
+
+.endScreen-wrapper .player>div {
+  height: 8%;
+  display: flex;
+  align-items: center;
+}
+
+.endScreen-wrapper .total {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 30px;
+}
+
+.endScreen-wrapper .total p {
+  font-size: 4em;
+}
+</style>

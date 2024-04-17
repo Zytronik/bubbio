@@ -26,6 +26,7 @@ import { GlickoService } from 'src/ranked/glicko.service';
 import { calculateTimeStats } from './logic/game.logic.stat-tracker';
 import { RankedService } from 'src/ranked/ranked.service';
 import { on } from 'events';
+import { UserService } from 'src/user/user.service';
 
 
 /*
@@ -88,6 +89,7 @@ export class GameGateway implements OnGatewayDisconnect {
     private matchmakingService: MatchmakingService,
     private glickoService: GlickoService,
     private rankedService: RankedService,
+    private userService: UserService,
   ) { }
 
   handleDisconnect(client: Socket): void {
@@ -373,12 +375,15 @@ export class GameGateway implements OnGatewayDisconnect {
     const player1Score = match.scoresMap.get(player1.playerClient.id)
     const player2 = match.players[1]
     const player2Score = match.scoresMap.get(player2.playerClient.id)
+    const player1Pb = await this.userService.getProfilePicById(player1.playerID);
+    const player2Pb = await this.userService.getProfilePicById(player2.playerID);
     const endScreenData: dto_EndScreen = {
       matchID: matchID,
       firstTo: match.firstTo,
       player1Data: {
         playerID: player1.playerID,
         playerName: player1.playerName,
+        playerProfilePic: player1Pb,
         playerScore: player1Score,
         hasWon: player1Score === match.firstTo,
         eloDiff: 0,
@@ -387,6 +392,7 @@ export class GameGateway implements OnGatewayDisconnect {
       player2Data: {
         playerID: player2.playerID,
         playerName: player2.playerName,
+        playerProfilePic: player2Pb,
         playerScore: player2Score,
         hasWon: player2Score === match.firstTo,
         eloDiff: 0,

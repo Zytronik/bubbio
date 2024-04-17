@@ -10,6 +10,7 @@ export interface dto_EndScreen {
 interface PlayerData {
     playerID: number;
     playerName: string;
+    playerProfilePic: string;
     playerScore: number;
     hasWon: boolean;
     eloDiff: number;

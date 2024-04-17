@@ -79,6 +79,7 @@ export const endScreenData: dto_EndScreen = {
     player1Data: {
         playerID: 0,
         playerName: "",
+        playerProfilePic: "",
         playerScore: 0,
         hasWon: false,
         eloDiff: 0,
@@ -87,6 +88,7 @@ export const endScreenData: dto_EndScreen = {
     player2Data: {
         playerID: 0,
         playerName: "",
+        playerProfilePic: "",
         playerScore: 0,
         hasWon: false,
         eloDiff: 0,
