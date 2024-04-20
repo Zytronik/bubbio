@@ -14,5 +14,5 @@ interface PlayerData {
     playerScore: number;
     hasWon: boolean;
     eloDiff: number;
-    playerStats?: GameStats;
+    playerStats?: GameStats[];
 }

@@ -100,11 +100,11 @@
         </div>
 
         <div v-if="showScores && playerStats" class="scores-wrapper">
-          <div :class="playerStats.userId === scoreScreenData.player1Data.playerID ? 'player1' : 'player2'">
+          <div :class="getPlayerCSSClass(scoreScreenData.player1Data.playerID)">
             <p>{{ scoreScreenData.player1Data.playerName }}</p>
             <p class="score">{{ scoreScreenData.player1Data.playerScore }}</p>
           </div>
-          <div :class="playerStats.userId === scoreScreenData.player2Data.playerID ? 'player1' : 'player2'">
+          <div :class="getPlayerCSSClass(scoreScreenData.player2Data.playerID)">
             <p>{{ scoreScreenData.player2Data.playerName }}</p>
             <p class="score">{{ scoreScreenData.player2Data.playerScore }}</p>
           </div>
@@ -112,7 +112,7 @@
         </div>
 
         <div v-if="showEndScreen" class="endScreen-wrapper">
-          <div class="player1 player">
+          <div :class="getPlayerCSSClass(endScreenData.player1Data.playerID)" class="player">
             <div>
               <p>{{ endScreenData.player1Data.playerName.toUpperCase() }}</p>
             </div>
@@ -121,14 +121,32 @@
           </div>
           <div class="rounds-wrapper">
             <div class="total">
-              <p>{{ endScreenData.player1Data.playerScore }}</p>
-              <p>{{ endScreenData.player2Data.playerScore }}</p>
+              <div :class="getPlayerCSSClass(endScreenData.player1Data.playerID)" class="player">
+                <p>{{ endScreenData.player1Data.playerScore }}</p>
+              </div>
+              <div :class="getPlayerCSSClass(endScreenData.player2Data.playerID)" class="player">
+                <p>{{ endScreenData.player2Data.playerScore }}</p>
+              </div>
             </div>
             <div class="rounds">
-              
+              <div class="r-player" :class="getPlayerCSSClass(endScreenData.player1Data.playerID)">
+                <div v-for="(roundStats1, index) in endScreenData.player1Data.playerStats as GameStats[]" :key="'player1-round-' + index" class="round">
+                  <p><span>{{ formatFloat(roundStats1.attackPerMinute) }}</span>APM</p>
+                  <p><span>{{ formatFloat(roundStats1.bubblesPerSecond) }}</span>BPS</p>
+                  <p><span>{{ formatFloat(roundStats1.defensePerMinute) }}</span>DPM</p>
+                  <span>{{ formatTimeNumberToString(roundStats1.gameDuration) }}</span>
+                </div>
+              </div>
+              <div class="r-player" :class="getPlayerCSSClass(endScreenData.player2Data.playerID)">
+                <div v-for="(roundStats2, index) in endScreenData.player2Data.playerStats as GameStats[]" :key="'player2-round-' + index" class="round">
+                  <p><span>{{ formatFloat(roundStats2.attackPerMinute) }}</span>APM</p>
+                  <p><span>{{ formatFloat(roundStats2.bubblesPerSecond) }}</span>BPS</p>
+                  <p><span>{{ formatFloat(roundStats2.defensePerMinute) }}</span>DPM</p>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="player2 player">
+          <div :class="getPlayerCSSClass(endScreenData.player2Data.playerID)" class="player">
             <div>
               <p>{{ endScreenData.player2Data.playerName.toUpperCase() }}</p>
             </div>
@@ -168,6 +186,8 @@ import { backInput } from '@/ts/input/input.all-inputs';
 import { disableResetInput, enableBackInputs } from '@/ts/input/input.input-manager';
 import { RankInfo } from '@/ts/page/i/page.i-rank-info';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
+import { GameStats } from '@/ts/game/i/game.i.game-stats';
+import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
 
 interface PlayerMatchmakingStats {
   userId: number;
@@ -383,7 +403,7 @@ export default {
     }
 
     function showEndScreenPage() {
-      //console.log('showEndScreen', endScreenData);
+      console.log('showEndScreen', endScreenData);
       transitionOutOfGame(() => {
         isGaming.value = false;
         showMatchmakingScreen.value = false;
@@ -413,6 +433,17 @@ export default {
         dashboard.classList.remove('slideLeftToCenter'); //reset styles
         container.classList.remove('flex-row') //remove flex-row from container
       }, 500);
+    }
+
+    function formatFloat(num: number) {
+      const formattedNumber = num.toFixed(2);
+      let [integral, decimal] = formattedNumber.split('.');
+      integral = integral.padStart(2, '0');
+      return `${integral}.${decimal}`;
+    }
+
+    function getPlayerCSSClass(playerID: number) {
+      return playerStats.value && playerStats.value.userId === playerID ? 'player1' : 'player2';
     }
 
     onMounted(() => {
@@ -466,6 +497,9 @@ export default {
       isLoggedIn,
       endScreenData,
       getDefaultProfilePbURL,
+      formatTimeNumberToString,
+      formatFloat,
+      getPlayerCSSClass,
     }
   }
 };
@@ -809,14 +843,14 @@ p {
   flex-direction: row;
 }
 
-.endScreen-wrapper .player {
-  width: 30%;
+.endScreen-wrapper > .player {
+  width: 28%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.endScreen-wrapper .player1 {
+.endScreen-wrapper > .player1 {
   flex-direction: column-reverse;
 }
 
@@ -826,14 +860,15 @@ p {
   object-fit: cover;
 }
 
-.endScreen-wrapper .player div p {
+.endScreen-wrapper > .player div p {
   font-size: 1.77em;
 }
 .endScreen-wrapper .rounds-wrapper {
-  width: 40%;
+  width: 44%;
+  order: 2;
 }
 
-.endScreen-wrapper .player>div {
+.endScreen-wrapper > .player>div {
   height: 8%;
   display: flex;
   align-items: center;
@@ -846,7 +881,91 @@ p {
   gap: 30px;
 }
 
+.endScreen-wrapper .total .player1{
+  order: 1;
+}
+
+.endScreen-wrapper .total .player2{
+  order: 2;
+}
+
 .endScreen-wrapper .total p {
   font-size: 4em;
+}
+
+.endScreen-wrapper .round>span {
+  position: absolute;
+  text-align: center;
+  width: 100px;
+}
+
+.endScreen-wrapper .player1 .round>span {
+  left: 100%;
+}
+
+.endScreen-wrapper .player2 .round>span {
+  right: 100%;
+}
+
+.endScreen-wrapper .round p {
+  width: 30%;
+}
+
+.endScreen-wrapper .round p span {
+  width: 50px;
+}
+
+.endScreen-wrapper .round p {
+  display: flex;
+}
+
+.endScreen-wrapper .rounds {
+  display: flex;
+  justify-content: space-between;
+}
+
+.endScreen-wrapper .round {
+  display: flex;
+  position: relative;
+  gap: 5px;
+  padding: 10px 15px;
+  margin: 15px 0;
+}
+
+.endScreen-wrapper .rounds .player {
+  width: 50%;
+}
+
+.endScreen-wrapper .rounds .r-player {
+  width: calc(50% - 50px);
+}
+
+.endScreen-wrapper .r-player.player1 .round {
+  background: linear-gradient(45deg, rgba(126, 10, 41, 1) 0%, rgba(144, 141, 58, 1) 100%);
+  justify-content: flex-end;
+}
+
+.endScreen-wrapper .r-player.player2 .round {
+  background: linear-gradient(45deg, rgb(10, 126, 88) 0%, rgb(144, 141, 58) 100%);
+}
+
+.endScreen-wrapper .r-player.player1 p {
+  justify-content: flex-end;
+}
+
+.endScreen-wrapper .r-player.player1 {
+  order: 1;
+}
+
+.endScreen-wrapper .r-player.player2 {
+  order: 2;
+}
+
+.endScreen-wrapper > .player1 {
+  order: 1;
+}
+
+.endScreen-wrapper > .player2 {
+  order: 3;
 }
 </style>

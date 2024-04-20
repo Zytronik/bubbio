@@ -240,7 +240,6 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      console.log(versusScreenData);
       playVsAnimation(() => {
         if(state.socket && versusScreenData){
           state.socket.emit(I_RANKED_SCREEN_TRANSITION_CONFIRMATION, versusScreenData.matchID);
