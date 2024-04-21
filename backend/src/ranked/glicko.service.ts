@@ -42,8 +42,8 @@ export class GlickoService {
             ratingDeviation: glickoLoser.getRd(),
             volatility: glickoLoser.getVol()
         };
-        const gainedElo = newWinnerRating - oldWinnerRating;
-        const lostElo = oldLoserRating - newLoserRating;
+        const gainedElo = Math.floor(newWinnerRating) - Math.floor(oldWinnerRating);
+        const lostElo = Math.floor(oldLoserRating) - Math.floor(newLoserRating);
         await this.userService.updateGlickoRating(winnerID, winnerRatings, loserID, loserRatings);
         return {gainedElo, lostElo};
     }

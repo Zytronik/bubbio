@@ -203,8 +203,8 @@ export class UserService {
             ...user,
             percentile,
             rankInfos,
-            rating: Math.round(user.rating),
-            ratingDeviation: Math.round(user.ratingDeviation),
+            rating: Math.floor(user.rating),
+            ratingDeviation: Math.floor(user.ratingDeviation),
             isRanked: rankInfos.isRanked,
         };
     }
@@ -264,8 +264,8 @@ export class UserService {
             ...user,
             rankIcon: rankInfos.iconName,
             rankName: rankInfos.name,
-            rating: Math.round(user.rating),
-            ratingDeviation: Math.round(user.ratingDeviation),
+            rating: Math.floor(user.rating),
+            ratingDeviation: Math.floor(user.ratingDeviation),
             isRanked: rankInfos.isRanked,
             sprintStats: {
                 averageBubblesCleared: sprintStats._avg.bubblesCleared,
@@ -590,8 +590,8 @@ export class UserService {
 
         return {
             userId,
-            rating: Math.round(user.rating),
-            ratingDeviation: Math.round(user.ratingDeviation),
+            rating: Math.floor(user.rating),
+            ratingDeviation: Math.floor(user.ratingDeviation),
             globalRank: globalRank,
             nationalRank: nationalRank,
             percentile: percentile,

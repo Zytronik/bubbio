@@ -403,7 +403,6 @@ export class GameGateway implements OnGatewayDisconnect {
       endScreenData.player1Data.hasWon = !(player1.playerClient.id === clientQuit.id);
       endScreenData.player2Data.hasWon = !(player2.playerClient.id === clientQuit.id);
     }
-    this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
     let winnerID, loserID;
     if (endScreenData.player1Data.hasWon) {
       winnerID = player1.playerID
@@ -418,6 +417,7 @@ export class GameGateway implements OnGatewayDisconnect {
       endScreenData.player1Data.eloDiff = eloDiffs.lostElo;
       endScreenData.player2Data.eloDiff = eloDiffs.gainedElo;
     }
+    this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
     match.players.forEach(player => {
       player.playerClient.leave(match.matchRoomName);
       this.stopSpectatingEnemies(player.playerClient, match);
