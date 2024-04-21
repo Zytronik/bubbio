@@ -236,6 +236,10 @@ p {
   cursor: pointer;
 }
 
+.user-info img {
+  object-fit: cover;
+}
+
 .user-info:hover p {
   transition: 200ms;
 }
