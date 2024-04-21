@@ -7,7 +7,7 @@ export interface dto_EndScreen {
     player2Data: PlayerData;
 }
 
-interface PlayerData {
+export interface PlayerData {
     playerID: number;
     playerName: string;
     playerProfilePic: string;

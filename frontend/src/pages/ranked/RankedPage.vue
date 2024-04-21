@@ -122,15 +122,30 @@
           <div class="rounds-wrapper">
             <div class="total">
               <div :class="getPlayerCSSClass(endScreenData.player1Data.playerID)" class="player">
-                <p>{{ endScreenData.player1Data.playerScore }}</p>
+                <div class="score">
+                  <p>{{ endScreenData.player1Data.playerScore }}</p>
+                </div>
+                <div class="round">
+                  <p><span>{{ getTotalAverageAPM(endScreenData.player1Data) }}</span>APM</p>
+                  <p><span>{{ getTotalAverageBPS(endScreenData.player1Data) }}</span>BPS</p>
+                  <p><span>{{ getTotalAverageDPM(endScreenData.player1Data) }}</span>DPM</p>
+                </div>
               </div>
               <div :class="getPlayerCSSClass(endScreenData.player2Data.playerID)" class="player">
-                <p>{{ endScreenData.player2Data.playerScore }}</p>
+                <div class="score">
+                  <p>{{ endScreenData.player2Data.playerScore }}</p>
+                </div>
+                <div class="round">
+                  <p><span>{{ getTotalAverageAPM(endScreenData.player2Data) }}</span>APM</p>
+                  <p><span>{{ getTotalAverageBPS(endScreenData.player2Data) }}</span>BPS</p>
+                  <p><span>{{ getTotalAverageDPM(endScreenData.player2Data) }}</span>DPM</p>
+                </div>
               </div>
             </div>
             <div class="rounds">
               <div class="r-player" :class="getPlayerCSSClass(endScreenData.player1Data.playerID)">
-                <div v-for="(roundStats1, index) in endScreenData.player1Data.playerStats as GameStats[]" :key="'player1-round-' + index" class="round">
+                <div v-for="(roundStats1, index) in endScreenData.player1Data.playerStats as GameStats[]"
+                  :key="'player1-round-' + index" class="round">
                   <p><span>{{ formatFloat(roundStats1.attackPerMinute) }}</span>APM</p>
                   <p><span>{{ formatFloat(roundStats1.bubblesPerSecond) }}</span>BPS</p>
                   <p><span>{{ formatFloat(roundStats1.defensePerMinute) }}</span>DPM</p>
@@ -138,12 +153,17 @@
                 </div>
               </div>
               <div class="r-player" :class="getPlayerCSSClass(endScreenData.player2Data.playerID)">
-                <div v-for="(roundStats2, index) in endScreenData.player2Data.playerStats as GameStats[]" :key="'player2-round-' + index" class="round">
+                <div v-for="(roundStats2, index) in endScreenData.player2Data.playerStats as GameStats[]"
+                  :key="'player2-round-' + index" class="round">
                   <p><span>{{ formatFloat(roundStats2.attackPerMinute) }}</span>APM</p>
                   <p><span>{{ formatFloat(roundStats2.bubblesPerSecond) }}</span>BPS</p>
                   <p><span>{{ formatFloat(roundStats2.defensePerMinute) }}</span>DPM</p>
                 </div>
               </div>
+            </div>
+            <div class="elo-change">
+              <p id="eloRating"> {{ playerStats?.rating }}</p>
+              <p>{{ hasWon() ? "+" : "-" }}{{ getChangedElo() }}</p>
             </div>
           </div>
           <div :class="getPlayerCSSClass(endScreenData.player2Data.playerID)" class="player">
@@ -168,7 +188,7 @@
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { SetupContext, computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import state from '@/ts/networking/networking.client-websocket';
 import VsScreen from './components/VsScreen.vue';
@@ -188,6 +208,8 @@ import { RankInfo } from '@/ts/page/i/page.i-rank-info';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
+import { PlayerData } from '@/ts/game/network/dto/game.network.dto.end-screen';
+import { CountUp } from 'countup.js';
 
 interface PlayerMatchmakingStats {
   userId: number;
@@ -210,7 +232,7 @@ export default {
       leaderboardTabs: ['Global', 'National'],
     };
   },
-  setup() {
+  setup(_: unknown, { emit }: SetupContext) {
     const backButtonData = ref([
       { pageState: PAGE_STATE.multiMenu, iconSrc: require('@/img/icons/ranked.png'), disabled: false },
       { pageState: PAGE_STATE.roomListing, iconSrc: require('@/img/icons/rooms.png'), disabled: true },
@@ -409,7 +431,9 @@ export default {
         showMatchmakingScreen.value = false;
         showEndScreen.value = true;
         fetchPlayerMmStats();
+        emit('updateProfileData');
         specialBackButtonBehavior.value = true;
+        animateElo();
       });
     }
 
@@ -444,6 +468,93 @@ export default {
 
     function getPlayerCSSClass(playerID: number) {
       return playerStats.value && playerStats.value.userId === playerID ? 'player1' : 'player2';
+    }
+
+    function getTotalAverageAPM(playerData: PlayerData){
+      if(!playerData.playerStats){
+        return formatFloat(0);
+      }
+      let t = 0;
+      playerData.playerStats.forEach((stat)=>{
+        t += stat.attackPerMinute;
+      });
+      return formatFloat(t / playerData.playerStats.length)
+    }
+
+    function getTotalAverageBPS(playerData: PlayerData){
+      if(!playerData.playerStats){
+        return formatFloat(0);
+      }
+      let t = 0;
+      playerData.playerStats.forEach((stat)=>{
+        t += stat.bubblesPerSecond;
+      });
+      return formatFloat(t / playerData.playerStats.length)
+    }
+
+    function getTotalAverageDPM(playerData: PlayerData){
+      if(!playerData.playerStats){
+        return formatFloat(0);
+      }
+      let t = 0;
+      playerData.playerStats.forEach((stat)=>{
+        t += stat.defensePerMinute;
+      });
+      return formatFloat(t / playerData.playerStats.length)
+    }
+
+    function getChangedElo(){
+      if(!endScreenData.player1Data || !endScreenData.player2Data){
+        return;
+      }
+      if(endScreenData.player1Data.playerID === playerStats.value?.userId){
+        return endScreenData.player1Data.eloDiff;
+      } else {
+        return endScreenData.player2Data.eloDiff;
+      }
+    }
+
+    function hasWon(){
+      if(!endScreenData.player1Data || !endScreenData.player2Data){
+        return '';
+      }
+      if(endScreenData.player1Data.playerID === playerStats.value?.userId){
+        return endScreenData.player1Data.hasWon;
+      } else {
+        return endScreenData.player2Data.hasWon;
+      }
+    }
+
+    function getOldElo(){
+      const changedElo = getChangedElo();
+      if (playerStats.value && changedElo) {
+        return playerStats.value.rating - changedElo
+      }
+    }
+
+    function animateElo(){
+      setTimeout(() => {
+        const changedElo = getChangedElo();
+        const oldElo = getOldElo();
+        if (playerStats.value && changedElo) {
+          const options = {
+            startVal: oldElo,
+            decimalPlaces: 0,
+            duration: 2.5,
+          };
+          const eloRatingEl = document.getElementById('eloRating');
+          if (eloRatingEl) {
+            if (hasWon()) {
+              eloRatingEl.classList.add('scale-up');
+              eloRatingEl.classList.remove('scale-down');
+            }
+            const countUp = new CountUp(eloRatingEl, playerStats.value.rating, options);
+            if (!countUp.error) {
+              countUp.start();
+            }
+          }
+        }
+      }, 1000);
     }
 
     onMounted(() => {
@@ -500,6 +611,11 @@ export default {
       formatTimeNumberToString,
       formatFloat,
       getPlayerCSSClass,
+      getTotalAverageAPM,
+      getTotalAverageDPM,
+      getTotalAverageBPS,
+      getChangedElo,
+      hasWon,
     }
   }
 };
@@ -866,6 +982,8 @@ p {
 .endScreen-wrapper .rounds-wrapper {
   width: 44%;
   order: 2;
+  display: flex;
+  flex-direction: column;
 }
 
 .endScreen-wrapper > .player>div {
@@ -878,7 +996,6 @@ p {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  gap: 30px;
 }
 
 .endScreen-wrapper .total .player1{
@@ -889,8 +1006,26 @@ p {
   order: 2;
 }
 
-.endScreen-wrapper .total p {
-  font-size: 4em;
+.endScreen-wrapper .total > .player .score p {
+  font-size: 6em;
+}
+
+.endScreen-wrapper .total > .player1 .score {
+  margin-right: 50px;
+  position: relative;
+}
+
+.endScreen-wrapper .total > .player2 .score {
+  margin-left: 50px;
+}
+
+.endScreen-wrapper .total>.player1 .score::after {
+  content: "VS";
+  font-size: 2em;
+  position: absolute;
+  left: calc(100% + 50px);
+  transform: translateX(-50%);
+  top: 50%;
 }
 
 .endScreen-wrapper .round>span {
@@ -913,6 +1048,8 @@ p {
 
 .endScreen-wrapper .round p span {
   width: 50px;
+  text-align: right;
+  padding-right: 5px;
 }
 
 .endScreen-wrapper .round p {
@@ -940,12 +1077,14 @@ p {
   width: calc(50% - 50px);
 }
 
-.endScreen-wrapper .r-player.player1 .round {
+.endScreen-wrapper .r-player.player1 .round,
+.endScreen-wrapper .total .player1 .round {
   background: linear-gradient(45deg, rgba(126, 10, 41, 1) 0%, rgba(144, 141, 58, 1) 100%);
   justify-content: flex-end;
 }
 
-.endScreen-wrapper .r-player.player2 .round {
+.endScreen-wrapper .r-player.player2 .round,
+.endScreen-wrapper .total .player2 .round {
   background: linear-gradient(45deg, rgb(10, 126, 88) 0%, rgb(144, 141, 58) 100%);
 }
 
@@ -967,5 +1106,70 @@ p {
 
 .endScreen-wrapper > .player2 {
   order: 3;
+}
+
+.endScreen-wrapper .total>.player {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.endScreen-wrapper .total>.player>div {
+  display: flex;
+}
+
+.endScreen-wrapper .player1 .score {
+  justify-content: flex-end;
+}
+
+.endScreen-wrapper .player2 .score {
+  justify-content: flex-start;
+}
+
+.endScreen-wrapper .elo-change {
+  font-size: 3em;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  margin-top: 30px;
+}
+
+.endScreen-wrapper .elo-change>p:last-of-type {
+  padding-left: 15px;
+  font-size: 80%;
+}
+
+.scale-up {
+  animation: scaleUp 2.5s ease forwards;
+}
+
+.scale-down {
+  animation: scaleDown 2.5s ease forwards;
+}
+
+#eloRating {
+  transform: scale(1.0);
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(1.0);
+    transform-origin: bottom right;
+  }
+  to {
+    transform: scale(1.4);
+    transform-origin: bottom right;
+  }
+}
+
+@keyframes scaleDown {
+  from {
+    transform: scale(1.4);
+    transform-origin: bottom right;
+  }
+  to {
+    transform: scale(1.0);
+    transform-origin: bottom right;
+  }
 }
 </style>
