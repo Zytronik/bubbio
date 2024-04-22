@@ -9,18 +9,18 @@
           <div id="matchFoundBackground"></div>
           <div class="left-content">
 
-            <div class="playerStats" v-if="playerStats && isLoggedIn">
+            <div class="playerStats" v-if="playerStats && isLoggedIn && playerStats.rankInfo.isRanked">
               <div>
                 <img v-if="playerStats.rankInfo.iconName && playerStats.rankInfo.isRanked" class="rank-img"
                   :src="getRankImagePath(playerStats.rankInfo.iconName)" :alt="playerStats.rankInfo.name">
                 <div>
                   <p class="rating">{{ playerStats.rating }}<span>±{{ playerStats.ratingDeviation }}</span></p>
-                  <p v-if="playerStats.rankInfo.isRanked" class="gamesWon"><span>Games won: </span>{{
+                  <p class="gamesWon"><span>Games won: </span>{{
                     playerStats.gamesWon }}/{{ playerStats.gamesPlayed }}
                   </p>
                 </div>
               </div>
-              <p v-if="playerStats.rankInfo.isRanked" class="rank">
+              <p class="rank">
                 <span v-if="currentLeaderboard === 'Global'" class="global">#{{ playerStats.globalRank }}</span>
                 <span v-if="currentLeaderboard === 'National'" class="national">#{{ playerStats.nationalRank }}</span>
               </p>
@@ -52,7 +52,7 @@
               <div v-if="!isLoggedIn">Please Log In or Sign Up to Play Ranked</div>
               <div v-else>
                 <p>Play some Ranked Games to get Ranked.</p>
-                <div v-if="playerStats" class="probablyAroundRank">
+                <div v-if="playerStats && playerStats.gamesPlayed > 0" class="probablyAroundRank">
                   <p>Probably around:</p>
                   <img v-if="playerStats.rankInfo.iconName" class="rank-img"
                     :src="getRankImagePath(playerStats.rankInfo.iconName)">
