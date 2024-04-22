@@ -190,7 +190,6 @@ export function disableGameplay(): void {
         const winningMoveAtTime = history[history.length - 1].frameTime;
         stats.gameEndTime = winningMoveAtTime;
         stats.gameDuration = stats.gameEndTime;
-        stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
         createStatGraphData(playerGameInstance);
     }
     disableGameInputs();

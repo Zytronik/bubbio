@@ -19,23 +19,26 @@ export function stopStatDisplay(): void {
         statTrackingRunning = false;
         cancelAnimationFrame(trackingFrameId);
         trackingFrameId = null;
-        fillStatStrings(playerGameInstance, playerGameVisuals.statNumbers);
+        fillStatStrings(playerGameInstance, playerGameVisuals.statNumbers, false);
     }
 }
 
 function statDisplayAnimation(): void {
-    fillStatStrings(playerGameInstance, playerGameVisuals.statNumbers);
+    fillStatStrings(playerGameInstance, playerGameVisuals.statNumbers, true);
     if (enemyGameInstance) {
-        fillStatStrings(enemyGameInstance, enemyVisuals.statNumbers);
+        fillStatStrings(enemyGameInstance, enemyVisuals.statNumbers, true);
     }
     if (statTrackingRunning) {
         trackingFrameId = requestAnimationFrame(() => statDisplayAnimation());
     }
 }
 
-export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNumberRefs): void {
+export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNumberRefs, calculateCurrentTime: boolean): void {
     const gameStats = gameInstance.stats;
-    const gameDuration = performance.now() - gameStats.gameStartTime;
+    let gameDuration = gameStats.gameDuration;
+    if(calculateCurrentTime) {
+        gameDuration = performance.now() - gameStats.gameStartTime;
+    }
     const formattedCurrentTimeString = formatTimeNumberToString(gameDuration);
     calculateTimeStats(gameInstance.stats, gameDuration)
     statStrings.formattedCurrentTime.value = formattedCurrentTimeString;
