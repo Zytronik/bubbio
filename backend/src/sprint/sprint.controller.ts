@@ -2,17 +2,10 @@ import { Controller, Get, UseGuards, Post, Body, Request, Query, Req } from '@ne
 import { SprintService } from './sprint.service';
 import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
 import { AuthenticatedRequest } from 'src/auth/e/auth.e-auth-request';
-import { SubmitSprintDto } from './dto/sprint.dto.submit-sprint-dto';
 
 @Controller('sprint')
 export class SprintController {
   constructor(private readonly sprintService: SprintService) { }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('submit')
-  async submitGameStats(@Request() req: AuthenticatedRequest, @Body() submitSprintDto: SubmitSprintDto) {
-    return await this.sprintService.saveGameStats(req.user.userId, submitSprintDto);
-  }
 
   @Get('totalGames')
   async getTotalGamesPlayed() {

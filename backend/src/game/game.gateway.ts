@@ -27,6 +27,8 @@ import { calculateTimeStats } from './logic/game.logic.stat-tracker';
 import { RankedService } from 'src/ranked/ranked.service';
 import { on } from 'events';
 import { UserService } from 'src/user/user.service';
+import { LobbyGateway } from 'src/lobby/lobby.gateway';
+import { SprintService } from 'src/sprint/sprint.service';
 
 
 /*
@@ -90,6 +92,8 @@ export class GameGateway implements OnGatewayDisconnect {
     private glickoService: GlickoService,
     private rankedService: RankedService,
     private userService: UserService,
+    private sprintService: SprintService,
+    private lobbyGateway: LobbyGateway,
   ) { }
 
   handleDisconnect(client: Socket): void {
@@ -520,7 +524,7 @@ export class GameGateway implements OnGatewayDisconnect {
         this.updatePlayerSpectator(game);
         this.updateSpectatorEntries();
       }.bind(this),
-      onGameVictory: function (): void {
+      onGameVictory: async function (): Promise<void> {
         const game = ongoingSingeplayerGamesMap.get(client.id);
         game.gameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
         this.updatePlayerSpectator(game);
@@ -530,6 +534,9 @@ export class GameGateway implements OnGatewayDisconnect {
         game.gameInstance.stats.gameDuration = winningMoveAtTime;
         calculateTimeStats(game.gameInstance.stats, winningMoveAtTime);
         //TODO: Save game stats to database
+        const username = await this.lobbyGateway.lobbyData.getUsername(client.id);
+        const userId = await this.userService.getUserIdByUsername(username);
+        this.sprintService.saveSprintToDB(userId, game.gameInstance.stats);
       }.bind(this)
     }
     const onGarbageSend = function (amount: number): void { }

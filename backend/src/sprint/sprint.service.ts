@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { NewsService } from 'src/news/news.service';
-import { SubmitSprintDto } from './dto/sprint.dto.submit-sprint-dto';
+import { GameStats } from 'src/game/i/game.i.game-stats';
 
 @Injectable()
 export class SprintService {
@@ -12,10 +12,10 @@ export class SprintService {
         private userService: UserService,
     ) { }
 
-    async saveGameStats(userId: number, submitSprintDto: SubmitSprintDto): Promise<any> {
+    async saveSprintToDB(userId: number, sprintStats: GameStats): Promise<any> {
         // Create Sprint
-        const newSprint = await this.createSprint(userId, submitSprintDto);
-        const sprintTime = submitSprintDto.gameDuration;
+        const newSprint = await this.createSprint(userId, sprintStats);
+        const sprintTime = sprintStats.gameDuration;
 
         // Get User by ID
         const user = await this.userService.getUserById(userId);
@@ -51,19 +51,42 @@ export class SprintService {
 
         return leaderboardRecords;
     }
-
-    async createSprint(userId: number, submitSprintDto: SubmitSprintDto): Promise<any> {
+    
+    async createSprint(userId: number, sprintStats: GameStats): Promise<any> {    
         try {
+            const userExists = await this.prisma.user.findUnique({
+                where: { id: userId },
+            });
+            if (!userExists) {
+                throw new Error('User does not exist');
+            }
+    
             return await this.prisma.sprint.create({
                 data: {
                     userId: userId,
-                    ...submitSprintDto,
+                    bpsGraph: JSON.stringify(sprintStats.bpsGraph),
+                    bubblesCleared: sprintStats.bubblesCleared,
+                    bubblesShot: sprintStats.bubblesShot,
+                    bubblesPerSecond: sprintStats.bubblesPerSecond,
+                    gameDuration: sprintStats.gameDuration,
+                    highestBubbleClear: sprintStats.highestBubbleClear,
+                    wallBounces: sprintStats.wallBounces,
+                    wallBounceClears: sprintStats.wallBounceClears,
+                    highestCombo: sprintStats.highestCombo,
+                    bubbleClearToWin: sprintStats.bubbleClearToWin,
+                    clear3: sprintStats.clear3,
+                    clear4: sprintStats.clear4,
+                    clear5: sprintStats.clear5,
+                    clear3wb: sprintStats.clear3wb,
+                    clear4wb: sprintStats.clear4wb,
+                    clear5wb: sprintStats.clear5wb,
                 },
             });
         } catch (error) {
-            throw new Error('Unable to create sprint record.');
+            console.error('Failed to create sprint due to:', error);
         }
     }
+    
 
     async getHistory(params: { userId: number, sortBy: string, sortDirection: string, limit: number }): Promise<any> {
         const { userId, sortBy, sortDirection, limit } = params;
@@ -98,8 +121,6 @@ export class SprintService {
         // Return the best run or null if there are no records
         return records.length > 0 ? records[0] : null;
     }
-    
-
 
     async getTotalGamesPlayed(): Promise<number> {
         return this.prisma.sprint.count();

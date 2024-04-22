@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { LobbyGateway } from './lobby/lobby.gateway';
 import { AuthModule } from './auth/auth.module';
 import { GlobalChatGateway } from './globalChat/globalChat.gateway';
 import { SprintModule } from './sprint/sprint.module';
@@ -12,8 +11,7 @@ import { GameModule } from './game/game.module';
 import { RankedModule } from './ranked/ranked.module';
 import { UsersModule } from './user/user.module';
 import { FriendsModule } from './friends/friends.module';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { LobbyModule } from './lobby/lobby.module';
 
 @Module({
   imports: [
@@ -30,7 +28,8 @@ import { APP_GUARD } from '@nestjs/core';
     RankedModule,
     UsersModule,
     FriendsModule,
+    LobbyModule,
   ],
-  providers: [LobbyGateway, GlobalChatGateway,],
+  providers: [GlobalChatGateway],
 })
 export class AppModule { }

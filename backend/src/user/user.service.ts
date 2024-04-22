@@ -646,4 +646,17 @@ export class UserService {
         });
         return user.pbUrl;
     }
+
+    async getUserIdByUsername(username: string): Promise<number> {
+        const user = await this.prisma.user.findUnique({
+            where: { username },
+            select: { id: true },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        return user.id;
+    }
 }
