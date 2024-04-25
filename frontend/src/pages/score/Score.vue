@@ -13,7 +13,7 @@ import { ButtonData } from '@/globalComponents/i/i-buttonData';
 import { GameMode } from '@/ts/page/e/page.e-leaderboard';
 
 export default {
-  name: 'SprintPage',
+  name: 'HighScorePage',
   components: { GameModeLayout },
   setup() {
     const backButtonData = ref<ButtonData[]>([

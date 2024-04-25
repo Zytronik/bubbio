@@ -10,11 +10,11 @@
         </button>
         <button class="menu-btn" @click="goToState(PAGE_STATE.scorePage)">
           <img src="@/img/icons/score.png" />
-          <p>Punktejagd</p>
+          <p>Highscore</p>
           <p class="desc">Send as much attack, in limited time</p>
         </button>
         <button class="menu-btn" @click="goToState(PAGE_STATE.pixiTest)">
-          <img src="@/img/icons/score.png" />
+          <img src="@/img/icons/pixi.png" />
           <p>Pixitesting</p>
           <p class="desc">Just for testing</p>
         </button>

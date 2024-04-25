@@ -70,10 +70,30 @@
                 <p>Leave Queue | Passed Time: {{ passedTime }}s</p>
               </div>
               <div v-else>Enter Queue</div>
-              <div class="ranked-history">
-                
+            </div>
+
+            <div v-if="isLoggedIn" class="ranked-history">
+              <div v-for="match in rankedMatches" :key="match.id" class="match">
+                <p class="submittedAt">{{ formatDateToAgoText(match.submittedAt) }}</p>
+                <p class="firstTo">FST {{ match.firstTo }}</p>
+                <div class="player1 player" :class="{ 'hasWon': match.user1HasWon }">
+                  <div class="username" @click="openProfile(match.user1Name)">
+                    <img class="profile-pic" :src="match.user1PbUrl ?? getDefaultProfilePbURL()" alt="profile-pic">
+                    <p>{{ match.user1Name.toUpperCase() }}</p>
+                  </div>
+                  <p class="score">{{ match.user1Score }}</p>
+                </div>
+                <p class="vs">VS</p>
+                <div class="player2 player" :class="{ 'hasWon': match.user2HasWon }">
+                  <div class="username" @click="openProfile(match.user2Name)">
+                    <img class="profile-pic" :src="match.user2PbUrl ?? getDefaultProfilePbURL()" alt="profile-pic">
+                    <p>{{ match.user2Name.toUpperCase() }}</p>
+                  </div>
+                  <p class="score">{{ match.user2Score }}</p>
+                </div>
               </div>
             </div>
+
           </div>
 
           <div class="right-content">
@@ -190,7 +210,7 @@
 
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
-import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
+import { changeBackgroundTo, goToState, openProfile } from '@/ts/page/page.page-manager';
 import { SetupContext, computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import state from '@/ts/networking/networking.client-websocket';
@@ -213,6 +233,7 @@ import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
 import { PlayerData } from '@/ts/game/network/dto/game.network.dto.end-screen';
 import { CountUp } from 'countup.js';
+import { formatDateToAgoText } from '@/ts/page/page.page-utils';
 
 interface PlayerMatchmakingStats {
   userId: number;
@@ -224,6 +245,20 @@ interface PlayerMatchmakingStats {
   gamesPlayed: number;
   percentile: number;
   rankInfo: RankInfo;
+}
+
+interface RankedMatches {
+  id: number;
+  submittedAt: string;
+  firstTo: number;
+  user1Name: string;
+  user1Score: number;
+  user1HasWon: boolean;
+  user1PbUrl: string;
+  user2Name: string;
+  user2Score: number;
+  user2HasWon: boolean;
+  user2PbUrl: string;
 }
 
 export default {
@@ -240,6 +275,7 @@ export default {
       { pageState: PAGE_STATE.multiMenu, iconSrc: require('@/img/icons/ranked.png'), disabled: false },
       { pageState: PAGE_STATE.roomListing, iconSrc: require('@/img/icons/rooms.png'), disabled: true },
     ]);
+    const rankedMatches = ref<RankedMatches[]>();
     const isGaming = ref(false);
     const specialBackButtonBehavior = ref(false);
     const showMatchmakingScreen = ref(true);
@@ -312,6 +348,19 @@ export default {
         playerStats.value = response.data;
       } catch (error) {
         console.error('Failed to fetch player stats', error);
+      }
+    }
+
+    async function fetchRankedHistory() {
+      const token = localStorage.getItem('authToken');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      try {
+        const response = await httpClient.get("/ranked/history", {
+          headers: headers
+        });
+        rankedMatches.value = response.data;
+      } catch (error) {
+        console.error('Failed to fetch ranked history', error);
       }
     }
 
@@ -434,6 +483,7 @@ export default {
         showMatchmakingScreen.value = false;
         showEndScreen.value = true;
         fetchPlayerMmStats();
+        fetchRankedHistory();
         emit('updateProfileData');
         specialBackButtonBehavior.value = true;
         animateElo();
@@ -473,69 +523,69 @@ export default {
       return playerStats.value && playerStats.value.userId === playerID ? 'player1' : 'player2';
     }
 
-    function getTotalAverageAPM(playerData: PlayerData){
-      if(!playerData.playerStats){
+    function getTotalAverageAPM(playerData: PlayerData) {
+      if (!playerData.playerStats) {
         return formatFloat(0);
       }
       let t = 0;
-      playerData.playerStats.forEach((stat)=>{
+      playerData.playerStats.forEach((stat) => {
         t += stat.attackPerMinute;
       });
       return formatFloat(t / playerData.playerStats.length)
     }
 
-    function getTotalAverageBPS(playerData: PlayerData){
-      if(!playerData.playerStats){
+    function getTotalAverageBPS(playerData: PlayerData) {
+      if (!playerData.playerStats) {
         return formatFloat(0);
       }
       let t = 0;
-      playerData.playerStats.forEach((stat)=>{
+      playerData.playerStats.forEach((stat) => {
         t += stat.bubblesPerSecond;
       });
       return formatFloat(t / playerData.playerStats.length)
     }
 
-    function getTotalAverageDPM(playerData: PlayerData){
-      if(!playerData.playerStats){
+    function getTotalAverageDPM(playerData: PlayerData) {
+      if (!playerData.playerStats) {
         return formatFloat(0);
       }
       let t = 0;
-      playerData.playerStats.forEach((stat)=>{
+      playerData.playerStats.forEach((stat) => {
         t += stat.defensePerMinute;
       });
       return formatFloat(t / playerData.playerStats.length)
     }
 
-    function getChangedElo(){
-      if(!endScreenData.player1Data || !endScreenData.player2Data){
+    function getChangedElo() {
+      if (!endScreenData.player1Data || !endScreenData.player2Data) {
         return;
       }
-      if(endScreenData.player1Data.playerID === playerStats.value?.userId){
+      if (endScreenData.player1Data.playerID === playerStats.value?.userId) {
         return endScreenData.player1Data.eloDiff;
       } else {
         return endScreenData.player2Data.eloDiff;
       }
     }
 
-    function hasWon(){
-      if(!endScreenData.player1Data || !endScreenData.player2Data){
+    function hasWon() {
+      if (!endScreenData.player1Data || !endScreenData.player2Data) {
         return '';
       }
-      if(endScreenData.player1Data.playerID === playerStats.value?.userId){
+      if (endScreenData.player1Data.playerID === playerStats.value?.userId) {
         return endScreenData.player1Data.hasWon;
       } else {
         return endScreenData.player2Data.hasWon;
       }
     }
 
-    function getOldElo(){
+    function getOldElo() {
       const changedElo = getChangedElo();
       if (playerStats.value && changedElo) {
         return playerStats.value.rating - changedElo
       }
     }
 
-    function animateElo(){
+    function animateElo() {
       setTimeout(() => {
         const changedElo = getChangedElo();
         const oldElo = getOldElo();
@@ -565,6 +615,7 @@ export default {
       backInputOnLoad.value = backInput.fire;
       if (isLoggedIn.value) {
         fetchPlayerMmStats();
+        fetchRankedHistory();
         mountSockets();
         eventBus.on("vue_matchFound", matchFound);
         eventBus.on('vue_goToGameView', goToGameView);
@@ -619,6 +670,9 @@ export default {
       getTotalAverageBPS,
       getChangedElo,
       hasWon,
+      rankedMatches,
+      formatDateToAgoText,
+      openProfile,
     }
   }
 };
@@ -962,14 +1016,14 @@ p {
   flex-direction: row;
 }
 
-.endScreen-wrapper > .player {
+.endScreen-wrapper>.player {
   width: 28%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.endScreen-wrapper > .player1 {
+.endScreen-wrapper>.player1 {
   flex-direction: column-reverse;
 }
 
@@ -979,9 +1033,10 @@ p {
   object-fit: cover;
 }
 
-.endScreen-wrapper > .player div p {
+.endScreen-wrapper>.player div p {
   font-size: 1.77em;
 }
+
 .endScreen-wrapper .rounds-wrapper {
   width: 44%;
   order: 2;
@@ -989,7 +1044,7 @@ p {
   flex-direction: column;
 }
 
-.endScreen-wrapper > .player>div {
+.endScreen-wrapper>.player>div {
   height: 8%;
   display: flex;
   align-items: center;
@@ -1001,24 +1056,24 @@ p {
   justify-content: center;
 }
 
-.endScreen-wrapper .total .player1{
+.endScreen-wrapper .total .player1 {
   order: 1;
 }
 
-.endScreen-wrapper .total .player2{
+.endScreen-wrapper .total .player2 {
   order: 2;
 }
 
-.endScreen-wrapper .total > .player .score p {
+.endScreen-wrapper .total>.player .score p {
   font-size: 6em;
 }
 
-.endScreen-wrapper .total > .player1 .score {
+.endScreen-wrapper .total>.player1 .score {
   margin-right: 50px;
   position: relative;
 }
 
-.endScreen-wrapper .total > .player2 .score {
+.endScreen-wrapper .total>.player2 .score {
   margin-left: 50px;
 }
 
@@ -1103,11 +1158,11 @@ p {
   order: 2;
 }
 
-.endScreen-wrapper > .player1 {
+.endScreen-wrapper>.player1 {
   order: 1;
 }
 
-.endScreen-wrapper > .player2 {
+.endScreen-wrapper>.player2 {
   order: 3;
 }
 
@@ -1159,6 +1214,7 @@ p {
     transform: scale(1.0);
     transform-origin: bottom right;
   }
+
   to {
     transform: scale(1.4);
     transform-origin: bottom right;
@@ -1170,9 +1226,76 @@ p {
     transform: scale(1.4);
     transform-origin: bottom right;
   }
+
   to {
     transform: scale(1.0);
     transform-origin: bottom right;
   }
 }
+
+.ranked-history {
+  margin-top: 30px;
+  height: 40%;
+  overflow-y: scroll;
+}
+
+.ranked-history .match {
+  display: flex;
+  background-color: rgb(50, 50, 50);
+  margin-bottom: 8px;
+}
+
+.ranked-history .match > .player {
+  display: flex;
+  width: 33%;
+  justify-content: space-between;
+  background-color: rgba(123, 2, 2, 0.3);
+}
+
+.ranked-history .match p {
+  display: flex;
+  align-items: center;
+}
+
+.ranked-history .match > .player img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.ranked-history .match > .player .username:hover {
+  opacity: 0.7;
+}
+
+.ranked-history .match > .player .username {
+  width: 80%;
+  cursor: pointer;
+  display: flex;
+}
+
+.ranked-history .match > .player .score {
+  width: 20%;
+  font-size: 120%;
+  font-weight: bold;
+}
+
+.ranked-history .match > .player.hasWon {
+  background-color: rgba(0, 101, 0, 0.3);
+}
+
+.ranked-history .submittedAt {
+  width: 14%;
+  padding-left: 15px;
+}
+
+.ranked-history .firstTo {
+  width: 10%;
+}
+
+.ranked-history .vs {
+  width: 10%;
+  justify-content: center;
+}
+
 </style>

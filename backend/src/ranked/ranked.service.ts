@@ -76,4 +76,55 @@ export class RankedService {
             throw error;
         }
     }
+
+    async getHistory(userID: number) {
+        try {
+            const matches = await this.prisma.ranked.findMany({
+                where: {
+                    OR: [
+                        { userId1: userID },
+                        { userId2: userID }
+                    ]
+                },
+                orderBy: {
+                    submittedAt: 'desc'
+                },
+                take: 10,
+                include: {
+                    user1: {
+                        select: {
+                            username: true,
+                            pbUrl: true,
+                        }
+                    },
+                    user2: {
+                        select: {
+                            username: true,
+                            pbUrl: true,
+                        }
+                    }
+                }
+            });
+
+            return matches.map(match => {
+                const me = match.userId1 === userID;
+                return {
+                    id: match.id,
+                    submittedAt: match.submittedAt,
+                    firstTo: match.firstTo,
+                    user1Name: me ? match.user1.username : match.user2.username,
+                    user1Score: me ? match.user1Score : match.user2Score,
+                    user1HasWon: me ? match.user1HasWon : match.user2HasWon,
+                    user1PbUrl: me ? match.user1.pbUrl : match.user2.pbUrl,
+                    user2Name: me ? match.user2.username : match.user1.username,
+                    user2Score: me ? match.user2Score : match.user1Score,
+                    user2HasWon: me ? match.user2HasWon : match.user1HasWon,
+                    user2PbUrl: me ? match.user2.pbUrl : match.user1.pbUrl,
+                };
+            });
+        } catch (error) {
+            console.error('Failed to get matches by user ID:', error);
+            throw error;
+        }
+    }
 }
