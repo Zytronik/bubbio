@@ -2,8 +2,7 @@
   <section id="pixicanvas" class="page">
     <MenuBackButtons :buttonData="backButtonData" />
     <div class="page-wrapper">
-      <div class="page-container">
-        <p>Test</p>
+      <div class="page-container" id="pixicanvas">
       </div>
     </div>
   </section>
@@ -14,6 +13,7 @@ import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo } from '@/ts/page/page.page-manager';
 import { defineComponent, onMounted, ref } from 'vue';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
+import { setupPixiCanvas } from '@/ts/game/visuals/game.visuals.pixi';
 
 export default defineComponent({
   name: 'PixiCanvas',
@@ -24,8 +24,10 @@ export default defineComponent({
     ]);
 
     onMounted(() => {
-      changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
+      changeBackgroundTo("black");
+      setupPixiCanvas();
     });
+
 
     return {
       backButtonData,

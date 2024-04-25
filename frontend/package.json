@@ -14,7 +14,7 @@
     "countup.js": "^2.8.0",
     "debounce": "^2.0.0",
     "jwt-decode": "^4.0.0",
-    "pixi.js": "^5.3.12",
+    "pixi.js": "^8.1.0",
     "socket.io-client": "^4.7.3",
     "vue": "^3.2.13"
   },
