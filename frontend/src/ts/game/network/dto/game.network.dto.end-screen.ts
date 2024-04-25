@@ -7,11 +7,12 @@ export interface dto_EndScreen {
     player2Data: PlayerData;
 }
 
-interface PlayerData {
+export interface PlayerData {
     playerID: number;
     playerName: string;
+    playerProfilePic: string;
     playerScore: number;
     hasWon: boolean;
     eloDiff: number;
-    playerStats?: GameStats;
+    playerStats?: GameStats[];
 }

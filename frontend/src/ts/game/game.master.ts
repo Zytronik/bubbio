@@ -185,13 +185,12 @@ export function setGameStateAndNotify(gameState: GAME_STATE): void {
 }
 export function disableGameplay(): void {
     stopCountdownAnimation();
-    const inputHistory = playerGameInstance.gameStateHistory.inputHistory;
-    if (playerGameInstance.gameMode === GAME_MODE.SPRINT && inputHistory.length > 0) {
-        const stats = playerGameInstance.stats;
-        const winningMoveAtTime = inputHistory[inputHistory.length - 1].frameTime;
+    const stats = playerGameInstance.stats;
+    const history = playerGameInstance.gameStateHistory.inputHistory
+    if (playerGameInstance.gameMode === GAME_MODE.SPRINT && history.length > 0) {
+        const winningMoveAtTime = history[history.length - 1].frameTime;
         stats.gameEndTime = winningMoveAtTime;
         stats.gameDuration = stats.gameEndTime;
-        stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));
         createStatGraphData(playerGameInstance);
     }
     disableGameInputs();

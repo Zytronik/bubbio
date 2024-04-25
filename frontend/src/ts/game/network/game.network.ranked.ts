@@ -12,11 +12,12 @@ import { GAME_STATE } from "../i/game.e.state";
 import { network_listenToQueuedInputsIndex, network_sendInputs, network_stopListenToQueuedInputsIndex } from "./game.network.game";
 import { dto_GameInstance } from "./dto/game.network.dto.game-instance";
 import { GameVisuals, getEmptyGameVisuals } from "../visuals/i/game.visuals.i.game-visuals";
-import { fillStatStrings } from "../visuals/game.visuals.stat-display";
+import { fillStatStrings, resetStatDisplays } from "../visuals/game.visuals.stat-display";
 import { dto_EndScreen } from "./dto/game.network.dto.end-screen";
 import { dto_ScoreScreen } from "./dto/game.network.dto.score-screen";
 import { GAME_INPUT } from "./i/game.network.i.game-input";
 import { InputFrame } from "../i/game.i.game-state-history";
+import { GameInstance } from "../i/game.i.game-instance";
 
 const O_RANKED_MATCH_FOUND = "output_rankedMatchFound";
 const O_RANKED_SETUP_GAME_INSTANCE = "output_rankedSetupGameInstance";
@@ -32,6 +33,7 @@ const O_RANKED_SHOW_END_SCREEN = "output_rankedShowEndScreen";
 
 const O_PLAYER_SPECTATOR = "update_playerSpectator";
 const O_RECEIVE_GARBAGE = "output_receiveGarbage";
+export let enemyGameInstance: GameInstance
 export const enemyVisuals: GameVisuals = getEmptyGameVisuals();
 export const versusScreenData: dto_VersusScreen = {
     matchID: "",
@@ -79,6 +81,7 @@ export const endScreenData: dto_EndScreen = {
     player1Data: {
         playerID: 0,
         playerName: "",
+        playerProfilePic: "",
         playerScore: 0,
         hasWon: false,
         eloDiff: 0,
@@ -87,6 +90,7 @@ export const endScreenData: dto_EndScreen = {
     player2Data: {
         playerID: 0,
         playerName: "",
+        playerProfilePic: "",
         playerScore: 0,
         hasWon: false,
         eloDiff: 0,
@@ -127,10 +131,16 @@ function network_listenToIngameUpdates(): void {
     const socket = state.socket;
     if (socket) {
         socket.on(O_PLAYER_SPECTATOR, (data: dto_GameInstance) => {
-            fillAsciiStrings(data.gameInstance, enemyVisuals.asciiBoard);
-            fillStatStrings(data.gameInstance, enemyVisuals.statNumbers);
+            enemyGameInstance = data.gameInstance;
+            enemyGameInstance.stats.gameStartTime = playerGameInstance.stats.gameStartTime;
             enemyVisuals.playerName = data.playerName;
-            enemyVisuals.timeDifference = data.gameInstance.stats.gameDuration - performance.now();
+            fillAsciiStrings(enemyGameInstance, enemyVisuals.asciiBoard);
+            if (playerGameInstance.gameState != GAME_STATE.IN_GAME 
+                && playerGameInstance.gameState != GAME_STATE.VICTORY_SCREEN
+                && playerGameInstance.gameState != GAME_STATE.DEFEAT_SCREEN
+                && playerGameInstance.gameState != GAME_STATE.READY) {
+                resetStatDisplays(enemyVisuals.statNumbers);
+            }
         });
         socket.on(O_RECEIVE_GARBAGE, (data: number) => {
             playerGameInstance.queuedGarbage += data;

@@ -9,7 +9,7 @@
   <div class="spectating" v-if="isSpectating">
     <button @click="showSpectationEntries();">Switch back to old view</button>
     <div class="game" v-for="[playerName, visuals] in playerNameVisualsMap" :key="playerName">
-      <Game :playerGameVisuals="visuals" :areRef="false" />
+      <Game :playerGameVisuals="visuals" :areRef="false" :gameMode="GameMode.Sprint" />
     </div>
   </div>
 </template>
@@ -19,6 +19,7 @@ import { network_joinSpectatorRoom, network_leaveSpectatorRoom, network_spectate
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import { allSpectationEntries, playerNameVisualsMap, startSpectatorStatDisplay, stopSpectatorStatDisplay } from "@/ts/game/spectate/spectate.spectator";
 import Game from '@/pages/game/Game.vue';
+import { GameMode } from '@/ts/page/e/page.e-leaderboard';
 
 export default defineComponent({
   name: 'SpectateTab',
@@ -54,6 +55,7 @@ export default defineComponent({
       showSpectatedGame,
       showSpectationEntries,
       playerNameVisualsMap,
+      GameMode,
     };
   },
 });
@@ -75,6 +77,6 @@ export default defineComponent({
 }
 
 .game-wrapper {
-  font-size: 2vh;
+  font-size: 2.1vh;
 }
 </style>

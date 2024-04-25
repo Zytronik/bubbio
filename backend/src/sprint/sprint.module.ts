@@ -6,6 +6,7 @@ import { UsersModule } from 'src/user/user.module';
 import { NewsModule } from 'src/news/news.module';
 
 @Module({
+  exports: [SprintService],
   controllers: [SprintController],
   providers: [SprintService, PrismaService],
   imports: [UsersModule, NewsModule],

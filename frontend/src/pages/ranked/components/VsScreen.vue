@@ -9,9 +9,9 @@
         </div>
         <p class="elo">Elo: {{ versusScreenData.player1Data.playerGlicko }}<span>±{{
         versusScreenData.player1Data.playerRD }}</span></p>
-        <p>Ranks: #{{ versusScreenData.player1Data.playerNationalRank }}, #{{
+        <p v-if="versusScreenData.player1Data.playerGlobalRank && versusScreenData.player1Data.playerNationalRank">Ranks: #{{ versusScreenData.player1Data.playerNationalRank }}, #{{
         versusScreenData.player1Data.playerGlobalRank }}</p>
-        <p>Country: {{ versusScreenData.player1Data.playerCountry }}</p>
+        <p v-if="versusScreenData.player1Data.playerCountry">Country: {{ versusScreenData.player1Data.playerCountry }}</p>
       </div>
       <img class="profilePic" :src="versusScreenData.player1Data.playerProfilePicture ? versusScreenData.player1Data.playerProfilePicture : getDefaultProfilePbURL()">
     </div>
@@ -29,9 +29,9 @@
         </div>
         <p class="elo">Elo: {{ versusScreenData.player2Data.playerGlicko }}<span>±{{
         versusScreenData.player2Data.playerRD }}</span></p>
-        <p>Ranks: #{{ versusScreenData.player2Data.playerNationalRank }}, #{{
+        <p v-if="versusScreenData.player2Data.playerGlobalRank && versusScreenData.player2Data.playerNationalRank">Ranks: #{{ versusScreenData.player2Data.playerNationalRank }}, #{{
         versusScreenData.player2Data.playerGlobalRank }}</p>
-        <p>Country: {{ versusScreenData.player2Data.playerCountry }}</p>
+        <p v-if="versusScreenData.player2Data.playerCountry">Country: {{ versusScreenData.player2Data.playerCountry }}</p>
       </div>
       <img class="profilePic" :src="versusScreenData.player2Data.playerProfilePicture ? versusScreenData.player2Data.playerProfilePicture : getDefaultProfilePbURL()">
     </div>
@@ -240,7 +240,6 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      console.log(versusScreenData);
       playVsAnimation(() => {
         if(state.socket && versusScreenData){
           state.socket.emit(I_RANKED_SCREEN_TRANSITION_CONFIRMATION, versusScreenData.matchID);

@@ -1,6 +1,7 @@
 <template>
   <section id="rankedPage" class="page menu">
-    <MenuBackButtons :buttonData="backButtonData" :specialBehavior="specialBackButtonBehavior" @special-click-event="goBackToRankedPage" />
+    <MenuBackButtons :buttonData="backButtonData" :specialBehavior="specialBackButtonBehavior"
+      @special-click-event="goBackToRankedPage" />
     <div class="page-wrapper">
       <div class="page-container">
         <div v-if="!isGaming && showMatchmakingScreen" class="page-dashboard ranked-dashboard">
@@ -8,17 +9,18 @@
           <div id="matchFoundBackground"></div>
           <div class="left-content">
 
-            <div class="playerStats" v-if="playerStats && isLoggedIn">
+            <div class="playerStats" v-if="playerStats && isLoggedIn && playerStats.rankInfo.isRanked">
               <div>
-                <img v-if="playerStats.rankInfo.iconName && playerStats.rankInfo.isRanked" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)"
-                  :alt="playerStats.rankInfo.name">
+                <img v-if="playerStats.rankInfo.iconName && playerStats.rankInfo.isRanked" class="rank-img"
+                  :src="getRankImagePath(playerStats.rankInfo.iconName)" :alt="playerStats.rankInfo.name">
                 <div>
                   <p class="rating">{{ playerStats.rating }}<span>±{{ playerStats.ratingDeviation }}</span></p>
-                  <p v-if="playerStats.rankInfo.isRanked" class="gamesWon"><span>Games won: </span>{{ playerStats.gamesWon }}/{{ playerStats.gamesCount }}
+                  <p class="gamesWon"><span>Games won: </span>{{
+                    playerStats.gamesWon }}/{{ playerStats.gamesPlayed }}
                   </p>
                 </div>
               </div>
-              <p v-if="playerStats.rankInfo.isRanked" class="rank">
+              <p class="rank">
                 <span v-if="currentLeaderboard === 'Global'" class="global">#{{ playerStats.globalRank }}</span>
                 <span v-if="currentLeaderboard === 'National'" class="national">#{{ playerStats.nationalRank }}</span>
               </p>
@@ -50,9 +52,10 @@
               <div v-if="!isLoggedIn">Please Log In or Sign Up to Play Ranked</div>
               <div v-else>
                 <p>Play some Ranked Games to get Ranked.</p>
-                <div v-if="playerStats" class="probablyAroundRank">
+                <div v-if="playerStats && playerStats.gamesPlayed > 0" class="probablyAroundRank">
                   <p>Probably around:</p>
-                  <img v-if="playerStats.rankInfo.iconName" class="rank-img" :src="getRankImagePath(playerStats.rankInfo.iconName)">
+                  <img v-if="playerStats.rankInfo.iconName" class="rank-img"
+                    :src="getRankImagePath(playerStats.rankInfo.iconName)">
                 </div>
               </div>
             </div>
@@ -93,15 +96,15 @@
         </div>
 
         <div v-if="hasMatchFound && !isGaming">
-          <VsScreen/>
+          <VsScreen />
         </div>
 
         <div v-if="showScores && playerStats" class="scores-wrapper">
-          <div :class="playerStats.userId === scoreScreenData.player1Data.playerID ? 'player1' : 'player2'"> 
+          <div :class="getPlayerCSSClass(scoreScreenData.player1Data.playerID)">
             <p>{{ scoreScreenData.player1Data.playerName }}</p>
             <p class="score">{{ scoreScreenData.player1Data.playerScore }}</p>
           </div>
-          <div :class="playerStats.userId === scoreScreenData.player2Data.playerID ? 'player1' : 'player2'"> 
+          <div :class="getPlayerCSSClass(scoreScreenData.player2Data.playerID)">
             <p>{{ scoreScreenData.player2Data.playerName }}</p>
             <p class="score">{{ scoreScreenData.player2Data.playerScore }}</p>
           </div>
@@ -109,13 +112,72 @@
         </div>
 
         <div v-if="showEndScreen" class="endScreen-wrapper">
-          <p>Please give me data to display here.</p>
-          <p>TODO: <br>show data here</p>
+          <div :class="getPlayerCSSClass(endScreenData.player1Data.playerID)" class="player">
+            <div>
+              <p>{{ endScreenData.player1Data.playerName.toUpperCase() }}</p>
+            </div>
+            <img class="profile-pic" :src="endScreenData.player1Data.playerProfilePic ?? getDefaultProfilePbURL()"
+              alt="profile-pic">
+          </div>
+          <div class="rounds-wrapper">
+            <div class="total">
+              <div :class="getPlayerCSSClass(endScreenData.player1Data.playerID)" class="player">
+                <div class="score">
+                  <p>{{ endScreenData.player1Data.playerScore }}</p>
+                </div>
+                <div class="round">
+                  <p><span>{{ getTotalAverageAPM(endScreenData.player1Data) }}</span>APM</p>
+                  <p><span>{{ getTotalAverageBPS(endScreenData.player1Data) }}</span>BPS</p>
+                  <p><span>{{ getTotalAverageDPM(endScreenData.player1Data) }}</span>DPM</p>
+                </div>
+              </div>
+              <div :class="getPlayerCSSClass(endScreenData.player2Data.playerID)" class="player">
+                <div class="score">
+                  <p>{{ endScreenData.player2Data.playerScore }}</p>
+                </div>
+                <div class="round">
+                  <p><span>{{ getTotalAverageAPM(endScreenData.player2Data) }}</span>APM</p>
+                  <p><span>{{ getTotalAverageBPS(endScreenData.player2Data) }}</span>BPS</p>
+                  <p><span>{{ getTotalAverageDPM(endScreenData.player2Data) }}</span>DPM</p>
+                </div>
+              </div>
+            </div>
+            <div class="rounds">
+              <div class="r-player" :class="getPlayerCSSClass(endScreenData.player1Data.playerID)">
+                <div v-for="(roundStats1, index) in endScreenData.player1Data.playerStats as GameStats[]"
+                  :key="'player1-round-' + index" class="round">
+                  <p><span>{{ formatFloat(roundStats1.attackPerMinute) }}</span>APM</p>
+                  <p><span>{{ formatFloat(roundStats1.bubblesPerSecond) }}</span>BPS</p>
+                  <p><span>{{ formatFloat(roundStats1.defensePerMinute) }}</span>DPM</p>
+                  <span>{{ formatTimeNumberToString(roundStats1.gameDuration) }}</span>
+                </div>
+              </div>
+              <div class="r-player" :class="getPlayerCSSClass(endScreenData.player2Data.playerID)">
+                <div v-for="(roundStats2, index) in endScreenData.player2Data.playerStats as GameStats[]"
+                  :key="'player2-round-' + index" class="round">
+                  <p><span>{{ formatFloat(roundStats2.attackPerMinute) }}</span>APM</p>
+                  <p><span>{{ formatFloat(roundStats2.bubblesPerSecond) }}</span>BPS</p>
+                  <p><span>{{ formatFloat(roundStats2.defensePerMinute) }}</span>DPM</p>
+                </div>
+              </div>
+            </div>
+            <div class="elo-change">
+              <p id="eloRating"> {{ playerStats?.rating }}</p>
+              <p>{{ hasWon() ? "+" : "-" }}{{ getChangedElo() }}</p>
+            </div>
+          </div>
+          <div :class="getPlayerCSSClass(endScreenData.player2Data.playerID)" class="player">
+            <div>
+              <p>{{ endScreenData.player2Data.playerName.toUpperCase() }}</p>
+            </div>
+            <img class="profile-pic" :src="endScreenData.player2Data.playerProfilePic ?? getDefaultProfilePbURL()"
+              alt="profile-pic">
+          </div>
         </div>
 
         <div v-if="isGaming" class="gaming-wrapper">
-          <Game :playerGameVisuals="playerGameVisuals" :areRef="true" />
-          <Game :playerGameVisuals="enemyVisuals" :areRef="true" />
+          <Game :playerGameVisuals="playerGameVisuals" :areRef="true" :gameMode="GameMode.Ranked" />
+          <Game :playerGameVisuals="enemyVisuals" :areRef="true" :gameMode="GameMode.Ranked" />
         </div>
 
       </div>
@@ -126,7 +188,7 @@
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { SetupContext, computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import state from '@/ts/networking/networking.client-websocket';
 import VsScreen from './components/VsScreen.vue';
@@ -135,7 +197,7 @@ import Leaderboard from '@/globalComponents/Leaderboard.vue';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
 import { UserData } from '@/ts/page/i/page.i.user-data';
 import eventBus from '@/ts/page/page.event-bus';
-import { getRankImagePath } from '@/ts/networking/paths';
+import { getDefaultProfilePbURL, getRankImagePath } from '@/ts/networking/paths';
 import { scoreScreenData, endScreenData, network_stopListeningToServer, enemyVisuals, I_RANKED_SCREEN_TRANSITION_CONFIRMATION } from '@/ts/game/network/game.network.ranked';
 import { network_listenToMatchFound } from '@/ts/game/network/game.network.ranked';
 import { playerGameVisuals } from '@/ts/game/game.master';
@@ -144,6 +206,10 @@ import { backInput } from '@/ts/input/input.all-inputs';
 import { disableResetInput, enableBackInputs } from '@/ts/input/input.input-manager';
 import { RankInfo } from '@/ts/page/i/page.i-rank-info';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
+import { GameStats } from '@/ts/game/i/game.i.game-stats';
+import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
+import { PlayerData } from '@/ts/game/network/dto/game.network.dto.end-screen';
+import { CountUp } from 'countup.js';
 
 interface PlayerMatchmakingStats {
   userId: number;
@@ -152,7 +218,7 @@ interface PlayerMatchmakingStats {
   globalRank: number;
   nationalRank: number;
   gamesWon: number;
-  gamesCount: number;
+  gamesPlayed: number;
   percentile: number;
   rankInfo: RankInfo;
 }
@@ -166,7 +232,7 @@ export default {
       leaderboardTabs: ['Global', 'National'],
     };
   },
-  setup() {
+  setup(_: unknown, { emit }: SetupContext) {
     const backButtonData = ref([
       { pageState: PAGE_STATE.multiMenu, iconSrc: require('@/img/icons/ranked.png'), disabled: false },
       { pageState: PAGE_STATE.roomListing, iconSrc: require('@/img/icons/rooms.png'), disabled: true },
@@ -351,7 +417,7 @@ export default {
       });
     }
 
-    function goBackToRankedPage(){
+    function goBackToRankedPage() {
       if (showEndScreen.value) {
         transitionEndScreenPageToDashboard();
         backInput.fire = backInputOnLoad.value;
@@ -359,13 +425,15 @@ export default {
     }
 
     function showEndScreenPage() {
-      //console.log('showEndScreen', endScreenData);
+      console.log('showEndScreen', endScreenData);
       transitionOutOfGame(() => {
         isGaming.value = false;
         showMatchmakingScreen.value = false;
         showEndScreen.value = true;
         fetchPlayerMmStats();
+        emit('updateProfileData');
         specialBackButtonBehavior.value = true;
+        animateElo();
       });
     }
 
@@ -391,10 +459,108 @@ export default {
       }, 500);
     }
 
+    function formatFloat(num: number) {
+      const formattedNumber = num.toFixed(2);
+      let [integral, decimal] = formattedNumber.split('.');
+      integral = integral.padStart(2, '0');
+      return `${integral}.${decimal}`;
+    }
+
+    function getPlayerCSSClass(playerID: number) {
+      return playerStats.value && playerStats.value.userId === playerID ? 'player1' : 'player2';
+    }
+
+    function getTotalAverageAPM(playerData: PlayerData){
+      if(!playerData.playerStats){
+        return formatFloat(0);
+      }
+      let t = 0;
+      playerData.playerStats.forEach((stat)=>{
+        t += stat.attackPerMinute;
+      });
+      return formatFloat(t / playerData.playerStats.length)
+    }
+
+    function getTotalAverageBPS(playerData: PlayerData){
+      if(!playerData.playerStats){
+        return formatFloat(0);
+      }
+      let t = 0;
+      playerData.playerStats.forEach((stat)=>{
+        t += stat.bubblesPerSecond;
+      });
+      return formatFloat(t / playerData.playerStats.length)
+    }
+
+    function getTotalAverageDPM(playerData: PlayerData){
+      if(!playerData.playerStats){
+        return formatFloat(0);
+      }
+      let t = 0;
+      playerData.playerStats.forEach((stat)=>{
+        t += stat.defensePerMinute;
+      });
+      return formatFloat(t / playerData.playerStats.length)
+    }
+
+    function getChangedElo(){
+      if(!endScreenData.player1Data || !endScreenData.player2Data){
+        return;
+      }
+      if(endScreenData.player1Data.playerID === playerStats.value?.userId){
+        return endScreenData.player1Data.eloDiff;
+      } else {
+        return endScreenData.player2Data.eloDiff;
+      }
+    }
+
+    function hasWon(){
+      if(!endScreenData.player1Data || !endScreenData.player2Data){
+        return '';
+      }
+      if(endScreenData.player1Data.playerID === playerStats.value?.userId){
+        return endScreenData.player1Data.hasWon;
+      } else {
+        return endScreenData.player2Data.hasWon;
+      }
+    }
+
+    function getOldElo(){
+      const changedElo = getChangedElo();
+      if (playerStats.value && changedElo) {
+        return playerStats.value.rating - changedElo
+      }
+    }
+
+    function animateElo(){
+      setTimeout(() => {
+        const changedElo = getChangedElo();
+        const oldElo = getOldElo();
+        if (playerStats.value && changedElo) {
+          const options = {
+            startVal: oldElo,
+            decimalPlaces: 0,
+            duration: 2.5,
+          };
+          const eloRatingEl = document.getElementById('eloRating');
+          if (eloRatingEl) {
+            if (hasWon()) {
+              eloRatingEl.classList.add('scale-up');
+              eloRatingEl.classList.remove('scale-down');
+            }
+            const countUp = new CountUp(eloRatingEl, playerStats.value.rating, options);
+            if (!countUp.error) {
+              countUp.start();
+            }
+          }
+        }
+      }, 1000);
+    }
+
     onMounted(() => {
       changeBackgroundTo('linear-gradient(45deg, rgba(126,10,41,1) 0%, rgba(144,141,58,1) 100%)');
       backInputOnLoad.value = backInput.fire;
-      if(isLoggedIn.value){
+      if (isLoggedIn.value) {
         fetchPlayerMmStats();
         mountSockets();
         eventBus.on("vue_matchFound", matchFound);
@@ -440,6 +606,16 @@ export default {
       goBackToRankedPage,
       specialBackButtonBehavior,
       isLoggedIn,
+      endScreenData,
+      getDefaultProfilePbURL,
+      formatTimeNumberToString,
+      formatFloat,
+      getPlayerCSSClass,
+      getTotalAverageAPM,
+      getTotalAverageDPM,
+      getTotalAverageBPS,
+      getChangedElo,
+      hasWon,
     }
   }
 };
@@ -697,7 +873,7 @@ p {
 
 .gaming-wrapper::before {
   left: 0;
-  background: linear-gradient(45deg, rgba(126,10,41,1) 0%, rgba(144,141,58,1) 100%);
+  background: linear-gradient(45deg, rgba(126, 10, 41, 1) 0%, rgba(144, 141, 58, 1) 100%);
 }
 
 .gaming-wrapper::after {
@@ -779,6 +955,221 @@ p {
   height: 100%;
   padding: 15px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
 }
-</style>computed, import { checkUserAuthentication } from '@/ts/networking/networking.auth';computed, import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 
+.endScreen-wrapper > .player {
+  width: 28%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.endScreen-wrapper > .player1 {
+  flex-direction: column-reverse;
+}
+
+.endScreen-wrapper .profile-pic {
+  width: 100%;
+  height: 92%;
+  object-fit: cover;
+}
+
+.endScreen-wrapper > .player div p {
+  font-size: 1.77em;
+}
+.endScreen-wrapper .rounds-wrapper {
+  width: 44%;
+  order: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.endScreen-wrapper > .player>div {
+  height: 8%;
+  display: flex;
+  align-items: center;
+}
+
+.endScreen-wrapper .total {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.endScreen-wrapper .total .player1{
+  order: 1;
+}
+
+.endScreen-wrapper .total .player2{
+  order: 2;
+}
+
+.endScreen-wrapper .total > .player .score p {
+  font-size: 6em;
+}
+
+.endScreen-wrapper .total > .player1 .score {
+  margin-right: 50px;
+  position: relative;
+}
+
+.endScreen-wrapper .total > .player2 .score {
+  margin-left: 50px;
+}
+
+.endScreen-wrapper .total>.player1 .score::after {
+  content: "VS";
+  font-size: 2em;
+  position: absolute;
+  left: calc(100% + 50px);
+  transform: translateX(-50%);
+  top: 50%;
+}
+
+.endScreen-wrapper .round>span {
+  position: absolute;
+  text-align: center;
+  width: 100px;
+}
+
+.endScreen-wrapper .player1 .round>span {
+  left: 100%;
+}
+
+.endScreen-wrapper .player2 .round>span {
+  right: 100%;
+}
+
+.endScreen-wrapper .round p {
+  width: 30%;
+}
+
+.endScreen-wrapper .round p span {
+  width: 50px;
+  text-align: right;
+  padding-right: 5px;
+}
+
+.endScreen-wrapper .round p {
+  display: flex;
+}
+
+.endScreen-wrapper .rounds {
+  display: flex;
+  justify-content: space-between;
+}
+
+.endScreen-wrapper .round {
+  display: flex;
+  position: relative;
+  gap: 5px;
+  padding: 10px 15px;
+  margin: 15px 0;
+}
+
+.endScreen-wrapper .rounds .player {
+  width: 50%;
+}
+
+.endScreen-wrapper .rounds .r-player {
+  width: calc(50% - 50px);
+}
+
+.endScreen-wrapper .r-player.player1 .round,
+.endScreen-wrapper .total .player1 .round {
+  background: linear-gradient(45deg, rgba(126, 10, 41, 1) 0%, rgba(144, 141, 58, 1) 100%);
+  justify-content: flex-end;
+}
+
+.endScreen-wrapper .r-player.player2 .round,
+.endScreen-wrapper .total .player2 .round {
+  background: linear-gradient(45deg, rgb(10, 126, 88) 0%, rgb(144, 141, 58) 100%);
+}
+
+.endScreen-wrapper .r-player.player1 p {
+  justify-content: flex-end;
+}
+
+.endScreen-wrapper .r-player.player1 {
+  order: 1;
+}
+
+.endScreen-wrapper .r-player.player2 {
+  order: 2;
+}
+
+.endScreen-wrapper > .player1 {
+  order: 1;
+}
+
+.endScreen-wrapper > .player2 {
+  order: 3;
+}
+
+.endScreen-wrapper .total>.player {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.endScreen-wrapper .total>.player>div {
+  display: flex;
+}
+
+.endScreen-wrapper .player1 .score {
+  justify-content: flex-end;
+}
+
+.endScreen-wrapper .player2 .score {
+  justify-content: flex-start;
+}
+
+.endScreen-wrapper .elo-change {
+  font-size: 3em;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  margin-top: 30px;
+}
+
+.endScreen-wrapper .elo-change>p:last-of-type {
+  padding-left: 15px;
+  font-size: 80%;
+}
+
+.scale-up {
+  animation: scaleUp 2.5s ease forwards;
+}
+
+.scale-down {
+  animation: scaleDown 2.5s ease forwards;
+}
+
+#eloRating {
+  transform: scale(1.0);
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(1.0);
+    transform-origin: bottom right;
+  }
+  to {
+    transform: scale(1.4);
+    transform-origin: bottom right;
+  }
+}
+
+@keyframes scaleDown {
+  from {
+    transform: scale(1.4);
+    transform-origin: bottom right;
+  }
+  to {
+    transform: scale(1.0);
+    transform-origin: bottom right;
+  }
+}
+</style>

@@ -26,6 +26,9 @@ import { GlickoService } from 'src/ranked/glicko.service';
 import { calculateTimeStats } from './logic/game.logic.stat-tracker';
 import { RankedService } from 'src/ranked/ranked.service';
 import { on } from 'events';
+import { UserService } from 'src/user/user.service';
+import { LobbyGateway } from 'src/lobby/lobby.gateway';
+import { SprintService } from 'src/sprint/sprint.service';
 
 
 /*
@@ -88,6 +91,9 @@ export class GameGateway implements OnGatewayDisconnect {
     private matchmakingService: MatchmakingService,
     private glickoService: GlickoService,
     private rankedService: RankedService,
+    private userService: UserService,
+    private sprintService: SprintService,
+    private lobbyGateway: LobbyGateway,
   ) { }
 
   handleDisconnect(client: Socket): void {
@@ -373,12 +379,15 @@ export class GameGateway implements OnGatewayDisconnect {
     const player1Score = match.scoresMap.get(player1.playerClient.id)
     const player2 = match.players[1]
     const player2Score = match.scoresMap.get(player2.playerClient.id)
+    const player1Pb = await this.userService.getProfilePicById(player1.playerID);
+    const player2Pb = await this.userService.getProfilePicById(player2.playerID);
     const endScreenData: dto_EndScreen = {
       matchID: matchID,
       firstTo: match.firstTo,
       player1Data: {
         playerID: player1.playerID,
         playerName: player1.playerName,
+        playerProfilePic: player1Pb,
         playerScore: player1Score,
         hasWon: player1Score === match.firstTo,
         eloDiff: 0,
@@ -387,6 +396,7 @@ export class GameGateway implements OnGatewayDisconnect {
       player2Data: {
         playerID: player2.playerID,
         playerName: player2.playerName,
+        playerProfilePic: player2Pb,
         playerScore: player2Score,
         hasWon: player2Score === match.firstTo,
         eloDiff: 0,
@@ -397,7 +407,6 @@ export class GameGateway implements OnGatewayDisconnect {
       endScreenData.player1Data.hasWon = !(player1.playerClient.id === clientQuit.id);
       endScreenData.player2Data.hasWon = !(player2.playerClient.id === clientQuit.id);
     }
-    this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
     let winnerID, loserID;
     if (endScreenData.player1Data.hasWon) {
       winnerID = player1.playerID
@@ -412,6 +421,7 @@ export class GameGateway implements OnGatewayDisconnect {
       endScreenData.player1Data.eloDiff = eloDiffs.lostElo;
       endScreenData.player2Data.eloDiff = eloDiffs.gainedElo;
     }
+    this.server.to(match.matchRoomName).emit(O_RANKED_SHOW_END_SCREEN, endScreenData);
     match.players.forEach(player => {
       player.playerClient.leave(match.matchRoomName);
       this.stopSpectatingEnemies(player.playerClient, match);
@@ -517,7 +527,7 @@ export class GameGateway implements OnGatewayDisconnect {
         this.updatePlayerSpectator(game);
         this.updateSpectatorEntries();
       }.bind(this),
-      onGameVictory: function (): void {
+      onGameVictory: async function (): Promise<void> {
         const game = ongoingSingeplayerGamesMap.get(client.id);
         game.gameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
         this.updatePlayerSpectator(game);
@@ -527,6 +537,9 @@ export class GameGateway implements OnGatewayDisconnect {
         game.gameInstance.stats.gameDuration = winningMoveAtTime;
         calculateTimeStats(game.gameInstance.stats, winningMoveAtTime);
         //TODO: Save game stats to database
+        const username = await this.lobbyGateway.lobbyData.getUsername(client.id);
+        const userId = await this.userService.getUserIdByUsername(username);
+        this.sprintService.saveSprintToDB(userId, game.gameInstance.stats);
       }.bind(this)
     }
     const onGarbageSend = function (amount: number): void { }

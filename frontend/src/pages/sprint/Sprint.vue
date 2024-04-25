@@ -41,7 +41,7 @@
         </div>
 
         <div v-if="isGaming" class="inGame">
-            <Game :playerGameVisuals="playerGameVisuals" :areRef="true" />
+            <Game :playerGameVisuals="playerGameVisuals" :areRef="true" :gameMode="GameMode.Sprint" />
         </div>
 
         <div v-if="isResultView" class="gameComplete">
@@ -188,7 +188,9 @@ export default {
           leaveGame();
           showDashboard();
           backInput.fire = backInputOnLoad.value;
-        }, true);
+        }, true, () => {
+          disableResetInput();
+        });
       }
       if (isResultView.value) {
         transitionResultViewToDashboard();
@@ -221,7 +223,7 @@ export default {
     function transitionToResultView() {
       transitionOutOfGame(() => {
         showResultView();
-      }, false);
+      }, false,()=>{/*do nothing*/});
     }
 
     function play() {
@@ -233,6 +235,7 @@ export default {
 
     function transitionToGame(onTransitionEnd: () => void): void {
       disableBackInputs();
+      disableResetInput();
       document.body.classList.add('slide-out-left-to-game');
       const overlay = document.createElement('div');
       overlay.className = 'black-overlay-right';
@@ -252,7 +255,7 @@ export default {
       }, 500);
     }
 
-    function transitionOutOfGame(onTransitionHidden: () => void, isQuit: boolean): void {
+    function transitionOutOfGame(onTransitionHidden: () => void, isQuit: boolean, onTransitionEnd: ()=>void): void {
       disableResetInput();
       disableBackInputs();
       const isQuitDelay = isQuit ? 0 : 1500;
@@ -272,12 +275,14 @@ export default {
             enableResetInput();
             resetInput.fire = play;
             document.body.removeChild(overlay);
+            onTransitionEnd();
           }, 1000);
         }, 500);
       }, isQuitDelay);
     }
 
     async function showDashboard() {
+      disableResetInput();
       isGaming.value = false;
       isDashboard.value = true;
       isResultView.value = false;

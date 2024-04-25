@@ -5,12 +5,13 @@ import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class RankedService {
-    constructor(private prisma: PrismaService) {}
-    
-    async saveMatchToDatabase(endScreenData: dto_EndScreen){
+    constructor(private prisma: PrismaService) { }
+
+    async saveMatchToDatabase(endScreenData: dto_EndScreen) {
         try {
             const { matchID, firstTo, player1Data, player2Data } = endScreenData;
-            const match: Prisma.RankedCreateInput = {
+            const createdMatch = await this.prisma.ranked.create({
+                data: {
                     matchId: matchID,
                     firstTo: firstTo,
                     user1Score: player1Data.playerScore,
@@ -28,12 +29,50 @@ export class RankedService {
                         connect: { id: player2Data.playerID }
                     },
                 }
-            
-
-            const createdMatch = await this.prisma.ranked.create({ data: match });
+            });
             return createdMatch;
         } catch (error) {
             console.error('Failed to save match to database:', error);
+            throw error;
+        }
+    }
+
+    async getPlayedMatchesByUserID(userID: number) {
+        try {
+            const matches = await this.prisma.ranked.findMany({
+                where: {
+                    OR: [
+                        { userId1: userID },
+                        { userId2: userID }
+                    ]
+                },
+                orderBy: {
+                    submittedAt: 'desc'
+                },
+            });
+            return matches;
+        } catch (error) {
+            console.error('Failed to get matches by user ID:', error);
+            throw error;
+        }
+    }
+
+    async getWonMatchesByUserID(userID: number) {
+        try {
+            const matches = await this.prisma.ranked.findMany({
+                where: {
+                    OR: [
+                        { userId1: userID, user1HasWon: true },
+                        { userId2: userID, user2HasWon: true }
+                    ]
+                },
+                orderBy: {
+                    submittedAt: 'desc'
+                }
+            });
+            return matches;
+        } catch (error) {
+            console.error('Failed to get matches by user ID:', error);
             throw error;
         }
     }
