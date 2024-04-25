@@ -70,6 +70,9 @@
                 <p>Leave Queue | Passed Time: {{ passedTime }}s</p>
               </div>
               <div v-else>Enter Queue</div>
+              <div class="ranked-history">
+                
+              </div>
             </div>
           </div>
 

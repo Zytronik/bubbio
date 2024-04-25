@@ -13,6 +13,11 @@
           <p>Punktejagd</p>
           <p class="desc">Send as much attack, in limited time</p>
         </button>
+        <button class="menu-btn" @click="goToState(PAGE_STATE.pixiTest)">
+          <img src="@/img/icons/score.png" />
+          <p>Pixitesting</p>
+          <p class="desc">Just for testing</p>
+        </button>
       </div>
     </div>
   </section>

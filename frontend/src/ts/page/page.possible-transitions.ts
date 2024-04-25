@@ -272,6 +272,26 @@ export const rankedPageToRoomListingTransition: PageTransition = {
     }
 }
 
+/* Test */
+export const soloMenuToPixiTestTransition: PageTransition = {
+    name: "soloMenuToPixiTestTransition",
+    origin: PAGE_STATE.soloMenu,
+    destination: PAGE_STATE.pixiTest,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + soloMenuToPixiTestTransition.name);
+    }
+}
+
+export const pixiTestToSoloMenuTransition: PageTransition = {
+    name: "pixiTestToSoloMenuTransition",
+    origin: PAGE_STATE.pixiTest,
+    destination: PAGE_STATE.soloMenu,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + pixiTestToSoloMenuTransition.name);
+    }
+}
+
+
 export const allPossibleTransitions: PageTransition[] = [
     mainMenuToSettingsPageTransition,
     multiMenuToRoomListingTransition,
@@ -302,4 +322,7 @@ export const allPossibleTransitions: PageTransition[] = [
     soloMenuToScorePageTransition,
     scorePageToSprintPageTransition,
     spintPageToScorePageTransition,
+    soloMenuToPixiTestTransition,
+
+    pixiTestToSoloMenuTransition,
 ];

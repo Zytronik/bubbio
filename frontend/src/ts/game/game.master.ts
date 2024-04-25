@@ -158,7 +158,6 @@ export function resetGame(): void {
 export function leaveGame(): void {
     playerGameInstance.gameTransitions.onGameLeave();
 }
-
 export function rankedGameStart(): void {
     showCountDownAndStart();
 }

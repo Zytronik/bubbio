@@ -9,4 +9,6 @@ export enum PAGE_STATE {
     gamePage = 'gamePage',
     sprintPage = 'sprintPage',
     scorePage = 'scorePage',
+
+    pixiTest = 'pixiTest',
 }

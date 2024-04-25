@@ -1,10 +1,11 @@
 import { checkUserAuthentication, logUserOut } from "../networking/networking.auth";
 import { PAGE_STATE } from "./e/page.e-page-state";
-import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToMultiMenuTransition, roomListingToMultiMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, roomPageToMultiMenuTransition, multiMenuToSoloMenuTransition, soloMenuToSprintPageTransition, spintPageToSoloMenuTransition, mainMenuToSoloMenuTransition, soloMenuToMainMenuTransition, multiMenuToRoomListingTransition, multiMenuToMainMenuTransition, soloMenuToMultiMenuTransition, soloMenuTosettingsPageTransition, multiMenuToSettingsPageTransition, settingsPageToMultiMenuTransition, settingsPageToSoloMenuTransition, multiMenuToRankedPageTransition, rankedPageToMultiMenuTransition, rankedPageToRoomListingTransition, roomListingToRankedPageTransition, scorePageToSoloMenuTransition, scorePageToSprintPageTransition, soloMenuToScorePageTransition, spintPageToScorePageTransition } from "./page.possible-transitions";
+import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToMultiMenuTransition, roomListingToMultiMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, roomPageToMultiMenuTransition, multiMenuToSoloMenuTransition, soloMenuToSprintPageTransition, spintPageToSoloMenuTransition, mainMenuToSoloMenuTransition, soloMenuToMainMenuTransition, multiMenuToRoomListingTransition, multiMenuToMainMenuTransition, soloMenuToMultiMenuTransition, soloMenuTosettingsPageTransition, multiMenuToSettingsPageTransition, settingsPageToMultiMenuTransition, settingsPageToSoloMenuTransition, multiMenuToRankedPageTransition, rankedPageToMultiMenuTransition, rankedPageToRoomListingTransition, roomListingToRankedPageTransition, scorePageToSoloMenuTransition, scorePageToSprintPageTransition, soloMenuToScorePageTransition, spintPageToScorePageTransition, soloMenuToPixiTestTransition, pixiTestToSoloMenuTransition } from "./page.possible-transitions";
 import { Page } from "./i/page.i-page";
 import StartMenu from '../../pages/startmenu/StartMenu.vue';
 import Room from '../../pages/room/Room.vue';
 import Game from '../../pages/game/Game.vue';
+import PixiCanvas from '../../pages/game/Pixitesting.vue';
 import Sprint from '../../pages/sprint/Sprint.vue';
 import Score from '../../pages/score/Score.vue';
 import Config from '../../pages/config/Config.vue';
@@ -26,6 +27,7 @@ export const pages: Page[] = [
     { title: 'Game', pageState: PAGE_STATE.gamePage, component: Game },
     { title: 'Sprint', pageState: PAGE_STATE.sprintPage, component: Sprint },
     { title: 'Score', pageState: PAGE_STATE.scorePage, component: Score },
+    { title: 'PixiTest', pageState: PAGE_STATE.pixiTest, component: PixiCanvas },
 ];
 
 export function setupTransitionFunctions() {
@@ -58,6 +60,8 @@ export function setupTransitionFunctions() {
     soloMenuToScorePageTransition.transitionFunction = soloMenuToScorePage;
     scorePageToSprintPageTransition.transitionFunction = scorePageToSprintPage;
     spintPageToScorePageTransition.transitionFunction = spintPageToScorePage;
+    soloMenuToPixiTestTransition.transitionFunction = soloMenuToPixiTest;
+    pixiTestToSoloMenuTransition.transitionFunction = pixiTestToSoloMenu;
 }
 
 export const currentPageState = ref<PAGE_STATE>(PAGE_STATE.mainMenu);
@@ -204,6 +208,14 @@ function scorePageToSprintPage(){
 }
 
 function spintPageToScorePage(){
+    // console.log("current page: " + currentPageState.value);
+}
+
+function soloMenuToPixiTest(){
+    // console.log("current page: " + currentPageState.value);
+}
+
+function pixiTestToSoloMenu(){
     // console.log("current page: " + currentPageState.value);
 }
 

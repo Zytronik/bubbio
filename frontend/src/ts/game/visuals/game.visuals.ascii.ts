@@ -245,18 +245,6 @@ function showASCIICountdownNumber(counter: number): string {
     return countDownSteps[counter];
 }
 
-// export function showASCIIVictory(gameInstance: GameInstance, asciiRefs: AsciiBoardRefs): void {
-//     stopASCIIAnimation();
-//     fillAsciiStrings(gameInstance, asciiRefs);
-//     asciiRefs.floatingText.value = victoryASCII;
-// }
-
-// export function showASCIIDefeat(gameInstance: GameInstance, asciiRefs: AsciiBoardRefs): void {
-//     stopASCIIAnimation();
-//     fillAsciiStrings(gameInstance, asciiRefs);
-//     asciiRefs.floatingText.value = defeatASCII;
-// }
-
 const victoryASCII = `
 ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 ██ ███ ██ ▄▄▄ ██ ██ ████ ███ ██ ▄▄▄ ██ ▀██ █ ██
