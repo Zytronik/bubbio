@@ -1,25 +1,26 @@
 <template>
-  <section id="sprintPage" class="page">
+  <section id="scorePage" class="page">
     <GameModeLayout :backButtonData="backButtonData" :gameMode="gameMode" :leaderboardFields="leaderboardFields" :leaderboardSortByField="leaderboardSortByField" />
   </section>
 </template>
 
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
-import { onMounted, ref } from 'vue';
-import GameModeLayout from '@/globalComponents/gameModeLayout.vue';
 import { changeBackgroundTo } from '@/ts/page/page.page-manager';
+import GameModeLayout from '@/globalComponents/gameModeLayout.vue';
+import { onMounted, ref } from 'vue';
+import { ButtonData } from '@/globalComponents/i/i-buttonData';
 import { GameMode } from '@/ts/page/e/page.e-leaderboard';
 
 export default {
   name: 'SprintPage',
   components: { GameModeLayout },
   setup() {
-    const backButtonData = ref([
-      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/sprint.png'), disabled: false },
-      { pageState: PAGE_STATE.scorePage, iconSrc: require('@/img/icons/score.png'), disabled: true },
+    const backButtonData = ref<ButtonData[]>([
+      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/score.png'), disabled: false },
+      { pageState: PAGE_STATE.sprintPage, iconSrc: require('@/img/icons/sprint.png'), disabled: true },
     ]);
-    const gameMode = GameMode.Sprint;
+    const gameMode = GameMode.Score;
     const leaderboardFields = ['gameDuration', 'bubblesPerSecond'];
     const leaderboardSortByField = 'gameDuration';
 
@@ -29,6 +30,7 @@ export default {
 
     return {
       backButtonData,
+      PAGE_STATE,
       gameMode,
       leaderboardFields,
       leaderboardSortByField,
@@ -38,7 +40,7 @@ export default {
 </script>
 
 <style>
-#sprintPage .back-buttons::before {
+#scorePage .back-buttons::before {
   background: linear-gradient(45deg, rgba(96, 221, 43, 1) 0%, rgba(198, 63, 135, 1) 100%);
 }
 </style>

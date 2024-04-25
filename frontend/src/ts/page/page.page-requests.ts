@@ -6,7 +6,8 @@ export function getFlagImagePath(countryCode: string) {
     }
 }
 
-export async function getSprintDifferenceToPB(currentTime: number) {
+export async function getSprintDifferenceToPB(currentTimeFloat: number) {
+    const currentTime = Math.floor(currentTimeFloat);
     const pb = await getSprintPersonalBest();
     const pbTime = pb?.gameDuration;
 

@@ -1,11 +1,12 @@
 import { checkUserAuthentication, logUserOut } from "../networking/networking.auth";
 import { PAGE_STATE } from "./e/page.e-page-state";
-import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToMultiMenuTransition, roomListingToMultiMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, roomPageToMultiMenuTransition, multiMenuToSoloMenuTransition, soloMenuToSprintPageTransition, spintPageToSoloMenuTransition, mainMenuToSoloMenuTransition, soloMenuToMainMenuTransition, multiMenuToRoomListingTransition, multiMenuToMainMenuTransition, soloMenuToMultiMenuTransition, soloMenuTosettingsPageTransition, multiMenuToSettingsPageTransition, settingsPageToMultiMenuTransition, settingsPageToSoloMenuTransition, multiMenuToRankedPageTransition, rankedPageToMultiMenuTransition, rankedPageToRoomListingTransition, roomListingToRankedPageTransition } from "./page.possible-transitions";
+import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToMultiMenuTransition, roomListingToMultiMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, roomPageToMultiMenuTransition, multiMenuToSoloMenuTransition, soloMenuToSprintPageTransition, spintPageToSoloMenuTransition, mainMenuToSoloMenuTransition, soloMenuToMainMenuTransition, multiMenuToRoomListingTransition, multiMenuToMainMenuTransition, soloMenuToMultiMenuTransition, soloMenuTosettingsPageTransition, multiMenuToSettingsPageTransition, settingsPageToMultiMenuTransition, settingsPageToSoloMenuTransition, multiMenuToRankedPageTransition, rankedPageToMultiMenuTransition, rankedPageToRoomListingTransition, roomListingToRankedPageTransition, scorePageToSoloMenuTransition, scorePageToSprintPageTransition, soloMenuToScorePageTransition, spintPageToScorePageTransition } from "./page.possible-transitions";
 import { Page } from "./i/page.i-page";
 import StartMenu from '../../pages/startmenu/StartMenu.vue';
 import Room from '../../pages/room/Room.vue';
 import Game from '../../pages/game/Game.vue';
 import Sprint from '../../pages/sprint/Sprint.vue';
+import Score from '../../pages/score/Score.vue';
 import Config from '../../pages/config/Config.vue';
 import RoomListing from '../../pages/room-listing/RoomListing.vue';
 import RankedPage from '../../pages/ranked/RankedPage.vue';
@@ -24,7 +25,7 @@ export const pages: Page[] = [
     { title: 'Config', pageState: PAGE_STATE.settingsPage, component: Config },
     { title: 'Game', pageState: PAGE_STATE.gamePage, component: Game },
     { title: 'Sprint', pageState: PAGE_STATE.sprintPage, component: Sprint },
-
+    { title: 'Score', pageState: PAGE_STATE.scorePage, component: Score },
 ];
 
 export function setupTransitionFunctions() {
@@ -53,6 +54,10 @@ export function setupTransitionFunctions() {
     rankedPageToMultiMenuTransition.transitionFunction = rankedPageToMultiMenu;
     roomListingToRankedPageTransition.transitionFunction = roomListingToRankedPage;
     rankedPageToRoomListingTransition.transitionFunction = rankedPageToRoomListing;
+    scorePageToSoloMenuTransition.transitionFunction = scorePageToSoloMenu;
+    soloMenuToScorePageTransition.transitionFunction = soloMenuToScorePage;
+    scorePageToSprintPageTransition.transitionFunction = scorePageToSprintPage;
+    spintPageToScorePageTransition.transitionFunction = spintPageToScorePage;
 }
 
 export const currentPageState = ref<PAGE_STATE>(PAGE_STATE.mainMenu);
@@ -183,6 +188,22 @@ function roomListingToRankedPage() {
 }
 
 function rankedPageToRoomListing() {
+    // console.log("current page: " + currentPageState.value);
+}
+
+function scorePageToSoloMenu(){
+    // console.log("current page: " + currentPageState.value);
+}
+
+function soloMenuToScorePage(){
+    // console.log("current page: " + currentPageState.value);
+}
+
+function scorePageToSprintPage(){
+    // console.log("current page: " + currentPageState.value);
+}
+
+function spintPageToScorePage(){
     // console.log("current page: " + currentPageState.value);
 }
 

@@ -12,6 +12,7 @@ import { RankedModule } from './ranked/ranked.module';
 import { UsersModule } from './user/user.module';
 import { FriendsModule } from './friends/friends.module';
 import { LobbyModule } from './lobby/lobby.module';
+import { ScoreModule } from './score/score.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { LobbyModule } from './lobby/lobby.module';
     }),
     AuthModule,
     SprintModule,
+    ScoreModule,
     NewsModule,
     LeaderboardModule,
     MailModule,

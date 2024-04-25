@@ -9,14 +9,6 @@ export class LeaderboardService {
         private prisma: PrismaService,
         private ranksService: RanksService,
     ) { }
-    getPrismaModelForGameMode(gameMode: string) {
-        switch (gameMode) {
-            case "sprint":
-                return this.prisma.sprint;
-            default:
-                throw new Error(`Unsupported game mode: ${gameMode}`);
-        }
-    }
 
     async getLeaderboardData(criteria: {
         gameMode: string;
@@ -26,24 +18,39 @@ export class LeaderboardService {
         country: string;
         limit: number;
     }) {
-        if (criteria.gameMode === "ranked") {
-            return this.getRankedLeaderboard(criteria.category, criteria.country, criteria.limit);
+        let records;
+        switch (criteria.gameMode) {
+            case "sprint":
+                records = await this.prisma.sprint.findMany(this.createQuery(criteria));
+                break;
+            case "score":
+                records = await this.prisma.score.findMany(this.createQuery(criteria));
+                break;
+            case "ranked":
+                return this.getRankedLeaderboard(criteria.category, criteria.country, criteria.limit);
+            default:
+                throw new Error(`Unsupported game mode: ${criteria.gameMode}`);
         }
-        const prismaModel = this.getPrismaModelForGameMode(criteria.gameMode);
 
-        let whereClause: Record<string, unknown> = {};
+        return this.processRecords(records, criteria);
+    }
 
+    createQuery(criteria: {
+        category: string;
+        country: string;
+        sortBy: string;
+        sortDirection: string;
+    }) {
+        let whereClause = {};
         if (criteria.category === 'national' && criteria.country) {
             whereClause = {
-                ...whereClause,
                 user: {
                     country: criteria.country,
                 },
             };
         }
 
-        // Fetch records, including user data
-        let records = await prismaModel.findMany({
+        return {
             where: whereClause,
             include: {
                 user: {
@@ -53,9 +60,10 @@ export class LeaderboardService {
                     }
                 },
             },
-        });
+        };
+    }
 
-        // Ensure grouping by userId to select the best run
+    processRecords(records, criteria: { sortBy: string; sortDirection: string; limit: number }) {
         let bestRunsPerUser = records.reduce((acc, record) => {
             const currentBest = acc[record.userId];
             const isBetterRun = !currentBest || (criteria.sortDirection === 'asc' ? record[criteria.sortBy] < currentBest[criteria.sortBy] : record[criteria.sortBy] > currentBest[criteria.sortBy]);
@@ -65,15 +73,12 @@ export class LeaderboardService {
             return acc;
         }, {});
 
-        // Convert the records object back to an array of best runs
         let filteredRecords = Object.values(bestRunsPerUser);
 
-        // Sort the filtered records by sortBy and sortDirection
         filteredRecords.sort((a, b) => {
             return criteria.sortDirection === 'asc' ? a[criteria.sortBy] - b[criteria.sortBy] : b[criteria.sortBy] - a[criteria.sortBy];
         });
 
-        // Limit the results
         filteredRecords = filteredRecords.slice(0, criteria.limit);
 
         return filteredRecords;

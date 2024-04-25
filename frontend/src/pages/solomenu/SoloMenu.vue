@@ -8,6 +8,11 @@
           <p>Sprint</p>
           <p class="desc">Go very very fast</p>
         </button>
+        <button class="menu-btn" @click="goToState(PAGE_STATE.scorePage)">
+          <img src="@/img/icons/score.png" />
+          <p>Punktejagd</p>
+          <p class="desc">Send as much attack, in limited time</p>
+        </button>
       </div>
     </div>
   </section>

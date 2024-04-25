@@ -8,4 +8,5 @@ export enum PAGE_STATE {
     settingsPage = 'settingsPage',
     gamePage = 'gamePage',
     sprintPage = 'sprintPage',
+    scorePage = 'scorePage',
 }

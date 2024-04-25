@@ -142,6 +142,15 @@ export const soloMenuToSprintPageTransition: PageTransition = {
     }
 }
 
+export const soloMenuToScorePageTransition: PageTransition = {
+    name: "soloMenuToScorePageTransition",
+    origin: PAGE_STATE.soloMenu,
+    destination: PAGE_STATE.scorePage,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + soloMenuToScorePageTransition.name);
+    }
+}
+
 export const soloMenuToMultiMenuTransition: PageTransition = {
     name: "soloMenuToMultiMenuTransition",
     origin: PAGE_STATE.soloMenu,
@@ -167,6 +176,34 @@ export const spintPageToSoloMenuTransition: PageTransition = {
     destination: PAGE_STATE.soloMenu,
     transitionFunction: () => {
         console.error("transition not yet defined for " + spintPageToSoloMenuTransition.name);
+    }
+}
+
+export const spintPageToScorePageTransition: PageTransition = {
+    name: "spintPageToScorePageTransition",
+    origin: PAGE_STATE.sprintPage,
+    destination: PAGE_STATE.scorePage,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + spintPageToScorePageTransition.name);
+    }
+}
+
+/* ScorePage */
+export const scorePageToSoloMenuTransition: PageTransition = {
+    name: "scorePageToSoloMenuTransition",
+    origin: PAGE_STATE.scorePage,
+    destination: PAGE_STATE.soloMenu,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + scorePageToSoloMenuTransition.name);
+    }
+}
+
+export const scorePageToSprintPageTransition: PageTransition = {
+    name: "scorePageToSprintPageTransition",
+    origin: PAGE_STATE.scorePage,
+    destination: PAGE_STATE.sprintPage,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + scorePageToSprintPageTransition.name);
     }
 }
 
@@ -261,4 +298,8 @@ export const allPossibleTransitions: PageTransition[] = [
     rankedPageToMultiMenuTransition,
     roomListingToRankedPageTransition,
     rankedPageToRoomListingTransition,
+    scorePageToSoloMenuTransition,
+    soloMenuToScorePageTransition,
+    scorePageToSprintPageTransition,
+    spintPageToScorePageTransition,
 ];

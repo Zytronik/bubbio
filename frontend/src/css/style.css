@@ -293,7 +293,7 @@ button.goBackButton:focus {
     transform: translateX(-60%);
 }
 
-.sprintDashboard button.playButton {
+.gameModeDashboard button.playButton {
     height: 100%;
     width: 100%;
     font-size: 400%;
@@ -308,7 +308,7 @@ button.retry {
     border: none;
 }
 
-.sprintDashboard .history-wrapper {
+.gameModeDashboard .history-wrapper {
     flex-grow: 1;
     margin-top: 30px;
 }
@@ -431,7 +431,7 @@ button.retry {
 }
 
 #rankedPage .game-wrapper {
-    font-size: 160%;
+    font-size: 150%;
 }
 
 .game-wrapper {
