@@ -12,7 +12,7 @@
       <p>{{ playerGameVisuals.statNumbers.attackPerMinute }} APM</p>
       <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond }}</p>
       <p>combo {{ playerGameVisuals.statNumbers.currentCombo }}</p>
-      <p>{{ playerGameVisuals.statNumbers.spikeNumber }}</p>
+      <p>{{ playerGameVisuals.statNumbers.spikeNumber.value }}</p>
     </div>
     <div class="gameUI-wrapper">
       <span class="monospace"
