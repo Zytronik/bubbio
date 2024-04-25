@@ -26,6 +26,7 @@ export function getSprintSettings(): GameSettings {
         garbageMaxAtOnce: GARBAGE_MAX_AT_ONCE.defaultValue,
         garbageCleanAmount: GARBAGE_CLEAN_AMOUNT.defaultValue,
         garbageColorAmount: GARBAGE_COLOR_AMOUNT.defaultValue,
+        garbageToKill: 30,
         countDownDuration: COUNTDOWN_DURATION.defaultValue,
     };
 }

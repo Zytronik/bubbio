@@ -166,6 +166,7 @@ export function rankedGameStart(): void {
 
 
 function showCountDownAndStart(): void {
+    fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
     resetStatDisplays(playerGameVisuals.statNumbers);
     startCountdownAnimation(playerGameInstance.gameSettings.countDownDuration, afterCountdown)
     function afterCountdown(): void {
@@ -184,9 +185,10 @@ export function setGameStateAndNotify(gameState: GAME_STATE): void {
 }
 export function disableGameplay(): void {
     stopCountdownAnimation();
-    if (playerGameInstance.gameMode === GAME_MODE.SPRINT) {
+    const inputHistory = playerGameInstance.gameStateHistory.inputHistory;
+    if (playerGameInstance.gameMode === GAME_MODE.SPRINT && inputHistory.length > 0) {
         const stats = playerGameInstance.stats;
-        const winningMoveAtTime = playerGameInstance.gameStateHistory.inputHistory[playerGameInstance.gameStateHistory.inputHistory.length - 1].frameTime;
+        const winningMoveAtTime = inputHistory[inputHistory.length - 1].frameTime;
         stats.gameEndTime = winningMoveAtTime;
         stats.gameDuration = stats.gameEndTime;
         stats.bubblesPerSecond = Number((stats.bubblesShot / stats.gameDuration * 1000).toFixed(2));

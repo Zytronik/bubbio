@@ -466,6 +466,9 @@ export class GameGateway implements OnGatewayDisconnect {
                 holdBubble(game.gameInstance);
               } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
                 game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
+                if (game.gameInstance.queuedGarbage >= game.gameInstance.gameSettings.garbageToKill) {
+                  game.gameInstance.gameTransitions.onGameDefeat();
+                }
               }
               game.gameInstance.stats.gameDuration = inputFrame.frameTime;
             }
