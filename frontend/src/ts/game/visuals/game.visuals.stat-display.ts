@@ -36,7 +36,7 @@ function statDisplayAnimation(): void {
 export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNumberRefs, calculateCurrentTime: boolean): void {
     const gameStats = gameInstance.stats;
     let gameDuration = gameStats.gameDuration;
-    if(calculateCurrentTime) {
+    if (calculateCurrentTime) {
         gameDuration = performance.now() - gameStats.gameStartTime;
     }
     const formattedCurrentTimeString = formatTimeNumberToString(gameDuration);
@@ -47,9 +47,9 @@ export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNum
     statStrings.bubblesLeftToClear.value = gameStats.bubblesLeftToClear;
     statStrings.bubblesShot.value = gameStats.bubblesShot;
     statStrings.bubblesPerSecond.value = gameStats.bubblesPerSecond;
-    statStrings.attackPerMinute.value = gameStats.attackPerMinute;
+    statStrings.attackPerMinute.value = (gameStats.attackPerMinute != null) ? gameStats.attackPerMinute : 0;
     statStrings.currentCombo.value = gameStats.currentCombo;
-    if (gameStats.spikeAnimationStart + SPIKE_COUNTER_TIMEFRAME < performance.now()) {
+    if (gameStats.spikeAnimationStart + SPIKE_COUNTER_TIMEFRAME > performance.now()) {
         statStrings.spikeNumber.value = "" + gameStats.spikeNumber;
     } else {
         statStrings.spikeNumber.value = "";

@@ -10,9 +10,9 @@
     <div v-if="gameMode === 'ranked'" class="inGameStats">
       <p v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime"></p>
       <p>{{ playerGameVisuals.statNumbers.attackPerMinute }} APM</p>
-      <p>{{ playerGameVisuals.statNumbers.defensePerMinute }} DPM</p>
-      <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond
-        }}</p>
+      <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond }}</p>
+      <p>combo {{ playerGameVisuals.statNumbers.currentCombo }}</p>
+      <p>{{ playerGameVisuals.statNumbers.spikeNumber }}</p>
     </div>
     <div class="gameUI-wrapper">
       <span class="monospace"
