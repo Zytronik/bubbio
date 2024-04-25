@@ -11,7 +11,7 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
     gameStats.defense += defense;
 
     if (attack > 0){
-        if (gameStats.spikeAnimationStart + SPIKE_COUNTER_TIMEFRAME < performance.now()) {
+        if (gameStats.spikeAnimationStart + SPIKE_COUNTER_TIMEFRAME > performance.now()) {
             gameStats.spikeNumber += attack;
         } else {
             gameStats.spikeNumber = attack;

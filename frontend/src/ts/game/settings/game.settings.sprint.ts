@@ -15,7 +15,7 @@ export function getSprintSettings(): GameSettings {
         queuePreviewSize: QUEUE_PREVIEW_SIZE.defaultValue,
         widthPrecisionUnits: WIDTH_PRECISION_UNITS.defaultValue,
         collisionDetectionFactor: COLLISION_DETECTION_FACTOR.defaultValue,
-        sprintVictoryCondition: 3,
+        sprintVictoryCondition: 100,
         clearFloatingBubbles: true,
         prefillBoard: true,
         prefillBoardAmount: prefillAmount,
@@ -26,6 +26,7 @@ export function getSprintSettings(): GameSettings {
         garbageMaxAtOnce: GARBAGE_MAX_AT_ONCE.defaultValue,
         garbageCleanAmount: GARBAGE_CLEAN_AMOUNT.defaultValue,
         garbageColorAmount: GARBAGE_COLOR_AMOUNT.defaultValue,
+        garbageToKill: 30,
         countDownDuration: COUNTDOWN_DURATION.defaultValue,
     };
 }

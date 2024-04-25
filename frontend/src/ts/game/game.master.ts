@@ -165,6 +165,7 @@ export function rankedGameStart(): void {
 
 
 function showCountDownAndStart(): void {
+    fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
     resetStatDisplays(playerGameVisuals.statNumbers);
     startCountdownAnimation(playerGameInstance.gameSettings.countDownDuration, afterCountdown)
     function afterCountdown(): void {

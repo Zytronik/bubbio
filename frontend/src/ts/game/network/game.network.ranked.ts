@@ -153,6 +153,9 @@ function network_listenToIngameUpdates(): void {
             }
             playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
             network_sendInputs(playerGameInstance);
+            if (playerGameInstance.queuedGarbage >= playerGameInstance.gameSettings.garbageToKill) {
+                playerGameInstance.gameTransitions.onGameDefeat();
+              }
         });
         socket.on(O_RANKED_YOU_WON, () => {
             playerGameInstance.gameTransitions.onGameVictory();
