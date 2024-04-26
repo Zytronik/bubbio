@@ -417,11 +417,27 @@ button.retry {
 
 .game-wrapper .inGameStats {
     position: absolute;
-    left: -210px;
-    bottom: 40px;
+    right: 100%;
+    bottom: 4vh;
     width: 200px;
     z-index: 2;
     text-align: right;
+    margin-right: 15px;
+    height: 100%;
+}
+
+.game-wrapper .inGameStats .bottom {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+}
+
+.game-wrapper .inGameStats .top {
+    position: absolute;
+    top: 30%;
+    right: 0;
+    width: 100%;
 }
 
 .game-wrapper .inGameStats p {
@@ -430,16 +446,12 @@ button.retry {
     font-size: 20px;
 }
 
-#rankedPage .game-wrapper {
-    font-size: 150%;
-}
-
 .game-wrapper {
     display: flex;
     justify-content: center;
     align-items: flex-end;
     position: relative;
-    font-size: 1.2em;
+    font-size: 2.6vh;
 }
 
 .gameUI-wrapper .playerName {

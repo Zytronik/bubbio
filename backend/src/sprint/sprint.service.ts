@@ -22,9 +22,8 @@ export class SprintService {
 
         // Check if the new sprint time is in the top 5
         const amountOfTopSprints = 5;
-        const topTimes = await this.getSprintRank(amountOfTopSprints);
-        const rank = topTimes.findIndex(time => time.userId === newSprint.userId && time.sprintTime === newSprint.sprintTime) + 1;
-
+        const topSprints = await this.getBestSprints(amountOfTopSprints);
+        const rank = topSprints.findIndex(sprint => sprint.id === newSprint.id) + 1;
         if (rank > 0 && rank <= amountOfTopSprints && user) {
             await this.newsService.createNews('Sprint', userId, rank, sprintTime);
             this.newsService.updateNews();
@@ -33,7 +32,7 @@ export class SprintService {
         return newSprint;
     }
 
-    async getSprintRank(take: number): Promise<any> {
+    async getBestSprints(take: number): Promise<any> {
         const leaderboardRecords = await this.prisma.sprint.findMany({
             orderBy: {
                 gameDuration: 'asc',

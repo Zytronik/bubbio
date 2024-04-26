@@ -234,6 +234,7 @@ import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-di
 import { PlayerData } from '@/ts/game/network/dto/game.network.dto.end-screen';
 import { CountUp } from 'countup.js';
 import { formatDateToAgoText } from '@/ts/page/page.page-utils';
+import { transitionEndScreenPageToDashboard, transitionOutOfGame } from '@/ts/page/page.css-transitions';
 
 interface PlayerMatchmakingStats {
   userId: number;
@@ -439,28 +440,6 @@ export default {
       }
     }
 
-    function transitionOutOfGame(onTransitionHidden: () => void): void {
-      setTimeout(() => {
-        document.body.classList.add('slide-out-right-off-game');
-        const overlay = document.createElement('div');
-        overlay.className = 'black-overlay-left';
-        document.body.appendChild(overlay);
-        setTimeout(() => {
-          overlay.classList.add('black-overlay-cover');
-          onTransitionHidden();
-          overlay.classList.remove('black-overlay-left');
-          document.body.classList.remove('slide-out-right-off-game');
-          document.body.classList.remove('game-view');
-          setTimeout(() => {
-            disableResetInput();
-            backInput.fire = goBackToRankedPage;
-            enableBackInputs();
-            document.body.removeChild(overlay);
-          }, 1000);
-        }, 500);
-      }, 1500);
-    }
-
     function showMatchScore() {
       slideScoresIn(() => {
         if (state.socket) {
@@ -471,14 +450,20 @@ export default {
 
     function goBackToRankedPage() {
       if (showEndScreen.value) {
-        transitionEndScreenPageToDashboard();
+        transitionEndScreenPageToDashboard('.ranked-dashboard', '.endScreen-wrapper', () => {
+          isGaming.value = false;
+          showEndScreen.value = true;
+          showMatchmakingScreen.value = true;
+          specialBackButtonBehavior.value = false;
+        },()=>{
+          showEndScreen.value = false;
+        });
         backInput.fire = backInputOnLoad.value;
       }
     }
 
     function showEndScreenPage() {
-      console.log('showEndScreen', endScreenData);
-      transitionOutOfGame(() => {
+      transitionOutOfGame(false, () => {/**/}, () => {
         isGaming.value = false;
         showMatchmakingScreen.value = false;
         showEndScreen.value = true;
@@ -487,29 +472,11 @@ export default {
         emit('updateProfileData');
         specialBackButtonBehavior.value = true;
         animateElo();
+      }, () => {
+        disableResetInput();
+        backInput.fire = goBackToRankedPage;
+        enableBackInputs();
       });
-    }
-
-    async function transitionEndScreenPageToDashboard() {
-      isGaming.value = false;
-      showEndScreen.value = true;
-      showMatchmakingScreen.value = true;
-      specialBackButtonBehavior.value = false;
-      await nextTick(); // if i dont do this, dashboard is undefined
-      const dashboard = document.querySelector('.ranked-dashboard') as HTMLElement;
-      const resultScreen = document.querySelector('.endScreen-wrapper') as HTMLElement;
-      const container = document.querySelector('.page-container') as HTMLElement;
-      container.classList.add('flex-row'); //add flex-row to container
-      dashboard.classList.add('moveResultScreen-left'); //position dashboard to the left
-      resultScreen.classList.add('slideToRight'); //slide result screen to the left
-      dashboard.classList.add('slideLeftToCenter'); //slide dashboard to the left
-      setTimeout(() => {
-        resultScreen.classList.remove('slideToRight'); //reset styles
-        showEndScreen.value = false; //remove result screen
-        dashboard.classList.remove('moveResultScreen-left'); //reset styles
-        dashboard.classList.remove('slideLeftToCenter'); //reset styles
-        container.classList.remove('flex-row') //remove flex-row from container
-      }, 500);
     }
 
     function formatFloat(num: number) {
