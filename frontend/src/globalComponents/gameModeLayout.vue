@@ -6,7 +6,8 @@
             <div v-if="isDashboard" class="gameModeDashboard page-dashboard">
                 <div class="left-content">
                     <div class="play-wrapper">
-                        <button class="playButton" @click="play()">Play!</button>
+                        <button v-if="gameMode != 'score'" class="playButton" @click="play()">Play!</button>
+                        <p v-else><br>Highscore Mode is not available yet.</p>
                     </div>
                     <History v-if="!isGuest" :gameMode="gameMode"
                         :fields="['gameDuration', 'bubblesShot', 'bubblesPerSecond', 'bubblesCleared', 'submittedAt']"

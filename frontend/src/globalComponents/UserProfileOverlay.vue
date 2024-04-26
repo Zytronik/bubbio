@@ -112,7 +112,6 @@ interface ProfileData {
     sprintStats: SprintStats;
     highscoreStats: HighscoreStats;
     rankedStats: RankedStats;
-    // ... other user fields
 }
 
 interface userFriend{
