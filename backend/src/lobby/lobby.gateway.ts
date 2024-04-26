@@ -105,7 +105,7 @@ export class LobbyGateway implements OnGatewayConnection {
 
   @SubscribeMessage('getUserOnlineStatus')
   handleGetUserOnlineStatus(@MessageBody() username, @ConnectedSocket() client: Socket) {
-    const status = this.lobbyData.checkUserStatus(username);
+    const status = this.lobbyData.checkUserStatus(username) !== 'notFound' ? true : false;
     client.emit('getUserOnlineStatus', status);
   }
 

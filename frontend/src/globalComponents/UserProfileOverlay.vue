@@ -10,17 +10,18 @@
                 <div class="user-profile-inner-container">
                     <div class="user-profile-meta">
                         <div v-if="isLoggedIn && !isMyProfile" class="friend-toggle">
-                            <!-- <button title="add Friend" @click="isFriend ? removeFriend(userData.id) : addFriend(userData.id)">
-                                {{ isFriend ? '♥' : '♡' }}
-                            </button> -->
+                            <button title="add Friend" @click="isFriend ? removeFriend(userData?.id) : addFriend(userData?.id)">
+                                <i v-if="isFriend" class="fa-solid fa-heart"></i>
+                                <i v-else class="fa-regular fa-heart"></i>
+                            </button>
                         </div>
                         <img class="profile-pic" :src="profilePicImagePath" alt="Profile Picture">
                         <h2>{{ userData.username.toUpperCase() }}<span class="online-status"
-                                :title="isUserOnline !== 'notFound' ? 'Online' : ''"
-                                :class="{ 'online': isUserOnline !== 'notFound' }">{{}}</span></h2>
+                                :title="isUserOnline ? 'Online' : 'Offline'"
+                                :class="{ 'online': isUserOnline }"></span></h2>
                         <p v-if="userData.id < 4">Since the Beginning</p>
                         <p v-else>Joined: {{ formattedDate }}</p>
-                        <p v-if="isUserOnline !== 'notFound' || userData.LastDisconnectedAt">Last seen: {{
+                        <p v-if="isUserOnline || userData.LastDisconnectedAt">Last seen: {{
                             getLastSeenText(userData.LastDisconnectedAt) }}</p>
                         <div class="user-country">
                             <p v-if="userData.country">{{ userData.country }}</p>
@@ -29,24 +30,53 @@
                         </div>
                     </div>
 
-                    <h3>Sprint</h3>
-                    <div v-if="userData.sprintStats.rank">
-                        <p>Leaderboard Rank: {{ userData.sprintStats.rank }}</p>
-                        <p>Average Bubbles Cleared: {{ Math.round(userData.sprintStats.averageBubblesCleared * 100) /
-                            100 }}
-                        </p>
-                        <p>Average Bubbles Per Second: {{ Math.round(userData.sprintStats.averageBubblesPerSecond * 100)
-                            /
-                            100 }}</p>
-                        <p>Average Bubbles Shot: {{ Math.round(userData.sprintStats.averageBubblesShot * 100) / 100 }}
-                        </p>
-                        <p>Average Sprint Time: {{ formatTimeNumberToString(userData.sprintStats.averageSprintTime) }}
-                        </p>
-                        <p>Games Played: {{ Math.round(userData.sprintStats.sprintGamesPlayed * 100) / 100 }}</p>
+                    <div class="gamemodes-wrapper">
+                        <div class="ranked-wrapper">
+                            <h3>Ranked</h3>
+                            <div v-if="userData.rankedStats.rankedGamesPlayed">
+                                <p>Currenty: {{ userData.isRanked ? 'Ranked' : 'Unranked' }}</p>
+                                <p>Rank: {{ userData.rankName }}</p>
+                                <p>Elo: {{ userData.rating }}±{{ userData.ratingDeviation }}</p>
+                                <p>Global Rank: #{{ userData.rankedStats.globalRank }}</p>
+                                <p>National Rank: #{{ userData.rankedStats.nationalRank }}</p>
+                                <p>Average Bubbles Per Second: {{ userData.rankedStats.averageBubblesPerSecond }}</p>
+                                <p>Average Attack Per Minute: {{ userData.rankedStats.averageAttackPerMinute }}</p>
+                                <p>Average Defense Per Minute: {{ userData.rankedStats.averageDefensePerMinute }}</p>
+                                <p>Ranked Games Played: {{ userData.rankedStats.rankedGamesPlayed }}</p>
+                            </div>
+                            <div v-else>
+                                <p>This User has never played Ranked.</p>
+                            </div>
+                        </div>
+
+                        <div class="ranked-wrapper">
+                            <h3>Highscore</h3>
+                            <div v-if="userData.highscoreStats">
+                                <p>TODO</p>
+                            </div>
+                            <div v-else>
+                                <p>This User has never played Highscore.</p>
+                            </div>
+                        </div>
+
+                        <div class="sprint-wrapper">
+                            <h3>Sprint</h3>
+                            <div v-if="userData.sprintStats.sprintGamesPlayed">
+                                <p>Global Rank: #{{ userData.sprintStats.globalRank }}</p>
+                                <p>National Rank: #{{ userData.sprintStats.nationalRank }}</p>
+                                <p>Average Bubbles Cleared: {{userData.sprintStats.averageBubblesCleared}}
+                                </p>
+                                <p>Average Bubbles Per Second: {{userData.sprintStats.averageBubblesPerSecond }}</p>
+                                <p>Average Bubbles Shot: {{userData.sprintStats.averageBubblesShot}}</p>
+                                <p>Average Sprint Time: {{formatTimeNumberToString(userData.sprintStats.averageSprintTime)}}</p>
+                                <p>Games Played: {{userData.sprintStats.sprintGamesPlayed}}</p>
+                            </div>
+                            <div v-else>
+                                <p>This User has never played Sprint.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div v-else>
-                        <p>This User has never played Sprint.</p>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -57,13 +87,12 @@
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { getDefaultProfileBannerURL, getDefaultProfilePbURL } from '@/ts/networking/paths';
-import state from '@/ts/networking/networking.client-websocket';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 import { formatDateToAgoText } from '@/ts/page/page.page-utils';
 import { UserData } from '@/ts/page/i/page.i.user-data';
 import eventBus from '@/ts/page/page.event-bus';
-import { getFriends } from '@/ts/page/page.page-requests';
+import { getFriends, getUserOnlineStatus } from '@/ts/page/page.page-requests';
 
 interface ProfileData {
     id: number;
@@ -75,13 +104,21 @@ interface ProfileData {
     bannerUrl: string;
     LastDisconnectedAt: Date;
     friends: userFriend[];
+    rating: number;
+    ratingDeviation: number;
+    rankIcon: string;
+    rankName: string;
+    isRanked: boolean;
     sprintStats: SprintStats;
+    highscoreStats: HighscoreStats;
+    rankedStats: RankedStats;
     // ... other user fields
 }
 
 interface userFriend{
     id: number;
     username: string;
+    pbUrl: string;
 }
 
 interface SprintStats {
@@ -89,8 +126,27 @@ interface SprintStats {
     averageBubblesPerSecond: number;
     averageBubblesShot: number;
     averageSprintTime: number;
-    rank: number;
+    globalRank: number;
+    nationalRank: number;
     sprintGamesPlayed: number;
+}
+
+interface HighscoreStats {
+    averageBubblesCleared: number;
+    averageBubblesPerSecond: number;
+    averageBubblesShot: number;
+    globalRank: number;
+    nationalRank: number;
+    highscoreGamesPlayed: number;
+}
+
+interface RankedStats {
+    averageBubblesPerSecond: number;
+    averageAttackPerMinute: number;
+    averageDefensePerMinute: number;
+    rankedGamesPlayed: number;
+    globalRank: number;
+    nationalRank: number;
 }
 
 export default defineComponent({
@@ -104,7 +160,7 @@ export default defineComponent({
         const userData = ref<UserData | null> (eventBus.getUserData());
         const isFriend = ref(false);
         const userError = ref<string | null>(null);
-        const isUserOnline = ref<string>("notFound");
+        const isUserOnline = ref<boolean>(false);
         const isMyProfile = computed(() => profileData.value && profileData.value.id === userData.value?.id);
         const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
 
@@ -143,23 +199,25 @@ export default defineComponent({
         onMounted(async () => {
             if (props.username) {
                 profileData.value = await fetchProfileData(props.username);
-                getUserOnlineStatus(props.username);
-                isFriend.value = await checkIfIsFriend();
+                isUserOnline.value = await getUserOnlineStatus(props.username);
+                if(isLoggedIn.value){
+                    isFriend.value = await checkIfIsFriend();
+                }
             }
         });
 
         async function checkIfIsFriend() {
-            /* const myFriends: userFriend[] = await getFriends();
+            const myFriends: userFriend[] = await getFriends();
             const profile = profileData.value;
 
             if (profile && profile.id != null) {
                 return myFriends.some(friend => friend.id === profile.id);
-            } */
+            }
             return false;
         }
 
         function getLastSeenText(LastDisconnectedAt: Date) {
-            if (isUserOnline.value !== "notFound") {
+            if (isUserOnline.value) {
                 return 'Online';
             }
 
@@ -168,19 +226,6 @@ export default defineComponent({
             }
 
             return formatDateToAgoText(LastDisconnectedAt);
-        }
-
-
-        function getUserOnlineStatus(username: string): void {
-            if (state.socket) {
-                state.socket.emit('getUserOnlineStatus', username);
-            }
-        }
-
-        if (state.socket) {
-            state.socket.on('getUserOnlineStatus', (status: string) => {
-                isUserOnline.value = status;
-            });
         }
 
         async function fetchProfileData(username: string) {
@@ -197,30 +242,33 @@ export default defineComponent({
             emit('close-overlay');
         }
 
-        async function addFriend(friendId: number) {
-            /* const token = localStorage.getItem('authToken');
-            const headers = token ? { Authorization: `Bearer ${token}` } : {};
-            try {
-                await httpClient.post(`/friends/add`, { friendId }, { headers });
-                eventBus.emit('updateFriendList');
-                isFriend.value = true;
-            } catch (error) {
-                console.error("Error adding friend", error);
-            } */
+        async function addFriend(friendId: number | undefined) {
+            if (friendId !== undefined) {
+                const token = localStorage.getItem('authToken');
+                const headers = token ? { Authorization: `Bearer ${token}` } : {};
+                try {
+                    await httpClient.post(`/friends/add`, { friendId }, { headers });
+                    eventBus.emit('updateFriendList');
+                    isFriend.value = true;
+                } catch (error) {
+                    console.error("Error adding friend", error);
+                }
+            }
         }
 
-        async function removeFriend(friendId: number) {
-            /* const token = localStorage.getItem('authToken');
-            const headers = token ? { Authorization: `Bearer ${token}` } : {};
-            try {
-                await httpClient.post(`/friends/remove`, { friendId }, { headers });
-                eventBus.emit('updateFriendList');
-                isFriend.value = false;
-            } catch (error) {
-                console.error("Error removing friend", error);
-            } */
+        async function removeFriend(friendId: number | undefined) {
+            if (friendId !== undefined) {
+                const token = localStorage.getItem('authToken');
+                const headers = token ? { Authorization: `Bearer ${token}` } : {};
+                try {
+                    await httpClient.post(`/friends/remove`, { friendId }, { headers });
+                    eventBus.emit('updateFriendList');
+                    isFriend.value = false;
+                } catch (error) {
+                    console.error("Error removing friend", error);
+                }
+            }
         }
-
 
         return {
             userData: profileData,
@@ -355,8 +403,13 @@ button.goBackButton {
     background-color: transparent;
     border: none;
     color: white;
-    font-size: 200%;
+    font-size: 150%;
     cursor: pointer;
+}
+
+.gamemodes-wrapper {
+    display: flex;
+    justify-content: space-between;
 }
 
 </style>

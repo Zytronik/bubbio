@@ -89,9 +89,9 @@ export default defineComponent({
 
     function getIconClass(type: string): string {
       switch (type) {
-        case 'error': return 'uil uil-times';
-        case 'success': return 'uil uil-check';
-        default: return 'uil uil-info';
+        case 'error': return 'fa-solid fa-xmark';
+        case 'success': return 'fa-solid fa-check';
+        default: return 'fa-solid fa-info';
       }
     }
 

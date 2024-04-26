@@ -129,7 +129,7 @@
 
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
-import { PropType, defineComponent, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { PropType, defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import Game from '@/pages/game/Game.vue';
 import Leaderboard from '@/globalComponents/Leaderboard.vue';
 import History from '@/globalComponents/History.vue';

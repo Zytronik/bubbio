@@ -1,3 +1,4 @@
+import state from "../networking/networking.client-websocket";
 import { httpClient } from "../networking/networking.http-client";
 
 export function getFlagImagePath(countryCode: string) {
@@ -45,3 +46,29 @@ export async function getFriends() {
         return undefined;
     }
 }
+
+export function getUserOnlineStatus(username: string): Promise<boolean>{
+    return new Promise((resolve, reject) => {
+        if (state.socket) {
+            state.socket.on('getUserOnlineStatus', (status) => {
+                resolve(status);
+                if (state.socket) {
+                    state.socket.off('getUserOnlineStatus');
+                }
+            });
+
+            state.socket.emit('getUserOnlineStatus', username);
+
+            setTimeout(() => {
+                reject(new Error("Timeout: Failed to get user online status"));
+                if (state.socket) {
+                    state.socket.off('getUserOnlineStatus');
+                }
+            }, 5000);
+        } else {
+            reject(new Error("Socket is not available"));
+        }
+    });
+}
+
+

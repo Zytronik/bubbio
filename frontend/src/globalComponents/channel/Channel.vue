@@ -47,17 +47,20 @@
                         <input v-model="chatInput" placeholder="Type a message..." @keyup.enter="sendChatMessage" />
                         <button @click="sendChatMessage">Send</button>
                       </div>
+                      <p v-else>Log in to chat.</p>
                     </div>
                     <div class="news">
                       <h3>News</h3>
                       <div class="news-wrapper">
                         <transition-group name="fade">
-                          <div v-for="(item,i) in newsData" :key="i" class="news-item">
+                          <div v-for="(item, i) in newsData" :key="i" class="news-item">
                             <div>
                               <img :src="item.userImg ? item.userImg : getDefaultProfilePbURL()"
                                 alt="User's profile picture">
                               <p>
-                                <span class="username" @click="openUserProfile(item.username)">{{ item.username.toUpperCase() }}</span> achieved <span>#{{ item.rank }}</span> in <span>{{
+                                <span class="username" @click="openUserProfile(item.username)">{{
+                                  item.username.toUpperCase() }}</span> achieved <span>#{{ item.rank }}</span> in
+                                <span>{{
                                   item.type }}</span> with <span>{{ formatTimeNumberToString(item.value) }}</span>
                               </p>
                             </div>
@@ -92,22 +95,25 @@
                 <li v-for="user in searchResults" :key="user.id" @click="openUserProfile(user.username)">
                   <img v-if="user.countryCode" :src="getFlagImagePath(user.countryCode)"
                     :alt="`${user.country}`"><span>{{
-                    user.username.toUpperCase() }}</span>
+                      user.username.toUpperCase() }}</span>
                 </li>
               </ul>
             </div>
             <div class="friend-listing">
-              <h3 v-if="isAuthenticated">Friend Listing (TODO)</h3>
-              <div class="friendList" v-for="friend in friendsList" :key="friend.id">
-                <div class="friend">
-                  <p>{{ friend.username }}</p>
-                  <div>
-                    <span>Invite</span>
-                    <span>Spectate</span>
-                    <span>Message</span>
+              <h3>Friend Listing</h3>
+              <div v-if="isLoggedIn">
+                <div class="friendList" v-for="friend in friendsList" :key="friend.id">
+                  <div class="friend">
+                    <div class="friend-info">
+                      <span class="online-status" :class="{ 'online': friend.isOnline }" :title="friend.isOnline ? 'Online' : 'Offline'"></span>
+                      <img class="pb" :src="friend.pbUrl ? friend.pbUrl : getDefaultProfilePbURL()" alt="User profile picture">
+                      <p class="username" @click="openUserProfile(friend.username)">{{ friend.username.toUpperCase() }}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
+              <p v-else>Log in to see your friends.</p>
             </div>
           </div>
           <transition name="fade-scale">
@@ -136,7 +142,7 @@ import { CountUp } from 'countup.js';
 import { getDefaultProfilePbURL } from '@/ts/networking/paths';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
 import { backInput } from '@/ts/input/input.all-inputs';
-import { getFlagImagePath, getFriends } from '@/ts/page/page.page-requests';
+import { getFlagImagePath, getFriends, getUserOnlineStatus } from '@/ts/page/page.page-requests';
 import { formatDateToAgoText } from '@/ts/page/page.page-utils';
 import { formatFieldValue } from '@/ts/page/i/page.i.stat-display';
 import eventBus from '@/ts/page/page.event-bus';
@@ -157,6 +163,13 @@ export default {
       username: string;
       countryCode: string,
       country: string,
+    }
+
+    interface Friend {
+      id: number;
+      username: string;
+      isOnline: boolean;
+      pbUrl: string;
     }
 
     const searchQuery = ref('');
@@ -219,7 +232,6 @@ export default {
       showUserProfileOverlay.value = false;
       selectedUsername.value = null;
       history.replaceState(null, '', '/');
-      updateFriendList();
     }
 
     function showUserPageFromURL() {
@@ -332,10 +344,26 @@ export default {
     }
 
     /* Friends */
-    const friendsList = ref<User[] | null>(null);
+    const friendsList = ref<Friend[] | null>(null);
 
     async function updateFriendList() {
-      friendsList.value = [];//await getFriends();
+      if (isLoggedIn.value) {
+        try {
+          friendsList.value = await getFriends();
+          if (friendsList.value) {
+            for (const friend of friendsList.value) {
+              try {
+                friend.isOnline = await getUserOnlineStatus(friend.username);
+              } catch (error) {
+                console.error(`Failed to fetch online status for ${friend.username}: ${error}`);
+                friend.isOnline = false;
+              }
+            }
+          }
+        } catch (error) {
+          console.error(`Failed to fetch friends list: ${error}`);
+        }
+      }
     }
 
     eventBus.on('updateFriendList', updateFriendList);
@@ -343,6 +371,7 @@ export default {
     /* General */
     backInput.fire = slideOverlayOut;
     const isAuthenticated = computed(() => checkUserAuthentication());
+    const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
 
     onMounted(async () => {
       if (state.socket) {
@@ -407,11 +436,13 @@ export default {
       formatFieldValue,
       getFriends,
       friendsList,
+      isLoggedIn,
+      getUserOnlineStatus,
     };
   },
 }
 </script>
-  
+
 <style scoped>
 .channel-container {
   background: rgb(30, 30, 30);
@@ -421,7 +452,7 @@ export default {
 }
 
 .channel-overlay {
-  z-index: 10;
+  z-index: 100;
 }
 
 .player-search ul {
@@ -546,7 +577,40 @@ export default {
 .friend-listing .friend {
   background-color: black;
   padding: 10px 10px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+}
+
+.friend-listing .friend .username {
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.friend-listing .friend-info {
+  display: flex;
+  align-items: center;
+}
+
+.friend-listing .friend-info .pb {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+.friend-listing .friend .online-status {
+  height: 15px;
+  width: 15px;
+  display: block;
+  border-radius: 50%;
+  background-color: red;
+}
+
+.friend-listing .friend .online-status.online {
+  background-color: green;
+}
+
+.friend-listing .friend .username:hover {
+  opacity: 0.7;
 }
 
 .friend-listing .friend span {
@@ -660,6 +724,11 @@ export default {
 
 .news-item .username {
   cursor: pointer;
+  transition: 0.3s;
+}
+
+.news-item .username:hover {
+  opacity: 0.7;
 }
 
 .news-item .time {
@@ -679,7 +748,7 @@ export default {
   align-items: center;
 }
 
-.news-item > div {
+.news-item>div {
   display: flex;
   flex-direction: row;
   align-items: center;

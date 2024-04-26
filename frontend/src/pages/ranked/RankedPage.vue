@@ -167,7 +167,7 @@
             </div>
             <div class="rounds">
               <div class="r-player" :class="getPlayerCSSClass(endScreenData.player1Data.playerID)">
-                <div v-for="(roundStats1, index) in endScreenData.player1Data.playerStats as GameStats[]"
+                <div v-for="(roundStats1, index) in endScreenData.player1Data.playerStats"
                   :key="'player1-round-' + index" class="round">
                   <p><span>{{ formatFloat(roundStats1.attackPerMinute) }}</span>APM</p>
                   <p><span>{{ formatFloat(roundStats1.bubblesPerSecond) }}</span>BPS</p>
@@ -176,7 +176,7 @@
                 </div>
               </div>
               <div class="r-player" :class="getPlayerCSSClass(endScreenData.player2Data.playerID)">
-                <div v-for="(roundStats2, index) in endScreenData.player2Data.playerStats as GameStats[]"
+                <div v-for="(roundStats2, index) in endScreenData.player2Data.playerStats"
                   :key="'player2-round-' + index" class="round">
                   <p><span>{{ formatFloat(roundStats2.attackPerMinute) }}</span>APM</p>
                   <p><span>{{ formatFloat(roundStats2.bubblesPerSecond) }}</span>BPS</p>
@@ -229,7 +229,6 @@ import { backInput } from '@/ts/input/input.all-inputs';
 import { disableResetInput, enableBackInputs } from '@/ts/input/input.input-manager';
 import { RankInfo } from '@/ts/page/i/page.i-rank-info';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
-import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
 import { PlayerData } from '@/ts/game/network/dto/game.network.dto.end-screen';
 import { CountUp } from 'countup.js';

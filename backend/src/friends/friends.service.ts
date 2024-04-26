@@ -18,6 +18,7 @@ export class FriendsService {
                                 select: {
                                     id: true,
                                     username: true,
+                                    pbUrl: true,
                                 }
                             },
                         },

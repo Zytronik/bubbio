@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
 import { dto_EndScreen } from "src/game/network/dto/game.network.dto.end-screen";
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -127,4 +126,52 @@ export class RankedService {
             throw error;
         }
     }
+
+    async getAverageStats(userId: number) {
+        const rankedMatches = await this.prisma.ranked.findMany({
+            where: {
+                OR: [
+                    { userId1: userId },
+                    { userId2: userId }
+                ]
+            },
+            select: {
+                user1Stats: true,
+                user2Stats: true,
+                userId1: true,
+                userId2: true
+            }
+        });
+
+        let totalBubblesPerSecond = 0;
+        let totalAttackPerMinute = 0;
+        let totalDefensePerMinute = 0;
+        let count = 0;
+
+        // Process each match to extract and aggregate stats
+        rankedMatches.forEach(match => {
+            let stats;
+            if (match.userId1 === userId) {
+                stats = JSON.parse(match.user1Stats);
+            } else if (match.userId2 === userId) {
+                stats = JSON.parse(match.user2Stats);
+            }
+
+            // Aggregate stats from all games in the match
+            stats.forEach(game => {
+                totalBubblesPerSecond += game.bubblesPerSecond;
+                totalAttackPerMinute += game.attackPerMinute;
+                totalDefensePerMinute += game.defensePerMinute;
+                count++;
+            });
+        });
+
+        // Calculate averages
+        return {
+            averageBubblesPerSecond: totalBubblesPerSecond / count,
+            averageAttackPerMinute: totalAttackPerMinute / count,
+            averageDefensePerMinute: totalDefensePerMinute / count,
+        }
+    }
+
 }
