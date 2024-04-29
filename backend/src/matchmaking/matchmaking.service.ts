@@ -206,6 +206,6 @@ export class MatchmakingService {
             return false;
         }
         const { token, isGuest } = client.handshake.query;
-        return token && token !== "null" && isGuest && isGuest === "null";
+        return token && token !== "null" && isGuest && isGuest === "null" && client.data.user.id;
     }
 }

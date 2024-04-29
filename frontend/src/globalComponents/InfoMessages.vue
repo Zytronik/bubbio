@@ -89,9 +89,9 @@ export default defineComponent({
 
     function getIconClass(type: string): string {
       switch (type) {
-        case 'error': return 'uil uil-times';
-        case 'success': return 'uil uil-check';
-        default: return 'uil uil-info';
+        case 'error': return 'fa-solid fa-xmark';
+        case 'success': return 'fa-solid fa-check';
+        default: return 'fa-solid fa-info';
       }
     }
 
@@ -103,7 +103,7 @@ export default defineComponent({
 <style scoped>
 .toast-container {
   position: fixed;
-  bottom: 7%;
+  bottom: 7vh;
   right: 15px;
   z-index: 1000;
 }
@@ -148,7 +148,8 @@ export default defineComponent({
   align-items: center;
   height: 35px;
   width: 35px;
-
+  min-height: 35px;
+  min-width: 35px;
   border-radius: 50%;
   color: #fff;
   font-size: 20px;

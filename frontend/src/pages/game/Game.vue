@@ -1,18 +1,44 @@
 <template class="page" id="game">
   <div class="game-wrapper">
     <div v-if="gameMode === 'sprint'" class="inGameStats">
-      <p v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime"></p>
-      <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}
-      </p>
-      <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond
-        }}</p>
+      <div class="bottom">
+        <p
+          v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
+        </p>
+        <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}
+        </p>
+        <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond
+          }}</p>
+      </div>
+      <div class="top">
+        <transition name="fade">
+          <p v-if="playerGameVisuals.statNumbers.currentCombo.value > 0">Combo {{
+            playerGameVisuals.statNumbers.currentCombo.value }}</p>
+        </transition>
+        <transition name="fade">
+          <p v-if="playerGameVisuals.statNumbers.spikeNumber.value">Spike {{
+            playerGameVisuals.statNumbers.spikeNumber.value }}</p>
+        </transition>
+      </div>
     </div>
     <div v-if="gameMode === 'ranked'" class="inGameStats">
-      <p v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime"></p>
-      <p>{{ playerGameVisuals.statNumbers.attackPerMinute }} APM</p>
-      <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond }}</p>
-      <p>combo {{ playerGameVisuals.statNumbers.currentCombo }}</p>
-      <p>{{ playerGameVisuals.statNumbers.spikeNumber.value }}</p>
+      <div class="bottom">
+        <p
+          v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
+        </p>
+        <p>{{ playerGameVisuals.statNumbers.attackPerMinute }} APM</p>
+        <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond }}</p>
+      </div>
+      <div class="top">
+        <transition name="fade">
+          <p v-if="playerGameVisuals.statNumbers.currentCombo.value > 0">Combo {{
+            playerGameVisuals.statNumbers.currentCombo.value }}</p>
+        </transition>
+        <transition name="fade">
+          <p v-if="playerGameVisuals.statNumbers.spikeNumber.value">Spike {{
+            playerGameVisuals.statNumbers.spikeNumber.value }}</p>
+        </transition>
+      </div>
     </div>
     <div class="gameUI-wrapper">
       <span class="monospace"
@@ -57,4 +83,14 @@ export default defineComponent({
 
 </script>
 
-<style scoped></style>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

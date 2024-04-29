@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { SprintService } from './sprint.service';
 import { SprintController } from './sprint.controller';
 import { PrismaService } from '../prisma/prisma.service';
@@ -9,6 +9,6 @@ import { NewsModule } from 'src/news/news.module';
   exports: [SprintService],
   controllers: [SprintController],
   providers: [SprintService, PrismaService],
-  imports: [UsersModule, NewsModule],
+  imports: [forwardRef(() => UsersModule), NewsModule],
 })
 export class SprintModule {}

@@ -6,9 +6,9 @@ import axios from 'axios';
 import { RanksService } from 'src/ranked/ranks.service';
 import { FileStorageService } from './file-storage.service';
 import { Ratings } from 'src/ranked/i/ranked.i.ratings';
-import { Prisma } from '@prisma/client';
 import { unrankedRatingDeviation } from 'src/ranked/ranks';
 import { RankedService } from 'src/ranked/ranked.service';
+import { SprintService } from 'src/sprint/sprint.service';
 
 @Injectable()
 export class UserService {
@@ -18,6 +18,8 @@ export class UserService {
         private ranksService: RanksService,
         private fileStorageService: FileStorageService,
         private rankedService: RankedService,
+        @Inject(forwardRef(() => SprintService))
+        private sprintService: SprintService,
     ) { }
 
     async createUser(createUserDto: CreateUserDto, clientIp: string): Promise<any> {
@@ -134,45 +136,6 @@ export class UserService {
         return user.username;
     }
 
-    async getUserSprintRank(username: string): Promise<number | null> {
-        // Step 1: Get the user's best sprint time
-        const userBestTimeRecord = await this.prisma.sprint.findFirst({
-            where: {
-                user: {
-                    username: {
-                        equals: username,
-                        mode: 'insensitive',
-                    }
-                }
-            },
-            orderBy: { gameDuration: 'asc' },
-            select: { gameDuration: true },
-        });
-
-        if (!userBestTimeRecord) {
-            return null; // User has no sprint times
-        }
-
-        // Step 2: Get the best sprint time for each user and sort them
-        const bestTimes = await this.prisma.sprint.groupBy({
-            by: ['userId'],
-            _min: {
-                gameDuration: true,
-            },
-            orderBy: {
-                _min: {
-                    gameDuration: 'asc',
-                },
-            },
-        });
-
-        // Find the rank of the user's best time among these best times
-        // We count how many times have a better (lower) sprintTime than the user's best time
-        const rank = bestTimes.findIndex(time => time._min.gameDuration >= userBestTimeRecord.gameDuration) + 1;
-
-        return rank;
-    }
-
     async getMyProfileDetails(userId: number): Promise<any> {
         const user = await this.prisma.user.findUnique({
             where: {
@@ -235,26 +198,15 @@ export class UserService {
             throw new NotFoundException(`User with username ${username} not found`);
         }
 
-        // Fetch average sprint statistics for this user
-        const sprintStats = await this.prisma.sprint.aggregate({
-            _avg: {
-                bubblesCleared: true,
-                bubblesPerSecond: true,
-                bubblesShot: true,
-                gameDuration: true,
-            },
-            where: {
-                userId: user.id,
-            },
-        });
+        const sprintStats = await this.sprintService.getAverageStats(user.id);
+        const rankedStats = await this.rankedService.getAverageStats(user.id);
+        const sprintGamesPlayed = await this.sprintService.getTotalGamesPlayedByUser(user.id);
+        const rankedGamesPlayed = await this.rankedService.getPlayedMatchesByUserID(user.id);
+        const globalSprintRank = await this.sprintService.getUserGlobalRank(user.id);
+        const nationalSprintRank = await this.sprintService.getUserNationalRank(user.id);
+        const globalRank = await this.getGlobalRank(user.id);
+        const nationalRank = await this.getNationalRank(user.id);
 
-        const sprintGamesPlayed = await this.prisma.sprint.count({
-            where: {
-                userId: user.id,
-            },
-        });
-
-        const sprintRank = await this.getUserSprintRank(username);
         let rankInfos = await this.ranksService.getRankInfo(user.id);
         if (user.ratingDeviation >= unrankedRatingDeviation) {
             rankInfos.isRanked = false;
@@ -268,13 +220,22 @@ export class UserService {
             ratingDeviation: Math.floor(user.ratingDeviation),
             isRanked: rankInfos.isRanked,
             sprintStats: {
-                averageBubblesCleared: sprintStats._avg.bubblesCleared,
-                averageBubblesPerSecond: sprintStats._avg.bubblesPerSecond,
-                averageBubblesShot: sprintStats._avg.bubblesShot,
-                averageSprintTime: sprintStats._avg.gameDuration,
+                averageBubblesCleared: Math.round(sprintStats._avg.bubblesCleared * 100) /100,
+                averageBubblesPerSecond: Math.round(sprintStats._avg.bubblesPerSecond * 100) /100,
+                averageBubblesShot: Math.round(sprintStats._avg.bubblesShot * 100) /100,
+                averageSprintTime: Math.round(sprintStats._avg.gameDuration * 100) /100,
                 sprintGamesPlayed: sprintGamesPlayed,
-                rank: sprintRank,
+                globalRank: globalSprintRank,
+                nationalRank: nationalSprintRank,
             },
+            rankedStats: {
+                averageBubblesPerSecond: Math.round(rankedStats.averageBubblesPerSecond * 100) /100,
+                averageAttackPerMinute: Math.round(rankedStats.averageAttackPerMinute * 100) /100,
+                averageDefensePerMinute: Math.round(rankedStats.averageDefensePerMinute * 100) /100,
+                rankedGamesPlayed: rankedGamesPlayed.length,
+                globalRank: globalRank,
+                nationalRank: nationalRank,
+            }
         };
     }
 

@@ -6,7 +6,8 @@
             <div v-if="isDashboard" class="gameModeDashboard page-dashboard">
                 <div class="left-content">
                     <div class="play-wrapper">
-                        <button class="playButton" @click="play()">Play!</button>
+                        <button v-if="gameMode != 'score'" class="playButton" @click="play()">Play!</button>
+                        <p v-else><br>Highscore Mode is not available yet.</p>
                     </div>
                     <History v-if="!isGuest" :gameMode="gameMode"
                         :fields="['gameDuration', 'bubblesShot', 'bubblesPerSecond', 'bubblesCleared', 'submittedAt']"
@@ -129,7 +130,7 @@
 
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
-import { PropType, defineComponent, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { PropType, defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import Game from '@/pages/game/Game.vue';
 import Leaderboard from '@/globalComponents/Leaderboard.vue';
 import History from '@/globalComponents/History.vue';
@@ -149,6 +150,7 @@ import eventBus from '@/ts/page/page.event-bus';
 import { UserData } from '@/ts/page/i/page.i.user-data';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { ButtonData } from './i/i-buttonData';
+import { transitionEndScreenPageToDashboard, transitionOutOfGame, transitionToGame } from '@/ts/page/page.css-transitions';
 
 export default defineComponent({
     name: 'GameModeLayout',
@@ -197,101 +199,53 @@ export default defineComponent({
 
         function goBack() {
             if (isGaming.value) {
-                transitionOutOfGame(() => {
+                transitionOutOfGame(true, ()=>{
+                    disableResetInput();
+                    disableBackInputs();
+                },()=>{
                     leaveGame();
                     showDashboard();
                     backInput.fire = backInputOnLoad.value;
-                }, true, () => {
+                }, () => {
+                    enableBackInputs();
                     disableResetInput();
+                    resetInput.fire = play;
                 });
             }
             if (isResultView.value) {
-                transitionResultViewToDashboard();
+                transitionEndScreenPageToDashboard('.gameModeDashboard', '.gameComplete', () => {
+                    disableResetInput();
+                    showDashboard();
+                    isResultView.value = true;
+                }, ()=>{
+                    leaveGame();
+                    isResultView.value = false;
+                });
                 backInput.fire = backInputOnLoad.value;
             }
         }
 
-        async function transitionResultViewToDashboard() {
-            disableResetInput();
-            showDashboard();
-            isResultView.value = true;
-            await nextTick(); // if i dont do this, dashboard is undefined
-            const dashboard = document.querySelector('.gameModeDashboard') as HTMLElement;
-            const resultScreen = document.querySelector('.gameComplete') as HTMLElement;
-            const container = document.querySelector('.page-container') as HTMLElement;
-            container.classList.add('flex-row'); //add flex-row to container
-            dashboard.classList.add('moveResultScreen-left'); //position dashboard to the left
-            resultScreen.classList.add('slideToRight'); //slide result screen to the left
-            dashboard.classList.add('slideLeftToCenter'); //slide dashboard to the left
-            setTimeout(() => {
-                leaveGame();
-                resultScreen.classList.remove('slideToRight'); //reset styles
-                isResultView.value = false; //remove result screen
-                dashboard.classList.remove('moveResultScreen-left'); //reset styles
-                dashboard.classList.remove('slideLeftToCenter'); //reset styles
-                container.classList.remove('flex-row') //remove flex-row from container
-            }, 500);
-        }
-
         function transitionToResultView() {
-            transitionOutOfGame(() => {
+            transitionOutOfGame(false, ()=>{
+                disableResetInput();
+                disableBackInputs();
+            },()=>{
                 showResultView();
-            }, false, () => {/*do nothing*/ });
+            },()=>{
+                enableBackInputs();
+                enableResetInput();
+                resetInput.fire = play;
+            });
         }
 
         function play() {
             backInput.fire = goBack;
             transitionToGame(() => {
                 startGame();
-            });
-        }
-
-        function transitionToGame(onTransitionEnd: () => void): void {
-            disableBackInputs();
-            disableResetInput();
-            document.body.classList.add('slide-out-left-to-game');
-            const overlay = document.createElement('div');
-            overlay.className = 'black-overlay-right';
-            document.body.appendChild(overlay);
-            setTimeout(() => {
-                enableBackInputs();
-                overlay.classList.add('black-overlay-cover');
-                overlay.classList.remove('black-overlay-right');
-                document.body.classList.remove('slide-out-left-to-game');
-                document.body.classList.add('game-view');
+            },()=>{
                 setupSprintGame();
                 showGameView();
-                setTimeout(() => {
-                    document.body.removeChild(overlay);
-                    onTransitionEnd();
-                }, 1000);
-            }, 500);
-        }
-
-        function transitionOutOfGame(onTransitionHidden: () => void, isQuit: boolean, onTransitionEnd: () => void): void {
-            disableResetInput();
-            disableBackInputs();
-            const isQuitDelay = isQuit ? 0 : 1500;
-            setTimeout(() => {
-                document.body.classList.add('slide-out-right-off-game');
-                const overlay = document.createElement('div');
-                overlay.className = 'black-overlay-left';
-                document.body.appendChild(overlay);
-                setTimeout(() => {
-                    overlay.classList.add('black-overlay-cover');
-                    onTransitionHidden();
-                    overlay.classList.remove('black-overlay-left');
-                    document.body.classList.remove('slide-out-right-off-game');
-                    document.body.classList.remove('game-view');
-                    setTimeout(() => {
-                        enableBackInputs();
-                        enableResetInput();
-                        resetInput.fire = play;
-                        document.body.removeChild(overlay);
-                        onTransitionEnd();
-                    }, 1000);
-                }, 500);
-            }, isQuitDelay);
+            });
         }
 
         async function showDashboard() {

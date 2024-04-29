@@ -7,7 +7,7 @@
     <span v-if="allSpectationEntries.length === 0">No players to spectate.</span>
   </div>
   <div class="spectating" v-if="isSpectating">
-    <button @click="showSpectationEntries();">Switch back to old view</button>
+    <button @click="showSpectationEntries();">Spectate Others</button>
     <div class="game" v-for="[playerName, visuals] in playerNameVisualsMap" :key="playerName">
       <Game :playerGameVisuals="visuals" :areRef="false" :gameMode="GameMode.Sprint" />
     </div>

@@ -22,18 +22,18 @@ export class ScoreService {
 
         // Check if the new score scores is in the top 5
         const amountOfTopScores = 5;
-        const topTimes = await this.getScoreRank(amountOfTopScores);
-        const rank = topTimes.findIndex(time => time.userId === newScore.userId && time.scoreValue === newScore.scoreValue) + 1;
+        const topScores = await this.getBestScores(amountOfTopScores);
+        const rank = topScores.findIndex(run => run.id === newScore.id) + 1;
 
         if (rank > 0 && rank <= amountOfTopScores && user) {
-            await this.newsService.createNews('Score', userId, rank, scoreValue);
+            await this.newsService.createNews('Highscore', userId, rank, scoreValue);
             this.newsService.updateNews();
         }
 
         return newScore;
     }
 
-    async getScoreRank(take: number): Promise<any> {
+    async getBestScores(take: number): Promise<any> {
         const leaderboardRecords = await this.prisma.score.findMany({
             orderBy: {
                 gameDuration: 'asc', //TODO
