@@ -2,7 +2,7 @@ import { playerGameInstance, playerGameVisuals } from "../game.master";
 import { GameInstance } from "../i/game.i.game-instance";
 import { calculateTimeStats } from "../logic/game.logic.stat-tracker";
 import { enemyGameInstance, enemyVisuals } from "../network/game.network.ranked";
-import { StatNumberRefs } from "./i/game.visuals.i.stat-numberscopy";
+import { StatNumberRefs } from "./i/game.visuals.i.stat-numbers";
 
 let trackingFrameId: number | null = null;
 let statTrackingRunning = false;
@@ -46,8 +46,8 @@ export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNum
     statStrings.bubblesCleared.value = gameStats.bubblesCleared;
     statStrings.bubblesLeftToClear.value = gameStats.bubblesLeftToClear;
     statStrings.bubblesShot.value = gameStats.bubblesShot;
-    statStrings.bubblesPerSecond.value = gameStats.bubblesPerSecond;
-    statStrings.attackPerMinute.value = (gameStats.attackPerMinute != null) ? gameStats.attackPerMinute : 0;
+    statStrings.bubblesPerSecond.value = typeof gameStats.bubblesPerSecond === 'number' ? gameStats.bubblesPerSecond : 0;
+    statStrings.attackPerMinute.value = typeof gameStats.attackPerMinute === 'number' ? gameStats.attackPerMinute : 0;
     statStrings.currentCombo.value = gameStats.currentCombo;
     if (gameStats.spikeAnimationStart + SPIKE_COUNTER_TIMEFRAME > performance.now()) {
         statStrings.spikeNumber.value = "" + gameStats.spikeNumber;

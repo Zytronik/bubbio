@@ -5,6 +5,7 @@
       <div class="page-container" id="pixicanvas">
       </div>
     </div>
+    <button @click="openCanvasAsImageInNewTab">open canvas in new tab</button>
   </section>
 </template>
 
@@ -13,7 +14,7 @@ import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo } from '@/ts/page/page.page-manager';
 import { defineComponent, onMounted, ref } from 'vue';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
-import { appendPixiCanvas, setupPixiAssets } from '@/ts/game/visuals/game.visuals.pixi';
+import { appendPixiCanvas, setupPixiAssets, openCanvasAsImageInNewTab } from '@/ts/game/visuals/game.visuals.pixi';
 
 export default defineComponent({
   name: 'PixiCanvas',
@@ -33,6 +34,7 @@ export default defineComponent({
 
     return {
       backButtonData,
+      openCanvasAsImageInNewTab,
     }
   }
 });

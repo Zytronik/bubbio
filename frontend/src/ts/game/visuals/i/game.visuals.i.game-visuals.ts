@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { AsciiBoardRefs } from "./game.visuals.i.ascii-board";
-import { StatNumberRefs } from "./game.visuals.i.stat-numberscopy";
+import { StatNumberRefs } from "./game.visuals.i.stat-numbers";
 
 export interface GameVisuals {
     asciiBoard: AsciiBoardRefs,
