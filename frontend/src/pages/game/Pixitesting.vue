@@ -1,9 +1,11 @@
 <template>
   <section id="pixitesting" class="page">
     <div class="page-wrapper">
-      <div class="page-container" id="pixicanvas">
-        <button @click="goToState(PAGE_STATE.soloMenu)">go Back</button>
-        <button @click="openCanvasAsImageInNewTab">open canvas in new tab</button>
+      <div class="page-container">
+        <div id="pixicanvas">
+          <button @click="goToState(PAGE_STATE.soloMenu)">go Back</button>
+          <button @click="openCanvasAsImageInNewTab">open canvas in new tab</button>
+        </div>
       </div>
     </div>
   </section>
@@ -41,7 +43,9 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.back-buttons::before {
-  background: linear-gradient(45deg, rgba(96, 221, 43, 1) 0%, rgba(198, 63, 135, 1) 100%);
+#pixicanvas {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
 }
 </style>
