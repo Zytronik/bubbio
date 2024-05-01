@@ -24,6 +24,14 @@ export async function transitionEndScreenPageToDashboard(dashboardSelector: stri
     }, 500);
 }
 
+export function addGameViewStyles() {
+    document.body.classList.add('game-view');
+
+}
+export function removeGameViewStyles() {
+    document.body.classList.remove('game-view');
+}
+
 export function transitionToGame(onEnd: () => void, onHidden?: () => void): void {
     disableBackInputs();
     disableResetInput();
@@ -36,7 +44,7 @@ export function transitionToGame(onEnd: () => void, onHidden?: () => void): void
         overlay.classList.add('black-overlay-cover');
         overlay.classList.remove('black-overlay-right');
         document.body.classList.remove('slide-out-left-to-game');
-        document.body.classList.add('game-view');
+        addGameViewStyles();
         if (onHidden) {
             onHidden();
         }
@@ -64,7 +72,7 @@ export function transitionOutOfGame(isQuit: boolean, onStart?: ()=>void, onHidde
             }
             overlay.classList.remove('black-overlay-left');
             document.body.classList.remove('slide-out-right-off-game');
-            document.body.classList.remove('game-view');
+            removeGameViewStyles();
             setTimeout(() => {
                 if(onEnd){
                     onEnd();

@@ -39,6 +39,17 @@ body.game-view .back-buttons {
     display: none;
 }
 
+body.game-view section.page,
+body.game-view .page-wrapper,
+body.game-view .page-container {
+    height: 100vh;
+    max-width: unset;
+    width: 100vw;
+    padding: unset;
+    margin: unset;
+    min-width: 100vw;
+}
+
 .text-center {
     text-align: center;
 }

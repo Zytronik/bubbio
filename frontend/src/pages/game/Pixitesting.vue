@@ -1,40 +1,40 @@
 <template>
-  <section id="pixicanvas" class="page">
-    <MenuBackButtons :buttonData="backButtonData" />
+  <section id="pixitesting" class="page">
     <div class="page-wrapper">
       <div class="page-container" id="pixicanvas">
+        <button @click="goToState(PAGE_STATE.soloMenu)">go Back</button>
+        <button @click="openCanvasAsImageInNewTab">open canvas in new tab</button>
       </div>
     </div>
-    <button @click="openCanvasAsImageInNewTab">open canvas in new tab</button>
   </section>
 </template>
 
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
-import { changeBackgroundTo } from '@/ts/page/page.page-manager';
-import { defineComponent, onMounted, ref } from 'vue';
-import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
+import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
+import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import { appendPixiCanvas, setupPixiAssets, openCanvasAsImageInNewTab } from '@/ts/game/visuals/game.visuals.pixi';
+import { addGameViewStyles, removeGameViewStyles } from '@/ts/page/page.css-transitions';
 
 export default defineComponent({
   name: 'PixiCanvas',
-  components: { MenuBackButtons },
   setup() {
-    const backButtonData = ref([
-      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/score.png'), disabled: false },
-    ]);
-
     onMounted(() => {
       changeBackgroundTo("black");
+      addGameViewStyles();
       setupPixiAssets().then(() => {
         appendPixiCanvas();
       });
     });
 
+    onUnmounted(() => {
+      removeGameViewStyles();
+    });
 
     return {
-      backButtonData,
       openCanvasAsImageInNewTab,
+      goToState,
+      PAGE_STATE,
     }
   }
 });

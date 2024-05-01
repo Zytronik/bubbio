@@ -15,6 +15,7 @@ export async function setupPixiAssets(): Promise<void> {
 export function appendPixiCanvas(): void {
     document.body.appendChild(pixiApp.canvas);
     const pixiCanvas = document.querySelector("#pixicanvas");
+    console.log(pixiCanvas);
     if (pixiCanvas) {
         pixiCanvas.appendChild(pixiApp.canvas);
         const bubble = createBubbleSprite();
