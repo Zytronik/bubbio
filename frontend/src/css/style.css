@@ -48,6 +48,7 @@ body.game-view .page-container {
     padding: unset;
     margin: unset;
     min-width: 100vw;
+    display: block;
 }
 
 .text-center {
