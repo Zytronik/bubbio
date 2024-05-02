@@ -5,7 +5,8 @@ let pixiApp: Application<Renderer>;
 export async function setupPixiAssets(): Promise<void> {
     pixiApp = new Application();
     await pixiApp.init({
-        resizeTo: window,
+        width: 800, 
+        height: 600,
         antialias: true,
         preserveDrawingBuffer: true,
         // backgroundAlpha: 0,
@@ -18,28 +19,25 @@ export function appendPixiCanvas(): void {
     document.body.appendChild(pixiApp.canvas);
     const pixiCanvas = document.querySelector("#pixicanvas");
     if (pixiCanvas) {
-        pixiApp.canvas.width = 500;
-        pixiApp.canvas.height = 500;
-        // drawBubbleGraphic(pixiCanvas);
-        // drawBubbleSprite();
+        pixiCanvas.appendChild(pixiApp.canvas);
+        drawBubbleGraphic();
+        drawBubbleSprite();
     }
 
     function drawBubbleSprite(): void {
-        const bubbleSprite = Sprite.from(WHITE_BUBBLE);
-        bubbleSprite.anchor.set(0.5);
-        bubbleSprite.x = bubbleSprite.width / 2;
-        bubbleSprite.y = bubbleSprite.height / 2;
-        pixiApp.stage.addChild(bubbleSprite);
+        const bubble = Sprite.from(WHITE_BUBBLE);
+        bubble.width = 40;
+        bubble.height = 40;
+        pixiApp.stage.addChild(bubble);
     }
 
-    function drawBubbleGraphic(canvas: Element): void {
-        canvas.appendChild(pixiApp.canvas);
+    function drawBubbleGraphic(): void {
         const bubble = createBubbleSprite();
-        bubble.x = bubble.width / 2;
+        bubble.x = bubble.width * 3 / 2;
         bubble.y = bubble.height / 2;
-        pixiApp.canvas.width = bubble.width;
-        pixiApp.canvas.height = bubble.height;
-        pixiApp.renderer.resize(bubble.width, bubble.height);
+        // pixiApp.canvas.width = bubble.width;
+        // pixiApp.canvas.height = bubble.height;
+        // pixiApp.renderer.resize(bubble.width, bubble.height);
         pixiApp.stage.addChild(bubble);
     }
 }

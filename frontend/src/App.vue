@@ -293,7 +293,7 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  background-color: rgb(30, 30, 30);
+  background-color: black;
   z-index: 1;
   position: relative;
 }
@@ -301,7 +301,7 @@ export default {
 .profile-wrapper {
   height: 100%;
   width: 20vw;
-  background-color: rgb(30, 30, 30);
+  background-color: black;
   display: flex;
   flex-direction: row;
   cursor: pointer;
@@ -316,7 +316,7 @@ export default {
   height: 1px;
   border-style: solid;
   border-width: 5vh 10vh 5vh 0;
-  border-color: transparent rgb(30, 30, 30) transparent transparent;
+  border-color: transparent black transparent transparent;
   display: inline-block;
   vertical-align: middle;
   right: 100%;
@@ -383,7 +383,7 @@ export default {
 }
 
 .openChannelButton:hover {
-  background-color: rgb(55, 55, 55);
+  background-color: rgb(5, 5, 5);
 }
 
 .bottomBar {
@@ -396,7 +396,7 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  background-color: rgb(30, 30, 30);
+  background-color: black;
 }
 
 /* Existing slide-left transitions */
