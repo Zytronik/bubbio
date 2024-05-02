@@ -203,35 +203,64 @@ button.goBackButton:focus {
 }
 
 .menu-btn {
-    text-align: left;
-    width: 120%;
-    height: 15%;
+    /* text-align: left;
     border: none;
     outline: 0;
-    cursor: pointer;
     font-size: 300%;
     padding: 30px 25% 30px 12%;
-    margin: unset;
+    margin: unset; */
+    cursor: pointer;
+    width: 120%;
+    height: 15%;
+    border: 6px solid black;
+    color: white;
+    transform: translateX(0%) skew(10deg);
+    transition: 300ms;
+    position: relative;
+}
+
+.menu-btn::before{
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 100%;
+    height: 100%;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid red;
+}
+
+.menu-btn:nth-of-type(2){
+    margin-left: 5%;
+}
+
+.menu-btn:nth-of-type(3){
+    margin-left: 10%;
+}
+
+.menu-btn:nth-of-type(4){
+    margin-left: 15%;
+}
+
+.menu-btn:nth-of-type(5){
+    margin-left: 20%;
+}
+
+.menu-btn > div {
+    transform: skew(-10deg);
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    background-color: rgb(30, 30, 30);
-    color: white;
-    transform: translateX(0%);
-    transition: 300ms;
-}
-
-.menu-wrapper:not(.back-buttons) .menu-btn:hover {
-    transform: translateX(-10%);
 }
 
 .menu-btn img {
     width: 10vh;
     height: 10vh;
     object-fit: cover;
-    position: absolute;
-    left: 15px;
+    /* position: absolute;
+    left: 15px; */
 }
 
 .menu-btn p.desc {
