@@ -3,9 +3,9 @@
     <div class="page-wrapper">
       <div class="page-container">
         <div id="pixicanvas">
-          <button @click="goToState(PAGE_STATE.soloMenu)">go Back</button>
-          <button @click="openCanvasAsImageInNewTab">open canvas in new tab</button>
         </div>
+        <button @click="goToState(PAGE_STATE.soloMenu)">go Back</button>
+        <button @click="openCanvasAsImageInNewTab">open canvas in new tab</button>
       </div>
     </div>
   </section>
@@ -44,8 +44,9 @@ export default defineComponent({
 
 <style scoped>
 #pixicanvas {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
+  display: inline;
+  width: 100%;
+  height: 100%;
+  background: gray;
 }
 </style>
