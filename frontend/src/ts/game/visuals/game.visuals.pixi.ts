@@ -9,8 +9,8 @@ export async function setupPixiAssets(): Promise<void> {
         height: 600,
         antialias: true,
         preserveDrawingBuffer: true,
-        // backgroundAlpha: 0,
-        backgroundColor: 0x666666,
+        backgroundAlpha: 0,
+        // backgroundColor: 0x666666,
     });
     await Assets.load(allAssets)
 }
@@ -20,25 +20,27 @@ export function appendPixiCanvas(): void {
     const pixiCanvas = document.querySelector("#pixicanvas");
     if (pixiCanvas) {
         pixiCanvas.appendChild(pixiApp.canvas);
-        drawBubbleGraphic();
-        drawBubbleSprite();
+        // drawBubbleGraphic();
+        // drawBubbleSprite();
+    }
+
+    function drawColorAtPosition(x: number, y: number, color: number): void {
+
     }
 
     function drawBubbleSprite(): void {
-        const bubble = Sprite.from(WHITE_BUBBLE);
-        bubble.width = 40;
-        bubble.height = 40;
+        const bubble = Sprite.from(BUBBLES);
+        bubble.width = 30;
+        bubble.height = 30;
         pixiApp.stage.addChild(bubble);
     }
 
     function drawBubbleGraphic(): void {
-        const bubble = createBubbleSprite();
-        bubble.x = bubble.width * 3 / 2;
-        bubble.y = bubble.height / 2;
-        // pixiApp.canvas.width = bubble.width;
-        // pixiApp.canvas.height = bubble.height;
-        // pixiApp.renderer.resize(bubble.width, bubble.height);
-        pixiApp.stage.addChild(bubble);
+        const bubbles = createBubbleSprite();
+        pixiApp.canvas.width = bubbles.width;
+        pixiApp.canvas.height = bubbles.height;
+        pixiApp.renderer.resize(bubbles.width, bubbles.height);
+        pixiApp.stage.addChild(bubbles);
     }
 }
 
@@ -54,7 +56,7 @@ ticker for animations in pixi
 i would like to have a generic animation interface
 each frame would check the status of my game, update visuals and trigger animations
 */
-const WHITE_BUBBLE = "whiteBubble";
+const BUBBLES = "allBubbles";
 const allAssets = [
-    { alias: WHITE_BUBBLE, src: require('@/img/sprite/white.png') },
+    { alias: BUBBLES, src: require('@/img/sprite/bubble_sprite_sheet.png') },
 ];
