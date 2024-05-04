@@ -61,6 +61,16 @@ body.game-view .page-container {
     src: url(../fonts/cslgreek.ttf);
 }
 
+@font-face {
+    font-family: DefectVPDemo;
+    src: url(../fonts/DefectVPDemo.otf);
+}
+
+@font-face {
+    font-family: TheDeadAreComing;
+    src: url(../fonts/thedeadarecoming.regular.ttf);
+}
+
 .rank-letter {
     font-family: rankFont;
 }
@@ -207,7 +217,7 @@ button.goBackButton:focus {
     font-size: 7.5em;
     position: fixed;
     z-index: 1;
-    top: 0vh;
+    top: 2vh;
     left: 2vw;
     text-transform: uppercase;
 }
@@ -218,9 +228,14 @@ button.goBackButton:focus {
     align-items: start;
 }
 
+.text-noWhiteSpaces {
+    display: ruby;
+    height: .75em;
+    line-height: .75em;
+}
+
 .menu-wrapper .menu-title span:first-of-type {
-    font-size: 1.7em;
-    margin-top: -3%;
+    font-size: 3em;
 }
 
 :root {
@@ -228,6 +243,11 @@ button.goBackButton:focus {
     --multiplayer-color: rgb(218, 0, 99);
     --singleplayer-color: rgb(12, 167, 137);
     --config-color: rgb(250, 199, 16);
+    --sprint-color: rgb(29, 179, 157);
+    --highscore-color: rgb(17, 178, 135);
+    --pixi-color: rgb(31, 176, 130);
+    --ranked-color: rgb(160, 0, 24);
+    --roomListing-color: rgb(129, 33, 81);
 }
 
 .menu-btn {
@@ -237,9 +257,34 @@ button.goBackButton:focus {
     border: var(--menu-btn-border-width) solid black;
     color: white;
     transform: translateX(0%) skew(10deg);
-    transition: 300ms;
+    transition: 500ms;
     position: relative;
+    z-index: 1;
     padding: 0 0 0 3%;
+}
+
+.menu-btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #161616;
+    background-image: url("../img/stripes.png");
+    z-index: -1;
+    animation: slide 4s linear infinite;
+}
+
+.menu-btn:hover::after {
+    animation: slide 2s linear infinite;
+    background-color: #2a2a2a;
+}
+
+@keyframes slide {
+    100% {
+        background-position: 226px 0; /* 226px is the width of the image */
+    }
 }
 
 .menu-btn .text {
@@ -254,12 +299,13 @@ button.goBackButton:focus {
 }
 
 .menu-btn .text > span {
-    font-size: 7em;
+    font-size: 9em;
 }
 
 .menu-btn .text > p span:first-of-type {
-    font-size: 3em;
-    padding-top: 5%;
+    font-size: 4.1em;
+    padding-top: 2%;
+    padding-bottom: 1%;
     letter-spacing: 0.1em;
     display: block;
 }
@@ -271,7 +317,9 @@ button.goBackButton:focus {
     padding: 1% 3%;
     white-space: nowrap;
     display: block;
-    width: 100%;
+    width: calc(100% + 3%);
+    box-sizing: border-box;
+    margin-left: -3%;
 }
 
 .menu-btn::before{
@@ -297,25 +345,52 @@ button.goBackButton:focus {
     border-left: var(--menu-btn-border-width) solid var(--singleplayer-color);
 }
 
-.menu-btn.config::before {
+.menu-btn.configuration::before {
     border-bottom: var(--menu-btn-border-width) solid var(--config-color);
     border-left: var(--menu-btn-border-width) solid var(--config-color);
+
 }
 
-.menu-btn:nth-of-type(2){
-    margin-left: 5%;
+.menu-btn.sprint::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--sprint-color);
+    border-left: var(--menu-btn-border-width) solid var(--sprint-color);
 }
 
-.menu-btn:nth-of-type(3){
+.menu-btn.highscore::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--highscore-color);
+    border-left: var(--menu-btn-border-width) solid var(--highscore-color);
+}
+
+.menu-btn.pixitesting::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--pixi-color);
+    border-left: var(--menu-btn-border-width) solid var(--pixi-color);
+}
+
+.menu-btn.play-ranked::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--ranked-color);
+    border-left: var(--menu-btn-border-width) solid var(--ranked-color);
+}
+
+.menu-btn.room-listing::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--roomListing-color);
+    border-left: var(--menu-btn-border-width) solid var(--roomListing-color);
+}
+
+.menu-btn.short-btn{
     margin-left: 10%;
 }
 
-.menu-btn:nth-of-type(4){
-    margin-left: 15%;
+.menu-btn:hover {
+    transform: scale(1.1) skew(10deg);
 }
 
-.menu-btn:nth-of-type(5){
-    margin-left: 20%;
+.back-buttons .menu-btn{
+    display: flex;
+    align-items: center;
+}
+
+.back-buttons .menu-btn::before{
+    display: none;
 }
 
 .menu-btn > div {
@@ -329,8 +404,8 @@ button.goBackButton:focus {
 }
 
 .menu-btn img {
-    width: 11vh;
-    height: 11vh;
+    max-width: 20vh;
+    height: 20vh;
     object-fit: cover;
     padding-left: 3%;
 }
@@ -348,6 +423,8 @@ button.goBackButton:focus {
     z-index: 1;
     position: relative;
     cursor: pointer;
+    position: absolute;
+    left: 0;
 }
 
 .back-buttons::before {

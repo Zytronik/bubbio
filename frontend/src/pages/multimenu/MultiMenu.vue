@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <section id="multiMenu" class="page menu">
     <MenuBackButtons :buttonData="backButtonData" />
     <div class="page-wrapper">
@@ -17,16 +17,23 @@
     </div>
   </section>
 </template>
+ -->
+
+<template>
+  <MenuLayout :backButtonData="backButtonData" :title="'Multiplayer'" :menuName="'multiMenu'"
+    :menuButtonsData="menuButtonsData" />
+</template>
 
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
-import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
-import { onMounted, ref } from 'vue';
-import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
+import { goToState } from '@/ts/page/page.page-manager';
+import { ref } from 'vue';
+import MenuLayout from '@/globalComponents/MenuLayout.vue';
+import { MenuButtonData } from '@/globalComponents/i/i-menuButtonData';
 
 export default {
   name: 'MultiMenu',
-  components: { MenuBackButtons },
+  components: { MenuLayout },
   setup() {
     const backButtonData = ref([
       { pageState: PAGE_STATE.mainMenu, iconSrc: require('@/img/icons/multi.png'), disabled: false },
@@ -34,22 +41,32 @@ export default {
       { pageState: PAGE_STATE.settingsPage, iconSrc: require('@/img/icons/config.png'), disabled: true },
     ]);
 
-    onMounted(() => {
-      changeBackgroundTo('linear-gradient(45deg, rgba(43,221,185,1) 0%, rgba(198,63,119,1) 100%)');
-    });
+    const menuButtonsData = ref<MenuButtonData[]>([
+      {
+        title: "Play Ranked",
+        desc: "Play ranked 1vs1",
+        iconSrc: require(`@/img/icons/ranked.png`),
+        pageState: PAGE_STATE.rankedPage,
+        bigButton: true,
+      },
+      {
+        title: "Room Listing",
+        desc: "Create or Join Rooms",
+        iconSrc: require(`@/img/icons/rooms.png`),
+        pageState: PAGE_STATE.roomListing,
+        bigButton: false,
+      },
+    ]);
 
     return {
       goToState,
       PAGE_STATE,
       backButtonData,
-      changeBackgroundTo,
+      menuButtonsData,
     }
   }
 };
 </script>
 
 <style scoped>
-.back-buttons::before {
-  background: linear-gradient(45deg, rgba(181, 43, 221, 1) 0%, rgba(198, 63, 63, 1) 100%);
-}
 </style>

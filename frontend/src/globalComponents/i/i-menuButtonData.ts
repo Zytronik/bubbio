@@ -1,7 +1,9 @@
 import { PAGE_STATE } from "@/ts/page/e/page.e-page-state";
 
-export interface BackButtonData {
+export interface MenuButtonData {
   iconSrc: string;
+  title: string;
+  desc: string;
   pageState: PAGE_STATE;
-  disabled: boolean;
+  bigButton: boolean;
 }

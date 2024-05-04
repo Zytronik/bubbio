@@ -149,7 +149,7 @@ import { backInput, resetInput } from '@/ts/input/input.all-inputs';
 import eventBus from '@/ts/page/page.event-bus';
 import { UserData } from '@/ts/page/i/page.i.user-data';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
-import { ButtonData } from './i/i-buttonData';
+import { BackButtonData } from './i/i-buttonData';
 import { transitionEndScreenPageToDashboard, transitionOutOfGame, transitionToGame } from '@/ts/page/page.css-transitions';
 
 export default defineComponent({
@@ -157,7 +157,7 @@ export default defineComponent({
     components: { Game, Leaderboard, History, LineChart, MenuBackButtons },
     props: {
         backButtonData: {
-            type: Array as PropType<ButtonData[]>,
+            type: Array as PropType<BackButtonData[]>,
             required: true,
         },
         gameMode: {

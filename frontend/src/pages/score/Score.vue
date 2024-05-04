@@ -9,14 +9,14 @@ import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo } from '@/ts/page/page.page-manager';
 import GameModeLayout from '@/globalComponents/gameModeLayout.vue';
 import { onMounted, ref } from 'vue';
-import { ButtonData } from '@/globalComponents/i/i-buttonData';
+import { BackButtonData } from '@/globalComponents/i/i-buttonData';
 import { GameMode } from '@/ts/page/e/page.e-leaderboard';
 
 export default {
   name: 'HighScorePage',
   components: { GameModeLayout },
   setup() {
-    const backButtonData = ref<ButtonData[]>([
+    const backButtonData = ref<BackButtonData[]>([
       { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/score.png'), disabled: false },
       { pageState: PAGE_STATE.sprintPage, iconSrc: require('@/img/icons/sprint.png'), disabled: true },
     ]);

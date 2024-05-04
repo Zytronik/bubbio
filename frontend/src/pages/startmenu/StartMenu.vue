@@ -1,69 +1,47 @@
 <template>
-  <section id="startmenu" class="menu page">
-    <div class="page-wrapper">
-      <div class="menu-wrapper">
-        <div class="menu-title">
-          <h1><span>B</span><span>lubb.io</span></h1>
-        </div>
-        <div class="menu-btn multiplayer" @click="goToState(PAGE_STATE.multiMenu)">
-          <div>
-            <div class="text">
-              <span>M</span>
-              <p>
-                <span>ultiplayer</span>
-                <span class="desc">Play with friends and foes</span>
-              </p>
-            </div>
-            <img src="@/img/icons/multi.png" />
-          </div>
-        </div>
-        <div class="menu-btn singleplayer" @click="goToState(PAGE_STATE.soloMenu)">
-          <div>
-            <div class="text">
-              <span>S</span>
-              <p>
-                <span>ingleplayer</span>
-                <span class="desc">Train yourself in different Modes</span>
-              </p>
-            </div>
-            <img src="@/img/icons/solo.png" />
-          </div>
-        </div>
-        <div class="menu-btn config" @click="goToState(PAGE_STATE.settingsPage)">
-          <div>
-            <div class="text">
-              <span>C</span>
-              <p>
-                <span>onfig</span>
-                <span class="desc">Tweak & Customize your Game</span>
-              </p>
-            </div>
-            <img src="@/img/icons/config.png" />
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <MenuLayout :backButtonData="[]" :title="'blubb.io'" :menuName="'startmenu'" :menuButtonsData="menuButtonsData" />
 </template>
 
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
-import { onMounted } from 'vue';
+import MenuLayout from '@/globalComponents/MenuLayout.vue';
+import { MenuButtonData } from '@/globalComponents/i/i-menuButtonData';
+import { ref } from 'vue';
 
 export default {
   name: 'StartMenu',
-
+  components: { MenuLayout },
   setup() {
-    onMounted(() => {
-      //changeBackgroundTo("linear-gradient(45deg, rgba(181,43,221,1) 0%, rgba(198,63,63,1) 100%)");
-      changeBackgroundTo("rgb(128, 128, 128)");
-    });
+    const menuButtonsData = ref<MenuButtonData[]>([
+      {
+        title: "Multiplayer",
+        desc: "Play with friends and foes",
+        iconSrc: require(`@/img/icons/multi.png`),
+        pageState: PAGE_STATE.multiMenu,
+        bigButton: true,
+      },
+      {
+        title: "Singleplayer",
+        desc: "Train yourself in different Modes",
+        iconSrc: require(`@/img/icons/solo.png`),
+        pageState: PAGE_STATE.soloMenu,
+        bigButton: false,
+      },
+      {
+        title: "Configuration",
+        desc: "Tweak & Customize your Game",
+        iconSrc: require(`@/img/icons/config.png`),
+        pageState: PAGE_STATE.settingsPage,
+        bigButton: false,
+      }
+    ]);
 
     return {
       goToState,
       PAGE_STATE,
       changeBackgroundTo,
+      menuButtonsData,
     }
   }
 };

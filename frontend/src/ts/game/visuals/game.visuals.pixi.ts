@@ -25,7 +25,7 @@ export function appendPixiCanvas(): void {
     }
 
     function drawColorAtPosition(x: number, y: number, color: number): void {
-
+        //todo
     }
 
     function drawBubbleSprite(): void {

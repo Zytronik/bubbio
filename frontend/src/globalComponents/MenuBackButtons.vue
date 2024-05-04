@@ -11,16 +11,16 @@
 import { defineComponent, onMounted, PropType } from 'vue';
 import { goToState } from '@/ts/page/page.page-manager';
 import { backInput } from '@/ts/input/input.all-inputs';
-import { ButtonData } from './i/i-buttonData';
+import { BackButtonData } from './i/i-buttonData';
 
 export default defineComponent({
   name: 'MenuBackButtons',
   props: {
-    buttonData: Array as PropType<ButtonData[]>,
+    buttonData: Array as PropType<BackButtonData[]>,
     specialBehavior: Boolean,
   },
   setup(props, {emit}) {
-    function handleButtonClick(btn: ButtonData) {
+    function handleButtonClick(btn: BackButtonData) {
       if (btn.disabled) {
         goToState(btn.pageState);
       } else {
@@ -45,7 +45,7 @@ export default defineComponent({
         emit('special-click-event');
         return;
       }
-      const activeButton = (props.buttonData as ButtonData[]).find(btn => !btn.disabled);
+      const activeButton = (props.buttonData as BackButtonData[]).find(btn => !btn.disabled);
       if (activeButton) {
         goToState(activeButton.pageState, false);
         let backButtons = document.querySelector("div.back-buttons");
