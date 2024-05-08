@@ -247,7 +247,10 @@ export default {
 
     async function waitForLoadingScreen() {
       await loadBackgroundCanvas();
-      //TODO wait for user data
+      if(!userData.value) {
+        await updateProfileData();
+        await applySavedInputSettings();
+      }
       //TODO add Promises for other loading tasks
 
       endLoading();

@@ -4,9 +4,9 @@ export let backgroundCanvasApp: Application;
 export let backgroundCanvasAssets: Texture;
 
 export async function loadBackgroundCanvas(): Promise<void> {
-    console.log(backgroundCanvasApp, backgroundCanvasAssets)
     if(!backgroundCanvasApp || !backgroundCanvasAssets){
         backgroundCanvasApp = new Application();
+        
         await backgroundCanvasApp.init({ background: 'rgb(100, 100, 100)', resizeTo: window });
         backgroundCanvasAssets = await Assets.load('https://pixijs.com/assets/bunny.png');
 
