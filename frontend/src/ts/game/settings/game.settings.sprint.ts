@@ -15,7 +15,7 @@ export function getSprintSettings(): GameSettings {
         queuePreviewSize: QUEUE_PREVIEW_SIZE.defaultValue,
         widthPrecisionUnits: WIDTH_PRECISION_UNITS.defaultValue,
         collisionDetectionFactor: COLLISION_DETECTION_FACTOR.defaultValue,
-        sprintVictoryCondition: 100,
+        sprintVictoryCondition: 3,
         clearFloatingBubbles: true,
         prefillBoard: true,
         prefillBoardAmount: prefillAmount,

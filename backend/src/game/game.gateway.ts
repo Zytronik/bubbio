@@ -537,9 +537,11 @@ export class GameGateway implements OnGatewayDisconnect {
         game.gameInstance.stats.gameDuration = winningMoveAtTime;
         calculateTimeStats(game.gameInstance.stats, winningMoveAtTime);
         //TODO: Save game stats to database
-        const username = await this.lobbyGateway.lobbyData.getUsername(client.id);
-        const userId = await this.userService.getUserIdByUsername(username);
-        this.sprintService.saveSprintToDB(userId, game.gameInstance.stats);
+        if(client.data && client.data.role === "User"){
+          const username = await this.lobbyGateway.lobbyData.getUsername(client.id);
+          const userId = await this.userService.getUserIdByUsername(username);
+          this.sprintService.saveSprintToDB(userId, game.gameInstance.stats);
+        }
       }.bind(this)
     }
     const onGarbageSend = function (amount: number): void { }

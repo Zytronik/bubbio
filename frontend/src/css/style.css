@@ -83,12 +83,13 @@ body.game-view .page-container {
 section.page {
     width: 100vw;
     padding-left: 0;
-    height: 90vh;
-    /* overflow: hidden; */
     display: flex;
     flex-direction: row;
     align-items: center;
-    position: relative;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
 }
 
 section .page-wrapper {
@@ -96,13 +97,15 @@ section .page-wrapper {
     position: relative;
     width: 100vw;
     overflow: hidden;
+    display: flex;
+    align-items: center;
 }
 
 section .page-container {
     padding: 80px 15px 80px;
     margin: 0 auto;
-    max-width: 92%;
-    height: 100%;
+    width: 92%;
+    height: 90%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -213,16 +216,16 @@ button.goBackButton:focus {
     height: 100%;
 }
 
-.menu-wrapper .menu-title {
-    font-size: 7.5em;
-    position: fixed;
+.menu .menu-title {
+    font-size: 7em;
+    position: absolute;
     z-index: 1;
-    top: 2vh;
-    left: 2vw;
+    top: 3vh;
+    left: 4vw;
     text-transform: uppercase;
 }
 
-.menu-wrapper .menu-title h1 {
+.menu .menu-title h1 {
     margin: 0;
     display: flex;
     align-items: start;
@@ -234,7 +237,7 @@ button.goBackButton:focus {
     line-height: .75em;
 }
 
-.menu-wrapper .menu-title span:first-of-type {
+.menu .menu-title span:first-of-type {
     font-size: 3em;
 }
 
@@ -245,7 +248,7 @@ button.goBackButton:focus {
     --config-color: rgb(250, 199, 16);
     --sprint-color: rgb(29, 179, 157);
     --highscore-color: rgb(17, 178, 135);
-    --pixi-color: rgb(31, 176, 130);
+    --pixi-color: rgb(14, 122, 88);
     --ranked-color: rgb(160, 0, 24);
     --roomListing-color: rgb(129, 33, 81);
 }
@@ -253,7 +256,7 @@ button.goBackButton:focus {
 .menu-btn {
     cursor: pointer;
     width: 120%;
-    height: 15%;
+    height: 15vh;
     border: var(--menu-btn-border-width) solid black;
     color: white;
     transform: translateX(0%) skew(10deg);
@@ -415,26 +418,14 @@ button.goBackButton:focus {
 }
 
 .back-buttons {
-    height: 100%;
+    height: 90vh;
     width: 0vw;
     animation: slideInBackButtons 0.4s ease forwards;
     animation-delay: 0.2s;
-    background-color: black;
-    z-index: 1;
+    background: rgb(0,0,0);
+    background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 1%, rgba(0,0,0,0) 100%); 
     position: relative;
     cursor: pointer;
-    position: absolute;
-    left: 0;
-}
-
-.back-buttons::before {
-    content: "";
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    height: 100%;
-    width: 100vw;
 }
 
 @keyframes slideInBackButtons {
@@ -447,18 +438,14 @@ button.goBackButton:focus {
     }
 }
 
-.back-buttons .menu-btn img {
-    position: static;
-}
-
 .back-buttons .menu-btn {
     animation: fadeInBackButtons 0.4s ease forwards;
     animation-delay: 0.2s;
-    padding: 30px 15px;
     justify-content: flex-end;
     width: 120%;
     opacity: 0;
-    transform: translateX(0);
+    padding-right: 20%;
+    transform: translateX(-20%) skew(10deg);
 }
 
 @keyframes fadeInBackButtons {
@@ -472,11 +459,11 @@ button.goBackButton:focus {
 }
 
 .back-buttons .menu-btn.disabled:hover {
-    transform: translateX(-17%);
+    transform: translateX(-20%) skew(10deg);
 }
 
 .menu-btn.disabled {
-    transform: translateX(-60%);
+    transform: translateX(-50%) skew(10deg);
 }
 
 .gameModeDashboard button.playButton {

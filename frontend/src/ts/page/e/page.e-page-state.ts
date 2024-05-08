@@ -11,4 +11,5 @@ export enum PAGE_STATE {
     scorePage = 'scorePage',
 
     pixiTest = 'pixiTest',
+    matchmakingSimulation = 'matchmakingSimulation',
 }

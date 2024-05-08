@@ -294,7 +294,6 @@ export default {
   flex-direction: row;
   justify-content: flex-end;
   background-color: black;
-  z-index: 1;
   position: relative;
 }
 

@@ -14,6 +14,7 @@ export class SprintService {
     ) { }
 
     async saveSprintToDB(userId: number, sprintStats: GameStats): Promise<any> {
+        console.log(userId);
         // Create Sprint
         const newSprint = await this.createSprint(userId, sprintStats);
         const sprintTime = sprintStats.gameDuration;
