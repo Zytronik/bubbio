@@ -1,9 +1,12 @@
 <template>
   <div class="menu-wrapper back-buttons" @click.self="getGoBackState()">
-    <button v-for="(button, index) in buttonData" :key="index" class="menu-btn"
-      :class="button.disabled ? 'disabled' : ''" @click="handleButtonClick(button)">
-      <img :src="button.iconSrc" />
-    </button>
+    <div v-for="(button, index) in buttonData" :key="index" class="menu-btn" :class="button.disabled ? 'disabled' : ''"
+      @click="handleButtonClick(button)">
+      <div>
+        <div class="text"></div>
+        <img :src="button.iconSrc" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -19,7 +22,7 @@ export default defineComponent({
     buttonData: Array as PropType<BackButtonData[]>,
     specialBehavior: Boolean,
   },
-  setup(props, {emit}) {
+  setup(props, { emit }) {
     function handleButtonClick(btn: BackButtonData) {
       if (btn.disabled) {
         goToState(btn.pageState);

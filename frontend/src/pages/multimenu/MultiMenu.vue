@@ -1,24 +1,3 @@
-<!-- <template>
-  <section id="multiMenu" class="page menu">
-    <MenuBackButtons :buttonData="backButtonData" />
-    <div class="page-wrapper">
-      <div class="menu-wrapper">
-        <button class="menu-btn" @click="goToState(PAGE_STATE.rankedPage)">
-          <img src="@/img/icons/ranked.png" />
-          <p>Play Ranked</p>
-          <p class="desc">Play ranked 1vs1</p>
-        </button>
-        <button class="menu-btn" @click="goToState(PAGE_STATE.roomListing)">
-          <img src="@/img/icons/rooms.png" />
-          <p>Room Listing</p>
-          <p class="desc">Create or Join Rooms</p>
-        </button>
-      </div>
-    </div>
-  </section>
-</template>
- -->
-
 <template>
   <MenuLayout :backButtonData="backButtonData" :title="'Multiplayer'" :menuName="'multiMenu'"
     :menuButtonsData="menuButtonsData" />
@@ -48,6 +27,14 @@ export default {
         iconSrc: require(`@/img/icons/ranked.png`),
         pageState: PAGE_STATE.rankedPage,
         bigButton: true,
+      },
+      {
+        title: "Mm Simulation",
+        desc: "Simulate Matchmaking",
+        iconSrc: require(`@/img/icons/ranked.png`),
+        pageState: PAGE_STATE.matchmakingSimulation,
+        bigButton: false,
+        authIds: ["1"],
       },
       {
         title: "Room Listing",

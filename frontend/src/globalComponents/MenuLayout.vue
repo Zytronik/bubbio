@@ -1,15 +1,13 @@
 <template>
   <section :id="menuName" class="menu page">
+    <div class="menu-title">
+      <h1><span class="text-noWhiteSpaces">{{ title[0] }}</span><span class="text-noWhiteSpaces">{{ title.slice(1)
+          }}</span></h1>
+    </div>
     <MenuBackButtons v-if="backButtonData && backButtonData.length > 0" :buttonData="backButtonData" />
     <div class="page-wrapper">
       <div class="menu-wrapper">
-
-        <div class="menu-title">
-          <h1><span class="text-noWhiteSpaces">{{ title[0] }}</span><span class="text-noWhiteSpaces">{{ title.slice(1)
-              }}</span></h1>
-        </div>
-
-        <div v-for="(button, index) in menuButtonsData" :key="index" :class="[
+        <div v-for="(button, index) in filteredMenuButtonsData" :key="index" :class="[
           'menu-btn',
           button.title.toLowerCase().replace(/\s+/g, '-'),
           { 'short-btn': !button.bigButton }
@@ -34,12 +32,13 @@
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
-import { PropType, onMounted } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 import { BackButtonData } from './i/i-buttonData';
 import { MenuButtonData } from './i/i-menuButtonData';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
+import eventBus from '@/ts/page/page.event-bus';
 
-export default {
+export default defineComponent({
   name: 'MenuLayout',
   components: { MenuBackButtons },
   props: {
@@ -60,18 +59,27 @@ export default {
       required: true,
     },
   },
-  setup() {
-    onMounted(() => {
-      changeBackgroundTo("rgb(100, 100, 100)");
+  setup(props) {
+
+    const currentUserID = computed(() => {
+      const userData = eventBus.getUserData();
+      return userData && userData.id ? userData.id.toString() : null;
+    });
+
+    const filteredMenuButtonsData = computed(() => {
+      return props.menuButtonsData.filter(button => {
+        return !button.authIds || (currentUserID.value && button.authIds.includes(currentUserID.value));
+      });
     });
 
     return {
       goToState,
       PAGE_STATE,
       changeBackgroundTo,
+      filteredMenuButtonsData,
     }
   }
-};
+});
 </script>
 
 <style scoped></style>

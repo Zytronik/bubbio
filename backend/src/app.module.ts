@@ -13,6 +13,7 @@ import { UsersModule } from './user/user.module';
 import { FriendsModule } from './friends/friends.module';
 import { LobbyModule } from './lobby/lobby.module';
 import { ScoreModule } from './score/score.module';
+import { MatchmakingSimulationModule } from './matchmakingSimulation/matchmakingSimulation.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ScoreModule } from './score/score.module';
     UsersModule,
     FriendsModule,
     LobbyModule,
+    MatchmakingSimulationModule,
   ],
   providers: [GlobalChatGateway],
 })

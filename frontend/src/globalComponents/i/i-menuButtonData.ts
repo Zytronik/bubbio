@@ -6,4 +6,5 @@ export interface MenuButtonData {
   desc: string;
   pageState: PAGE_STATE;
   bigButton: boolean;
+  authIds?: string[];
 }

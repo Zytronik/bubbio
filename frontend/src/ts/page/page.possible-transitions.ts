@@ -291,6 +291,25 @@ export const pixiTestToSoloMenuTransition: PageTransition = {
     }
 }
 
+/* Matchmaking Simulation */
+export const multiMenuToMatchmakingSimulationTransition: PageTransition = {
+    name: "multiMenuToMatchmakingSimulationTransition",
+    origin: PAGE_STATE.multiMenu,
+    destination: PAGE_STATE.matchmakingSimulation,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + multiMenuToMatchmakingSimulationTransition.name);
+    }
+}
+
+export const matchmakingSimulationToMultiMenuTransition: PageTransition = {
+    name: "matchmakingSimulationToMultiMenuTransition",
+    origin: PAGE_STATE.matchmakingSimulation,
+    destination: PAGE_STATE.multiMenu,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + matchmakingSimulationToMultiMenuTransition.name);
+    }
+}
+
 
 export const allPossibleTransitions: PageTransition[] = [
     mainMenuToSettingsPageTransition,
@@ -325,4 +344,6 @@ export const allPossibleTransitions: PageTransition[] = [
     soloMenuToPixiTestTransition,
 
     pixiTestToSoloMenuTransition,
+    multiMenuToMatchmakingSimulationTransition,
+    matchmakingSimulationToMultiMenuTransition,
 ];

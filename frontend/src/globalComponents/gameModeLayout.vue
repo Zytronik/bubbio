@@ -265,11 +265,15 @@ export default defineComponent({
 
         async function showResultView() {
             resultStats.value = playerGameInstance.stats;
-            if (resultStats.value.gameDuration !== undefined) {
-                diffToPb.value = await getSprintDifferenceToPB(resultStats.value.gameDuration);
-            }
-            if (diffToPb.value === 0) {
-                triggerConfettiAnimation(".page-container");
+            if(!isGuest){
+                if (resultStats.value.gameDuration !== undefined) {
+                    diffToPb.value = await getSprintDifferenceToPB(resultStats.value.gameDuration);
+                }
+                if (diffToPb.value === 0) {
+                    triggerConfettiAnimation(".page-container");
+                }
+            }else{
+                diffToPb.value = undefined;
             }
             specialBackButtonBehavior.value = true;
             isGaming.value = false;
