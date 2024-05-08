@@ -55,9 +55,9 @@ export const playerGameInstance: GameInstance = {
     angle: 0,
     currentAPS: 0,
     currentBubble: {
-        color: "",
         ascii: "",
-        type: 0
+        type: 0,
+        spriteSheetName: "",
     },
     bubbleQueue: [],
     playGrid: setupGrid(getSprintSettings()),

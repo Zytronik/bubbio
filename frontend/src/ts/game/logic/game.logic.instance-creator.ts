@@ -30,9 +30,9 @@ export function createGameInstance(
         angle: 90,
         currentAPS: handlingSettings.defaultAPS,
         currentBubble: {
-            color: "",
             ascii: "",
-            type: 0
+            type: 0,
+            spriteSheetName: ""
         },
         bubbleQueue: [],
         playGrid: setupGrid(gameSettings),
@@ -67,9 +67,9 @@ export function resetGameInstance(gameInstance: GameInstance, seed: number): voi
     gameInstance.angle = 90;
     gameInstance.currentAPS = gameInstance.handlingSettings.defaultAPS;
     gameInstance.currentBubble = {
-        color: "",
         ascii: "",
-        type: 0
+        type: 0,
+        spriteSheetName: ""
     };
     gameInstance.holdBubble = undefined;
     gameInstance.playGrid.previewBubble = undefined;
