@@ -1,5 +1,6 @@
 <template>
   <article id="app">
+    <LoadingScreen :isLoading="isLoading" />
     <div class="topbar">
       <div v-if="isAuthenticated && userData" @click="showMyProfile" class="profile-wrapper">
         <img class="profile-pic" :src="userData?.pbUrl" alt="Profile Picture">
@@ -31,6 +32,7 @@
     <div class="bottomBar">
       <button @click="openChannelOverlay" class="openChannelButton">Channel</button>
     </div>
+    <PageBackgroundCanvas />
   </article>
 </template>
 
@@ -39,9 +41,10 @@ import { ref, computed, watchEffect, onMounted, onUnmounted, watch } from 'vue';
 import state, { addSocketConnectListener, disconnectGlobalSocket, initializeGlobalSocket } from './ts/networking/networking.client-websocket';
 import { currentPageState, goToState, isChannelActive, openChannelOverlay, openProfile, pages, setupTransitionFunctions, showUserPageFromURL } from './ts/page/page.page-manager';
 import LoginOverlay from './globalComponents/LoginOverlay.vue';
+import PageBackgroundCanvas from './globalComponents/PageBackgroundCanvas.vue';
 import InfoMessages from './globalComponents/InfoMessages.vue';
 import Channel from './globalComponents/channel/Channel.vue';
-
+import LoadingScreen from './pages/startmenu/components/LoadingScreen.vue';
 import { PAGE_STATE } from './ts/page/e/page.e-page-state';
 import { checkUserAuthentication, clearClientState, clearGuestCookies, logUserOut, showLoginForm } from './ts/networking/networking.auth';
 import eventBus from './ts/page/page.event-bus';
@@ -51,6 +54,7 @@ import { getDefaultProfilePbURL, getRankImagePath } from './ts/networking/paths'
 import { applySavedInputSettings, enableBackInputs, enableChannelInput, enableNetworkDebugInputs } from './ts/input/input.input-manager';
 import { setupDebugListeners } from "./ts/game/network/game.network.debug";
 import { RankInfo } from './ts/page/i/page.i-rank-info';
+import { loadBackgroundCanvas } from './ts/page/page.background-canvas';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -63,7 +67,7 @@ interface InfoMessageData {
 
 export default {
   name: 'App',
-  components: { LoginOverlay, InfoMessages, Channel },
+  components: { LoginOverlay, InfoMessages, Channel, LoadingScreen, PageBackgroundCanvas},
   setup() {
     attachInputReader();
     /* Channel */
@@ -185,7 +189,7 @@ export default {
             pbUrl: getDefaultProfilePbURL(),
           };
         } else {
-          const data = await fetchUserData()
+          const data = await fetchUserData();
           if (data) {
             const updatedPbUrl = data.pbUrl ? data.pbUrl : getDefaultProfilePbURL();
             userData.value = {
@@ -227,8 +231,31 @@ export default {
       return;
     }
 
+    /* Loading Screen */
+    const isLoading = ref(true);
+
+    function endLoading() {
+      let minLoadingScreenShowTime = 1000;
+      const loadingScreen = document.querySelector('.loading-screen');
+      setTimeout(() => {
+        loadingScreen?.classList.add('slide-out-LoadingScreen');
+      }, minLoadingScreenShowTime - 500);
+      setTimeout(() => {
+        isLoading.value = false;
+      }, minLoadingScreenShowTime);
+    }
+
+    async function waitForLoadingScreen() {
+      await loadBackgroundCanvas();
+      //TODO wait for user data
+      //TODO add Promises for other loading tasks
+
+      endLoading();
+    }
+
     /* General */
     onMounted(async () => {
+      waitForLoadingScreen();
       addSocketConnectListener(setupDebugListeners);
       enableBackInputs();
       enableChannelInput();
@@ -280,6 +307,7 @@ export default {
       updateAuthenticatedState,
       getRankImagePath,
       getProgressBarFillWidth,
+      isLoading,
     };
   },
 }
@@ -434,7 +462,18 @@ export default {
   transform: translateX(93vw);
 }
 
+.slide-out-LoadingScreen {
+    animation: slideOutLoadingScreen 0.5s forwards;
+}
 
+@keyframes slideOutLoadingScreen {
+	0% {
+		transform: translateY(0);
+	}
+	100% {
+		transform: translateY(-100%);
+	}
+}
 
 
 </style>

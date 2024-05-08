@@ -32,7 +32,7 @@
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
-import { PropType, computed, defineComponent, onMounted } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 import { BackButtonData } from './i/i-buttonData';
 import { MenuButtonData } from './i/i-menuButtonData';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
@@ -60,9 +60,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    onMounted(() => {
-      changeBackgroundTo("rgb(100, 100, 100)");
-    });
 
     const currentUserID = computed(() => {
       const userData = eventBus.getUserData();

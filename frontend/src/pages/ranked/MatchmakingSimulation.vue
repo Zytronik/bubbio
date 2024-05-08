@@ -368,7 +368,7 @@ h2 {
   height: 55vh;
   display: flex;
   flex-direction: column;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .scrollable {

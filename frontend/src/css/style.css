@@ -228,7 +228,7 @@ button.goBackButton:focus {
 .menu .menu-title h1 {
     margin: 0;
     display: flex;
-    align-items: start;
+    align-items: flex-start;
 }
 
 .text-noWhiteSpaces {
@@ -293,7 +293,7 @@ button.goBackButton:focus {
 .menu-btn .text {
     text-transform: uppercase;
     display: flex;
-    align-items: start;
+    align-items: flex-start;
 }
 
 .menu-btn .text > p {
