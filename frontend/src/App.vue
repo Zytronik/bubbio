@@ -337,6 +337,7 @@ export default {
   cursor: pointer;
   height: 10vh;
   position: relative;
+  z-index: 1;
 }
 
 .profile-wrapper::before{
