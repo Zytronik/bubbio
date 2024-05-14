@@ -1,4 +1,5 @@
-import { Application, Assets, Container, Texture } from "pixi.js";
+import { Application, Assets, Sprite, Texture } from "pixi.js";
+import { AsciiFilter, ZoomBlurFilter } from "pixi-filters";
 
 export let backgroundCanvasApp: Application;
 export let backgroundCanvasAssets: Texture;
@@ -7,9 +8,9 @@ export async function loadBackgroundCanvas(): Promise<void> {
     if(!backgroundCanvasApp || !backgroundCanvasAssets){
         backgroundCanvasApp = new Application();
         
-        await backgroundCanvasApp.init({ background: 'rgb(100, 100, 100)', resizeTo: window });
+        await backgroundCanvasApp.init({resizeTo: window });
         backgroundCanvasAssets = await Assets.load('https://pixijs.com/assets/bunny.png');
-
+        Assets.load({alias: 'background', src: require('@/img/sprite/1480843698063.jpg')});
         setupBackgroundCanvas();
     }
     
@@ -25,9 +26,19 @@ function appendBackgroundCanvas() {
 }
 
 function setupBackgroundCanvas() {
-    const container = new Container();
+    const background = Sprite.from('background');
+    console.log(background)
+    background.width = backgroundCanvasApp.screen.width;
+    background.height = backgroundCanvasApp.screen.height;
+    backgroundCanvasApp.stage.addChild(background);
+    background.x = 0;
+    background.y = 0;
 
-    backgroundCanvasApp.stage.addChild(container);
+    const filter = new AsciiFilter({size: 5});
+    const zoom = new ZoomBlurFilter();
+    backgroundCanvasApp.stage.filters = [zoom, filter];
+
+    
 
     // Create a 5x5 grid of bunnies in the container
     /* for (let i = 0; i < 25; i++) {
