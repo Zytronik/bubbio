@@ -1,5 +1,5 @@
 import { Application, Assets, Sprite, Texture } from "pixi.js";
-import { AsciiFilter, ZoomBlurFilter } from "pixi-filters";
+import { AsciiFilter, ConvolutionFilter, ZoomBlurFilter } from "pixi-filters";
 
 export let backgroundCanvasApp: Application;
 export let backgroundCanvasAssets: Texture;
@@ -34,9 +34,8 @@ function setupBackgroundCanvas() {
     background.x = 0;
     background.y = 0;
 
-    const filter = new AsciiFilter({size: 5});
-    const zoom = new ZoomBlurFilter();
-    backgroundCanvasApp.stage.filters = [zoom, filter];
+    const convo = new ConvolutionFilter({width: 300, height: 300, matrix: [0.01,0.1,0.1,0.01,0,0,0,0,0.01]});
+    backgroundCanvasApp.stage.filters = [convo];
 
     
 
