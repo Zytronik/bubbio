@@ -233,7 +233,7 @@ import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-di
 import { PlayerData } from '@/ts/game/network/dto/game.network.dto.end-screen';
 import { CountUp } from 'countup.js';
 import { formatDateToAgoText } from '@/ts/page/page.page-utils';
-import { transitionEndScreenPageToDashboard, transitionOutOfGame } from '@/ts/page/page.css-transitions';
+import { transitionEndScreenPageToRankedDashboard, transitionOutOfGame } from '@/ts/page/page.css-transitions';
 
 interface PlayerMatchmakingStats {
   userId: number;
@@ -449,12 +449,13 @@ export default {
 
     function goBackToRankedPage() {
       if (showEndScreen.value) {
-        transitionEndScreenPageToDashboard('.ranked-dashboard', '.endScreen-wrapper', () => {
+        transitionEndScreenPageToRankedDashboard('.ranked-dashboard', '.endScreen-wrapper', () => {
           isGaming.value = false;
           showEndScreen.value = true;
           showMatchmakingScreen.value = true;
           specialBackButtonBehavior.value = false;
         },()=>{
+          disableResetInput();
           showEndScreen.value = false;
         });
         backInput.fire = backInputOnLoad.value;

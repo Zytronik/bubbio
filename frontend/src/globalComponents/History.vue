@@ -1,28 +1,28 @@
 <template>
   <div class="history-wrapper">
     <div v-if="loading" class="loader"></div>
-    <table v-if="historyData.length > 0" class="history">
-      <thead>
-        <tr>
-          <th v-for="field in orderedFields" :key="field"
+    <div v-if="historyData.length > 0" class="history">
+      <div class="head">
+        <div class="row">
+          <div class="cell" v-for="field in orderedFields" :key="field"
             @click="updateSort(field)">
             {{ getFullName(field) }}
             <span v-if="sortByVal === field">
-              <span v-if="sortDirectionVal === 'asc'">▲</span>
-              <span v-else>▼</span>
+              <span v-if="sortDirectionVal === 'asc'"><i class="fa-solid fa-caret-up"></i></span>
+              <span v-else><i class="fa-solid fa-caret-down"></i></span>
             </span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(entry, index) in historyData" :key="index">
-          <td v-for="field in orderedFields" :key="field">
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="row" v-for="(entry, index) in historyData" :key="index">
+          <div class="cell" v-for="field in orderedFields" :key="field">
             {{ formatFieldValue(entry[field], field) }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <p v-else>No history data available.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="no-entries" v-if="historyData.length <= 0 && !loading">No history data available.</p>
   </div>
 </template>
 
@@ -134,26 +134,52 @@ export default defineComponent({
 </script>
 
 <style scoped>
-table {
+.history {
   width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
+  height: 100%;
 }
 
-th {
+.head .cell {
   cursor: pointer;
 }
 
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
+.head {
+  background-color: rgba(149, 149, 149, 0.3);
+  font-size: 70%;
 }
 
-td p {
-  vertical-align: middle;
+p {
   margin: unset;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  padding: 0 15px;
+}
+
+.cell {
+  flex: 1;
+  padding: 15px 0px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  font-size: 1.5em;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.cell span i {
+  margin-left: 10px;
+  font-size: 180%;
+}
+
+.row .cell:first-of-type {
+  justify-content: flex-start;
+  padding-left: 15px;
 }
 
 .history {
@@ -163,7 +189,9 @@ td p {
 .history-wrapper {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
+  height: 100%;
+  position: relative;
 }
 
 </style>

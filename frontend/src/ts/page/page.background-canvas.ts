@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Sprite, Texture } from "pixi.js";
+import { Application, Assets, Container, Texture } from "pixi.js";
 
 export let backgroundCanvasApp: Application;
 export let backgroundCanvasAssets: Texture;
@@ -30,7 +30,7 @@ function setupBackgroundCanvas() {
     backgroundCanvasApp.stage.addChild(container);
 
     // Create a 5x5 grid of bunnies in the container
-    for (let i = 0; i < 25; i++) {
+    /* for (let i = 0; i < 25; i++) {
         const bunny = new Sprite(backgroundCanvasAssets);
         bunny.width = 100;
         bunny.height = 100;
@@ -52,5 +52,5 @@ function setupBackgroundCanvas() {
         // Continuously rotate the container!
         // * use delta to create frame-independent transform *
         container.rotation -= 0.01 * time.deltaTime;
-    });
+    }); */
 }

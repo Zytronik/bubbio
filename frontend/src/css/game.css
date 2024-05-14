@@ -1,0 +1,143 @@
+/* Game */
+.gameUI-wrapper {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+}
+
+.game-wrapper .inGameStats {
+    position: absolute;
+    right: 100%;
+    bottom: 4vh;
+    width: 200px;
+    z-index: 2;
+    text-align: right;
+    margin-right: 15px;
+    height: 100%;
+}
+
+.game-wrapper .inGameStats .bottom {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+}
+
+.game-wrapper .inGameStats .top {
+    position: absolute;
+    top: 30%;
+    right: 0;
+    width: 100%;
+}
+
+.game-wrapper .inGameStats p {
+    margin: unset;
+    margin-top: 5px;
+    font-size: 20px;
+}
+
+.game-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: relative;
+    font-size: 2.6vh;
+}
+
+.gameUI-wrapper .playerName {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.gameUI-wrapper .monospace {
+    white-space: pre-line;
+    font-family: 'Consolas', monospace;
+}
+
+.gameUI-wrapper .overlap-infos {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    width: 250%;
+}
+
+.gameUI-wrapper .remove-whiteSpaces {
+    display: ruby;
+}
+
+@keyframes slideOutToGame {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.slide-out-left-to-game {
+    animation: slideOutToGame 0.5s forwards;
+}
+
+@keyframes slideOutOffGame {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.slide-out-right-off-game {
+    animation: slideOutOffGame 0.5s forwards;
+}
+
+.black-overlay-cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
+    animation-delay: 0.2s !important;
+    animation: fadeOut 1.3s forwards;
+    opacity: 1;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.black-overlay-right {
+    position: fixed;
+    top: 0;
+    left: 100%;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
+}
+
+.black-overlay-left {
+    position: fixed;
+    top: 0;
+    right: 100%;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
+}

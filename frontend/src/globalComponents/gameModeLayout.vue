@@ -3,40 +3,43 @@
         @special-click-event="goBack" />
     <div class="page-wrapper">
         <div class="page-container">
-            <div v-if="isDashboard" class="gameModeDashboard page-dashboard">
-                <div class="left-content">
-                    <div class="play-wrapper">
-                        <button v-if="gameMode != 'score'" class="playButton" @click="play()">Play!</button>
+            <div v-if="isDashboard" class="gameMode-dashboard page-dashboard">
+                <div class="content-title">
+                    <h1><span class="text-noWhiteSpaces">{{ gameMode[0] }}</span><span class="text-noWhiteSpaces">{{ gameMode.slice(1) }}</span></h1>
+                </div>
+                <div class="play-wrapper">
+                        <button v-if="gameMode != 'score'" class="playButton" @click="play()"><span>Play</span></button>
                         <p v-else><br>Highscore Mode is not available yet.</p>
                     </div>
-                    <History v-if="!isGuest" :gameMode="gameMode"
-                        :fields="['gameDuration', 'bubblesShot', 'bubblesPerSecond', 'bubblesCleared', 'submittedAt']"
-                        :sortBy="'submittedAt'" :sortDirection="SortDirection.Desc" :limit="10" />
-                    <h4 v-else><br>Log in for Stats and Submit Scores.</h4>
+                <div class="content">
+                    <div class="content-wrapper">
+                        <div class="l-tab-buttons">
+                            <button class="l-tab-button" v-for="tab in leaderboardTabs" :key="tab"
+                                :class="{ active: currentLeaderboard === tab }" @click="currentLeaderboard = tab">
+                                <span>{{ tab }}</span>
+                                <span v-if="tab === 'National' && userData?.countryCode">
+                                    ({{ userData.countryCode }})
+                                </span>
+                            </button>
+                        </div>
+                        <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
+                            <Leaderboard :gameMode="gameMode" :fields="leaderboardFields" :sortBy="leaderboardSortByField"
+                                :sortDirection="SortDirection.Asc" :leaderboardCategory="LeaderboardCategory.Global"
+                                :limit="30" />
+                        </div>
+                        <div v-if="currentLeaderboard === 'National'" class="l-tab national-tab">
+                            <Leaderboard :gameMode="gameMode" :fields="leaderboardFields" :sortBy="leaderboardSortByField"
+                                :sortDirection="SortDirection.Asc" :leaderboardCategory="LeaderboardCategory.National"
+                                :limit="30" />
+                        </div>
+                        <div v-if="currentLeaderboard === 'Me'" class="l-tab national-tab">
+                            <History v-if="!isGuest" :gameMode="gameMode"
+                            :fields="['submittedAt', 'bubblesCleared', 'gameDuration', 'bubblesPerSecond']"
+                            :sortBy="'submittedAt'" :sortDirection="SortDirection.Desc" :limit="10" />
+                            <h4 v-else><br>Log in for Stats and Submit Scores.</h4>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="right-content">
-                    <div class="l-tab-buttons">
-                        <button class="l-tab-button" v-for="tab in leaderboardTabs" :key="tab"
-                            :class="{ active: currentLeaderboard === tab }" @click="currentLeaderboard = tab">
-                            <span>{{ tab }}</span>
-                            <span v-if="tab === 'National' && userData?.countryCode">
-                                ({{ userData.countryCode }})
-                            </span>
-                        </button>
-                    </div>
-                    <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
-                        <Leaderboard :gameMode="gameMode" :fields="leaderboardFields" :sortBy="leaderboardSortByField"
-                            :sortDirection="SortDirection.Asc" :leaderboardCategory="LeaderboardCategory.Global"
-                            :limit="30" />
-                    </div>
-                    <div v-if="currentLeaderboard === 'National'" class="l-tab national-tab">
-                        <Leaderboard :gameMode="gameMode" :fields="leaderboardFields" :sortBy="leaderboardSortByField"
-                            :sortDirection="SortDirection.Asc" :leaderboardCategory="LeaderboardCategory.National"
-                            :limit="30" />
-                    </div>
-                </div>
-
             </div>
 
             <div v-if="isGaming" class="inGame">
@@ -177,7 +180,7 @@ export default defineComponent({
     setup() {
         const specialBackButtonBehavior = ref(false);
         const currentLeaderboard = ref<string>('Global');
-        const leaderboardTabs = ref<string[]>(['Global', 'National']);
+        const leaderboardTabs = ref<string[]>(['Global', 'National', 'Me']);
         const isGaming = ref<boolean>(false);
         const isDashboard = ref<boolean>(true);
         const isResultView = ref<boolean>(false);
@@ -213,7 +216,7 @@ export default defineComponent({
                 });
             }
             if (isResultView.value) {
-                transitionEndScreenPageToDashboard('.gameModeDashboard', '.gameComplete', () => {
+                transitionEndScreenPageToDashboard('.gameMode-dashboard', '.gameComplete', () => {
                     disableResetInput();
                     showDashboard();
                     isResultView.value = true;
@@ -312,10 +315,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.play-wrapper {
-    height: 6vw;
-}
-
 .inGame {
     display: flex;
     flex-direction: row;
@@ -394,5 +393,13 @@ export default defineComponent({
 
 .gameComplete .top {
     height: 15%;
+}
+
+.back-buttons{
+    z-index: 1;
+}
+
+.page .page-wrapper {
+    transform: translateX(0%)
 }
 </style>

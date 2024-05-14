@@ -1,31 +1,36 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { TestUser } from './i/matchmakingSimulation.i-testUser';
 import { MatchmakingSimulationGateway } from './matchmakingSimulation.gateway';
+import { TestUser } from './i/matchmakingSimulation.i-testUser';
 
 interface MatchmakingQueue {
-    [name: string]: UserMatchmakingData;
-}
-
-interface UserMatchmakingData {
-    glicko: number;
-    searchStart: number;
+    [name: string]: TestUser;
 }
 
 @Injectable()
 export class MatchmakingSimulationService {
     private socketMmRoomName: string = 'matchmakingSimulationVue_389w4389w4uhbf803w4bnf83wn4f803w4fsdjkngsdfr';
     private queue: MatchmakingQueue = {};
+    private speedFactor = 100;
     private startGap = 100; // Startwert für den akzeptablen Skill Gap
-    private gapIncreaseInterval = 1000; // Zeit in Millisekunden, nach der der Skill Gap erhöht wird
-    private matchmakingIntervalTime = 1000;
+    private gapIncreaseInterval = 10000 / this.speedFactor; // Zeit in Millisekunden, nach der der Skill Gap erhöht wird
+    private matchmakingIntervalTime = 5000 / this.speedFactor;
+    private minGapIncreaseAmount = 10; // Minimale Erhöhung des Skill Gaps
     private gapIncreaseAmount = 100; // Erhöhung des Skill Gaps
-    private maxGap = 1000; // Maximale Erweiterung des Skill Gaps
+    private maxGap = 800; // Maximale Erweiterung des Skill Gaps
     private matchmakingInterval: NodeJS.Timeout | null = null;
+
+    private glicko2 = require('glicko2');
+    private glicko = new this.glicko2.Glicko2({
+        tau: 0.5,
+        rating: 1500,
+        rd: 250,
+        vol: 0.06,
+    });
 
     constructor(
         @Inject(forwardRef(() => MatchmakingSimulationGateway))
-        private matchmakingSimulationGateway: MatchmakingSimulationGateway,
+        private matchmakingSimulationGateway: MatchmakingSimulationGateway
     ) { }
 
     addAllUsersToQueue(users: TestUser[]) {
@@ -55,7 +60,17 @@ export class MatchmakingSimulationService {
 
     addUserToQueue(user: TestUser) {
         if (!this.checkIfUserIsInQueue(user)) {
-            this.queue[user.name] = { glicko: user.rating, searchStart: Date.now() };
+            this.queue[user.name] = {
+                name: user.name,
+                rating: user.rating,
+                ratingDeviation: user.ratingDeviation,
+                volatility: user.volatility,
+                amountOfQueues: user.amountOfQueues,
+                maxAmountOfQueues: user.maxAmountOfQueues,
+                startDeviation: user.startDeviation,
+                searchStart: Date.now()
+            };
+            
             this.startMatchmakingInterval();
             this.notfiyQueueUpdate();
         }
@@ -77,6 +92,7 @@ export class MatchmakingSimulationService {
     }
 
     matchPlayers() {
+        console.log('Matching players');
         const userIds = Object.keys(this.queue);
         const matches = [];
 
@@ -84,17 +100,17 @@ export class MatchmakingSimulationService {
             const userId = userIds[i];
             const user = this.queue[userId];
             if (!user) continue;
-            const { glicko, searchStart } = user;
+            const { rating, searchStart } = user;
 
             const currentTime = Date.now();
             const timeDiff = currentTime - searchStart;
-            const currentGap = Math.min(this.startGap + Math.floor(timeDiff / this.gapIncreaseInterval) * this.gapIncreaseAmount, this.maxGap);
+            const currentGap = Math.min(this.startGap + Math.max((1 - Math.exp(-timeDiff / this.gapIncreaseInterval)) * this.gapIncreaseAmount, this.minGapIncreaseAmount), this.maxGap);
             for (let j = i + 1; j < userIds.length; j++) {
                 const opponentId = userIds[j];
                 const opponent = this.queue[opponentId];
                 if (!opponent) continue;
 
-                const ratingDiff = Math.abs(glicko - opponent.glicko);
+                const ratingDiff = Math.abs(rating - opponent.rating);
                 if (ratingDiff <= currentGap) {
                     matches.push([userId, opponentId]);
                     break;
@@ -110,17 +126,62 @@ export class MatchmakingSimulationService {
         });
     }
 
-    matchFound(player1ID: number, player2ID: number, onMatched: () => void) {
-        const player1 = this.queue[player1ID];
-        const player2 = this.queue[player2ID];
+    matchFound(player1Name: string, player2Name: string, onMatched: () => void) {
+        const player1 = this.queue[player1Name];
+        const player2 = this.queue[player2Name];
         if (player1 && player2) {
-            this.notfiyMatchFound(player1ID, player2ID);
+            this.notfiyMatchFound(player1Name, player2Name);
+            this.predictAndSimulateMatch(player1, player2);
             onMatched();
         }
     }
 
-    notfiyMatchFound(player1ID: number, player2ID: number) {
-        this.matchmakingSimulationGateway.server.to(this.socketMmRoomName).emit('matchFoundUpdate', [player1ID, player2ID]);
+    predictAndSimulateMatch(player1: TestUser, player2: TestUser) {
+        const winrate = this.predictWinrate(player1, player2);
+        const random = Math.random() * 100;
+        let winner = player2;
+        let loser = player1;
+        if(random <= winrate){
+            winner = player1;
+            loser = player2;
+        }
+        this.notfiyMatchResult(winner, loser);
+        this.updatePlayerRatings(winner, loser);
+    }
+
+    updatePlayerRatings(winner: TestUser, loser: TestUser) {
+        const glickoWinner = this.glicko.makePlayer(winner.rating, winner.ratingDeviation, winner.volatility);
+        const glickoLoser = this.glicko.makePlayer(loser.rating, loser.ratingDeviation, loser.volatility);
+
+        this.glicko.updateRatings([[glickoWinner, glickoLoser, 1]]);
+
+        winner.rating = glickoWinner.getRating();
+        winner.ratingDeviation = glickoWinner.getRd();
+        winner.volatility = glickoWinner.getVol();
+
+        loser.rating = glickoLoser.getRating();
+        loser.ratingDeviation = glickoLoser.getRd();
+        loser.volatility = glickoLoser.getVol();
+
+        this.notifyUpdatedRatings(winner, loser);
+    }
+
+    notifyUpdatedRatings(winner: TestUser, loser: TestUser) {
+        this.matchmakingSimulationGateway.server.to(this.socketMmRoomName).emit('ratingsUpdate', [winner, loser]);
+    }
+
+    notfiyMatchResult(player1: TestUser, player2: TestUser) {
+        this.matchmakingSimulationGateway.server.to(this.socketMmRoomName).emit('matchResult', [player1, player2]);
+    }
+
+    predictWinrate(player1: TestUser, player2: TestUser): number {
+        const glickoPlayer1 = this.glicko.makePlayer(player1.rating, player1.ratingDeviation, player1.volatility);
+        const glickoPlayer2 = this.glicko.makePlayer(player2.rating, player2.ratingDeviation, player2.volatility);
+        return this.glicko.predict(glickoPlayer1, glickoPlayer2) * 100;
+    }
+
+    notfiyMatchFound(player1Name: string, player2Name: string) {
+        this.matchmakingSimulationGateway.server.to(this.socketMmRoomName).emit('matchFoundUpdate', [player1Name, player2Name]);
     }
 
     startMatchmakingInterval() {

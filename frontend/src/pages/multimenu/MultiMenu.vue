@@ -34,7 +34,7 @@ export default {
         iconSrc: require(`@/img/icons/ranked.png`),
         pageState: PAGE_STATE.matchmakingSimulation,
         bigButton: false,
-        authIds: ["1"],
+        authIds: ["1", "2", "3"],
       },
       {
         title: "Room Listing",

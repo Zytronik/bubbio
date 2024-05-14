@@ -6,7 +6,7 @@ export interface Rank {
     //minRating: number;
 }
 
-export const unrankedRatingDeviation = 350;
+export const unrankedRatingDeviation = 250;
 
 interface AllRanks {
     e_minus: Rank;

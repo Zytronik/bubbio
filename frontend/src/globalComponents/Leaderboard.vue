@@ -12,6 +12,8 @@
         </div>
       </div>
       <div class="body">
+        <div class="shape hidden"></div>
+        <div class="spacer hidden"></div>
         <div class="row" v-for="(entry, index) in leaderboard" :key="index"
           :class="{ 'me': entry.userId === userData?.id }">
           <div class="cell">
@@ -21,16 +23,17 @@
             <div class="user-info" @click="openProfile(entry.user.username)">
               <img :src="entry.user.pbUrl ? entry.user.pbUrl : getDefaultProfilePbURL()" alt="flag" width="30"
                 height="30" />
-              <p>{{ truncateString(entry.user.username, 10).toUpperCase() }}</p>
+              <p>{{ truncateString(entry.user.username, 15).toUpperCase() }}</p>
             </div>
           </div>
           <div class="cell" v-for="field in orderedFields" :key="field">
             <p>{{ formatFieldValue(entry[field], field) }}</p>
           </div>
         </div>
+        <div class="spacer hidden"></div>
       </div>
     </div>
-    <p v-if="noEntries">No entries found.</p>
+    <p class="no-entries" v-if="noEntries && !loading">No entries found.</p>
   </div>
 </template>
 
@@ -197,25 +200,25 @@ p {
   text-align: left;
 }
 
-.row:nth-of-type(1) .cell:first-of-type p {
-  color: gold;
-}
-
-.row:nth-of-type(2) .cell:first-of-type p {
-  color: silver;
-}
-
 .row:nth-of-type(3) .cell:first-of-type p {
+  color: rgb(144, 122, 0);
+}
+
+.row:nth-of-type(4) .cell:first-of-type p {
+  color: rgb(135, 135, 135);
+}
+
+.row:nth-of-type(5) .cell:first-of-type p {
   color: #CD7F32;
 }
 
-.row:nth-of-type(4) {
+.row:nth-of-type(6) {
   border-top: 1px solid white;
 }
 
 .cell {
   flex: 1;
-  padding: 10px 0px;
+  padding: 15px 0px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
