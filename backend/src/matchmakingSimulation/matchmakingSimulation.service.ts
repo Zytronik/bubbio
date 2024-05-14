@@ -33,6 +33,18 @@ export class MatchmakingSimulationService {
         private matchmakingSimulationGateway: MatchmakingSimulationGateway
     ) { }
 
+    getSettings(){
+        return {
+            speedFactor: this.speedFactor,
+            startGap: this.startGap,
+            gapIncreaseInterval: this.gapIncreaseInterval,
+            matchmakingIntervalTime: this.matchmakingIntervalTime,
+            minGapIncreaseAmount: this.minGapIncreaseAmount,
+            gapIncreaseAmount: this.gapIncreaseAmount,
+            maxGap: this.maxGap,
+        }
+    }
+
     addAllUsersToQueue(users: TestUser[]) {
         for (let user of users) {
             this.addUserToQueue(user);

@@ -34,6 +34,7 @@ export class MatchmakingSimulationGateway implements OnGatewayDisconnect {
     @SubscribeMessage('playerJoinedMmSimVue')
     handlePlayerJoinedMmVue(@ConnectedSocket() client: Socket) {
         this.matchmakingSimulationService.userJoinedMmSimVue(client);
+        client.emit('mMSettings', this.matchmakingSimulationService.getSettings());
     }
 
     @SubscribeMessage('playerLeftMmSimVue')
