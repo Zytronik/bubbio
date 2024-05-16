@@ -94,8 +94,8 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
 
     const gridWidth = playGrid.gridWidth;
     let boardText = ""
-    if(gameInstance.playGrid.previewBubble){
-        boardText += getTravelLine(gameInstance.playGrid.previewBubble, gameInstance.playGrid.precisionWidth, gameInstance.playGrid.precisionHeight);  
+    if (gameInstance.playGrid.previewBubble) {
+        boardText += getTravelLineString(gameInstance.playGrid.previewBubble, gameInstance.playGrid.precisionWidth, gameInstance.playGrid.precisionHeight);
     }
     boardText += getUpperBoarderLineString(gridWidth);
     let once = true;
@@ -162,17 +162,22 @@ function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosi
 }
 
 function getArrowLineString(gridWidth: number, angle: number, currentBubble: Bubble): string {
-    return "<div class='arrowLine'><div style='transform: translateX(-50%) rotate("+angle+"deg)'>"+currentBubble.ascii+"</div></div>";
+    return "<div class='arrowLine'><div style='transform: translateX(-50%) rotate(" + angle + "deg)'>" + currentBubble.ascii + "</div></div>";
 }
 
-function getTravelLine(previewBubble: PreviewBubble, gridWidth: number, gridHeight: number): string {
+function getTravelLineString(previewBubble: PreviewBubble, gridWidth: number, gridHeight: number): string {
     const boardWidth = document.querySelector(".board")?.clientWidth || 0;
     const boardHeight = document.querySelector(".board")?.clientHeight || 0;
-    const startX = previewBubble.travelLine[0].x / gridWidth * boardWidth;
-    const startY = previewBubble.travelLine[0].y / gridHeight * boardHeight;
-    const endX = previewBubble.travelLine[1].x / gridWidth * boardWidth;
-    const endY = previewBubble.travelLine[1].y / gridHeight * boardHeight;
-    return `<svg class="trajectory"><polyline points="${startX},${startY} ${endX},${endY}"></polyline></svg>`
+    let lineString = `<svg class="trajectory">`;
+    for (let i = 0; i < previewBubble.travelLine.length-1; i++) {
+        const startX = previewBubble.travelLine[i].x / gridWidth * boardWidth;
+        const startY = previewBubble.travelLine[i].y / gridHeight * boardHeight;
+        const endX = previewBubble.travelLine[i + 1].x / gridWidth * boardWidth;
+        const endY = previewBubble.travelLine[i + 1].y / gridHeight * boardHeight;
+        lineString += `<polyline points="${startX},${startY} ${endX},${endY}"></polyline>`
+    }
+    lineString += `</svg>`;
+    return lineString;
 }
 
 function getHoldBubbleString(holdBubble: Bubble | undefined): string {

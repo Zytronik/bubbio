@@ -103,6 +103,7 @@ export function calculatePreview(game: GameInstance): void {
     } else {
         grid.previewBubble.type = bubble.type;
         grid.previewBubble.location = snapToNextEmptyField(grid, bubbleCoords).coords;
+        grid.previewBubble.travelLine = line; 
     }
 }
 
