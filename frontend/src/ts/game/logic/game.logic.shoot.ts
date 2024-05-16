@@ -34,6 +34,7 @@ export function executeShot(playerGameInstance: GameInstance): void {
 }
 
 export function shootBubble(game: GameInstance): number {
+    console.log(game.playGrid.previewBubble)
     const angle = game.angle;
     const grid = game.playGrid;
     const bubble = game.currentBubble;
@@ -81,19 +82,23 @@ export function calculatePreview(game: GameInstance): void {
     const bubbleCoords = { x: grid.bubbleLauncherPosition.x, y: grid.bubbleLauncherPosition.y };
     let xDirection = getVelocity(angle, game.gameSettings).x;
     const yDirection = getVelocity(angle, game.gameSettings).y;
+    const line: Coordinates[] = [{ x: grid.bubbleLauncherPosition.x, y: grid.bubbleLauncherPosition.y }];
     while (!checkForCollision(grid, bubbleCoords)) {
         bubbleCoords.x += xDirection;
         bubbleCoords.y += yDirection;
         const hitLeftWall = bubbleCoords.x < grid.bubbleRadius;
         const hitRightWall = bubbleCoords.x > grid.precisionWidth - grid.bubbleRadius;
         if (hitLeftWall || hitRightWall) {
+            line.push({x: bubbleCoords.x, y: bubbleCoords.y})
             xDirection = -xDirection;
         }
     }
+    line.push({x: bubbleCoords.x, y: bubbleCoords.y})
     if (!grid.previewBubble) {
         grid.previewBubble = {
             type: bubble.type,
-            location: snapToNextEmptyField(grid, bubbleCoords).coords
+            location: snapToNextEmptyField(grid, bubbleCoords).coords,
+            travelLine: line,
         }
     } else {
         grid.previewBubble.type = bubble.type;
