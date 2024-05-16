@@ -9,12 +9,13 @@
 .game-wrapper .inGameStats {
     position: absolute;
     right: 100%;
-    bottom: 4vh;
-    width: 200px;
+    bottom: 0;
+    width: 100%;
+    top: 0;
     z-index: 2;
     text-align: right;
-    margin-right: 15px;
     height: 100%;
+    margin-right: 15px;
 }
 
 .game-wrapper .inGameStats .bottom {
@@ -22,6 +23,23 @@
     bottom: 0;
     right: 0;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.game-wrapper .inGameStats .bottom > div{
+    font-variant: small-caps;/* 
+    text-transform: uppercase; */
+}
+
+.game-wrapper .inGameStats .bottom div p {
+    margin: unset;
+}
+
+.game-wrapper .inGameStats .bottom div p:first-of-type{
+    opacity: 0.7;
+    font-size: 50%;
 }
 
 .game-wrapper .inGameStats .top {
@@ -34,7 +52,6 @@
 .game-wrapper .inGameStats p {
     margin: unset;
     margin-top: 5px;
-    font-size: 20px;
 }
 
 .game-wrapper {
@@ -42,7 +59,8 @@
     justify-content: center;
     align-items: flex-end;
     position: relative;
-    font-size: 2.6vh;
+    margin-bottom: 30px;
+    font-size: 3.8vh;
 }
 
 .gameUI-wrapper .playerName {
@@ -139,9 +157,9 @@
 }
 
 :root {
-    --game-bubble-height: 30px;
+    --game-bubble-height: 3.2vh;
     --game-bubble-border-width: 5px;
-    --game-board-border-radius: 15px;
+    --game-board-border-radius: 0;
     --game-board-border-width: 5px;
     --game-board-padding: 8px;
 }
@@ -154,13 +172,13 @@
     border-radius: var(--game-board-border-radius);
     border-bottom-right-radius: unset;
     padding: var(--game-board-padding);
-    border-right: none;
+    border-right: var(--game-board-border-width) solid transparent;
 }
 
 .gameUI-wrapper .board::after {
     content: "";
     position: absolute;
-    left: calc(100% - 20px);
+    left: calc(100% - 20px - var(--game-board-border-width));
     top: 0px;
     width: 20px;
     border-right: var(--game-board-border-width) solid white;
@@ -176,7 +194,7 @@
 }
 
 .gameUI-wrapper .board .row.small {
-    padding: 0 calc(var(--game-bubble-height) / 2 + 4px);
+    padding: 0 calc(var(--game-bubble-height) / 2 + var(--game-board-padding));
 }
 
 .gameUI-wrapper .field {
@@ -190,7 +208,7 @@
 }
 
 .gameUI-wrapper .board .deathZoneLine {
-    border: var(--game-board-border-width) solid white;
+    border-top: var(--game-board-border-width) solid white;
 }
 
 .gameUI-wrapper .board .preview .bubble {
@@ -198,7 +216,7 @@
 }
 
 .gameUI-wrapper .board .arrowLine {
-    height: var(--game-bubble-height);
+    height: calc(var(--game-bubble-height) + 2 * var(--game-bubble-border-width));
     position: relative;
 }
 
@@ -215,14 +233,14 @@
     background-repeat: no-repeat;
     position: absolute;
     left: 50%;
-    bottom: 0;
+    bottom: 50%;
 }
 
 .gameUI-wrapper .queue-wrapper {
     position: absolute;
     bottom: 0%;
     right: 0;
-    transform: translateX(50%);
+    transform: translateX(45%);
     padding: var(--game-board-padding);
     border: var(--game-board-border-width) solid white;
     border-left: none;
@@ -237,7 +255,7 @@
     position: relative;
 }
 
-.gameUI-wrapper  .trajectory {
+.gameUI-wrapper .trajectory {
     position: absolute;
     top: 0;
     left: 0;
@@ -246,6 +264,18 @@
 }
 
 .gameUI-wrapper  .trajectory > polyline {
-    stroke: rgba(255, 255, 255, 0.3);
-    stroke-width: 3;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 4px;
+    transform: translateX(4px);
+}
+
+.gameUI-wrapper .username {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 15px);
+    transform: translateX(-50%);
+}
+
+.gameUI-wrapper .username {
+    font-size: 80%;
 }

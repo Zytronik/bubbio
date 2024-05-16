@@ -162,7 +162,7 @@ function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosi
 }
 
 function getArrowLineString(gridWidth: number, angle: number, currentBubble: Bubble): string {
-    return "<div class='arrowLine'><div style='transform: translateX(-50%) rotate(" + angle + "deg)'>" + currentBubble.ascii + "</div></div>";
+    return "<div class='arrowLine'><div style='transform: translate(-50%, 50%) rotate(" + angle + "deg)'>" + currentBubble.ascii + "</div></div>";
 }
 
 function getTravelLineString(previewBubble: PreviewBubble, gridWidth: number, gridHeight: number): string {

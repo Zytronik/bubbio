@@ -2,13 +2,23 @@
   <div class="game-wrapper">
     <div v-if="gameMode === 'sprint'" class="inGameStats">
       <div class="bottom">
-        <p
-          v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
-        </p>
-        <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}
-        </p>
-        <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond
-          }}</p>
+        <div>
+          <p>Time</p>
+          <p
+            v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
+          </p>
+        </div>
+        <div>
+          <p>Cleared</p>
+          <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}
+          </p>
+        </div>
+        <div>
+          <p>Bubbles</p>
+          <p>{{ playerGameVisuals.statNumbers.bubblesShot }}.</p>
+          <p>{{ playerGameVisuals.statNumbers.bubblesPerSecond
+            }}/S</p>
+        </div>
       </div>
       <div class="top">
         <transition name="fade">
@@ -22,13 +32,6 @@
       </div>
     </div>
     <div v-if="gameMode === 'ranked'" class="inGameStats">
-      <div class="bottom">
-        <p
-          v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
-        </p>
-        <p>{{ playerGameVisuals.statNumbers.attackPerMinute }} APM</p>
-        <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond }}</p>
-      </div>
       <div class="top">
         <transition name="fade">
           <p v-if="playerGameVisuals.statNumbers.currentCombo.value > 0">Combo {{
@@ -39,21 +42,42 @@
             playerGameVisuals.statNumbers.spikeNumber.value }}</p>
         </transition>
       </div>
+      <div class="bottom">
+        <div>
+          <p>Time</p>
+          <p v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
+          </p>
+        </div>
+        <div>
+          <p>Attack</p>
+          <p>{{ playerGameVisuals.statNumbers.attackPerMinute }} APM</p>
+        </div>
+        <div>
+          <p>Bubbles</p>
+          <p>{{ playerGameVisuals.statNumbers.bubblesShot }}.</p>
+          <p>{{ playerGameVisuals.statNumbers.bubblesPerSecond
+            }}/S</p>
+        </div>
+      </div>
     </div>
     <div class="gameUI-wrapper">
       <!-- <div class="garbage"
         v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage"></div>
-       --><div class="hold"
+       --><!-- <div class="hold"
         v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></div>
+       -->
       <div class="queue-wrapper">
         <div class="queue-pieces"
-        v-html="areRef ? playerGameVisuals.asciiBoard.queueString.value : playerGameVisuals.asciiBoard.queueString"></div>
+          v-html="areRef ? playerGameVisuals.asciiBoard.queueString.value : playerGameVisuals.asciiBoard.queueString">
+        </div>
       </div>
       <div class="board"
-        v-html="areRef ? playerGameVisuals.asciiBoard.playGridASCII.value : playerGameVisuals.asciiBoard.playGridASCII"></div>
+        v-html="areRef ? playerGameVisuals.asciiBoard.playGridASCII.value : playerGameVisuals.asciiBoard.playGridASCII">
+      </div>
       <div class="overlap-infos"
-        v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText"></div>
-      <!-- <span class="username text-center" v-html="playerGameVisuals.playerName.toUpperCase()"></span> -->
+        v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText">
+      </div>
+      <span class="username text-center" v-html="playerGameVisuals.playerName.toUpperCase()"></span>
     </div>
   </div>
 

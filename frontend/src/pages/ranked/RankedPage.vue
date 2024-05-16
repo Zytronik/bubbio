@@ -578,7 +578,6 @@ export default {
     }
 
     onMounted(() => {
-      changeBackgroundTo('linear-gradient(45deg, rgba(126,10,41,1) 0%, rgba(144,141,58,1) 100%)');
       backInputOnLoad.value = backInput.fire;
       if (isLoggedIn.value) {
         fetchPlayerMmStats();
@@ -646,9 +645,6 @@ export default {
 </script>
 
 <style scoped>
-.back-buttons::before {
-  background: linear-gradient(45deg, rgba(43, 221, 185, 1) 0%, rgba(198, 63, 119, 1) 100%);
-}
 
 .matchmakingButton {
   font-size: 35px;
@@ -893,16 +889,6 @@ p {
   position: fixed;
   top: 0;
   bottom: 0;
-}
-
-.gaming-wrapper::before {
-  left: 0;
-  background: linear-gradient(45deg, rgba(126, 10, 41, 1) 0%, rgba(144, 141, 58, 1) 100%);
-}
-
-.gaming-wrapper::after {
-  right: 0;
-  background: linear-gradient(45deg, rgb(10, 126, 88) 0%, rgb(144, 141, 58) 100%);
 }
 
 .scores-wrapper {
