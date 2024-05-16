@@ -41,17 +41,19 @@
       </div>
     </div>
     <div class="gameUI-wrapper">
-      <span class="monospace"
-        v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage"></span>
-      <span class="hold"
-        v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></span>
-      <span class="queue"
-        v-html="areRef ? playerGameVisuals.asciiBoard.queueString.value : playerGameVisuals.asciiBoard.queueString"></span>
+      <!-- <div class="garbage"
+        v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage"></div>
+       --><div class="hold"
+        v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></div>
+      <div class="queue-wrapper">
+        <div class="queue-pieces"
+        v-html="areRef ? playerGameVisuals.asciiBoard.queueString.value : playerGameVisuals.asciiBoard.queueString"></div>
+      </div>
       <div class="board"
         v-html="areRef ? playerGameVisuals.asciiBoard.playGridASCII.value : playerGameVisuals.asciiBoard.playGridASCII"></div>
-      <span class="monospace overlap-infos"
-        v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText"></span>
-      <span class="username text-center" v-html="playerGameVisuals.playerName.toUpperCase()"></span>
+      <div class="overlap-infos"
+        v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText"></div>
+      <!-- <span class="username text-center" v-html="playerGameVisuals.playerName.toUpperCase()"></span> -->
     </div>
   </div>
 

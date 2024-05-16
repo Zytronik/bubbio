@@ -6,6 +6,7 @@ import { playerGameInstance, playerGameVisuals, setGameStateAndNotify } from "..
 import { calculatePreview } from "../logic/game.logic.shoot";
 import { Bubble } from "../i/game.i.bubble";
 import { GAME_STATE } from "../i/game.e.state";
+import { PreviewBubble } from "../i/game.i.preview-bubble";
 
 let asciiAnimationRunning = false;
 let asciiAnimationFrameId: number | null = null;
@@ -93,6 +94,9 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
 
     const gridWidth = playGrid.gridWidth;
     let boardText = ""
+    if(gameInstance.playGrid.previewBubble){
+        boardText += getTravelLine(gameInstance.playGrid.previewBubble, gameInstance.playGrid.precisionWidth, gameInstance.playGrid.precisionHeight);  
+    }
     boardText += getUpperBoarderLineString(gridWidth);
     let once = true;
     playGrid.rows.forEach(row => {
@@ -102,7 +106,7 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
         }
         boardText += getRegularRowString(row.fields, row.isSmallerRow, previewPosition, gameInstance.currentBubble);
     });
-    boardText += getArrowLineString(gameInstance.playGrid.gridWidth, gameInstance.angle);
+    boardText += getArrowLineString(gameInstance.playGrid.gridWidth, gameInstance.angle, gameInstance.currentBubble);
     boardText += getLowerBoarderLineString(gridWidth);
     asciiRefs.playGridASCII.value = boardText;
     asciiRefs.holdString.value = getHoldBubbleString(gameInstance.holdBubble);
@@ -157,20 +161,30 @@ function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosi
     return rowString;
 }
 
-function getArrowLineString(gridWidth: number, angle: number): string {
-    return "<div class='arrowLine'><div style='transform:rotate("+angle+"deg)'></div></div>";
+function getArrowLineString(gridWidth: number, angle: number, currentBubble: Bubble): string {
+    return "<div class='arrowLine'><div style='transform: translateX(-50%) rotate("+angle+"deg)'>"+currentBubble.ascii+"</div></div>";
+}
+
+function getTravelLine(previewBubble: PreviewBubble, gridWidth: number, gridHeight: number): string {
+    const boardWidth = document.querySelector(".board")?.clientWidth || 0;
+    const boardHeight = document.querySelector(".board")?.clientHeight || 0;
+    const startX = previewBubble.travelLine[0].x / gridWidth * boardWidth;
+    const startY = previewBubble.travelLine[0].y / gridHeight * boardHeight;
+    const endX = previewBubble.travelLine[1].x / gridWidth * boardWidth;
+    const endY = previewBubble.travelLine[1].y / gridHeight * boardHeight;
+    return `<svg class="trajectory"><polyline points="${startX},${startY} ${endX},${endY}"></polyline></svg>`
 }
 
 function getHoldBubbleString(holdBubble: Bubble | undefined): string {
-    return `Hold: ${holdBubble ? `${holdBubble.ascii}` : ""}` + "\n";
+    return `${holdBubble ? `${holdBubble.ascii}` : ""}` + "\n";
 }
 
 function getBubbleQueueString(currentBubble: Bubble, bubbleQueue: Bubble[], previewLength: number): string {
-    let queueString = `Queue: ${currentBubble.ascii} |`;
+    let queueString = "";
     for (let i = 0; i < previewLength; i++) {
         queueString += ` ${bubbleQueue[i].ascii} `;
     }
-    return queueString + "\n\n";
+    return queueString;
 }
 
 function getIncomingGarbageString(garbageAmount: number, gridtotalHeight: number): string {
