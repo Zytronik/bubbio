@@ -43,12 +43,12 @@
     <div class="gameUI-wrapper">
       <span class="monospace"
         v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage"></span>
-      <span class="monospace"
+      <span class="hold"
         v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></span>
-      <span class="monospace remove-whiteSpaces"
+      <span class="queue"
         v-html="areRef ? playerGameVisuals.asciiBoard.queueString.value : playerGameVisuals.asciiBoard.queueString"></span>
-      <span class="monospace text-center"
-        v-html="areRef ? playerGameVisuals.asciiBoard.playGridASCII.value : playerGameVisuals.asciiBoard.playGridASCII"></span>
+      <div class="board"
+        v-html="areRef ? playerGameVisuals.asciiBoard.playGridASCII.value : playerGameVisuals.asciiBoard.playGridASCII"></div>
       <span class="monospace overlap-infos"
         v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText"></span>
       <span class="username text-center" v-html="playerGameVisuals.playerName.toUpperCase()"></span>

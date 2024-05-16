@@ -1,5 +1,5 @@
 import { Application, Assets, Sprite, Texture } from "pixi.js";
-import { AsciiFilter, ConvolutionFilter, ZoomBlurFilter } from "pixi-filters";
+import { ConvolutionFilter } from "pixi-filters";
 
 export let backgroundCanvasApp: Application;
 export let backgroundCanvasAssets: Texture;
@@ -10,7 +10,7 @@ export async function loadBackgroundCanvas(): Promise<void> {
         
         await backgroundCanvasApp.init({resizeTo: window });
         backgroundCanvasAssets = await Assets.load('https://pixijs.com/assets/bunny.png');
-        Assets.load({alias: 'background', src: require('@/img/sprite/1480843698063.jpg')});
+        await Assets.load({alias: 'background', src: require('@/img/sprite/1480843698063.jpg')});
         setupBackgroundCanvas();
     }
     
@@ -27,14 +27,13 @@ function appendBackgroundCanvas() {
 
 function setupBackgroundCanvas() {
     const background = Sprite.from('background');
-    console.log(background)
     background.width = backgroundCanvasApp.screen.width;
     background.height = backgroundCanvasApp.screen.height;
     backgroundCanvasApp.stage.addChild(background);
     background.x = 0;
     background.y = 0;
 
-    const convo = new ConvolutionFilter({width: 300, height: 300, matrix: [0.01,0.1,0.1,0.01,0,0,0,0,0.01]});
+    const convo = new ConvolutionFilter({width: 300, height: 300, matrix: [0,0,0,0,0,0,0,0.1,0.1]});
     backgroundCanvasApp.stage.filters = [convo];
 
     

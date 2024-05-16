@@ -130,72 +130,45 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
 }
 
 function getUpperBoarderLineString(gridWidth: number): string {
-    let boarderLine = "╭─";
-    for (let i = 0; i < gridWidth; i++) {
-        boarderLine += "────";
-    }
-    boarderLine += "╮\n";
-    return boarderLine;
+    return "";
 }
 
 function getLowerBoarderLineString(gridWidth: number): string {
-    let boarderLine = "╰─";
-    for (let i = 0; i < gridWidth; i++) {
-        boarderLine += "────";
-    }
-    boarderLine += "╯\n";
-    return boarderLine;
+    return "";
 }
 
 function getDeathZoneLineString(gridWidth: number): string {
-    let deathZoneLine = "├┅";
-    for (let i = 0; i < gridWidth; i++) {
-        deathZoneLine += "┅┅┅┅";
-    }
-    deathZoneLine += "┤\n";
-    return deathZoneLine;
+    return "<div class='deathZoneLine'></div>";
 }
 
 function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosition: Coordinates, currrentBubble: Bubble): string {
     let rowString = "";
-    rowString += isSmallerRow ? "│&nbsp;&nbsp;&nbsp;" : "│ ";
+    rowString += isSmallerRow ? "<div class='row small'>" : "<div class='row'>";
 
     fields.forEach(field => {
         if (previewPosition.x === field.coords.x && previewPosition.y === field.coords.y) {
-            rowString += `|${currrentBubble.ascii}| `;
+            rowString += `<div class="preview">${currrentBubble.ascii}</div>`;
         } else {
-            rowString += field.bubble ? `(${field.bubble.ascii}) ` : "--- ";
+            rowString += field.bubble ? `${field.bubble.ascii} ` : "<div class='field empty'></div>";
         }
     });
 
-    rowString += isSmallerRow ? "&nbsp;&nbsp;│\n" : "│\n";
+    rowString += "</div>";
     return rowString;
 }
 
 function getArrowLineString(gridWidth: number, angle: number): string {
-    let arrowLine = "│ ";
-    const isEvenRow = gridWidth % 2 === 0;
-
-    for (let i = 0; i < (gridWidth / 2) - 1; i++) {
-        arrowLine += "&nbsp;&nbsp;&nbsp;&nbsp;";
-    }
-    arrowLine += isEvenRow ? `&nbsp;&nbsp;&nbsp;${getASCIIArrow(angle)}&nbsp;&nbsp;&nbsp;&nbsp;` : ` ${getASCIIArrow(angle)}&nbsp;&nbsp;`
-    for (let i = 0; i < (gridWidth / 2) - 1; i++) {
-        arrowLine += "&nbsp;&nbsp;&nbsp;&nbsp;";
-    }
-
-    arrowLine += "│\n";
-    return arrowLine;
+    return "<div class='arrowLine'><div style='transform:rotate("+angle+"deg)'></div></div>";
 }
 
 function getHoldBubbleString(holdBubble: Bubble | undefined): string {
-    return `Hold: ${holdBubble ? `(${holdBubble.ascii})` : ""}` + "\n";
+    return `Hold: ${holdBubble ? `${holdBubble.ascii}` : ""}` + "\n";
 }
 
 function getBubbleQueueString(currentBubble: Bubble, bubbleQueue: Bubble[], previewLength: number): string {
-    let queueString = `Queue: (${currentBubble.ascii}) |`;
+    let queueString = `Queue: ${currentBubble.ascii} |`;
     for (let i = 0; i < previewLength; i++) {
-        queueString += ` (${bubbleQueue[i].ascii}) `;
+        queueString += ` ${bubbleQueue[i].ascii} `;
     }
     return queueString + "\n\n";
 }

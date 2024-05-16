@@ -42,37 +42,37 @@ function getBubbleBag(gameInstance: GameInstance): Bubble[] {
 
 
 const red: Bubble = {
-    ascii: `<span style="color: rgb(255, 0, 0);">R</span>`,
+    ascii: `<div class="field bubble" style="background: rgb(255, 0, 0);"></div>`,
     type: 0,
     spriteSheetName: RED_BUBBLE_IDLE,
 }
 const orange: Bubble = {
-    ascii: `<span style="color: rgb(255, 174, 0);">O</span>`,
+    ascii: `<div class="field bubble" style="background: rgb(255, 136, 0);"></div>`,
     type: 1,
     spriteSheetName: ORANGE_BUBBLE_IDLE,
 }
 const yellow: Bubble = {
-    ascii: `<span style="color: rgb(255, 255, 0);">Y</span>`,
+    ascii: `<div class="field bubble" style="background: rgb(255, 255, 0);"></div>`,
     type: 2,
     spriteSheetName: YELLOW_BUBBLE_IDLE,
 }
 const green: Bubble = {
-    ascii: `<span style="color: rgb(123, 255, 0);">G</span>`,
+    ascii: `<div class="field bubble" style=" background: rgb(32, 226, 25);"></div>`,
     type: 3,
     spriteSheetName: GREEN_BUBBLE_IDLE,
 }
 const cyan: Bubble = {
-    ascii: `<span style="color: rgb(0, 255, 255);">B</span>`,
+    ascii: `<div class="field bubble" style="background: rgb(0, 255, 255);"></div>`,
     type: 4,
     spriteSheetName: CYAN_BUBBLE_IDLE,
 }
 const purple: Bubble = {
-    ascii: `<span style="color: rgb(255, 0, 255);">P</span>`,
+    ascii: `<div class="field bubble" style=" background: rgb(255, 0, 255);"></div>`,
     type: 5,
     spriteSheetName: PURPLE_BUBBLE_IDLE,
 }
 const white: Bubble = {
-    ascii: `<span style="color: rgb(255, 255, 255);">W</span>`,
+    ascii: `<div class="field bubble" style=" background: rgb(255, 255, 255);"></div>`,
     type: 6,
     spriteSheetName: WHITE_BUBBLE_IDLE,
 }

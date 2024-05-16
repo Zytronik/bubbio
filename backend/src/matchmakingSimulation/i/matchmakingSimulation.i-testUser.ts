@@ -4,6 +4,7 @@ export interface TestUser {
     ratingDeviation: number;
     volatility: number;
     searchStart?: number;
+    loopsInQueue: number;
     amountOfQueues: number;
     maxAmountOfQueues: number;
     startDeviation: number;

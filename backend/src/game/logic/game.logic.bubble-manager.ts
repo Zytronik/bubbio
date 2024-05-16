@@ -42,37 +42,37 @@ function getBubbleBag(gameInstance: GameInstance): Bubble[] {
 
 const red: Bubble = {
     color: "rgb(255, 0, 0)",
-    ascii: `<span style="color: rgb(255, 0, 0);">R</span>`,
+    ascii: `<span style="color: rgb(255, 0, 0);">⬤</span>`,
     type: 0,
 }
 const orange: Bubble = {
     color: "rgb(255, 174, 0)",
-    ascii: `<span style="color: rgb(255, 174, 0);">O</span>`,
+    ascii: `<span style="color: rgb(255, 174, 0);">⬤</span>`,
     type: 1,
 }
 const yellow: Bubble = {
     color: "rgb(255, 255, 0)",
-    ascii: `<span style="color: rgb(255, 255, 0);">Y</span>`,
+    ascii: `<span style="color: rgb(255, 255, 0);">⬤</span>`,
     type: 2,
 }
 const green: Bubble = {
     color: "rgb(123, 255, 0)",
-    ascii: `<span style="color: rgb(123, 255, 0);">G</span>`,
+    ascii: `<span style="color: rgb(123, 255, 0);">⬤</span>`,
     type: 3,
 }
 const cyan: Bubble = {
     color: "rgb(0, 255, 255)",
-    ascii: `<span style="color: rgb(0, 255, 255);">B</span>`,
+    ascii: `<span style="color: rgb(0, 255, 255);">⬤</span>`,
     type: 4,
 }
 const magenta: Bubble = {
     color: "rgb(255, 0, 255)",
-    ascii: `<span style="color: rgb(255, 0, 255);">P</span>`,
+    ascii: `<span style="color: rgb(255, 0, 255);">⬤</span>`,
     type: 5,
 }
 const white: Bubble = {
     color: "rgb(255, 255, 255)",
-    ascii: `<span style="color: rgb(255, 255, 255);">W</span>`,
+    ascii: `<span style="color: rgb(255, 255, 255);">⬤</span>`, 
     type: 6,
 }
 export const allBubbles: Bubble[] = [

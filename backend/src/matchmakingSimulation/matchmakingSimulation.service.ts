@@ -11,7 +11,7 @@ interface MatchmakingQueue {
 export class MatchmakingSimulationService {
     private socketMmRoomName: string = 'matchmakingSimulationVue_389w4389w4uhbf803w4bnf83wn4f803w4fsdjkngsdfr';
     private queue: MatchmakingQueue = {};
-    private speedFactor = 100;
+    private speedFactor = 1000;
     private startGap = 100; // Startwert für den akzeptablen Skill Gap
     private gapIncreaseInterval = 10000 / this.speedFactor; // Zeit in Millisekunden, nach der der Skill Gap erhöht wird
     private matchmakingIntervalTime = 5000 / this.speedFactor;
@@ -45,12 +45,6 @@ export class MatchmakingSimulationService {
         }
     }
 
-    addAllUsersToQueue(users: TestUser[]) {
-        for (let user of users) {
-            this.addUserToQueue(user);
-        }
-    }
-
     userJoinedMmSimVue(client: Socket){
         client.join(this.socketMmRoomName);
         this.clearQueue();
@@ -80,7 +74,8 @@ export class MatchmakingSimulationService {
                 amountOfQueues: user.amountOfQueues,
                 maxAmountOfQueues: user.maxAmountOfQueues,
                 startDeviation: user.startDeviation,
-                searchStart: Date.now()
+                searchStart: Date.now(),
+                loopsInQueue: 0,
             };
             
             this.startMatchmakingInterval();
@@ -105,6 +100,7 @@ export class MatchmakingSimulationService {
 
     matchPlayers() {
         console.log('Matching players');
+        console.log('__________________________');
         const userIds = Object.keys(this.queue);
         const matches = [];
 
@@ -116,13 +112,30 @@ export class MatchmakingSimulationService {
 
             const currentTime = Date.now();
             const timeDiff = currentTime - searchStart;
-            const currentGap = Math.min(this.startGap + Math.max((1 - Math.exp(-timeDiff / this.gapIncreaseInterval)) * this.gapIncreaseAmount, this.minGapIncreaseAmount), this.maxGap);
+            /* const currentGap = Math.min( //uses the time difference to calculate the current gap
+                this.startGap + Math.max(
+                    Math.log(1 + Math.floor(timeDiff / this.gapIncreaseInterval)) * this.gapIncreaseAmount,
+                    this.minGapIncreaseAmount
+                ), 
+                this.maxGap
+            ); */
+            const currentGap = Math.min( //uses the loops in queue to calculate the current gap
+                this.startGap + Math.max(
+                    Math.log(1 + user.loopsInQueue) * this.gapIncreaseAmount,
+                    this.minGapIncreaseAmount
+                ), 
+                this.maxGap
+            );
             for (let j = i + 1; j < userIds.length; j++) {
                 const opponentId = userIds[j];
                 const opponent = this.queue[opponentId];
                 if (!opponent) continue;
 
                 const ratingDiff = Math.abs(rating - opponent.rating);
+                console.log('Time Diff:', timeDiff);
+                console.log('Logarithmic Increase:', Math.log(1 + Math.floor(timeDiff / this.gapIncreaseInterval)) * this.gapIncreaseAmount);
+                console.log('Min Gap Increase:', this.minGapIncreaseAmount);
+                console.log('Current Gap:', currentGap);
                 if (ratingDiff <= currentGap) {
                     matches.push([userId, opponentId]);
                     break;
@@ -142,7 +155,7 @@ export class MatchmakingSimulationService {
         const player1 = this.queue[player1Name];
         const player2 = this.queue[player2Name];
         if (player1 && player2) {
-            this.notfiyMatchFound(player1Name, player2Name);
+            this.notfiyMatchFound(player1, player2);
             this.predictAndSimulateMatch(player1, player2);
             onMatched();
         }
@@ -192,13 +205,15 @@ export class MatchmakingSimulationService {
         return this.glicko.predict(glickoPlayer1, glickoPlayer2) * 100;
     }
 
-    notfiyMatchFound(player1Name: string, player2Name: string) {
-        this.matchmakingSimulationGateway.server.to(this.socketMmRoomName).emit('matchFoundUpdate', [player1Name, player2Name]);
+    notfiyMatchFound(player1: TestUser, player2: TestUser) {
+        console.log(player1, player2)
+        this.matchmakingSimulationGateway.server.to(this.socketMmRoomName).emit('matchFoundUpdate', [player1, player2]);
     }
 
     startMatchmakingInterval() {
         if (this.matchmakingInterval === null) {
             this.matchmakingInterval = setInterval(() => {
+                Object.values(this.queue).forEach(user => user.loopsInQueue++);
                 this.matchPlayers();
                 if (this.checkIfMatchmakingQueueIsEmpty() && this.matchmakingInterval) {
                     clearInterval(this.matchmakingInterval);

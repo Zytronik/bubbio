@@ -21,11 +21,6 @@ export class MatchmakingSimulationGateway implements OnGatewayDisconnect {
         this.matchmakingSimulationService.clearQueue();
     }
 
-    @SubscribeMessage('addAllUsersToQueue')
-    handleAddAllUsersToQueue(@ConnectedSocket() client: Socket, @MessageBody() users: TestUser[]) {
-        this.matchmakingSimulationService.addAllUsersToQueue(users);
-    }
-
     @SubscribeMessage('addUserToQueue')
     handleAddUserToQueue(@ConnectedSocket() client: Socket, @MessageBody() user: TestUser) {
         this.matchmakingSimulationService.addUserToQueue(user);

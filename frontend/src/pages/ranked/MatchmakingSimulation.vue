@@ -12,10 +12,12 @@
             <h2>Settings</h2>
             <div class="settings-wrapper">
               <p><span>Startwert für den akzeptablen Skill Gap:</span> {{ mmSettings?.startGap }}</p>
-              <p><span>Zeit in Millisekunden, nach der der Skill Gap erhöht wird:</span> {{
-                mmSettings?.gapIncreaseInterval }}</p>
-              <p><span>Zeit in Millisekunden, nach der Matchmaking Funktion ausgeführt wird:</span> {{
-                mmSettings?.matchmakingIntervalTime }}</p>
+              <p v-if="mmSettings?.gapIncreaseInterval"><span>Zeit in Millisekunden, nach der der Skill Gap erhöht
+                  wird:</span> {{
+                    mmSettings?.gapIncreaseInterval * speedFactor }}</p>
+              <p v-if="mmSettings?.matchmakingIntervalTime"><span>Zeit in Millisekunden, nach der Matchmaking Funktion
+                  ausgeführt wird:</span> {{
+                    mmSettings.matchmakingIntervalTime * speedFactor }}</p>
               <p><span>Wert für erhöhung des Skill Gaps:</span> {{ mmSettings?.gapIncreaseAmount }}</p>
               <p><span>Minimale Erhöhung des Skill Gaps:</span> {{ mmSettings?.minGapIncreaseAmount }}</p>
               <p><span>Maximale Erweiterung des Skill Gaps:</span> {{ mmSettings?.maxGap }}</p>
@@ -29,17 +31,14 @@
             <h2>Not in Queue</h2>
             <div class="button-wrapper">
               <button @click="createAddUser">Create & Add 1 User</button>
-              <button @click="createAdd100Users">Create & Add 100 Users</button>
-              <!-- <button @click="createAddRandomUser">Create & Add 1 R. User</button>
-              <button @click="createAdd100RandomUsers">Create & Add 100 R. Users</button> -->
-              <!-- <button @click="addAllUsersToQueue">Add All To Queue</button> -->
+              <button @click="createAddMultipleUsers">Create & Add {{ amountOfMultipleUsers }} Users</button>
             </div>
             <div class="scrollable">
               <div v-for="(user, index) in users" :key="'not-in-queue-' + index" class="user">
                 <p class="username">{{ user.name }}</p>
                 <p class="rating"><span>Rating: </span>{{ user.rating }}<span>±{{ user.ratingDeviation }}</span></p>
                 <p class="queueAmount"><span>Queued: </span> {{ user.amountOfQueues }}/{{ user.maxAmountOfQueues }}</p>
-                <p class="startRDev"><span>Start RD: </span> {{ user.startDeviation }}</p>
+                <!-- <p class="startRDev"><span>Start RD: </span> {{ user.startDeviation }}</p> -->
               </div>
             </div>
           </div>
@@ -66,7 +65,7 @@
                       }}</span></p>
                   <p class="queueAmount"><span>Queued: </span> {{ match.user1.amountOfQueues }}/{{
                     match.user1.maxAmountOfQueues }}</p>
-                  <p class="time" v-if="match.user1.waitingTime"><span>Waiting Time: </span>{{
+                  <p class="time"><span>Waiting Time: </span>{{
                     millisToMinutesAndSeconds(match.user1.waitingTime * speedFactor) ?? 0
                   }}
                   </p>
@@ -78,7 +77,7 @@
                       }}</span></p>
                   <p class="queueAmount"><span>Queued: </span> {{ match.user2.amountOfQueues }}/{{
                     match.user2.maxAmountOfQueues }}</p>
-                  <p class="time" v-if="match.user2.waitingTime"><span>Waiting Time: </span>{{
+                  <p class="time"><span>Waiting Time: </span>{{
                     millisToMinutesAndSeconds(match.user2.waitingTime * speedFactor) ?? 0
                   }}
                   </p>
@@ -135,12 +134,13 @@ interface User {
   rating: number;
   ratingDeviation: number;
   volatility: number;
-  waitingTime?: number;
+  waitingTime: number;
   hasWon?: boolean;
   hasLost?: boolean;
   amountOfQueues: number;
   maxAmountOfQueues: number;
   startDeviation: number;
+  loopsInQueue?: number;
 }
 
 interface MmSettings {
@@ -174,8 +174,9 @@ export default defineComponent({
     const queue = ref<User[]>([]);
     const matches = ref<Match[]>([]);
     const currentId = ref(1);
-    const speedFactor = ref(100);
+    const speedFactor = ref(1000);
     const mmSettings = ref<MmSettings>()
+    const amountOfMultipleUsers = ref(200);
 
     onMounted(() => {
       changeBackgroundTo("black");
@@ -195,6 +196,11 @@ export default defineComponent({
     function unmountSockets() {
       if (state.socket) {
         state.socket.emit('playerLeftMmSimVue');
+        state.socket.off('queueUpdate');
+        state.socket.off('matchFoundUpdate');
+        state.socket.off('matchResult');
+        state.socket.off('ratingsUpdate');
+        state.socket.off('mMSettings');
       }
     }
 
@@ -202,37 +208,118 @@ export default defineComponent({
       if (state.socket) {
         state.socket.emit('playerJoinedMmSimVue');
       }
+
+      if (state.socket) {
+        state.socket.on('queueUpdate', (q: MatchmakingQueue) => {
+          for (const username in q) {
+            let user = getUserByName(username)
+            if (user) {
+              users.value = users.value.filter((u) => u.name !== username);
+              queue.value.push(user);
+            }
+          }
+        });
+
+        state.socket.on('matchFoundUpdate', (match: User[]) => {
+          let user1 = queue.value.find(user => user.name === match[0].name);
+          let user2 = queue.value.find(user => user.name === match[1].name);
+          if (user1 && user2 && mmSettings.value && match[0].loopsInQueue && match[1].loopsInQueue) {
+            user1.waitingTime = Math.floor((match[0].loopsInQueue - 1) * mmSettings.value.matchmakingIntervalTime);
+            user2.waitingTime = Math.floor((match[1].loopsInQueue - 1) * mmSettings.value.matchmakingIntervalTime);
+            queue.value = queue.value.filter(user => user.name !== user1.name && user.name !== user2.name);
+            matches.value.push({ user1, user2 });
+            updateStatistics(user1, user2);
+          }
+        });
+
+        state.socket.on('matchResult', (matchResult: User[]) => {
+          let winner = matchResult[0];
+          let loser = matchResult[1];
+          let winnerIndex = matches.value.findIndex(match => match.user1.name === winner.name || match.user2.name === winner.name);
+          let loserIndex = matches.value.findIndex(match => match.user1.name === loser.name || match.user2.name === loser.name);
+          if (winnerIndex !== -1 && loserIndex !== -1) {
+            matches.value[winnerIndex].user1.hasWon = matches.value[winnerIndex].user1.name === winner.name;
+            matches.value[winnerIndex].user2.hasWon = matches.value[winnerIndex].user2.name === winner.name;
+            matches.value[loserIndex].user1.hasLost = matches.value[loserIndex].user1.name === loser.name;
+            matches.value[loserIndex].user2.hasLost = matches.value[loserIndex].user2.name === loser.name;
+          }
+        });
+
+        state.socket.on('mMSettings', (settings: MmSettings) => {
+          mmSettings.value = settings;
+        });
+
+        state.socket.on('ratingsUpdate', (ratingUpdate: User[]) => {
+          let winner = ratingUpdate[0];
+          let loser = ratingUpdate[1];
+          const maxDelay = 600000;
+          const minDelay = 120000;
+          const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+
+          // Wait for x seconds
+          setTimeout(() => {
+            // Add both users to users array if they are not already in there
+            [winner, loser].forEach(user => {
+              if (!users.value.some(u => u.name === user.name)) {
+                users.value.push({
+                  ...user,
+                  waitingTime: 0,  // Reset or assign appropriate waiting time
+                  hasWon: undefined,       // Reset or assign win/loss status
+                  hasLost: undefined
+                });
+              }
+            });
+
+            // Remove both users from matches array
+            matches.value = matches.value.filter(match =>
+              match.user1.name !== winner.name && match.user1.name !== loser.name &&
+              match.user2.name !== winner.name && match.user2.name !== loser.name
+            );
+
+            // After users are added to users array and removed from matches array, update the ratings
+            users.value.forEach(user => {
+              if (user.name === winner.name) {
+                user.rating = formatRating(winner.rating);
+                user.ratingDeviation = formatRating(winner.ratingDeviation);
+                user.volatility = formatVolatity(winner.volatility);
+              }
+              if (user.name === loser.name) {
+                user.rating = formatRating(loser.rating);
+                user.ratingDeviation = formatRating(loser.ratingDeviation);
+                user.volatility = formatVolatity(loser.volatility);
+              }
+            });
+            addUserToQueue(winner);
+            addUserToQueue(loser);
+
+          }, randomDelay / speedFactor.value);
+        });
+      }
     }
 
     function createUser() {
       const name = `tester-${currentId.value}`;
       currentId.value++;
       const rating = 1500;
-      /* const ratingDeviation = 250; */
+      const ratingDeviation = 250;
       const volatility = 0.06;
+      const waitingTime = 0;
       const amountOfQueues = 0;
       const minMaxAmountOfQueues = 10;
       const maxMaxAmountOfQueues = 20;
       const maxAmountOfQueues = Math.floor(Math.random() * (maxMaxAmountOfQueues - minMaxAmountOfQueues + 1)) + minMaxAmountOfQueues;
 
-      const minRatingDeviation = 60;
+      /* const minRatingDeviation = 60;
       const maxRatingDeviation = 250;
       const ratingDeviation = formatRating(Math.random() * (maxRatingDeviation - minRatingDeviation + 1)) + minRatingDeviation;
-
-      const newUser: User = { name, rating, ratingDeviation, volatility, amountOfQueues, maxAmountOfQueues, startDeviation: ratingDeviation };
+ */
+      const newUser: User = { name, rating, ratingDeviation, volatility, amountOfQueues, maxAmountOfQueues, startDeviation: ratingDeviation, waitingTime };
       users.value.push(newUser);
       return newUser;
     }
 
-    function createAdd100RandomUsers() {
-      for (let i = 0; i < 6; i++) {
-        const user = createRandomUser();
-        addUserToQueue(user);
-      }
-    }
-
-    function createAdd100Users() {
-      for (let i = 0; i < 100; i++) {
+    function createAddMultipleUsers() {
+      for (let i = 0; i < amountOfMultipleUsers.value; i++) {
         const user = createUser();
         addUserToQueue(user);
       }
@@ -243,49 +330,19 @@ export default defineComponent({
       addUserToQueue(user);
     }
 
-    function createAddRandomUser() {
-      const user = createRandomUser();
-      addUserToQueue(user);
-    }
-
     function addUserToQueue(user: User) {
       debouncedUpdateChart();
       if (user.amountOfQueues >= user.maxAmountOfQueues) return;
       user.amountOfQueues++;
 
-      const minDelay = 5000 / speedFactor.value;
-      const maxDelay = 60000 / speedFactor.value;
+      const minDelay = 5000;
+      const maxDelay = 60000;
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
       setTimeout(() => {
         if (state.socket) {
           state.socket.emit('addUserToQueue', user);
         }
-      }, randomDelay);
-    }
-
-    function createRandomUser() {
-      const index = currentId.value;
-      currentId.value++;
-      const name = `tester-${index}`;
-      const minRating = 500;
-      const maxRating = 5000;
-      const minRatingDeviation = 60;
-      const maxRatingDeviation = 300;
-      const minVolatility = 0.04;
-      const maxVolatility = 0.06;
-      const minMaxAmountOfQueues = 10;
-      const maxMaxAmountOfQueues = 20;
-
-      const rating = formatRating(Math.random() * (maxRating - minRating + 1)) + minRating;
-      const ratingDeviation = formatRating(Math.random() * (maxRatingDeviation - minRatingDeviation + 1)) + minRatingDeviation;
-      const volatility = formatVolatity((Math.random() * (maxVolatility - minVolatility) + minVolatility))
-
-      const amountOfQueues = 0;
-      const maxAmountOfQueues = Math.floor(Math.random() * (maxMaxAmountOfQueues - minMaxAmountOfQueues + 1)) + minMaxAmountOfQueues;
-
-      const newUser: User = { name, rating, ratingDeviation, volatility, amountOfQueues, maxAmountOfQueues, startDeviation: ratingDeviation };
-      users.value.push(newUser);
-      return newUser;
+      }, randomDelay / speedFactor.value);
     }
 
     function formatRating(rating: number) {
@@ -294,100 +351,6 @@ export default defineComponent({
 
     function formatVolatity(volatility: number) {
       return Math.round(volatility * 1000) / 1000;
-    }
-
-    function addAllUsersToQueue() {
-      if (state.socket) {
-        state.socket.emit('addAllUsersToQueue', users.value);
-      }
-    }
-
-    if (state.socket) {
-      state.socket.on('queueUpdate', (q: MatchmakingQueue) => {
-        for (const username in q) {
-          let user = getUserByName(username)
-          if (user) {
-            user.waitingTime = q[username].searchStart;
-            users.value = users.value.filter((u) => u.name !== username);
-            queue.value.push(user);
-          }
-        }
-      });
-
-      state.socket.on('matchFoundUpdate', (match: string[]) => {
-        let user1 = queue.value.find(user => user.name === match[0]);
-        let user2 = queue.value.find(user => user.name === match[1]);
-        if (user1 && user2 && user1.waitingTime && user2.waitingTime) {
-          user1.waitingTime = Date.now() - user1.waitingTime;
-          user2.waitingTime = Date.now() - user2.waitingTime;
-          queue.value = queue.value.filter(user => user.name !== user1.name && user.name !== user2.name);
-          matches.value.push({ user1, user2 });
-          updateStatistics(user1, user2);
-        }
-      });
-
-      state.socket.on('matchResult', (matchResult: User[]) => {
-        let winner = matchResult[0];
-        let loser = matchResult[1];
-        let winnerIndex = matches.value.findIndex(match => match.user1.name === winner.name || match.user2.name === winner.name);
-        let loserIndex = matches.value.findIndex(match => match.user1.name === loser.name || match.user2.name === loser.name);
-        if (winnerIndex !== -1 && loserIndex !== -1) {
-          matches.value[winnerIndex].user1.hasWon = matches.value[winnerIndex].user1.name === winner.name;
-          matches.value[winnerIndex].user2.hasWon = matches.value[winnerIndex].user2.name === winner.name;
-          matches.value[loserIndex].user1.hasLost = matches.value[loserIndex].user1.name === loser.name;
-          matches.value[loserIndex].user2.hasLost = matches.value[loserIndex].user2.name === loser.name;
-        }
-      });
-
-      state.socket.on('mMSettings', (settings: MmSettings) => {
-        mmSettings.value = settings;
-      });
-
-      state.socket.on('ratingsUpdate', (ratingUpdate: User[]) => {
-        let winner = ratingUpdate[0];
-        let loser = ratingUpdate[1];
-        const maxDelay = 600000 / speedFactor.value;
-        const minDelay = 120000 / speedFactor.value;
-        const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
-
-        // Wait for x seconds
-        setTimeout(() => {
-          // Add both users to users array if they are not already in there
-          [winner, loser].forEach(user => {
-            if (!users.value.some(u => u.name === user.name)) {
-              users.value.push({
-                ...user,
-                waitingTime: undefined,  // Reset or assign appropriate waiting time
-                hasWon: undefined,       // Reset or assign win/loss status
-                hasLost: undefined
-              });
-            }
-          });
-
-          // Remove both users from matches array
-          matches.value = matches.value.filter(match =>
-            match.user1.name !== winner.name && match.user1.name !== loser.name &&
-            match.user2.name !== winner.name && match.user2.name !== loser.name
-          );
-
-          // After users are added to users array and removed from matches array, update the ratings
-          users.value.forEach(user => {
-            if (user.name === winner.name) {
-              user.rating = formatRating(winner.rating);
-              user.ratingDeviation = formatRating(winner.ratingDeviation);
-              user.volatility = formatVolatity(winner.volatility);
-            }
-            if (user.name === loser.name) {
-              user.rating = formatRating(loser.rating);
-              user.ratingDeviation = formatRating(loser.ratingDeviation);
-              user.volatility = formatVolatity(loser.volatility);
-            }
-          });
-          addUserToQueue(winner);
-          addUserToQueue(loser);
-
-        }, randomDelay);
-      });
     }
 
     function getUserByName(name: string) {
@@ -410,7 +373,6 @@ export default defineComponent({
         averageRatingDifference: 0,
       }
       currentId.value = 1;
-      console.log(users.value);
       if (state.socket) {
         state.socket.emit('resetMatchmakingSimulation');
       }
@@ -441,16 +403,15 @@ export default defineComponent({
     });
 
     function updateStatistics(user1: User, user2: User) {
-      if (!user1.waitingTime || !user2.waitingTime) return;
-      const waitingTime = user1.waitingTime + user2.waitingTime;
+      const waitingTime = (user1.waitingTime ?? 0) + (user2.waitingTime ?? 0);
       const ratingDifference = Math.abs(user1.rating - user2.rating);
       statistics.value.totalWaitingTime += waitingTime;
       statistics.value.totalRatingDifference += ratingDifference;
       statistics.value.matchCount++;
-      statistics.value.averageWaitingTime = statistics.value.totalWaitingTime / statistics.value.matchCount;
+      statistics.value.averageWaitingTime = statistics.value.totalWaitingTime / statistics.value.matchCount / 2;
       statistics.value.averageRatingDifference = Math.round(statistics.value.totalRatingDifference / statistics.value.matchCount);
-      statistics.value.highestWaitingTime = Math.max(statistics.value.highestWaitingTime, waitingTime);
-      statistics.value.lowestWaitingTime = Math.min(statistics.value.lowestWaitingTime, waitingTime);
+      statistics.value.highestWaitingTime = Math.max(statistics.value.highestWaitingTime, Math.max((user1.waitingTime ?? 0), (user2.waitingTime ?? 0)));
+      statistics.value.lowestWaitingTime = Math.min(statistics.value.lowestWaitingTime, Math.min((user1.waitingTime ?? 0), (user2.waitingTime ?? 0)));
       statistics.value.highestRatingDifference = Math.max(statistics.value.highestRatingDifference, ratingDifference);
       statistics.value.lowestRatingDifference = Math.min(statistics.value.lowestRatingDifference, ratingDifference);
     }
@@ -461,119 +422,104 @@ export default defineComponent({
     const debouncedUpdateChart = debounce(updateChart, 1000);
 
     function updateChart() {
-  if (!chartCanvas.value || !chartCanvas.value.getContext) {
-    console.error("Canvas element is not available or not ready.");
-    return; // Exit the function if the canvas is not ready
-  }
-
-  // Define the rating ranges
-  const ratingRanges = [
-    { min: 0, max: 900, label: '0-900' },
-    { min: 901, max: 1000, label: '901-1000' },
-    { min: 1000, max: 1050, label: '1000-1050' },
-    { min: 1051, max: 1100, label: '1051-1100' },
-    { min: 1101, max: 1150, label: '1101-1150' },
-    { min: 1151, max: 1200, label: '1151-1200' },
-    { min: 1201, max: 1250, label: '1201-1250' },
-    { min: 1251, max: 1300, label: '1251-1300' },
-    { min: 1301, max: 1350, label: '1301-1350' },
-    { min: 1351, max: 1400, label: '1351-1400' },
-    { min: 1401, max: 1450, label: '1401-1450' },
-    { min: 1451, max: 1500, label: '1451-1500' },
-    { min: 1501, max: 1550, label: '1501-1550' },
-    { min: 1551, max: 1600, label: '1551-1600' },
-    { min: 1601, max: 1650, label: '1601-1650' },
-    { min: 1651, max: 1700, label: '1651-1700' },
-    { min: 1701, max: 1750, label: '1701-1750' },
-    { min: 1751, max: 1800, label: '1751-1800' },
-    { min: 1801, max: 1850, label: '1801-1850' },
-    { min: 1851, max: 1900, label: '1851-1900' },
-    { min: 1901, max: 1950, label: '1901-1950' },
-    { min: 1951, max: 2000, label: '1951-2000' },
-    { min: 2001, max: 2050, label: '2001-2050' },
-    { min: 2051, max: 2100, label: '2051-2100' },
-    { min: 2101, max: 2150, label: '2101-2150' },
-    { min: 2151, max: 2200, label: '2151-2200' },
-    { min: 2201, max: 3000, label: '2201-3000' },
-    // Add more ranges as needed
-  ];
-
-  // Gather all users from different sources
-  const allUsers = [...users.value, ...queue.value, ...matches.value.flatMap(match => [match.user1, match.user2])];
-
-  // Count users in each range
-  const usersPerRange = ratingRanges.map(range => {
-    const count = allUsers.filter(user => user.rating >= range.min && user.rating <= range.max).length;
-    return count; // Return the count of users in the range
-  });
-
-  const labels = ratingRanges.map(range => range.label); // Use the range labels for the x-axis
-  const data = {
-    labels: labels,
-    datasets: [{
-      label: 'Number of Users',
-      data: usersPerRange,
-      borderColor: 'rgb(75, 192, 192)',
-      backgroundColor: 'rgba(75, 192, 192, 0.5)',
-      fill: false,
-      tension: 0.1,
-    }],
-  };
-
-  // Always destroy the existing chart before creating a new one
-  if (chartInstance.value) {
-    chartInstance.value.destroy();
-  }
-
-  // Configuration for the new chart
-  const config: any = {
-    type: 'line', // Use a line chart
-    data: data,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        title: { display: true, text: 'User Distribution by Rating Ranges' },
-      },
-      scales: {
-        x: { // Configure x-axis for rating ranges
-          display: true, 
-          title: { display: true, text: 'Rating Ranges' },
-          ticks: {
-                    display: false //this will remove only the label
-                }
-        },
-        y: { // Configure y-axis for user counts
-          display: true, 
-          title: { display: true, text: 'Number of Users' },
-          beginAtZero: true // Start y-axis at 0
-        }
+      if (!chartCanvas.value || !chartCanvas.value.getContext) {
+        console.error("Canvas element is not available or not ready.");
+        return;
       }
+
+      const ratingRanges = [
+        { min: 0, max: 900, label: '0-900' },
+        { min: 901, max: 1000, label: '901-1000' },
+        { min: 1000, max: 1050, label: '1000-1050' },
+        { min: 1051, max: 1100, label: '1051-1100' },
+        { min: 1101, max: 1150, label: '1101-1150' },
+        { min: 1151, max: 1200, label: '1151-1200' },
+        { min: 1201, max: 1250, label: '1201-1250' },
+        { min: 1251, max: 1300, label: '1251-1300' },
+        { min: 1301, max: 1350, label: '1301-1350' },
+        { min: 1351, max: 1400, label: '1351-1400' },
+        { min: 1401, max: 1450, label: '1401-1450' },
+        { min: 1451, max: 1500, label: '1451-1500' },
+        { min: 1501, max: 1550, label: '1501-1550' },
+        { min: 1551, max: 1600, label: '1551-1600' },
+        { min: 1601, max: 1650, label: '1601-1650' },
+        { min: 1651, max: 1700, label: '1651-1700' },
+        { min: 1701, max: 1750, label: '1701-1750' },
+        { min: 1751, max: 1800, label: '1751-1800' },
+        { min: 1801, max: 1850, label: '1801-1850' },
+        { min: 1851, max: 1900, label: '1851-1900' },
+        { min: 1901, max: 1950, label: '1901-1950' },
+        { min: 1951, max: 2000, label: '1951-2000' },
+        { min: 2001, max: 2050, label: '2001-2050' },
+        { min: 2051, max: 2100, label: '2051-2100' },
+        { min: 2101, max: 2150, label: '2101-2150' },
+        { min: 2151, max: 2200, label: '2151-2200' },
+        { min: 2201, max: 3000, label: '2201-3000' },
+      ];
+
+      // Gather all users from different sources
+      const allUsers = [...users.value, ...queue.value, ...matches.value.flatMap(match => [match.user1, match.user2])];
+
+      // Count users in each range
+      const usersPerRange = ratingRanges.map(range => {
+        const count = allUsers.filter(user => user.rating >= range.min && user.rating <= range.max).length;
+        return count;
+      });
+
+      const labels = ratingRanges.map(range => range.label);
+      const data = {
+        labels: labels,
+        datasets: [{
+          label: 'Number of Users',
+          data: usersPerRange,
+          borderColor: 'rgb(75, 192, 192)',
+          backgroundColor: 'rgba(75, 192, 192, 0.5)',
+          fill: false,
+          tension: 0.1,
+        }],
+      };
+
+      if (chartInstance.value) {
+        chartInstance.value.destroy();
+      }
+
+      const config: any = {
+        type: 'line',
+        data: data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'User Distribution by Rating Ranges' },
+          },
+          scales: {
+            x: {
+              display: true,
+              title: { display: true, text: 'Rating Ranges' },
+              ticks: {
+                display: false
+              }
+            },
+            y: {
+              display: true,
+              title: { display: true, text: 'Number of Users' },
+              beginAtZero: true
+            }
+          }
+        }
+      };
+
+      chartInstance.value = new Chart(chartCanvas.value, config);
     }
-  };
-
-  // Create a new chart instance
-  chartInstance.value = new Chart(chartCanvas.value, config);
-}
-
-
-
-
-
-
-
 
 
     return {
       goToState,
       PAGE_STATE,
       createAddUser,
-      createAddRandomUser,
-      createAdd100Users,
-      createAdd100RandomUsers,
+      createAddMultipleUsers,
       users,
-      addAllUsersToQueue,
       queue,
       matches,
       millisToMinutesAndSeconds,
@@ -583,6 +529,7 @@ export default defineComponent({
       speedFactor,
       mmSettings,
       chartCanvas,
+      amountOfMultipleUsers,
     }
   }
 });
