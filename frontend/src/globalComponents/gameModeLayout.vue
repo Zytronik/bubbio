@@ -8,7 +8,7 @@
                     <h1><span class="text-noWhiteSpaces">{{ gameMode[0] }}</span><span class="text-noWhiteSpaces">{{ gameMode.slice(1) }}</span></h1>
                 </div>
                 <div class="play-wrapper">
-                        <button v-if="gameMode != 'score'" class="playButton" @click="play()"><span>Play</span></button>
+                        <button @mouseenter="playSound('menu_hover')" v-if="gameMode != 'score'" class="playButton" @click="play()"><span>Play</span></button>
                         <p v-else><br>Highscore Mode is not available yet.</p>
                     </div>
                 <div class="content">
@@ -154,6 +154,7 @@ import { UserData } from '@/ts/page/i/page.i.user-data';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { BackButtonData } from './i/i-buttonData';
 import { transitionEndScreenPageToDashboard, transitionOutOfGame, transitionToGame } from '@/ts/page/page.css-transitions';
+import { playSound } from '@/ts/asset/asset.howler-load';
 
 export default defineComponent({
     name: 'GameModeLayout',
@@ -201,6 +202,7 @@ export default defineComponent({
         });
 
         function goBack() {
+            playSound('menu_back');
             if (isGaming.value) {
                 transitionOutOfGame(true, ()=>{
                     disableResetInput();
@@ -242,6 +244,7 @@ export default defineComponent({
         }
 
         function play() {
+            playSound('button_play');
             backInput.fire = goBack;
             transitionToGame(() => {
                 startGame();
@@ -309,6 +312,7 @@ export default defineComponent({
             diffToPb,
             currentLeaderboard,
             leaderboardTabs,
+            playSound,
         };
     },
 });

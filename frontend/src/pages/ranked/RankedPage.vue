@@ -65,7 +65,7 @@
               <p><span>{{ rankedMatchesCount }}</span> in Games</p>
             </div>
 
-            <div v-if="isLoggedIn" class="matchmakingButton" @click="toggleQueue" :class="{ 'in-queue': isInQueue }">
+            <div v-if="isLoggedIn" @mouseenter="playSound('menu_hover')" class="matchmakingButton" @click="toggleQueue" :class="{ 'in-queue': isInQueue }">
               <div v-if="isInQueue">
                 <p>Leave Queue | Passed Time: {{ passedTime }}s</p>
               </div>
@@ -234,6 +234,7 @@ import { PlayerData } from '@/ts/game/network/dto/game.network.dto.end-screen';
 import { CountUp } from 'countup.js';
 import { formatDateToAgoText } from '@/ts/page/page.page-utils';
 import { transitionEndScreenPageToRankedDashboard, transitionOutOfGame } from '@/ts/page/page.css-transitions';
+import { playSound } from '@/ts/asset/asset.howler-load';
 
 interface PlayerMatchmakingStats {
   userId: number;
@@ -300,6 +301,7 @@ export default {
     }
 
     function toggleQueue() {
+      playSound('button_play');
       if (isInQueue.value) {
         leaveQueue();
       } else {
@@ -639,6 +641,7 @@ export default {
       rankedMatches,
       formatDateToAgoText,
       openProfile,
+      playSound,
     }
   }
 };
@@ -658,6 +661,10 @@ export default {
   align-items: center;
   text-align: center;
   transition: 300ms;
+}
+
+.matchmakingButton:hover {
+  background-color: #575757;
 }
 
 .in-queue {

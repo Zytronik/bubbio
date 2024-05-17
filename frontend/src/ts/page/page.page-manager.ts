@@ -16,6 +16,7 @@ import SoloMenu from '../../pages/solomenu/SoloMenu.vue';
 import MultiMenu from '../../pages/multimenu/MultiMenu.vue';
 import { ref } from 'vue';
 import eventBus from "./page.event-bus";
+import { playSound } from "../asset/asset.howler-load";
 
 export const pages: Page[] = [
     { title: 'StartMenu', pageState: PAGE_STATE.mainMenu, component: StartMenu },
@@ -238,6 +239,7 @@ const isChannelOpen = ref(false);
 
 export function openChannelOverlay() {
     isChannelOpen.value = true;
+    playSound('menu_front');
 }
 
 export function closeChannelOverlay() {
@@ -260,7 +262,7 @@ export function showUserPageFromURL() {
     const path = window.location.pathname;
     const match = path.match(/^\/user\/(.+)$/);
     if (match) {
-        isChannelOpen.value = true;
+        openChannelOverlay();
     }
 }
 

@@ -1,5 +1,11 @@
 <template class="page" id="game">
   <div class="game-wrapper">
+
+
+
+
+
+
     <div v-if="gameMode === 'sprint'" class="inGameStats">
       <div class="bottom">
         <div>
@@ -31,6 +37,13 @@
         </transition>
       </div>
     </div>
+
+
+
+
+
+
+
     <div v-if="gameMode === 'ranked'" class="inGameStats">
       <div class="top">
         <transition name="fade">
@@ -60,12 +73,20 @@
         </div>
       </div>
     </div>
+
+
+
+
+
+
     <div class="gameUI-wrapper">
-      <!-- <div class="garbage"
+      <div class="garbage-wrapper"
         v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage"></div>
-       --><!-- <div class="hold"
-        v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></div>
-       -->
+      <p class="hold-text"><span class="text-noWhiteSpaces">H</span><span class="text-noWhiteSpaces">old</span></p>
+      <div class="hold-wrapper">
+       <div class="hold-piece" v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></div>
+      </div>
+      <p class="queue-text"><span class="text-noWhiteSpaces">Q</span><span class="text-noWhiteSpaces">ueue</span></p>
       <div class="queue-wrapper">
         <div class="queue-pieces"
           v-html="areRef ? playerGameVisuals.asciiBoard.queueString.value : playerGameVisuals.asciiBoard.queueString">
@@ -74,9 +95,9 @@
       <div class="board"
         v-html="areRef ? playerGameVisuals.asciiBoard.playGridASCII.value : playerGameVisuals.asciiBoard.playGridASCII">
       </div>
-      <div class="overlap-infos"
+      <span class="overlap-infos"
         v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText">
-      </div>
+      </span>
       <span class="username text-center" v-html="playerGameVisuals.playerName.toUpperCase()"></span>
     </div>
   </div>

@@ -46,8 +46,8 @@ export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNum
     statStrings.bubblesCleared.value = gameStats.bubblesCleared;
     statStrings.bubblesLeftToClear.value = gameStats.bubblesLeftToClear;
     statStrings.bubblesShot.value = gameStats.bubblesShot;
-    statStrings.bubblesPerSecond.value = (statStrings.bubblesPerSecond.value == Number.POSITIVE_INFINITY || statStrings.bubblesPerSecond.value == Number.NEGATIVE_INFINITY) ? 0 : gameStats.bubblesPerSecond;
-    statStrings.attackPerMinute.value = (statStrings.attackPerMinute.value == Number.POSITIVE_INFINITY || statStrings.attackPerMinute.value == Number.NEGATIVE_INFINITY) ? 0 : gameStats.attackPerMinute;
+    statStrings.bubblesPerSecond.value = (statStrings.bubblesPerSecond.value == Number.POSITIVE_INFINITY || statStrings.bubblesPerSecond.value == Number.NEGATIVE_INFINITY) ? 0.00 : gameStats.bubblesPerSecond;
+    statStrings.attackPerMinute.value = (statStrings.attackPerMinute.value == Number.POSITIVE_INFINITY || statStrings.attackPerMinute.value == Number.NEGATIVE_INFINITY) ? 0.00 : gameStats.attackPerMinute;
     statStrings.currentCombo.value = gameStats.currentCombo;
     if (gameStats.spikeAnimationStart + SPIKE_COUNTER_TIMEFRAME > performance.now()) {
         statStrings.spikeNumber.value = "" + gameStats.spikeNumber;
