@@ -4,17 +4,23 @@
       <div class="page-container">
         <button @click="goToState(PAGE_STATE.multiMenu)" class="back-button">Back</button>
         <button @click="resetSimulation" class="back-button">Reset</button>
-        <h1>Matchmaking Simulation</h1>
+        <button @click="sortUsersByRating" class="back-button">Sort Users</button>
+        <h1>Matchmaking Simulation <span>(Speed x{{ speedFactor }})</span></h1>
 
         <div class="row">
           <div class="settings">
             <h2>Settings</h2>
             <div class="settings-wrapper">
-              <p><span>Startwert für den akzeptablen Skill Gap:</span> 100</p>
-              <p><span>Zeit in Millisekunden, nach der der Skill Gap erhöht wird:</span> 1000</p>
-              <p><span>Zeit in Millisekunden, nach der Matchmaking Funktion ausgeführt wird:</span> 1000</p>
-              <p><span>Wert für erhöhung des Skill Gaps:</span> 100</p>
-              <p><span>Maximale Erweiterung des Skill Gaps:</span> 1000</p>
+              <p><span>Startwert für den akzeptablen Skill Gap:</span> {{ mmSettings?.startGap }}</p>
+              <p v-if="mmSettings?.gapIncreaseInterval"><span>Zeit in Millisekunden, nach der der Skill Gap erhöht
+                  wird:</span> {{
+                    mmSettings?.gapIncreaseInterval * speedFactor }}</p>
+              <p v-if="mmSettings?.matchmakingIntervalTime"><span>Zeit in Millisekunden, nach der Matchmaking Funktion
+                  ausgeführt wird:</span> {{
+                    mmSettings.matchmakingIntervalTime * speedFactor }}</p>
+              <p><span>Wert für erhöhung des Skill Gaps:</span> {{ mmSettings?.gapIncreaseAmount }}</p>
+              <p><span>Minimale Erhöhung des Skill Gaps:</span> {{ mmSettings?.minGapIncreaseAmount }}</p>
+              <p><span>Maximale Erweiterung des Skill Gaps:</span> {{ mmSettings?.maxGap }}</p>
             </div>
           </div>
         </div>
@@ -24,14 +30,15 @@
           <div class="column">
             <h2>Not in Queue</h2>
             <div class="button-wrapper">
-              <button @click="createUser">Create User</button>
-              <button @click="create100Users">Create & Add 100 Users</button>
-              <button @click="addAllUsersToQueue">Add All To Queue</button>
+              <button @click="createAddUser">Create & Add 1 User</button>
+              <button @click="createAddMultipleUsers">Create & Add {{ amountOfMultipleUsers }} Users</button>
             </div>
             <div class="scrollable">
               <div v-for="(user, index) in users" :key="'not-in-queue-' + index" class="user">
                 <p class="username">{{ user.name }}</p>
                 <p class="rating"><span>Rating: </span>{{ user.rating }}<span>±{{ user.ratingDeviation }}</span></p>
+                <p class="queueAmount"><span>Queued: </span> {{ user.amountOfQueues }}/{{ user.maxAmountOfQueues }}</p>
+                <!-- <p class="startRDev"><span>Start RD: </span> {{ user.startDeviation }}</p> -->
               </div>
             </div>
           </div>
@@ -42,6 +49,7 @@
               <div v-for="(user, index) in queue" :key="'in-queue-' + index" class="user">
                 <p class="username">{{ user.name }}</p>
                 <p class="rating"><span>Rating: </span>{{ user.rating }}<span>±{{ user.ratingDeviation }}</span></p>
+                <p class="queueAmount"><span>Queued: </span> {{ user.amountOfQueues }}/{{ user.maxAmountOfQueues }}</p>
               </div>
               <p v-if="queue.length === 0">No users in queue</p>
             </div>
@@ -51,19 +59,27 @@
             <h2>Matched</h2>
             <div class="scrollable">
               <div v-for="(match, index) in matches" :key="'matched-' + index" class="match">
-                <div class="user">
+                <div class="user" :class="{ 'won': match.user1.hasWon, 'lost': match.user1.hasLost }">
                   <p class="username">{{ match.user1.name }}</p>
                   <p class="rating"><span>Rating: </span>{{ match.user1.rating }}<span>±{{ match.user1.ratingDeviation
                       }}</span></p>
-                  <p class="time"><span>Waiting Time: </span>{{ millisToMinutesAndSeconds(match.user1.waitingTime ?? 0) }}
+                  <p class="queueAmount"><span>Queued: </span> {{ match.user1.amountOfQueues }}/{{
+                    match.user1.maxAmountOfQueues }}</p>
+                  <p class="time"><span>Waiting Time: </span>{{
+                    millisToMinutesAndSeconds(match.user1.waitingTime * speedFactor) ?? 0
+                  }}
                   </p>
                 </div>
                 <span>VS</span>
-                <div class="user">
+                <div class="user" :class="{ 'won': match.user2.hasWon, 'lost': match.user2.hasLost }">
                   <p class="username">{{ match.user2.name }}</p>
                   <p class="rating"><span>Rating: </span>{{ match.user2.rating }}<span>±{{ match.user2.ratingDeviation
                       }}</span></p>
-                  <p class="time"><span>Waiting Time: </span>{{ millisToMinutesAndSeconds(match.user2.waitingTime ?? 0) }}
+                  <p class="queueAmount"><span>Queued: </span> {{ match.user2.amountOfQueues }}/{{
+                    match.user2.maxAmountOfQueues }}</p>
+                  <p class="time"><span>Waiting Time: </span>{{
+                    millisToMinutesAndSeconds(match.user2.waitingTime * speedFactor) ?? 0
+                  }}
                   </p>
                 </div>
               </div>
@@ -74,19 +90,26 @@
         </div>
 
         <div class="row">
-          <div class="statistics">
+          <div class="column col-2 statistics">
             <h2>Statistics</h2>
-            <p><span>Found Matches: </span>{{ matches.length }}</p>
+            <p><span>Found Matches: </span>{{ statistics.matchCount }}</p>
             <div class="multi-stat">
-              <p><span>Average Waiting Time: </span>{{ statistics?.averageWaitingTime ?? 0 }}</p>
-              <p><span>Highest Waiting Time: </span>{{ statistics?.highestWaitingTime ?? 0 }}</p>
-              <p><span>Lowest Waiting Time: </span>{{ statistics?.lowestWaitingTime ?? 0 }}</p>
+              <p><span>Average Waiting Time: </span>{{ millisToMinutesAndSeconds(statistics.averageWaitingTime *
+                speedFactor) ?? 0 }}</p>
+              <p><span>Highest Waiting Time: </span>{{ millisToMinutesAndSeconds(statistics.highestWaitingTime *
+                speedFactor) ?? 0 }}</p>
+              <p><span>Lowest Waiting Time: </span>{{ millisToMinutesAndSeconds(statistics.lowestWaitingTime *
+                speedFactor) ?? 0 }}</p>
             </div>
             <div class="multi-stat">
-              <p><span>Average Rating Difference: </span>{{ statistics?.averageRatingDifference ?? 0 }}</p>
-              <p><span>Highest Rating Difference: </span>{{ statistics?.highestRatingDifference ?? 0 }}</p>
-              <p><span>Lowest Rating Difference: </span>{{ statistics?.lowestRatingDifference ?? 0 }}</p>
+              <p><span>Average Rating Difference: </span>{{ statistics.averageRatingDifference ?? 0 }}</p>
+              <p><span>Highest Rating Difference: </span>{{ statistics.highestRatingDifference ?? 0 }}</p>
+              <p><span>Lowest Rating Difference: </span>{{ isFinite(statistics.lowestRatingDifference) ?
+                statistics.lowestRatingDifference : "∞" }}</p>
             </div>
+          </div>
+          <div class="column col-2">
+            <canvas ref="chartCanvas"></canvas>
           </div>
         </div>
 
@@ -100,15 +123,34 @@
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
-import { computed, defineComponent, onMounted, onUnmounted, ref } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import { addGameViewStyles, removeGameViewStyles } from '@/ts/page/page.css-transitions';
 import state from '@/ts/networking/networking.client-websocket';
+import { Chart } from 'chart.js';
+import debounce from 'debounce';
 
 interface User {
   name: string;
   rating: number;
   ratingDeviation: number;
-  waitingTime?: number;
+  volatility: number;
+  waitingTime: number;
+  hasWon?: boolean;
+  hasLost?: boolean;
+  amountOfQueues: number;
+  maxAmountOfQueues: number;
+  startDeviation: number;
+  loopsInQueue?: number;
+}
+
+interface MmSettings {
+  speedFactor: number;
+  startGap: number;
+  gapIncreaseInterval: number;
+  matchmakingIntervalTime: number;
+  minGapIncreaseAmount: number;
+  gapIncreaseAmount: number;
+  maxGap: number;
 }
 
 interface MatchmakingQueue {
@@ -132,6 +174,9 @@ export default defineComponent({
     const queue = ref<User[]>([]);
     const matches = ref<Match[]>([]);
     const currentId = ref(1);
+    const speedFactor = ref(1000);
+    const mmSettings = ref<MmSettings>()
+    const amountOfMultipleUsers = ref(200);
 
     onMounted(() => {
       changeBackgroundTo("black");
@@ -142,11 +187,20 @@ export default defineComponent({
     onUnmounted(() => {
       removeGameViewStyles();
       unmountSockets();
+      if (chartInstance.value) {
+        chartInstance.value.destroy();
+        chartInstance.value = null;
+      }
     });
 
     function unmountSockets() {
       if (state.socket) {
         state.socket.emit('playerLeftMmSimVue');
+        state.socket.off('queueUpdate');
+        state.socket.off('matchFoundUpdate');
+        state.socket.off('matchResult');
+        state.socket.off('ratingsUpdate');
+        state.socket.off('mMSettings');
       }
     }
 
@@ -154,71 +208,149 @@ export default defineComponent({
       if (state.socket) {
         state.socket.emit('playerJoinedMmSimVue');
       }
+
+      if (state.socket) {
+        state.socket.on('queueUpdate', (q: MatchmakingQueue) => {
+          for (const username in q) {
+            let user = getUserByName(username)
+            if (user) {
+              users.value = users.value.filter((u) => u.name !== username);
+              queue.value.push(user);
+            }
+          }
+        });
+
+        state.socket.on('matchFoundUpdate', (match: User[]) => {
+          let user1 = queue.value.find(user => user.name === match[0].name);
+          let user2 = queue.value.find(user => user.name === match[1].name);
+          if (user1 && user2 && mmSettings.value && match[0].loopsInQueue && match[1].loopsInQueue) {
+            user1.waitingTime = Math.floor((match[0].loopsInQueue - 1) * mmSettings.value.matchmakingIntervalTime);
+            user2.waitingTime = Math.floor((match[1].loopsInQueue - 1) * mmSettings.value.matchmakingIntervalTime);
+            queue.value = queue.value.filter(user => user.name !== user1.name && user.name !== user2.name);
+            matches.value.push({ user1, user2 });
+            updateStatistics(user1, user2);
+          }
+        });
+
+        state.socket.on('matchResult', (matchResult: User[]) => {
+          let winner = matchResult[0];
+          let loser = matchResult[1];
+          let winnerIndex = matches.value.findIndex(match => match.user1.name === winner.name || match.user2.name === winner.name);
+          let loserIndex = matches.value.findIndex(match => match.user1.name === loser.name || match.user2.name === loser.name);
+          if (winnerIndex !== -1 && loserIndex !== -1) {
+            matches.value[winnerIndex].user1.hasWon = matches.value[winnerIndex].user1.name === winner.name;
+            matches.value[winnerIndex].user2.hasWon = matches.value[winnerIndex].user2.name === winner.name;
+            matches.value[loserIndex].user1.hasLost = matches.value[loserIndex].user1.name === loser.name;
+            matches.value[loserIndex].user2.hasLost = matches.value[loserIndex].user2.name === loser.name;
+          }
+        });
+
+        state.socket.on('mMSettings', (settings: MmSettings) => {
+          mmSettings.value = settings;
+        });
+
+        state.socket.on('ratingsUpdate', (ratingUpdate: User[]) => {
+          let winner = ratingUpdate[0];
+          let loser = ratingUpdate[1];
+          const maxDelay = 600000;
+          const minDelay = 120000;
+          const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+
+          // Wait for x seconds
+          setTimeout(() => {
+            // Add both users to users array if they are not already in there
+            [winner, loser].forEach(user => {
+              if (!users.value.some(u => u.name === user.name)) {
+                users.value.push({
+                  ...user,
+                  waitingTime: 0,  // Reset or assign appropriate waiting time
+                  hasWon: undefined,       // Reset or assign win/loss status
+                  hasLost: undefined
+                });
+              }
+            });
+
+            // Remove both users from matches array
+            matches.value = matches.value.filter(match =>
+              match.user1.name !== winner.name && match.user1.name !== loser.name &&
+              match.user2.name !== winner.name && match.user2.name !== loser.name
+            );
+
+            // After users are added to users array and removed from matches array, update the ratings
+            users.value.forEach(user => {
+              if (user.name === winner.name) {
+                user.rating = formatRating(winner.rating);
+                user.ratingDeviation = formatRating(winner.ratingDeviation);
+                user.volatility = formatVolatity(winner.volatility);
+              }
+              if (user.name === loser.name) {
+                user.rating = formatRating(loser.rating);
+                user.ratingDeviation = formatRating(loser.ratingDeviation);
+                user.volatility = formatVolatity(loser.volatility);
+              }
+            });
+            addUserToQueue(winner);
+            addUserToQueue(loser);
+
+          }, randomDelay / speedFactor.value);
+        });
+      }
     }
 
     function createUser() {
-      createRandomUser();
-    }
-
-    function create100Users() {
-      const minDelay = 0;
-      const maxDelay = 3000;
-
-      for (let i = 0; i < 100; i++) {
-        const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
-        setTimeout(() => {
-          createRandomUser();
-          setTimeout(() => {
-            addAllUsersToQueue();
-          }, 1000);
-        }, randomDelay * i);
-      }
-    }
-
-    function createRandomUser() {
-      const index = currentId.value;
+      const name = `tester-${currentId.value}`;
       currentId.value++;
-      const name = `tester-${index}`;
-      const minRating = 500;
-      const maxRating = 5000;
-      const minRatingDeviation = 60;
-      const maxRatingDeviation = 300;
+      const rating = 1500;
+      const ratingDeviation = 250;
+      const volatility = 0.06;
+      const waitingTime = 0;
+      const amountOfQueues = 0;
+      const minMaxAmountOfQueues = 10;
+      const maxMaxAmountOfQueues = 20;
+      const maxAmountOfQueues = Math.floor(Math.random() * (maxMaxAmountOfQueues - minMaxAmountOfQueues + 1)) + minMaxAmountOfQueues;
 
-      const rating = Math.floor(Math.random() * (maxRating - minRating + 1)) + minRating;
-      const ratingDeviation = Math.floor(Math.random() * (maxRatingDeviation - minRatingDeviation + 1)) + minRatingDeviation;
-
-      const newUser: User = { name, rating, ratingDeviation };
+      /* const minRatingDeviation = 60;
+      const maxRatingDeviation = 250;
+      const ratingDeviation = formatRating(Math.random() * (maxRatingDeviation - minRatingDeviation + 1)) + minRatingDeviation;
+ */
+      const newUser: User = { name, rating, ratingDeviation, volatility, amountOfQueues, maxAmountOfQueues, startDeviation: ratingDeviation, waitingTime };
       users.value.push(newUser);
+      return newUser;
     }
 
-    function addAllUsersToQueue() {
-      if (state.socket) {
-        state.socket.emit('addAllUsersToQueue', users.value);
+    function createAddMultipleUsers() {
+      for (let i = 0; i < amountOfMultipleUsers.value; i++) {
+        const user = createUser();
+        addUserToQueue(user);
       }
     }
 
-    if (state.socket) {
-      state.socket.on('queueUpdate', (q: MatchmakingQueue) => {
-        for (const username in q) {
-          let user = getUserByName(username)
-          if (user) {
-            user.waitingTime = q[username].searchStart;
-            users.value = users.value.filter((u) => u.name !== username);
-            queue.value.push(user);
-          }
-        }
-      });
+    function createAddUser() {
+      const user = createUser();
+      addUserToQueue(user);
+    }
 
-      state.socket.on('matchFoundUpdate', (match: string[]) => {
-        let user1 = queue.value.find(user => user.name === match[0]);
-        let user2 = queue.value.find(user => user.name === match[1]);
-        if (user1 && user2 && user1.waitingTime && user2.waitingTime) {
-          user1.waitingTime = Date.now() - user1.waitingTime;
-          user2.waitingTime = Date.now() - user2.waitingTime;
-          queue.value = queue.value.filter(user => user.name !== user1.name && user.name !== user2.name);
-          matches.value.push({ user1, user2 });
+    function addUserToQueue(user: User) {
+      debouncedUpdateChart();
+      if (user.amountOfQueues >= user.maxAmountOfQueues) return;
+      user.amountOfQueues++;
+
+      const minDelay = 5000;
+      const maxDelay = 60000;
+      const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+      setTimeout(() => {
+        if (state.socket) {
+          state.socket.emit('addUserToQueue', user);
         }
-      });
+      }, randomDelay / speedFactor.value);
+    }
+
+    function formatRating(rating: number) {
+      return Math.round(rating);
+    }
+
+    function formatVolatity(volatility: number) {
+      return Math.round(volatility * 1000) / 1000;
     }
 
     function getUserByName(name: string) {
@@ -226,92 +358,188 @@ export default defineComponent({
     }
 
     function resetSimulation() {
-      users.value = [];
-      queue.value = [];
-      matches.value = [];
+      users.value.length = 0;
+      queue.value.length = 0;
+      matches.value.length = 0;
+      statistics.value = {
+        totalWaitingTime: 0,
+        totalRatingDifference: 0,
+        matchCount: 0,
+        highestWaitingTime: 0,
+        lowestWaitingTime: Infinity,
+        averageWaitingTime: 0,
+        highestRatingDifference: 0,
+        lowestRatingDifference: Infinity,
+        averageRatingDifference: 0,
+      }
       currentId.value = 1;
-      if(state.socket){
+      if (state.socket) {
         state.socket.emit('resetMatchmakingSimulation');
       }
+      debouncedUpdateChart();
     }
 
     function millisToMinutesAndSeconds(millis: number) {
+      if (millis === Infinity) return "∞";
       let minutes: number = Math.floor(millis / 60000);
       let seconds: number = parseInt(((millis % 60000) / 1000).toFixed(0));
       return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
     }
 
-    const statistics = computed(() => {
-      let highestWaitingTime = 0;
-      let lowestWaitingTime = Infinity;
-      let highestRatingDifference = 0;
-      let lowestRatingDifference = Infinity;
+    function sortUsersByRating() {
+      users.value.sort((a, b) => b.rating - a.rating);
+    }
 
-      if (matches.value.length === 0) return null;
-
-      const totalWaitingTime = matches.value.reduce((acc, match) => {
-        const user1WaitingTime = match.user1.waitingTime ?? 0;
-        const user2WaitingTime = match.user2.waitingTime ?? 0;
-        const waitingTimeSum = user1WaitingTime + user2WaitingTime;
-
-        highestWaitingTime = Math.max(highestWaitingTime, waitingTimeSum);
-        lowestWaitingTime = Math.min(lowestWaitingTime, waitingTimeSum);
-
-        if (user1WaitingTime && user2WaitingTime) {
-          return acc + user1WaitingTime + user2WaitingTime;
-        } else {
-          return acc;
-        }
-      }, 0);
-
-      const totalRatingDifference = matches.value.reduce((acc, match) => {
-        const ratingDifference = Math.abs(match.user1.rating - match.user2.rating);
-
-        highestRatingDifference = Math.max(highestRatingDifference, ratingDifference);
-        lowestRatingDifference = Math.min(lowestRatingDifference, ratingDifference);
-
-        return acc + ratingDifference;
-      }, 0);
-
-      const numberOfValidMatches = matches.value.reduce((acc, match) => {
-        if (match.user1.waitingTime && match.user2.waitingTime) {
-          return acc + 1;
-        } else {
-          return acc;
-        }
-      }, 0);
-
-      const averageWaitingTime = millisToMinutesAndSeconds(totalWaitingTime / (numberOfValidMatches * 2));
-      const averageRatingDifference = Math.round(totalRatingDifference / matches.value.length);
-
-      return {
-        averageWaitingTime,
-        highestWaitingTime: millisToMinutesAndSeconds(highestWaitingTime),
-        lowestWaitingTime: millisToMinutesAndSeconds(lowestWaitingTime),
-        averageRatingDifference,
-        highestRatingDifference,
-        lowestRatingDifference,
-      };
+    const statistics = ref({
+      totalWaitingTime: 0,
+      totalRatingDifference: 0,
+      matchCount: 0,
+      highestWaitingTime: 0,
+      lowestWaitingTime: Infinity,
+      averageWaitingTime: 0,
+      highestRatingDifference: 0,
+      lowestRatingDifference: Infinity,
+      averageRatingDifference: 0,
     });
+
+    function updateStatistics(user1: User, user2: User) {
+      const waitingTime = (user1.waitingTime ?? 0) + (user2.waitingTime ?? 0);
+      const ratingDifference = Math.abs(user1.rating - user2.rating);
+      statistics.value.totalWaitingTime += waitingTime;
+      statistics.value.totalRatingDifference += ratingDifference;
+      statistics.value.matchCount++;
+      statistics.value.averageWaitingTime = statistics.value.totalWaitingTime / statistics.value.matchCount / 2;
+      statistics.value.averageRatingDifference = Math.round(statistics.value.totalRatingDifference / statistics.value.matchCount);
+      statistics.value.highestWaitingTime = Math.max(statistics.value.highestWaitingTime, Math.max((user1.waitingTime ?? 0), (user2.waitingTime ?? 0)));
+      statistics.value.lowestWaitingTime = Math.min(statistics.value.lowestWaitingTime, Math.min((user1.waitingTime ?? 0), (user2.waitingTime ?? 0)));
+      statistics.value.highestRatingDifference = Math.max(statistics.value.highestRatingDifference, ratingDifference);
+      statistics.value.lowestRatingDifference = Math.min(statistics.value.lowestRatingDifference, ratingDifference);
+    }
+
+    const chartCanvas = ref<any>(null);
+    const chartInstance = ref<any>(null);
+
+    const debouncedUpdateChart = debounce(updateChart, 1000);
+
+    function updateChart() {
+      if (!chartCanvas.value || !chartCanvas.value.getContext) {
+        console.error("Canvas element is not available or not ready.");
+        return;
+      }
+
+      const ratingRanges = [
+        { min: 0, max: 900, label: '0-900' },
+        { min: 901, max: 1000, label: '901-1000' },
+        { min: 1000, max: 1050, label: '1000-1050' },
+        { min: 1051, max: 1100, label: '1051-1100' },
+        { min: 1101, max: 1150, label: '1101-1150' },
+        { min: 1151, max: 1200, label: '1151-1200' },
+        { min: 1201, max: 1250, label: '1201-1250' },
+        { min: 1251, max: 1300, label: '1251-1300' },
+        { min: 1301, max: 1350, label: '1301-1350' },
+        { min: 1351, max: 1400, label: '1351-1400' },
+        { min: 1401, max: 1450, label: '1401-1450' },
+        { min: 1451, max: 1500, label: '1451-1500' },
+        { min: 1501, max: 1550, label: '1501-1550' },
+        { min: 1551, max: 1600, label: '1551-1600' },
+        { min: 1601, max: 1650, label: '1601-1650' },
+        { min: 1651, max: 1700, label: '1651-1700' },
+        { min: 1701, max: 1750, label: '1701-1750' },
+        { min: 1751, max: 1800, label: '1751-1800' },
+        { min: 1801, max: 1850, label: '1801-1850' },
+        { min: 1851, max: 1900, label: '1851-1900' },
+        { min: 1901, max: 1950, label: '1901-1950' },
+        { min: 1951, max: 2000, label: '1951-2000' },
+        { min: 2001, max: 2050, label: '2001-2050' },
+        { min: 2051, max: 2100, label: '2051-2100' },
+        { min: 2101, max: 2150, label: '2101-2150' },
+        { min: 2151, max: 2200, label: '2151-2200' },
+        { min: 2201, max: 3000, label: '2201-3000' },
+      ];
+
+      // Gather all users from different sources
+      const allUsers = [...users.value, ...queue.value, ...matches.value.flatMap(match => [match.user1, match.user2])];
+
+      // Count users in each range
+      const usersPerRange = ratingRanges.map(range => {
+        const count = allUsers.filter(user => user.rating >= range.min && user.rating <= range.max).length;
+        return count;
+      });
+
+      const labels = ratingRanges.map(range => range.label);
+      const data = {
+        labels: labels,
+        datasets: [{
+          label: 'Number of Users',
+          data: usersPerRange,
+          borderColor: 'rgb(75, 192, 192)',
+          backgroundColor: 'rgba(75, 192, 192, 0.5)',
+          fill: false,
+          tension: 0.1,
+        }],
+      };
+
+      if (chartInstance.value) {
+        chartInstance.value.destroy();
+      }
+
+      const config: any = {
+        type: 'line',
+        data: data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'User Distribution by Rating Ranges' },
+          },
+          scales: {
+            x: {
+              display: true,
+              title: { display: true, text: 'Rating Ranges' },
+              ticks: {
+                display: false
+              }
+            },
+            y: {
+              display: true,
+              title: { display: true, text: 'Number of Users' },
+              beginAtZero: true
+            }
+          }
+        }
+      };
+
+      chartInstance.value = new Chart(chartCanvas.value, config);
+    }
+
 
     return {
       goToState,
       PAGE_STATE,
-      createUser,
-      create100Users,
+      createAddUser,
+      createAddMultipleUsers,
       users,
-      addAllUsersToQueue,
       queue,
       matches,
       millisToMinutesAndSeconds,
       statistics,
       resetSimulation,
+      sortUsersByRating,
+      speedFactor,
+      mmSettings,
+      chartCanvas,
+      amountOfMultipleUsers,
     }
   }
 });
 </script>
 
 <style scoped>
+#matchmakingSimulation {
+  background-color: black;
+}
+
 .page-container {
   max-width: 80% !important;
   width: auto !important;
@@ -326,6 +554,11 @@ h1 {
   font-size: 30px;
   margin-bottom: 10px;
   margin-top: 10px;
+}
+
+h1 span {
+  font-size: 80%;
+  opacity: 0.7;
 }
 
 h2 {
@@ -355,20 +588,26 @@ h2 {
 
 .multi-stat {
   display: flex;
+  width: 100%;
 }
 
 .multi-stat>* {
-  width: 20%;
+  width: calc(100% / 3);
 }
 
 .column {
   border: 1px solid #ccc;
   padding: 10px;
   width: calc(100% / 3);
-  height: 55vh;
+  height: 50vh;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+.column.col-2 {
+  width: 50%;
+  height: auto !important;
 }
 
 .scrollable {
@@ -404,6 +643,14 @@ h2 {
   margin: unset
 }
 
+.match>.user.won {
+  background-color: rgb(0, 255, 0, 0.2);
+}
+
+.match>.user.lost {
+  background-color: rgb(255, 0, 0, 0.2);
+}
+
 .user {
   background-color: rgb(20, 20, 20);
   padding: 5px 10px;
@@ -422,6 +669,16 @@ h2 {
 }
 
 .user .rating span {
+  font-size: 80%;
+  opacity: 0.7;
+}
+
+.user .queueAmount span {
+  font-size: 80%;
+  opacity: 0.7;
+}
+
+.user .startRDev span {
   font-size: 80%;
   opacity: 0.7;
 }

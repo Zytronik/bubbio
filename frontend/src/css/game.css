@@ -1,0 +1,370 @@
+/* Game */
+.gameUI-wrapper {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+}
+
+.game-wrapper .inGameStats {
+    position: absolute;
+    right: 100%;
+    bottom: 0;
+    width: 100%;
+    top: 0;
+    z-index: 2;
+    text-align: right;
+    height: 100%;
+    margin-right: calc(15px + 3 * var(--game-bubble-border-width));
+}
+
+.game-wrapper .inGameStats .bottom {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.game-wrapper .inGameStats .bottom > div{
+    font-variant: small-caps;/* 
+    text-transform: uppercase; */
+}
+
+.game-wrapper .inGameStats .bottom div p {
+    margin: unset;
+}
+
+.game-wrapper .inGameStats .bottom div p:first-of-type{
+    opacity: 0.7;
+    font-size: 50%;
+}
+
+.game-wrapper .inGameStats .top {
+    position: absolute;
+    top: 20%;
+    right: 0;
+    width: 100%;
+}
+
+.game-wrapper .inGameStats p {
+    margin: unset;
+    margin-top: 5px;
+}
+
+.game-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: relative;
+    margin-bottom: 30px;
+    font-size: 3.8vh;
+    --game-bubble-height: 3.2vh;
+    --game-bubble-border-width: 5px;
+    --game-board-border-radius: 0;
+    --game-board-border-width: 5px;
+    --game-board-padding: 8px;
+}
+
+.gameUI-wrapper .playerName {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.gameUI-wrapper .monospace {
+    white-space: pre-line;
+    font-family: 'Consolas', monospace;
+}
+
+.gameUI-wrapper .overlap-infos {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    width: 250%;
+}
+
+@keyframes slideOutToGame {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.slide-out-left-to-game {
+    animation: slideOutToGame 0.5s forwards;
+}
+
+@keyframes slideOutOffGame {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.slide-out-right-off-game {
+    animation: slideOutOffGame 0.5s forwards;
+}
+
+.black-overlay-cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
+    animation-delay: 0.2s !important;
+    animation: fadeOut 1.3s forwards;
+    opacity: 1;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.black-overlay-right {
+    position: fixed;
+    top: 0;
+    left: 100%;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
+}
+
+.black-overlay-left {
+    position: fixed;
+    top: 0;
+    right: 100%;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
+}
+
+.gameUI-wrapper .board {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    border: var(--game-board-border-width) solid white;
+    border-radius: var(--game-board-border-radius);
+    border-bottom-right-radius: unset;
+    padding: var(--game-board-padding);
+    border-right: var(--game-board-border-width) solid transparent;
+}
+
+.gameUI-wrapper .board::after {
+    content: "";
+    position: absolute;
+    left: calc(100% - 20px - var(--game-board-border-width));
+    top: 0px;
+    width: 20px;
+    border-right: var(--game-board-border-width) solid white;
+    border-top: var(--game-board-border-width) solid white;
+    border-top-right-radius: var(--game-board-border-radius);
+    height: calc(100% - var(--game-bubble-height) - 2 * var(--game-bubble-border-width) - 2 * var(--game-board-padding) - 2 * var(--game-board-border-width));
+}
+
+.gameUI-wrapper .board .row {
+    display: flex;
+    box-sizing: border-box;
+    gap: var(--game-board-padding);
+}
+
+.gameUI-wrapper .board .row.small {
+    padding: 0 calc(var(--game-bubble-height) / 2 + var(--game-board-padding));
+}
+
+.gameUI-wrapper .field {
+    width: var(--game-bubble-height);
+    min-width: var(--game-bubble-height);
+    height: var(--game-bubble-height);
+    min-height: var(--game-bubble-height);
+    border: var(--game-bubble-border-width) solid transparent;
+}
+
+.gameUI-wrapper .field.bubble {
+    border-radius: 50%;
+    position: relative;
+}
+
+.gameUI-wrapper .field.bubble:after {
+	content: "";
+	position: absolute;
+	display: block;
+	top: 10%;
+	left: 70%;
+	height: 40%;
+	width: 20%;
+	border-radius: 50%;
+	background: white;
+	overflow: hidden;
+    z-index: 1;
+}
+
+.gameUI-wrapper .field.bubble:before {
+	content: "";
+	position: absolute;
+    z-index: 1;
+    top: calc(-1 * var(--game-bubble-border-width));
+    left: calc(-1 * var(--game-bubble-border-width));
+    width: calc(100% + 2 * var(--game-bubble-border-width));
+    height: calc(100% + 2 * var(--game-bubble-border-width));
+    border-radius: 50%;
+    background: linear-gradient(to left, rgba(126, 148, 191, 0.2), rgba(136, 191, 176, 0.2));
+}
+
+.gameUI-wrapper .board .deathZoneLine {
+    border-top: var(--game-board-border-width) solid white;
+}
+
+.gameUI-wrapper .board .preview .bubble {
+    background: transparent !important;
+}
+
+.gameUI-wrapper .board .preview .bubble:after {
+    display: none;
+}
+
+.gameUI-wrapper .board .preview .bubble:before {
+    display: none;
+}
+
+.gameUI-wrapper .board .arrowLine {
+    height: calc(var(--game-bubble-height) + 2 * var(--game-bubble-border-width));
+    position: relative;
+}
+
+.gameUI-wrapper .board .arrowLine>div {
+    height: calc(var(--game-bubble-height) * 3);
+    width: calc(var(--game-bubble-height) * 3);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    will-change: transform;
+    background-image: url("../img/arrow.png");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+}
+
+.gameUI-wrapper .queue-wrapper {
+    position: absolute;
+    bottom: 0%;
+    right: 0;
+    transform: translateX(45%);
+    padding: var(--game-board-padding);
+    border: var(--game-board-border-width) solid white;
+    border-left: none;
+    overflow: hidden;
+    width: calc((5 * var(--game-bubble-height) + 6 * var(--game-board-padding) + 7 * var(--game-board-border-width)) - var(--game-bubble-height));
+}
+
+.gameUI-wrapper .queue-wrapper .queue-pieces {
+    display: flex;
+    flex-direction: row;
+    gap: var(--game-board-padding);
+    z-index: 1;
+    position: relative;
+}
+
+.gameUI-wrapper .queue-text {
+    position: absolute;
+    bottom: calc(0% + var(--game-bubble-height) + 2 * var(--game-bubble-border-width) + 2 * var(--game-board-padding));
+    left: 100%;
+    font-size: 150%;
+    text-transform: uppercase;
+    transform: rotate(90deg) translate(-50% , 100%);
+    margin: unset;
+    display: flex;
+    align-items: flex-end;
+}
+
+.gameUI-wrapper .queue-text span:first-of-type,
+.gameUI-wrapper .hold-text span:first-of-type {
+    font-size: 150%;
+}
+
+.gameUI-wrapper .hold-text {
+    position: absolute;
+    top: calc(var(--game-bubble-height) + 2 * var(--game-board-padding) + 2 * var(--game-board-border-width));
+    left: 100%;
+    font-size: 150%;
+    text-transform: uppercase;
+    transform: rotate(90deg) translate(50% , 70%);
+    margin: unset;
+    display: flex;
+    align-items: flex-end;
+}
+
+.gameUI-wrapper .hold-wrapper {
+    position: absolute;
+    top: 0%;
+    left: calc(100% - var(--game-board-border-width));
+    border: var(--game-board-border-width) solid white;
+    height: calc(var(--game-bubble-height) + 2 * var(--game-board-padding) + 2 * var(--game-board-border-width));
+    width: calc(var(--game-bubble-height) + 2 * var(--game-board-padding) + 2 * var(--game-board-border-width));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gameUI-wrapper .trajectory {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.gameUI-wrapper  .trajectory > polyline {
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 4px;
+    transform: translateX(4px);
+}
+
+.gameUI-wrapper .username {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 15px);
+    transform: translateX(-50%);
+}
+
+.gameUI-wrapper .username {
+    font-size: 80%;
+}
+
+.gameUI-wrapper .garbage-wrapper {
+    position: absolute;
+    top: 0%;
+    right: calc(100% - var(--game-board-border-width));
+    height: calc(100% - 2 * var(--game-board-border-width));
+    width: calc(3 * var(--game-board-border-width));
+    border: var(--game-board-border-width) solid white;
+}
+
+.gameUI-wrapper .garbage-wrapper .garbage {
+    background-color: white;
+}

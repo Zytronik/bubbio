@@ -1,0 +1,281 @@
+/* Menus */
+.menu-wrapper {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3vh;
+    height: 100%;
+}
+
+.menu .menu-title {
+    font-size: 7em;
+    position: absolute;
+    z-index: 1;
+    top: 3vh;
+    left: 4vw;
+    text-transform: uppercase;
+}
+
+.menu .menu-title h1 {
+    margin: 0;
+    display: flex;
+    align-items: flex-start;
+}
+
+.menu .menu-title span:first-of-type {
+    font-size: 300%;
+}
+
+.menu-btn {
+    cursor: pointer;
+    width: 120%;
+    height: 15vh;
+    border: var(--menu-btn-border-width) solid black;
+    color: white;
+    transform: translateX(0%) skew(10deg);
+    transition: 500ms;
+    position: relative;
+    z-index: 2;
+    padding: 0 0 0 3%;
+}
+
+.menu-btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #161616;
+    background-image: url("../img/stripes.png");
+    z-index: -1;
+    animation: slide 4s linear infinite;
+}
+
+.menu-btn:hover::after {
+    animation: slide 2s linear infinite;
+    background-color: #2a2a2a;
+}
+
+@keyframes slide {
+    100% {
+        background-position: 226px 0; /* 226px is the width of the image */
+    }
+}
+
+.menu-btn .text {
+    text-transform: uppercase;
+    display: flex;
+    align-items: flex-start;
+}
+
+.menu-btn .text > p {
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-btn .text > span {
+    font-size: 9em;
+}
+
+.menu-btn .text > p span:first-of-type {
+    font-size: 4.1em;
+    padding-top: 2%;
+    padding-bottom: 1%;
+    letter-spacing: 0.1em;
+    display: block;
+}
+
+.menu-btn .text > p span:last-of-type {
+    font-size: 1em;
+    background-color: white;
+    color: black;
+    padding: 1% 3%;
+    white-space: nowrap;
+    display: block;
+    width: calc(100% + 3%);
+    box-sizing: border-box;
+    margin-left: -3%;
+}
+
+.menu-btn::before{
+    content: "";
+    position: absolute;
+    bottom: calc(var(--menu-btn-border-width) * -1);
+    left: calc(var(--menu-btn-border-width) * -1);
+    border-top: 12vh solid transparent;
+    height: 10%;
+    width: 20%;
+    border-right: 40vw solid transparent;
+    border-bottom: var(--menu-btn-border-width) solid black;
+    border-left: var(--menu-btn-border-width) solid black;
+}
+
+.menu-btn.multiplayer::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--multiplayer-color);
+    border-left: var(--menu-btn-border-width) solid var(--multiplayer-color);
+}
+
+.menu-btn.singleplayer::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--singleplayer-color);
+    border-left: var(--menu-btn-border-width) solid var(--singleplayer-color);
+}
+
+.menu-btn.configuration::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--config-color);
+    border-left: var(--menu-btn-border-width) solid var(--config-color);
+
+}
+
+.menu-btn.sprint::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--sprint-color);
+    border-left: var(--menu-btn-border-width) solid var(--sprint-color);
+}
+
+.menu-btn.highscore::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--highscore-color);
+    border-left: var(--menu-btn-border-width) solid var(--highscore-color);
+}
+
+.menu-btn.pixitesting::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--pixi-color);
+    border-left: var(--menu-btn-border-width) solid var(--pixi-color);
+}
+
+.menu-btn.play-ranked::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--ranked-color);
+    border-left: var(--menu-btn-border-width) solid var(--ranked-color);
+}
+
+.menu-btn.room-listing::before {
+    border-bottom: var(--menu-btn-border-width) solid var(--roomListing-color);
+    border-left: var(--menu-btn-border-width) solid var(--roomListing-color);
+}
+
+#soloMenu .back-buttons{
+    background-color: var(--singleplayer-color);
+}
+
+#sprintPage .back-buttons{
+    background-color: var(--sprint-color);
+}
+
+#scorePage .back-buttons{
+    background-color: var(--highscore-color);
+}
+
+#multiMenu .back-buttons{
+    background-color: var(--multiplayer-color);
+}
+
+#rankedPage .back-buttons{
+    background-color: var(--ranked-color);
+}
+
+#roomListing .back-buttons{
+    background-color: var(--roomListing-color);
+}
+
+#config .back-buttons{
+    background-color: var(--config-color);
+}
+
+.menu-btn.short-btn{
+    margin-left: 10%;
+}
+
+.menu-btn:hover {
+    transform: scale(1.1) skew(10deg);
+}
+
+.back-buttons .menu-btn{
+    display: flex;
+    align-items: center;
+}
+
+.back-buttons .menu-btn::before{
+    display: none;
+}
+
+.menu-btn > div {
+    transform: skew(-10deg);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+}
+
+.menu-btn img {
+    max-width: 20vh;
+    height: 20vh;
+    object-fit: cover;
+    padding-left: 3%;
+}
+
+.menu-btn p {
+    margin: 0;
+}
+
+.back-buttons {
+    height: 90vh;
+    width: 0vw;
+    animation: slideInBackButtons 0.4s ease forwards;
+    animation-delay: 0.2s;
+    background-color: rgb(40, 40, 40);
+    position: relative;
+    cursor: pointer;
+}
+
+@keyframes slideInBackButtons {
+    from {
+        width: 0vw;
+    }
+
+    to {
+        width: 5vw;
+    }
+}
+
+.back-buttons .menu-btn {
+    animation: fadeInBackButtons 0.4s ease forwards;
+    animation-delay: 0.2s;
+    justify-content: flex-end;
+    width: 120%;
+    opacity: 0;
+    padding-right: 7%;
+    transform: translateX(-20%);
+}
+
+.back-buttons .menu-btn > div {
+    transform: skewX(0);
+    justify-content: flex-end;
+}
+
+.back-buttons .menu-btn img {
+    width: 12vh;
+    height: 12vh;
+}
+
+@keyframes fadeInBackButtons {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.back-buttons .menu-btn.disabled:hover {
+    transform: translateX(-20%);
+}
+
+.menu-btn.disabled {
+    transform: translateX(-50%);
+}

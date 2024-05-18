@@ -1,34 +1,50 @@
 <template class="page" id="game">
   <div class="game-wrapper">
+
+
+
+
+
+
     <div v-if="gameMode === 'sprint'" class="inGameStats">
       <div class="bottom">
-        <p
-          v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
-        </p>
-        <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}
-        </p>
-        <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond
-          }}</p>
+        <div>
+          <p>Time</p>
+          <p
+            v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
+          </p>
+        </div>
+        <div>
+          <p>Cleared</p>
+          <p>{{ playerGameVisuals.statNumbers.bubblesCleared }}/{{ playerGameVisuals.statNumbers.bubbleClearToWin }}
+          </p>
+        </div>
+        <div>
+          <p>Bubbles</p>
+          <p>{{ playerGameVisuals.statNumbers.bubblesShot }}.</p>
+          <p>{{ playerGameVisuals.statNumbers.bubblesPerSecond
+            }}/S</p>
+        </div>
       </div>
       <div class="top">
         <transition name="fade">
-          <p v-if="playerGameVisuals.statNumbers.currentCombo.value > 0">Combo {{
-            playerGameVisuals.statNumbers.currentCombo.value }}</p>
+          <p v-if="playerGameVisuals.statNumbers.currentCombo > 0 || playerGameVisuals.statNumbers.currentCombo.value > 0">Combo {{
+            areRef ? playerGameVisuals.statNumbers.currentCombo.value : playerGameVisuals.statNumbers.currentCombo }}</p>
         </transition>
         <transition name="fade">
-          <p v-if="playerGameVisuals.statNumbers.spikeNumber.value">Spike {{
-            playerGameVisuals.statNumbers.spikeNumber.value }}</p>
+          <p v-if="(areRef && playerGameVisuals.statNumbers.spikeNumber.value) || (!areRef && playerGameVisuals.statNumbers.spikeNumber)">Spike {{
+            areRef ? playerGameVisuals.statNumbers.spikeNumber.value : playerGameVisuals.statNumbers.spikeNumber }}</p>
         </transition>
       </div>
     </div>
+
+
+
+
+
+
+
     <div v-if="gameMode === 'ranked'" class="inGameStats">
-      <div class="bottom">
-        <p
-          v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
-        </p>
-        <p>{{ playerGameVisuals.statNumbers.attackPerMinute }} APM</p>
-        <p>{{ playerGameVisuals.statNumbers.bubblesShot }} BPS: {{ playerGameVisuals.statNumbers.bubblesPerSecond }}</p>
-      </div>
       <div class="top">
         <transition name="fade">
           <p v-if="playerGameVisuals.statNumbers.currentCombo.value > 0">Combo {{
@@ -39,18 +55,49 @@
             playerGameVisuals.statNumbers.spikeNumber.value }}</p>
         </transition>
       </div>
+      <div class="bottom">
+        <div>
+          <p>Time</p>
+          <p v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
+          </p>
+        </div>
+        <div>
+          <p>Attack</p>
+          <p>{{ playerGameVisuals.statNumbers.attackPerMinute }} APM</p>
+        </div>
+        <div>
+          <p>Bubbles</p>
+          <p>{{ playerGameVisuals.statNumbers.bubblesShot }}.</p>
+          <p>{{ playerGameVisuals.statNumbers.bubblesPerSecond
+            }}/S</p>
+        </div>
+      </div>
     </div>
+
+
+
+
+
+
     <div class="gameUI-wrapper">
-      <span class="monospace"
-        v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage"></span>
-      <span class="monospace"
-        v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></span>
-      <span class="monospace remove-whiteSpaces"
-        v-html="areRef ? playerGameVisuals.asciiBoard.queueString.value : playerGameVisuals.asciiBoard.queueString"></span>
-      <span class="monospace text-center"
-        v-html="areRef ? playerGameVisuals.asciiBoard.playGridASCII.value : playerGameVisuals.asciiBoard.playGridASCII"></span>
-      <span class="monospace overlap-infos"
-        v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText"></span>
+      <div class="garbage-wrapper"
+        v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage"></div>
+      <p class="hold-text"><span class="text-noWhiteSpaces">H</span><span class="text-noWhiteSpaces">old</span></p>
+      <div class="hold-wrapper">
+       <div class="hold-piece" v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></div>
+      </div>
+      <p class="queue-text"><span class="text-noWhiteSpaces">Q</span><span class="text-noWhiteSpaces">ueue</span></p>
+      <div class="queue-wrapper">
+        <div class="queue-pieces"
+          v-html="areRef ? playerGameVisuals.asciiBoard.queueString.value : playerGameVisuals.asciiBoard.queueString">
+        </div>
+      </div>
+      <div class="board"
+        v-html="areRef ? playerGameVisuals.asciiBoard.playGridASCII.value : playerGameVisuals.asciiBoard.playGridASCII">
+      </div>
+      <span class="overlap-infos"
+        v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText">
+      </span>
       <span class="username text-center" v-html="playerGameVisuals.playerName.toUpperCase()"></span>
     </div>
   </div>

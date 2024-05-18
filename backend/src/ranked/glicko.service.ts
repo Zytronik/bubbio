@@ -47,4 +47,12 @@ export class GlickoService {
         await this.userService.updateGlickoRating(winnerID, winnerRatings, loserID, loserRatings);
         return {gainedElo, lostElo};
     }
+
+    async predictWinrate(player1ID: number, player2ID: number): Promise<number> {
+        const player1 = await this.userService.getGlickoRatingsByUserId(player1ID);
+        const player2 = await this.userService.getGlickoRatingsByUserId(player2ID);
+        const glickoPlayer1 = this.glicko.makePlayer(player1.rating, player1.ratingDeviation, player1.volatility);
+        const glickoPlayer2 = this.glicko.makePlayer(player2.rating, player2.ratingDeviation, player2.volatility);
+        return await this.glicko.predict(glickoPlayer1, glickoPlayer2) * 100;
+    }
 }

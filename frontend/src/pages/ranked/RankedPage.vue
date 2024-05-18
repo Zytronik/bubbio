@@ -65,7 +65,7 @@
               <p><span>{{ rankedMatchesCount }}</span> in Games</p>
             </div>
 
-            <div v-if="isLoggedIn" class="matchmakingButton" @click="toggleQueue" :class="{ 'in-queue': isInQueue }">
+            <div v-if="isLoggedIn" @mouseenter="playSound('menu_hover')" class="matchmakingButton" @click="toggleQueue" :class="{ 'in-queue': isInQueue }">
               <div v-if="isInQueue">
                 <p>Leave Queue | Passed Time: {{ passedTime }}s</p>
               </div>
@@ -233,7 +233,8 @@ import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-di
 import { PlayerData } from '@/ts/game/network/dto/game.network.dto.end-screen';
 import { CountUp } from 'countup.js';
 import { formatDateToAgoText } from '@/ts/page/page.page-utils';
-import { transitionEndScreenPageToDashboard, transitionOutOfGame } from '@/ts/page/page.css-transitions';
+import { transitionEndScreenPageToRankedDashboard, transitionOutOfGame } from '@/ts/page/page.css-transitions';
+import { playSound } from '@/ts/asset/asset.howler-load';
 
 interface PlayerMatchmakingStats {
   userId: number;
@@ -300,6 +301,7 @@ export default {
     }
 
     function toggleQueue() {
+      playSound('button_play');
       if (isInQueue.value) {
         leaveQueue();
       } else {
@@ -449,12 +451,13 @@ export default {
 
     function goBackToRankedPage() {
       if (showEndScreen.value) {
-        transitionEndScreenPageToDashboard('.ranked-dashboard', '.endScreen-wrapper', () => {
+        transitionEndScreenPageToRankedDashboard('.ranked-dashboard', '.endScreen-wrapper', () => {
           isGaming.value = false;
           showEndScreen.value = true;
           showMatchmakingScreen.value = true;
           specialBackButtonBehavior.value = false;
         },()=>{
+          disableResetInput();
           showEndScreen.value = false;
         });
         backInput.fire = backInputOnLoad.value;
@@ -577,7 +580,6 @@ export default {
     }
 
     onMounted(() => {
-      changeBackgroundTo('linear-gradient(45deg, rgba(126,10,41,1) 0%, rgba(144,141,58,1) 100%)');
       backInputOnLoad.value = backInput.fire;
       if (isLoggedIn.value) {
         fetchPlayerMmStats();
@@ -639,15 +641,13 @@ export default {
       rankedMatches,
       formatDateToAgoText,
       openProfile,
+      playSound,
     }
   }
 };
 </script>
 
 <style scoped>
-.back-buttons::before {
-  background: linear-gradient(45deg, rgba(43, 221, 185, 1) 0%, rgba(198, 63, 119, 1) 100%);
-}
 
 .matchmakingButton {
   font-size: 35px;
@@ -661,6 +661,10 @@ export default {
   align-items: center;
   text-align: center;
   transition: 300ms;
+}
+
+.matchmakingButton:hover {
+  background-color: #575757;
 }
 
 .in-queue {
@@ -892,16 +896,6 @@ p {
   position: fixed;
   top: 0;
   bottom: 0;
-}
-
-.gaming-wrapper::before {
-  left: 0;
-  background: linear-gradient(45deg, rgba(126, 10, 41, 1) 0%, rgba(144, 141, 58, 1) 100%);
-}
-
-.gaming-wrapper::after {
-  right: 0;
-  background: linear-gradient(45deg, rgb(10, 126, 88) 0%, rgb(144, 141, 58) 100%);
 }
 
 .scores-wrapper {

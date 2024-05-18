@@ -1,5 +1,5 @@
 <template>
-  <article id="app">
+  <article id="app" :class="currentComponent.name">
     <LoadingScreen :isLoading="isLoading" />
     <div class="topbar">
       <div v-if="isAuthenticated && userData" @click="showMyProfile" class="profile-wrapper">
@@ -7,15 +7,22 @@
         <div class="profile-content">
           <h3>{{ userData?.username.toUpperCase() }}</h3>
           <div class="ratingDetails">
-            <p v-if="userData.isRanked" class="rating">{{ userData.rating }}<span>±{{ userData.ratingDeviation }}</span></p>
+            <p v-if="userData.isRanked" class="rating">{{ userData.rating }}<span>±{{ userData.ratingDeviation }}</span>
+            </p>
             <img v-if="userData?.rankInfos && userData.isRanked" class="rank-img"
               :src="getRankImagePath(userData.rankInfos.iconName)" :alt="userData?.rankInfos.name">
             <p v-else class="unranked">Unranked</p>
           </div>
-          <div v-if="userData.isRanked" class="progressBar">
-            <div class="progressBarFill" :style="{
-              'width': getProgressBarFillWidth()
-            }"></div>
+          <div v-if="userData.isRanked" class="progressBar-wrapper">
+            <img v-if="userData?.rankInfos && userData.rankInfos?.prevRank" class="prevRank hidden rank-img"
+              :src="getRankImagePath(userData.rankInfos.prevRank.iconName)" :alt="userData.rankInfos.prevRank.name">
+            <div class="progressBar">
+              <div class="progressBarFill" :style="{
+                'width': getProgressBarFillWidth()
+              }"></div>
+            </div>
+            <img v-if="userData?.rankInfos && userData.rankInfos?.nextRank" class="nextRank hidden rank-img"
+              :src="getRankImagePath(userData.rankInfos.nextRank.iconName)" :alt="userData.rankInfos.nextRank.name">
           </div>
         </div>
       </div>
@@ -30,7 +37,7 @@
       </component>
     </transition>
     <div class="bottomBar">
-      <button @click="openChannelOverlay" class="openChannelButton">Channel</button>
+      <button @click="openChannelOverlay" @mouseenter="playSound('menu_hover')" class="openChannelButton">Channel</button>
     </div>
     <PageBackgroundCanvas />
   </article>
@@ -55,6 +62,7 @@ import { applySavedInputSettings, enableBackInputs, enableChannelInput, enableNe
 import { setupDebugListeners } from "./ts/game/network/game.network.debug";
 import { RankInfo } from './ts/page/i/page.i-rank-info';
 import { loadBackgroundCanvas } from './ts/page/page.background-canvas';
+import { loadAudioFiles, playSound } from './ts/asset/asset.howler-load';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -67,7 +75,7 @@ interface InfoMessageData {
 
 export default {
   name: 'App',
-  components: { LoginOverlay, InfoMessages, Channel, LoadingScreen, PageBackgroundCanvas},
+  components: { LoginOverlay, InfoMessages, Channel, LoadingScreen, PageBackgroundCanvas },
   setup() {
     attachInputReader();
     /* Channel */
@@ -247,10 +255,11 @@ export default {
 
     async function waitForLoadingScreen() {
       await loadBackgroundCanvas();
-      if(!userData.value) {
+      if (!userData.value) {
         await updateProfileData();
         await applySavedInputSettings();
       }
+      await loadAudioFiles();
       //TODO add Promises for other loading tasks
 
       endLoading();
@@ -311,6 +320,7 @@ export default {
       getRankImagePath,
       getProgressBarFillWidth,
       isLoading,
+      playSound,
     };
   },
 }
@@ -337,9 +347,10 @@ export default {
   cursor: pointer;
   height: 10vh;
   position: relative;
+  z-index: 1;
 }
 
-.profile-wrapper::before{
+.profile-wrapper::before {
   position: absolute;
   content: '';
   width: 0px;
@@ -430,53 +441,66 @@ export default {
 }
 
 /* Existing slide-left transitions */
-.slide-left-enter-active, .slide-left-leave-active {
+.slide-left-enter-active,
+.slide-left-leave-active {
   transition: transform 0.15s ease;
 }
-.slide-left-enter-from, .slide-left-leave-to {
+
+.slide-left-enter-from,
+.slide-left-leave-to {
   position: absolute;
   width: 100vw;
 }
+
 .slide-left-enter-from {
   transform: translateX(100vw);
 }
-.slide-left-enter-to, .slide-left-leave-from {
+
+.slide-left-enter-to,
+.slide-left-leave-from {
   transform: translateX(0);
 }
+
 .slide-left-leave-to {
   transform: translateX(-100vw);
 }
 
 /* New slide-right transitions */
-.slide-right-enter-active, .slide-right-leave-active {
+.slide-right-enter-active,
+.slide-right-leave-active {
   transition: transform 0.15s ease;
 }
-.slide-right-enter-from, .slide-right-leave-to {
+
+.slide-right-enter-from,
+.slide-right-leave-to {
   position: absolute;
   width: 100vw;
 }
+
 .slide-right-enter-from {
   transform: translateX(-100vw);
 }
-.slide-right-enter-to, .slide-right-leave-from {
+
+.slide-right-enter-to,
+.slide-right-leave-from {
   transform: translateX(0);
 }
+
 .slide-right-leave-to {
   transform: translateX(93vw);
 }
 
 .slide-out-LoadingScreen {
-    animation: slideOutLoadingScreen 0.5s forwards;
+  animation: slideOutLoadingScreen 0.5s forwards;
 }
 
 @keyframes slideOutLoadingScreen {
-	0% {
-		transform: translateY(0);
-	}
-	100% {
-		transform: translateY(-100%);
-	}
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-100%);
+  }
 }
-
-
 </style>

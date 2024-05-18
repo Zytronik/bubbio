@@ -40,6 +40,7 @@ export default {
         iconSrc: require(`@/img/icons/pixi.png`),
         pageState: PAGE_STATE.pixiTest,
         bigButton: false,
+        authIds: ["1", "2", "3"],
       }
     ]);
 

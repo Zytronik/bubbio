@@ -1,7 +1,7 @@
 import { nextTick } from "vue";
 import { disableBackInputs, disableResetInput, enableBackInputs } from "../input/input.input-manager";
 
-export async function transitionEndScreenPageToDashboard(dashboardSelector: string, endScreenSelector: string, onStart?: () => void, onEnd?: () => void) {
+export async function transitionEndScreenPageToRankedDashboard(dashboardSelector: string, endScreenSelector: string, onStart?: () => void, onEnd?: () => void) {
     if (onStart) {
         onStart();
     }
@@ -22,6 +22,59 @@ export async function transitionEndScreenPageToDashboard(dashboardSelector: stri
         dashboard.classList.remove('slideLeftToCenter'); //reset styles
         container.classList.remove('flex-row') //remove flex-row from container
     }, 500);
+}
+
+export async function transitionEndScreenPageToDashboard(dashboardSelector: string, endScreenSelector: string, onStart?: () => void, onEnd?: () => void) {
+    if (onStart) {
+        onStart();
+    }
+    await nextTick(); // if i dont do this, dashboard is undefined
+    const dashboard = document.querySelector(dashboardSelector) as HTMLElement;
+    const resultScreen = document.querySelector(endScreenSelector) as HTMLElement;
+    const content = document.querySelector('.page-dashboard .content') as HTMLElement;
+    const playWrapper = document.querySelector('.page-dashboard .play-wrapper') as HTMLElement;
+    const contentTitle = document.querySelector('.page-dashboard .content-title') as HTMLElement;
+    dashboard.classList.add('moveResultScreen-left'); //position dashboard to the left
+
+    const contentLeft = window.getComputedStyle(content,null).getPropertyValue("left");
+    const playWrapperLeft = window.getComputedStyle(playWrapper,null).getPropertyValue("left");
+    const contentTitleLeft = window.getComputedStyle(contentTitle,null).getPropertyValue("left");
+
+    content.classList.add('moveFixedLeftOutOfScreen');
+    playWrapper.classList.add('moveFixedLeftOutOfScreen');
+    contentTitle.classList.add('moveFixedLeftOutOfScreen');
+
+    resultScreen.classList.add('slideToRight'); //slide result screen to the left
+
+    setTimeout(() => {
+        content.classList.add('addLeftTransitionToFixedElements');
+        playWrapper.classList.add('addLeftTransitionToFixedElements');
+        contentTitle.classList.add('addLeftTransitionToFixedElements');
+        content.style.left = contentLeft;
+        playWrapper.style.left = playWrapperLeft;
+        contentTitle.style.left = contentTitleLeft;
+    }, 1);
+    
+    setTimeout(() => {
+        if (onEnd) {
+            onEnd();
+        }
+
+        content.classList.remove('moveFixedLeftOutOfScreen');
+        playWrapper.classList.remove('moveFixedLeftOutOfScreen');
+        contentTitle.classList.remove('moveFixedLeftOutOfScreen');
+
+        content.classList.remove('addLeftTransitionToFixedElements');
+        playWrapper.classList.remove('addLeftTransitionToFixedElements');
+        contentTitle.classList.remove('addLeftTransitionToFixedElements');
+
+        content.style.removeProperty('left');
+        playWrapper.style.removeProperty('left');
+        contentTitle.style.removeProperty('left');
+        
+        resultScreen.classList.remove('slideToRight'); //reset styles
+        dashboard.classList.remove('moveResultScreen-left'); //reset styles
+    }, 501);
 }
 
 export function addGameViewStyles() {

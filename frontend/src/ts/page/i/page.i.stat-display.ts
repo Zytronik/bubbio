@@ -15,12 +15,12 @@ export const statDisplays: Record<string, StatDisplay> = {
         isTime: true,
     },
     gameDuration: {
-        fullName: "Game Duration",
+        fullName: "Duration",
         shortName: "",
         isTime: true,
     },
     bubblesCleared: {
-        fullName: "Bubbles Cleared",
+        fullName: "Cleared",
         shortName: "",
         isTime: false,
     },
@@ -30,7 +30,7 @@ export const statDisplays: Record<string, StatDisplay> = {
         isTime: false,
     },
     bubblesPerSecond: {
-        fullName: "Bubbles Per Second",
+        fullName: "Bubbl. Per Sec.",
         shortName: "bps",
         isTime: false,
     },

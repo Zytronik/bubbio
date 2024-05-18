@@ -1,0 +1,294 @@
+.gameMode-dashboard button.playButton {
+    height: 100%;
+    width: 40%;
+    background: white;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    font-size: 14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    padding: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gameMode-dashboard button.playButton span {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transform: skewX(-10deg);
+    justify-content: center;
+    align-items: center;
+}
+
+button.retry {
+    width: 30%;
+    font-size: 300%;
+    cursor: pointer;
+    border: none;
+}
+
+.page-wrapper .moveResultScreen-left {
+    position: absolute;
+}
+
+.page-wrapper .gameMode-dashboard .moveFixedLeftOutOfScreen {
+    left: -100vw;
+}
+
+.confetti-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: var(--confetti-color);
+    top: -10px;
+    /* Start off-screen */
+    /* Randomize the starting position */
+    left: calc(var(--confetti-position) * 100%);
+    opacity: 0.7;
+
+    /* Confetti falling animation */
+    animation: fall linear infinite;
+    animation-duration: calc(2s + var(--confetti-duration) * 3s);
+    animation-delay: calc(var(--confetti-delay) * -5s);
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+    }
+}
+
+.confetti:nth-child(1) {
+    --confetti-color: #ff0000;
+    /* Red */
+    --confetti-position: 0.1;
+    --confetti-duration: 0.5;
+    --confetti-delay: 0.1;
+}
+
+.confetti:nth-child(2) {
+    --confetti-color: #00ff00;
+    /* Green */
+    --confetti-position: 0.2;
+    --confetti-duration: 0.7;
+    --confetti-delay: 0.2;
+}
+
+.gameMode-dashboard {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: flex-end;
+    position: relative;
+}
+
+.gameMode-dashboard .content::after {
+    content: "";
+    background-color: rgb(232, 238, 235);
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 200%;
+    height: 200%;
+    z-index: -1;
+    border: var(--menu-btn-border-width) solid black;
+}
+
+.gameMode-dashboard .content {
+    height: 72%;
+    bottom: 0;
+    width: 48%;
+    position: fixed;
+    transform: skewX(10deg);
+    padding-bottom: calc(5vh);
+    box-sizing: border-box;
+    padding-top: var(--menu-btn-border-width);
+    padding-right: var(--menu-btn-border-width);
+}
+
+.gameMode-dashboard .cell {
+    height: 70px;
+    font-size: 1.5em;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.gameMode-dashboard .content::before{
+    content: "";
+    position: absolute;   
+    top: 0;
+    right: 0;
+    border-bottom: 15vw solid transparent;
+    border-left: 30vh solid transparent;
+    border-top: var(--menu-btn-border-width) solid black;
+    border-right: var(--menu-btn-border-width) solid black;
+    height: 15%;
+    width: 20%;
+}
+
+.gameMode-dashboard .content::before {
+    border-top: var(--menu-btn-border-width) solid var(--sprint-color);
+    border-right: var(--menu-btn-border-width) solid var(--sprint-color);
+} 
+
+.gameMode-dashboard .content-wrapper {
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    color: black;
+}
+
+.gameMode-dashboard .leaderboard .row:nth-of-type(6) {
+    border-top: 5px solid transparent;
+    position: relative;
+}
+
+.gameMode-dashboard .leaderboard .row:nth-of-type(6)::after {
+    content: "";
+    position: absolute;   
+    top: -5px;
+    right: 0;
+    border-left: 40vw solid transparent;
+    border-top: 5px solid black;
+    height: 100%;
+    width: 10%;
+}
+
+.gameMode-dashboard .leaderboard .cell,
+.gameMode-dashboard .history .cell {
+    transform: skewX(-10deg);
+}
+
+.gameMode-dashboard .leaderboard .row div:nth-child(3) {
+    color: var(--sprint-color);
+}
+
+.gameMode-dashboard .history .body .row div:nth-child(3) {
+    color: var(--sprint-color);
+}
+
+.gameMode-dashboard .history .row div:nth-child(2) {
+    flex: 0.6;
+}
+
+.gameMode-dashboard .leaderboard .user-info img {
+    height: 40px;
+    width: 40px;
+}
+
+.gameMode-dashboard .l-tab {
+    height: 100%;
+}
+
+.gameMode-dashboard .no-entries {
+    font-size: 1.5em;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.gameMode-dashboard .no-entries,
+.gameMode-dashboard .loader {
+    transform: skewX(-10deg);
+}
+
+.gameMode-dashboard .content .l-tab-buttons{
+    position: absolute;
+    bottom: 100%;
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    transform: skewX(-10deg);
+}
+
+.gameMode-dashboard .content .l-tab-buttons .l-tab-button {
+    background-color: black;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 5px 15px;
+    font-size: 1.5em;
+    opacity: 0.5;
+    text-transform: uppercase;
+    transition: 0.3ms;
+}
+
+.gameMode-dashboard .content .l-tab-buttons .l-tab-button.active {
+    opacity: 1;
+}
+
+.gameMode-dashboard .content-title {
+    position: fixed;
+    left: 46%;
+    bottom: 35%;
+    font-size: 5em;
+    transform: rotate(90deg) skewY(-10deg);
+    text-transform: uppercase;
+    z-index: 1;
+}
+
+.gameMode-dashboard .content-title h1 {
+    margin: 0;
+    display: flex;
+    align-items: flex-end;
+}
+
+.gameMode-dashboard .content-title span:first-of-type {
+    font-size: 150%;
+}
+
+.gameMode-dashboard .play-wrapper {
+    position: fixed;
+    top: 14vh;
+    height: 25%;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    background: white;
+}
+
+.page-wrapper .page-container div.addLeftTransitionToFixedElements {
+    transition: 0.5s;
+}
+
+.page-wrapper .slideToRight {
+    animation: slideToRight 0.5s forwards;
+}
+
+.page-wrapper .slideLeftToCenter {
+    animation: slideLeftToCenter 0.5s forwards;
+}
+
+@keyframes slideToRight {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(110%);
+    }
+}
+
+@keyframes slideLeftToCenter {
+    from {
+        transform: translateX(-110%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}

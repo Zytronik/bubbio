@@ -6,6 +6,7 @@ import { playerGameInstance, playerGameVisuals, setGameStateAndNotify } from "..
 import { calculatePreview } from "../logic/game.logic.shoot";
 import { Bubble } from "../i/game.i.bubble";
 import { GAME_STATE } from "../i/game.e.state";
+import { PreviewBubble } from "../i/game.i.preview-bubble";
 
 let asciiAnimationRunning = false;
 let asciiAnimationFrameId: number | null = null;
@@ -93,20 +94,21 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
 
     const gridWidth = playGrid.gridWidth;
     let boardText = ""
-    boardText += getUpperBoarderLineString(gridWidth);
+    if (gameInstance.playGrid.previewBubble) {
+        boardText += getTravelLineString(gameInstance.playGrid.previewBubble, gameInstance.playGrid.precisionWidth, gameInstance.playGrid.precisionHeight);
+    }
     let once = true;
     playGrid.rows.forEach(row => {
         if (row.isInDeathZone && once) {
-            boardText += getDeathZoneLineString(gridWidth);
+            boardText += getDeathZoneLineString();
             once = false;
         }
         boardText += getRegularRowString(row.fields, row.isSmallerRow, previewPosition, gameInstance.currentBubble);
     });
-    boardText += getArrowLineString(gameInstance.playGrid.gridWidth, gameInstance.angle);
-    boardText += getLowerBoarderLineString(gridWidth);
+    boardText += getArrowLineString(gameInstance.angle, gameInstance.currentBubble);
     asciiRefs.playGridASCII.value = boardText;
     asciiRefs.holdString.value = getHoldBubbleString(gameInstance.holdBubble);
-    asciiRefs.queueString.value = getBubbleQueueString(gameInstance.currentBubble, gameInstance.bubbleQueue, gameInstance.gameSettings.queuePreviewSize);
+    asciiRefs.queueString.value = getBubbleQueueString(gameInstance.bubbleQueue, gameInstance.gameSettings.queuePreviewSize);
     asciiRefs.incomingGarbage.value = getIncomingGarbageString(gameInstance.queuedGarbage, gameInstance.playGrid.gridHeight + gameInstance.playGrid.extraGridHeight);
     if (gameInstance.gameState === GAME_STATE.VICTORY_SCREEN) {
         asciiRefs.floatingText.value = victoryASCII;
@@ -129,115 +131,60 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
     }
 }
 
-function getUpperBoarderLineString(gridWidth: number): string {
-    let boarderLine = "╭─";
-    for (let i = 0; i < gridWidth; i++) {
-        boarderLine += "────";
-    }
-    boarderLine += "╮\n";
-    return boarderLine;
-}
-
-function getLowerBoarderLineString(gridWidth: number): string {
-    let boarderLine = "╰─";
-    for (let i = 0; i < gridWidth; i++) {
-        boarderLine += "────";
-    }
-    boarderLine += "╯\n";
-    return boarderLine;
-}
-
-function getDeathZoneLineString(gridWidth: number): string {
-    let deathZoneLine = "├┅";
-    for (let i = 0; i < gridWidth; i++) {
-        deathZoneLine += "┅┅┅┅";
-    }
-    deathZoneLine += "┤\n";
-    return deathZoneLine;
+function getDeathZoneLineString(): string {
+    return "<div class='deathZoneLine'></div>";
 }
 
 function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosition: Coordinates, currrentBubble: Bubble): string {
     let rowString = "";
-    rowString += isSmallerRow ? "│&nbsp;&nbsp;&nbsp;" : "│ ";
+    rowString += isSmallerRow ? "<div class='row small'>" : "<div class='row'>";
 
     fields.forEach(field => {
         if (previewPosition.x === field.coords.x && previewPosition.y === field.coords.y) {
-            rowString += `|${currrentBubble.ascii}| `;
+            rowString += `<div class="preview">${currrentBubble.ascii}</div>`;
         } else {
-            rowString += field.bubble ? `(${field.bubble.ascii}) ` : "--- ";
+            rowString += field.bubble ? `${field.bubble.ascii} ` : "<div class='field empty'></div>";
         }
     });
 
-    rowString += isSmallerRow ? "&nbsp;&nbsp;│\n" : "│\n";
+    rowString += "</div>";
     return rowString;
 }
 
-function getArrowLineString(gridWidth: number, angle: number): string {
-    let arrowLine = "│ ";
-    const isEvenRow = gridWidth % 2 === 0;
+function getArrowLineString(angle: number, currentBubble: Bubble): string {
+    return "<div class='arrowLine'><div style='transform: translate(-50%, 50%) rotate(" + angle + "deg)'><div style='transform: rotate(-" + angle + "deg)'>" + currentBubble.ascii + "</div></div></div>";
+}
 
-    for (let i = 0; i < (gridWidth / 2) - 1; i++) {
-        arrowLine += "&nbsp;&nbsp;&nbsp;&nbsp;";
+function getTravelLineString(previewBubble: PreviewBubble, gridWidth: number, gridHeight: number): string {
+    const boardWidth = document.querySelector(".board")?.clientWidth || 0;
+    const boardHeight = document.querySelector(".board")?.clientHeight || 0;
+    let lineString = `<svg class="trajectory">`;
+    for (let i = 0; i < previewBubble.travelLine.length-1; i++) {
+        const startX = previewBubble.travelLine[i].x / gridWidth * boardWidth;
+        const startY = previewBubble.travelLine[i].y / gridHeight * boardHeight;
+        const endX = previewBubble.travelLine[i + 1].x / gridWidth * boardWidth;
+        const endY = previewBubble.travelLine[i + 1].y / gridHeight * boardHeight;
+        lineString += `<polyline points="${startX},${startY} ${endX},${endY}"></polyline>`
     }
-    arrowLine += isEvenRow ? `&nbsp;&nbsp;&nbsp;${getASCIIArrow(angle)}&nbsp;&nbsp;&nbsp;&nbsp;` : ` ${getASCIIArrow(angle)}&nbsp;&nbsp;`
-    for (let i = 0; i < (gridWidth / 2) - 1; i++) {
-        arrowLine += "&nbsp;&nbsp;&nbsp;&nbsp;";
-    }
-
-    arrowLine += "│\n";
-    return arrowLine;
+    lineString += `</svg>`;
+    return lineString;
 }
 
 function getHoldBubbleString(holdBubble: Bubble | undefined): string {
-    return `Hold: ${holdBubble ? `(${holdBubble.ascii})` : ""}` + "\n";
+    return `${holdBubble ? `${holdBubble.ascii}` : ""}` + "\n";
 }
 
-function getBubbleQueueString(currentBubble: Bubble, bubbleQueue: Bubble[], previewLength: number): string {
-    let queueString = `Queue: (${currentBubble.ascii}) |`;
+function getBubbleQueueString(bubbleQueue: Bubble[], previewLength: number): string {
+    let queueString = "";
     for (let i = 0; i < previewLength; i++) {
-        queueString += ` (${bubbleQueue[i].ascii}) `;
+        queueString += ` ${bubbleQueue[i].ascii} `;
     }
-    return queueString + "\n\n";
-}
-
-function getIncomingGarbageString(garbageAmount: number, gridtotalHeight: number): string {
-    const stringWidth = gridtotalHeight;
-    let queueString = "╭";
-    for (let i = 0; i < stringWidth; i++) {
-        queueString += "─";
-    }
-    queueString += "╮\n│"
-
-    for (let i = 0; i < stringWidth; i++) {
-        if (i < garbageAmount) {
-            queueString += "▓";
-        } else {
-            queueString += "░";
-        }
-    }
-    queueString += "│\n╰"
-
-    for (let i = 0; i < stringWidth; i++) {
-        queueString += "─";
-    }
-    queueString += "╯"
     return queueString;
 }
 
-function getASCIIArrow(angle: number): string {
-    if (angle < 22.5) {
-        return "←"
-    }
-    if (angle < 67.5) {
-        return "↖"
-    }
-    if (angle < 112.5) {
-        return "↑"
-    }
-    if (angle < 157.5) {
-        return "↗"
-    }
-    return "→"
+function getIncomingGarbageString(garbageAmount: number, gridtotalHeight: number): string {
+    const barHeight = 100 / gridtotalHeight * garbageAmount;
+    return "<div style='height: "+barHeight+"%' class='garbage'></div>";
 }
 
 function showASCIICountdownNumber(counter: number): string {

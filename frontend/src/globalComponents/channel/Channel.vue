@@ -146,6 +146,7 @@ import { getFlagImagePath, getFriends, getUserOnlineStatus } from '@/ts/page/pag
 import { formatDateToAgoText } from '@/ts/page/page.page-utils';
 import { formatFieldValue } from '@/ts/page/i/page.i.stat-display';
 import eventBus from '@/ts/page/page.event-bus';
+import { playSound } from '@/ts/asset/asset.howler-load';
 
 export default {
   name: "ChannelOverlay",
@@ -220,6 +221,7 @@ export default {
     }
 
     function slideOverlayOut() {
+      playSound('menu_back');
       isVisible.value = false;
       setTimeout(() => {
         closeChannelOverlay();
@@ -369,11 +371,13 @@ export default {
     eventBus.on('updateFriendList', updateFriendList);
 
     /* General */
-    backInput.fire = slideOverlayOut;
     const isAuthenticated = computed(() => checkUserAuthentication());
     const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
+    const oldBackInput = ref<() => void>(() => "");
 
     onMounted(async () => {
+      oldBackInput.value = backInput.fire;
+      backInput.fire = slideOverlayOut;
       if (state.socket) {
         state.socket.on('fetchGlobalStats', (globalStats: GlobalStats) => {
           handleGlobalStatsUpdate(globalStats);
@@ -385,7 +389,6 @@ export default {
           }));
         });
       }
-
 
       fetchNews();
       slideOverlayIn();
@@ -399,6 +402,7 @@ export default {
     });
 
     onUnmounted(() => {
+      backInput.fire = oldBackInput.value;
       initialAnimationDone.value = false;
       if (state.socket) {
         state.socket.off('fetchGlobalStats', handleGlobalStatsUpdate);
