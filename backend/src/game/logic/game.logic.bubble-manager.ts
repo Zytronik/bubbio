@@ -41,37 +41,30 @@ function getBubbleBag(gameInstance: GameInstance): Bubble[] {
 
 
 const red: Bubble = {
-    color: "rgb(255, 0, 0)",
     ascii: `<div class="field bubble" style="background: rgb(255, 0, 0); border-color: rgb(255, 0, 0);"></div>`,
     type: 0,
 }
 const orange: Bubble = {
-    color: "rgb(255, 174, 0)",
     ascii: `<div class="field bubble" style="background: rgb(255, 136, 0); border-color: rgb(255, 136, 0);"></div>`,
     type: 1,
 }
 const yellow: Bubble = {
-    color: "rgb(255, 255, 0)",
     ascii: `<div class="field bubble" style="background: rgb(255, 255, 0); border-color: rgb(255, 255, 0);"></div>`,
     type: 2,
 }
 const green: Bubble = {
-    color: "rgb(123, 255, 0)",
     ascii: `<div class="field bubble" style=" background: rgb(32, 226, 25); border-color: rgb(32, 226, 25);"></div>`,
     type: 3,
 }
 const cyan: Bubble = {
-    color: "rgb(0, 255, 255)",
     ascii: `<div class="field bubble" style="background: rgb(0, 255, 255); border-color: rgb(0, 255, 255);"></div>`,
     type: 4,
 }
-const magenta: Bubble = {
-    color: "rgb(255, 0, 255)",
+const purple: Bubble = {
     ascii: `<div class="field bubble" style=" background: rgb(255, 0, 255); border-color: rgb(255, 0, 255);"></div>`,
     type: 5,
 }
 const white: Bubble = {
-    color: "rgb(255, 255, 255)",
     ascii: `<div class="field bubble" style=" background: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"></div>`, 
     type: 6,
 }

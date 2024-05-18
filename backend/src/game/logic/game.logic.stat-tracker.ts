@@ -10,14 +10,15 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
     gameStats.attack += attack;
     gameStats.defense += defense;
 
-    if (attack > 0){
-        if (gameStats.spikeAnimationStart + SPIKE_COUNTER_TIMEFRAME > performance.now()) {
-            gameStats.spikeNumber += attack;
-        } else {
-            gameStats.spikeNumber = attack;
-        }
-        gameStats.spikeAnimationStart = performance.now();
-    }
+    //performance.now() does not exist in the backend
+    // if (attack > 0){
+    //     if (gameStats.spikeAnimationStart + SPIKE_COUNTER_TIMEFRAME > performance.now()) {
+    //         gameStats.spikeNumber += attack;
+    //     } else {
+    //         gameStats.spikeNumber = attack;
+    //     }
+    //     gameStats.spikeAnimationStart = performance.now();
+    // }
 
     if (amountCleared > 0) {
         trackClearedBubbles(wallBounces, amountCleared);
