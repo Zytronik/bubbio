@@ -28,12 +28,12 @@
       </div>
       <div class="top">
         <transition name="fade">
-          <p v-if="playerGameVisuals.statNumbers.currentCombo.value > 0">Combo {{
-            playerGameVisuals.statNumbers.currentCombo.value }}</p>
+          <p v-if="playerGameVisuals.statNumbers.currentCombo > 0 || playerGameVisuals.statNumbers.currentCombo.value > 0">Combo {{
+            areRef ? playerGameVisuals.statNumbers.currentCombo.value : playerGameVisuals.statNumbers.currentCombo }}</p>
         </transition>
         <transition name="fade">
-          <p v-if="playerGameVisuals.statNumbers.spikeNumber.value">Spike {{
-            playerGameVisuals.statNumbers.spikeNumber.value }}</p>
+          <p v-if="(areRef && playerGameVisuals.statNumbers.spikeNumber.value) || (!areRef && playerGameVisuals.statNumbers.spikeNumber)">Spike {{
+            areRef ? playerGameVisuals.statNumbers.spikeNumber.value : playerGameVisuals.statNumbers.spikeNumber }}</p>
         </transition>
       </div>
     </div>

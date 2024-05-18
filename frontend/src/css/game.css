@@ -61,6 +61,11 @@
     position: relative;
     margin-bottom: 30px;
     font-size: 3.8vh;
+    --game-bubble-height: 3.2vh;
+    --game-bubble-border-width: 5px;
+    --game-board-border-radius: 0;
+    --game-board-border-width: 5px;
+    --game-board-padding: 8px;
 }
 
 .gameUI-wrapper .playerName {
@@ -154,14 +159,6 @@
     height: 100vh;
     background-color: black;
     z-index: 999;
-}
-
-:root {
-    --game-bubble-height: 3.2vh;
-    --game-bubble-border-width: 5px;
-    --game-board-border-radius: 0;
-    --game-board-border-width: 5px;
-    --game-board-padding: 8px;
 }
 
 .gameUI-wrapper .board {

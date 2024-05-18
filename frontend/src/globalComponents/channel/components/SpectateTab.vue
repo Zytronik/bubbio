@@ -77,6 +77,7 @@ export default defineComponent({
 }
 
 .game-wrapper {
-  font-size: 2.1vh;
+  font-size: 3vh;
+  --game-bubble-height: 2.4vh;
 }
 </style>
