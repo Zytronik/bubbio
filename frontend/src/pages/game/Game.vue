@@ -82,14 +82,15 @@
     <div class="gameUI-wrapper">
       <div class="garbage-wrapper"
         v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage"></div>
-      <p class="hold-text"><span class="text-noWhiteSpaces">H</span><span class="text-noWhiteSpaces">old</span></p>
-      <div class="hold-wrapper">
+      <!-- <div class="hold-wrapper">
        <div class="hold-piece" v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></div>
-      </div>
+      </div> -->
       <p class="queue-text"><span class="text-noWhiteSpaces">Q</span><span class="text-noWhiteSpaces">ueue</span></p>
       <div class="queue-wrapper">
-        <div class="queue-pieces"
-          v-html="areRef ? playerGameVisuals.asciiBoard.queueString.value : playerGameVisuals.asciiBoard.queueString">
+        <div class="queue-overflow">
+          <div class="queue-pieces"
+            v-html="areRef ? playerGameVisuals.asciiBoard.queueString.value : playerGameVisuals.asciiBoard.queueString">
+          </div>
         </div>
       </div>
       <div class="board"

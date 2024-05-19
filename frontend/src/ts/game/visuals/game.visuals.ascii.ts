@@ -105,9 +105,9 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
         }
         boardText += getRegularRowString(row.fields, row.isSmallerRow, previewPosition, gameInstance.currentBubble);
     });
-    boardText += getArrowLineString(gameInstance.angle, gameInstance.currentBubble);
+    boardText += getArrowLineString(gameInstance.angle, gameInstance.currentBubble, gameInstance.holdBubble);
     asciiRefs.playGridASCII.value = boardText;
-    asciiRefs.holdString.value = getHoldBubbleString(gameInstance.holdBubble);
+    /* asciiRefs.holdString.value = getHoldBubbleString(gameInstance.holdBubble); */
     asciiRefs.queueString.value = getBubbleQueueString(gameInstance.bubbleQueue, gameInstance.gameSettings.queuePreviewSize);
     asciiRefs.incomingGarbage.value = getIncomingGarbageString(gameInstance.queuedGarbage, gameInstance.playGrid.gridHeight + gameInstance.playGrid.extraGridHeight);
     if (gameInstance.gameState === GAME_STATE.VICTORY_SCREEN) {
@@ -151,8 +151,13 @@ function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosi
     return rowString;
 }
 
-function getArrowLineString(angle: number, currentBubble: Bubble): string {
-    return "<div class='arrowLine'><div style='transform: translate(-50%, 50%) rotate(" + angle + "deg)'><div style='transform: rotate(-" + angle + "deg)'>" + currentBubble.ascii + "</div></div></div>";
+function getArrowLineString(angle: number, currentBubble: Bubble, holdBubble: Bubble | undefined): string {
+    return "<div class='arrowLine'>"+
+        "<div class='crossbow' style='transform: translate(-50%, 50%) rotate(" + angle + "deg)'>"+
+            "<div class='current-piece' style='transform: rotate(-" + angle + "deg)'>" + currentBubble.ascii + "</div>"+
+        "</div>"+
+        "<div class='hold-piece'>"+(holdBubble ? holdBubble.ascii : "")+"</div>"+
+    "</div>";
 }
 
 function getTravelLineString(previewBubble: PreviewBubble, gridWidth: number, gridHeight: number): string {
@@ -170,9 +175,9 @@ function getTravelLineString(previewBubble: PreviewBubble, gridWidth: number, gr
     return lineString;
 }
 
-function getHoldBubbleString(holdBubble: Bubble | undefined): string {
+/* function getHoldBubbleString(holdBubble: Bubble | undefined): string {
     return `${holdBubble ? `${holdBubble.ascii}` : ""}` + "\n";
-}
+} */
 
 function getBubbleQueueString(bubbleQueue: Bubble[], previewLength: number): string {
     let queueString = "";
