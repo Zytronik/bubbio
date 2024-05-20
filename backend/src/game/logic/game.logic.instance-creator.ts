@@ -30,9 +30,8 @@ export function createGameInstance(
         angle: 90,
         currentAPS: handlingSettings.defaultAPS,
         currentBubble: {
-            color: "",
             ascii: "",
-            type: 0
+            type: 0,
         },
         bubbleQueue: [],
         playGrid: setupGrid(gameSettings),
@@ -67,9 +66,8 @@ export function resetGameInstance(gameInstance: GameInstance, seed: number): voi
     gameInstance.angle = 90;
     gameInstance.currentAPS = gameInstance.handlingSettings.defaultAPS;
     gameInstance.currentBubble = {
-        color: "",
         ascii: "",
-        type: 0
+        type: 0,
     };
     gameInstance.holdBubble = undefined;
     gameInstance.playGrid.previewBubble = undefined;
@@ -107,6 +105,8 @@ export function getEmptyStats(gameSettings: GameSettings): GameStats {
         defense: 0,
         defensePerMinute: 0,
         defensePerBubble: 0,
+        spikeNumber: 0,
+        spikeAnimationStart: 0,
         clear3: 0,
         clear4: 0,
         clear5: 0,

@@ -14,6 +14,7 @@
     "core-js": "^3.8.3",
     "countup.js": "^2.8.0",
     "debounce": "^2.0.0",
+    "howler": "^2.2.4",
     "jwt-decode": "^4.0.0",
     "pixi-filters": "^6.0.3",
     "pixi.js": "^8.1.0",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.41",
+    "@types/howler": "^2.2.11",
     "@types/webpack-env": "^1.18.4",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",

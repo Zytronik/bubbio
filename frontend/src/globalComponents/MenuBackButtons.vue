@@ -1,7 +1,7 @@
 <template>
   <div class="menu-wrapper back-buttons" @click.self="getGoBackState()">
     <div v-for="(button, index) in buttonData" :key="index" class="menu-btn" :class="button.disabled ? 'disabled' : ''"
-      @click="handleButtonClick(button)">
+      @click="handleButtonClick(button)" @mouseenter="playSound('menu_hover')">
       <div>
         <div class="text"></div>
         <img :src="button.iconSrc" />
@@ -12,9 +12,11 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, PropType } from 'vue';
-import { goToState } from '@/ts/page/page.page-manager';
+import { currentPageState, goToState } from '@/ts/page/page.page-manager';
 import { backInput } from '@/ts/input/input.all-inputs';
 import { BackButtonData } from './i/i-buttonData';
+import { playSound } from '@/ts/asset/asset.howler-load';
+import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 
 export default defineComponent({
   name: 'MenuBackButtons',
@@ -24,6 +26,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     function handleButtonClick(btn: BackButtonData) {
+      playSound('menu_back');
       if (btn.disabled) {
         goToState(btn.pageState);
       } else {
@@ -44,6 +47,10 @@ export default defineComponent({
     });
 
     function getGoBackState() {
+      if(currentPageState.value === PAGE_STATE.mainMenu) {
+        return;
+      }
+      playSound('menu_back');
       if (props.specialBehavior) {
         emit('special-click-event');
         return;
@@ -61,6 +68,7 @@ export default defineComponent({
     return {
       handleButtonClick,
       getGoBackState,
+      playSound,
     };
   },
 });

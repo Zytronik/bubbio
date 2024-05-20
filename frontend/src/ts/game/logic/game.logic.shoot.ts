@@ -34,7 +34,6 @@ export function executeShot(playerGameInstance: GameInstance): void {
 }
 
 export function shootBubble(game: GameInstance): number {
-    console.log(game.playGrid.previewBubble)
     const angle = game.angle;
     const grid = game.playGrid;
     const bubble = game.currentBubble;

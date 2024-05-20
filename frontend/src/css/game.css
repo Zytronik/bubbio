@@ -9,12 +9,13 @@
 .game-wrapper .inGameStats {
     position: absolute;
     right: 100%;
-    bottom: 4vh;
-    width: 200px;
+    bottom: 0;
+    width: 100%;
+    top: 0;
     z-index: 2;
     text-align: right;
-    margin-right: 15px;
     height: 100%;
+    margin-right: calc(15px + 6 * var(--game-bubble-border-width));
 }
 
 .game-wrapper .inGameStats .bottom {
@@ -22,11 +23,27 @@
     bottom: 0;
     right: 0;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.game-wrapper .inGameStats .bottom > div{
+    font-variant: small-caps;
+}
+
+.game-wrapper .inGameStats .bottom div p {
+    margin: unset;
+}
+
+.game-wrapper .inGameStats .bottom div p:first-of-type{
+    opacity: 0.7;
+    font-size: 50%;
 }
 
 .game-wrapper .inGameStats .top {
     position: absolute;
-    top: 30%;
+    top: 20%;
     right: 0;
     width: 100%;
 }
@@ -34,7 +51,6 @@
 .game-wrapper .inGameStats p {
     margin: unset;
     margin-top: 5px;
-    font-size: 20px;
 }
 
 .game-wrapper {
@@ -42,7 +58,13 @@
     justify-content: center;
     align-items: flex-end;
     position: relative;
-    font-size: 2.6vh;
+    margin-bottom: 30px;
+    font-size: 3.8vh;
+    --game-bubble-height: 3.2vh;
+    --game-bubble-border-width: 5px;
+    --game-board-border-radius: 0;
+    --game-board-border-width: 8px;
+    --game-board-padding: 8px;
 }
 
 .gameUI-wrapper .playerName {
@@ -138,14 +160,6 @@
     z-index: 999;
 }
 
-:root {
-    --game-bubble-height: 30px;
-    --game-bubble-border-width: 5px;
-    --game-board-border-radius: 15px;
-    --game-board-border-width: 5px;
-    --game-board-padding: 8px;
-}
-
 .gameUI-wrapper .board {
     display: flex;
     flex-direction: column;
@@ -154,13 +168,13 @@
     border-radius: var(--game-board-border-radius);
     border-bottom-right-radius: unset;
     padding: var(--game-board-padding);
-    border-right: none;
+    border-right: var(--game-board-border-width) solid transparent;
 }
 
 .gameUI-wrapper .board::after {
     content: "";
     position: absolute;
-    left: calc(100% - 20px);
+    left: calc(100% - 20px - var(--game-board-border-width));
     top: 0px;
     width: 20px;
     border-right: var(--game-board-border-width) solid white;
@@ -176,33 +190,84 @@
 }
 
 .gameUI-wrapper .board .row.small {
-    padding: 0 calc(var(--game-bubble-height) / 2 + 4px);
+    padding: 0 calc(var(--game-bubble-height) / 2 + var(--game-board-padding));
 }
 
 .gameUI-wrapper .field {
     width: var(--game-bubble-height);
+    min-width: var(--game-bubble-height);
     height: var(--game-bubble-height);
+    min-height: var(--game-bubble-height);
     border: var(--game-bubble-border-width) solid transparent;
 }
 
 .gameUI-wrapper .field.bubble {
     border-radius: 50%;
+    position: relative;
+}
+
+.gameUI-wrapper .field.bubble:after {
+	content: "";
+	position: absolute;
+	display: block;
+	top: 10%;
+	left: 70%;
+	height: 40%;
+	width: 20%;
+	border-radius: 50%;
+	background: white;
+	overflow: hidden;
+    z-index: 1;
+}
+
+.gameUI-wrapper .field.bubble:before {
+	content: "";
+	position: absolute;
+    z-index: 1;
+    top: calc(-1 * var(--game-bubble-border-width));
+    left: calc(-1 * var(--game-bubble-border-width));
+    width: calc(100% + 2 * var(--game-bubble-border-width));
+    height: calc(100% + 2 * var(--game-bubble-border-width));
+    border-radius: 50%;
+    background: linear-gradient(to left, rgba(126, 148, 191, 0.2), rgba(136, 191, 176, 0.2));
 }
 
 .gameUI-wrapper .board .deathZoneLine {
-    border: var(--game-board-border-width) solid white;
+    border-top: var(--game-board-border-width) solid white;
 }
 
 .gameUI-wrapper .board .preview .bubble {
     background: transparent !important;
 }
 
+.gameUI-wrapper .board .preview .bubble:after {
+    display: none;
+}
+
+.gameUI-wrapper .board .preview .bubble:before {
+    display: none;
+}
+
 .gameUI-wrapper .board .arrowLine {
-    height: var(--game-bubble-height);
+    height: calc(var(--game-bubble-height) + 2 * var(--game-bubble-border-width));
     position: relative;
 }
 
-.gameUI-wrapper .board .arrowLine>div {
+.gameUI-wrapper .board .arrowLine .hold-piece{
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+}
+
+/* .gameUI-wrapper .board .arrowLine .hold-piece .bubble{
+    height: calc(var(--game-bubble-height) / 2);
+    min-height: calc(var(--game-bubble-height) / 2);
+    min-width: calc(var(--game-bubble-height) / 2);
+    width: calc(var(--game-bubble-height) / 2);
+} */
+
+.gameUI-wrapper .board .arrowLine .crossbow {
     height: calc(var(--game-bubble-height) * 3);
     width: calc(var(--game-bubble-height) * 3);
     display: flex;
@@ -215,17 +280,37 @@
     background-repeat: no-repeat;
     position: absolute;
     left: 50%;
-    bottom: 0;
+    bottom: 50%;
+    z-index: 1;
+}
+
+.gameUI-wrapper .queue-wrapper::before {
+    border-top: 5vh solid transparent;
+    border-right: var(--game-board-border-width) solid var(--sprint-color);
+    content: "";
+    position: absolute;
+    bottom: calc(-1 * var(--game-board-border-width));
+    right: calc(-1 * var(--game-board-border-width));
+    border-bottom:  var(--game-board-border-width) solid var(--sprint-color);
+    border-left: 10vw solid transparent;
+    height: 20%;
+    width: 40%;
 }
 
 .gameUI-wrapper .queue-wrapper {
     position: absolute;
     bottom: 0%;
     right: 0;
-    transform: translateX(50%);
-    padding: var(--game-board-padding);
+    transform: translateX(45%);
+    padding: var(--game-board-padding) 0;
     border: var(--game-board-border-width) solid white;
     border-left: none;
+    width: calc((5 * var(--game-bubble-height) + 4 * var(--game-board-padding) + 9 * var(--game-board-border-width)) - var(--game-bubble-height) / 2);
+}
+
+.gameUI-wrapper .queue-overflow {
+    width: 100%;
+    height: 100%;
     overflow: hidden;
 }
 
@@ -237,7 +322,23 @@
     position: relative;
 }
 
-.gameUI-wrapper  .trajectory {
+.gameUI-wrapper .queue-text {
+    position: absolute;
+    bottom: calc(0% + var(--game-bubble-height) + 2 * var(--game-bubble-border-width) + 2 * var(--game-board-padding));
+    left: 100%;
+    font-size: 150%;
+    text-transform: uppercase;
+    transform: rotate(90deg) translate(-50% , 100%);
+    margin: unset;
+    display: flex;
+    align-items: flex-end;
+}
+
+.gameUI-wrapper .queue-text span:first-of-type  {
+    font-size: 150%;
+}
+
+.gameUI-wrapper .trajectory {
     position: absolute;
     top: 0;
     left: 0;
@@ -246,6 +347,32 @@
 }
 
 .gameUI-wrapper  .trajectory > polyline {
-    stroke: rgba(255, 255, 255, 0.3);
-    stroke-width: 3;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 4px;
+    transform: translateX(4px);
+}
+
+.gameUI-wrapper .username {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 15px);
+    transform: translateX(-50%);
+}
+
+.gameUI-wrapper .username {
+    font-size: 80%;
+}
+
+.gameUI-wrapper .garbage-wrapper {
+    position: absolute;
+    top: 0%;
+    right: calc(100% - var(--game-board-border-width));
+    height: calc(100% - 2 * var(--game-board-border-width));
+    width: calc(3 * var(--game-board-border-width));
+    border: var(--game-board-border-width) solid white;
+}
+
+.gameUI-wrapper .garbage-wrapper .garbage {
+    background-color: white;
+    max-height: 100%;
 }

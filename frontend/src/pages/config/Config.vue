@@ -37,7 +37,17 @@
           <div class="tab-wrapper"></div>
         </div>
         <div v-if="currentTab === 'Audio Settings'" class="tab-content audio-tab">
-          <div class="tab-wrapper"></div>
+          <div class="tab-wrapper">
+            <h2>Audio Settings</h2>
+            <div class="audio-settings">
+              <div class="audio-setting setting">
+                <div>
+                  <h3>Volume</h3>
+                  <p>Adjust the volume of the game.</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div v-if="isAuthenticated && currentTab === 'Account Settings'" class="tab-content account-tab">
           <div class="tab-wrapper">

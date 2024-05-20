@@ -11,7 +11,7 @@
           'menu-btn',
           button.title.toLowerCase().replace(/\s+/g, '-'),
           { 'short-btn': !button.bigButton }
-        ]" @click="goToState(button.pageState)">
+        ]" @click="handleButtonClick(button)" @mouseenter="playSound('menu_hover')">
           <div>
             <div class="text">
               <span class="text-noWhiteSpaces">{{ button.title[0] }}</span>
@@ -37,6 +37,7 @@ import { BackButtonData } from './i/i-buttonData';
 import { MenuButtonData } from './i/i-menuButtonData';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import eventBus from '@/ts/page/page.event-bus';
+import { playSound } from '@/ts/asset/asset.howler-load';
 
 export default defineComponent({
   name: 'MenuLayout',
@@ -72,11 +73,18 @@ export default defineComponent({
       });
     });
 
+    function handleButtonClick(button :MenuButtonData) {
+      playSound('menu_front');
+      goToState(button.pageState);
+    }
+
     return {
       goToState,
       PAGE_STATE,
       changeBackgroundTo,
       filteredMenuButtonsData,
+      handleButtonClick,
+      playSound,
     }
   }
 });

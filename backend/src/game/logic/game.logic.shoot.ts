@@ -54,18 +54,19 @@ export function shootBubble(game: GameInstance): number {
     const gridField = snapToNextEmptyField(grid, bubbleCoords);
     gridField.bubble = bubble;
     const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type);
-    const garbageAmount = getGarbageAmount(bubblesCleared, game.stats.currentCombo, bounceAmount > 0)
-    game.stats.attack += garbageAmount;
-    if (garbageAmount > 0) {
-        game.queuedGarbage -= garbageAmount;
+    const attack = getGarbageAmount(bubblesCleared, game.stats.currentCombo, bounceAmount > 0)
+    let defense = 0;
+    game.stats.attack += attack;
+    if (attack > 0) {
+        game.queuedGarbage -= attack;
         if (game.queuedGarbage < 0) {
             const garbageToSend = Math.abs(game.queuedGarbage);
             game.sendGarbage(garbageToSend);
-            game.stats.defense += garbageAmount - garbageToSend;
+            defense = attack - garbageToSend;
             game.queuedGarbage = 0;
         }
     }
-    trackBubbleShot(game, bounceAmount, bubblesCleared);
+    trackBubbleShot(game, bounceAmount, bubblesCleared, attack, defense);
 
     if (bubblesCleared < 3 && grid.rows[gridField.coords.y].isInDeathZone) {
         game.gameTransitions.onGameDefeat();

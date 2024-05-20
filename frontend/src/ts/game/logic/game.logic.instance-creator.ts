@@ -32,7 +32,6 @@ export function createGameInstance(
         currentBubble: {
             ascii: "",
             type: 0,
-            spriteSheetName: ""
         },
         bubbleQueue: [],
         playGrid: setupGrid(gameSettings),
@@ -69,7 +68,6 @@ export function resetGameInstance(gameInstance: GameInstance, seed: number): voi
     gameInstance.currentBubble = {
         ascii: "",
         type: 0,
-        spriteSheetName: ""
     };
     gameInstance.holdBubble = undefined;
     gameInstance.playGrid.previewBubble = undefined;

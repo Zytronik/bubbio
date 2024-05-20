@@ -37,7 +37,7 @@
       </component>
     </transition>
     <div class="bottomBar">
-      <button @click="openChannelOverlay" class="openChannelButton">Channel</button>
+      <button @click="openChannelOverlay" @mouseenter="playSound('menu_hover')" class="openChannelButton">Channel</button>
     </div>
     <PageBackgroundCanvas />
   </article>
@@ -62,6 +62,7 @@ import { applySavedInputSettings, enableBackInputs, enableChannelInput, enableNe
 import { setupDebugListeners } from "./ts/game/network/game.network.debug";
 import { RankInfo } from './ts/page/i/page.i-rank-info';
 import { loadBackgroundCanvas } from './ts/page/page.background-canvas';
+import { loadAudioFiles, playSound } from './ts/asset/asset.howler-load';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -258,6 +259,7 @@ export default {
         await updateProfileData();
         await applySavedInputSettings();
       }
+      await loadAudioFiles();
       //TODO add Promises for other loading tasks
 
       endLoading();
@@ -318,6 +320,7 @@ export default {
       getRankImagePath,
       getProgressBarFillWidth,
       isLoading,
+      playSound,
     };
   },
 }
