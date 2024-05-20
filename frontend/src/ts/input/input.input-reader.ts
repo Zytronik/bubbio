@@ -2,12 +2,17 @@ import { Input } from "./i/input.i.input";
 import { allInputs, defaultBlocker } from "./input.all-inputs";
 
 let hasAttachedAlready = false;
-
+let canUseGamepad = false;
 export function attachInputReader() {
     if (!hasAttachedAlready) {
         document.addEventListener("keydown", (event) => handleKeyDown(event));
         document.addEventListener("keydown", (event) => preventDefaults(event));
         document.addEventListener("keyup", (event) => handleKeyUp(event));
+        if ('getGamepads' in navigator) {
+            canUseGamepad = true;
+        } else {
+            console.error("Browser does not support gamepad API");
+        }
         hasAttachedAlready = true;
         handleHeldDownKeys();
     }
@@ -19,9 +24,9 @@ function handleKeyDown(event: KeyboardEvent): void {
             if (event.code === customCode && !input.pressed && input.enabled) {
                 event.preventDefault();
                 event.stopPropagation();
-                input.pressed = true;
                 input.lastFiredAtTime = performance.now();
                 input.fire();
+                input.pressed = true;
             }
         });
     });
@@ -57,10 +62,63 @@ function handleKeyUp(event: KeyboardEvent): void {
 
 function handleHeldDownKeys(): void {
     allInputs.forEach((input: Input) => {
-        if (!input.isTrigger && input.pressed && input.enabled) {
-            input.fire();
-            input.lastFiredAtTime = performance.now();
+        if (input.enabled) {
+            if (!input.isSingleTriggerAction && input.pressed) {
+                input.fire();
+                input.lastFiredAtTime = performance.now();
+                handleHeldGamepadInput(input)
+            }
+            if (!input.isSingleTriggerAction && !input.pressed) {
+                handleInitialGamepadInput(input)
+            }
+            if (input.isSingleTriggerAction) {
+                handleSingleTriggerGamepadInput(input)
+            }
         }
     });
     requestAnimationFrame(() => handleHeldDownKeys());
+
+    function handleHeldGamepadInput(input: Input): void {
+        if (canUseGamepad && input.controllerButtonIndex !== undefined) {
+            const gamepads = navigator.getGamepads();
+            for (let i = 0; i < gamepads.length; i++) {
+                if (gamepads[i]?.buttons[input.controllerButtonIndex]?.pressed) {
+                    input.fire();
+                    input.lastFiredAtTime = performance.now();
+                } else {
+                    input.pressed = false;
+                }
+            }
+        }
+    }
+
+    function handleInitialGamepadInput(input: Input): void {
+        if (canUseGamepad && input.controllerButtonIndex !== undefined) {
+            const gamepads = navigator.getGamepads();
+            for (let i = 0; i < gamepads.length; i++) {
+                if (gamepads[i]?.buttons[input.controllerButtonIndex]?.pressed) {
+                    input.lastFiredAtTime = performance.now();
+                    input.fire();
+                    input.pressed = true;
+                }
+            }
+        }
+    }
+
+    function handleSingleTriggerGamepadInput(input: Input): void {
+        if (canUseGamepad && input.controllerButtonIndex !== undefined) {
+            const gamepads = navigator.getGamepads();
+            for (let i = 0; i < gamepads.length; i++) {
+                if (gamepads[i]?.buttons[input.controllerButtonIndex]?.pressed) {
+                    if (!input.pressed) {
+                        input.fire();
+                        input.lastFiredAtTime = performance.now();
+                    }
+                    input.pressed = true;
+                } else {
+                    input.pressed = false;
+                }
+            }
+        }
+    }
 }

@@ -3,7 +3,8 @@ export interface Input {
     description: string;
     customKeyMap: string[];
     defaultKeyCode: string;
-    isTrigger: boolean;
+    controllerButtonIndex?: number;
+    isSingleTriggerAction: boolean;
     pressed: boolean;
     lastFiredAtTime: number;
     releasedAtTime: number;
