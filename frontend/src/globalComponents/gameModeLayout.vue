@@ -47,6 +47,7 @@
             </div>
 
             <div v-if="isResultView" class="gameComplete">
+                <button @click="openNetworkEvaluation()">Network Evaluation</button>
                 <div class="top">
                     <div class="resultValue">
                         <p v-if="resultStats" class="rValue">{{ formatTimeNumberToString(resultStats.gameDuration ?? 0)
@@ -127,6 +128,11 @@
                     </div>
                 </div>
             </div>
+
+            <div v-if="isNetworkEval">
+                <button @click="closeNetworkEvaluation()">Result Screen</button>
+                <NetworkEvaluation/>
+            </div>
         </div>
     </div>
 </template>
@@ -155,6 +161,7 @@ import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { BackButtonData } from './i/i-buttonData';
 import { transitionEndScreenPageToDashboard, transitionOutOfGame, transitionToGame } from '@/ts/page/page.css-transitions';
 import { playSound } from '@/ts/asset/asset.howler-load';
+import NetworkEvaluation from '@/pages/game/NetworkEvaluation.vue';
 
 export default defineComponent({
     name: 'GameModeLayout',
@@ -185,6 +192,7 @@ export default defineComponent({
         const isGaming = ref<boolean>(false);
         const isDashboard = ref<boolean>(true);
         const isResultView = ref<boolean>(false);
+        const isNetworkEval = ref<boolean>(false);
         const resultStats = ref<Partial<GameStats>>();
         const userData: UserData | null = eventBus.getUserData();
         const isGuestString = sessionStorage.getItem('isGuest');
@@ -287,6 +295,23 @@ export default defineComponent({
             isResultView.value = true;
         }
 
+        function openNetworkEvaluation() {
+            disableResetInput();
+            isGaming.value = false;
+            isDashboard.value = false;
+            isResultView.value = false;
+            isNetworkEval.value = true;
+            specialBackButtonBehavior.value = false;
+        }
+
+        function closeNetworkEvaluation() {
+            disableResetInput();
+            isGaming.value = false;
+            isDashboard.value = false;
+            isResultView.value = true;
+            isNetworkEval.value = false;
+            specialBackButtonBehavior.value = false;
+        }
 
         return {
             PAGE_STATE,
@@ -313,6 +338,9 @@ export default defineComponent({
             currentLeaderboard,
             leaderboardTabs,
             playSound,
+            openNetworkEvaluation,
+            isNetworkEval,
+            closeNetworkEvaluation,
         };
     },
 });
