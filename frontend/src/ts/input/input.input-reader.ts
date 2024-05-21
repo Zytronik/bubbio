@@ -79,44 +79,82 @@ function handleHeldDownKeys(): void {
     requestAnimationFrame(() => handleHeldDownKeys());
 
     function handleHeldGamepadInput(input: Input): void {
-        if (canUseGamepad && input.controllerButtonIndex !== undefined) {
+        if (canUseGamepad) {
             const gamepads = navigator.getGamepads();
             for (let i = 0; i < gamepads.length; i++) {
-                if (gamepads[i]?.buttons[input.controllerButtonIndex]?.pressed) {
-                    input.fire();
-                    input.lastFiredAtTime = performance.now();
-                } else {
-                    input.pressed = false;
+                if (input.controllerButtonIndex !== undefined) {
+                    if (gamepads[i]?.buttons[input.controllerButtonIndex]?.pressed) {
+                        input.fire();
+                        input.lastFiredAtTime = performance.now();
+                    } else {
+                        input.pressed = false;
+                    }
+                }
+                if (input.controllerAxisDirection !== undefined) {
+                    const axis = input.controllerAxisDirection[0];
+                    const direction = input.controllerAxisDirection[1];
+                    if (gamepads[i]?.axes[axis] === direction) {
+                        input.fire();
+                        input.lastFiredAtTime = performance.now();
+                    } else {
+                        input.pressed = false;
+                    }
                 }
             }
         }
     }
 
     function handleInitialGamepadInput(input: Input): void {
-        if (canUseGamepad && input.controllerButtonIndex !== undefined) {
+        if (canUseGamepad) {
             const gamepads = navigator.getGamepads();
             for (let i = 0; i < gamepads.length; i++) {
-                if (gamepads[i]?.buttons[input.controllerButtonIndex]?.pressed) {
-                    input.lastFiredAtTime = performance.now();
-                    input.fire();
-                    input.pressed = true;
+                if (input.controllerButtonIndex !== undefined) {
+                    if (gamepads[i]?.buttons[input.controllerButtonIndex]?.pressed) {
+                        input.lastFiredAtTime = performance.now();
+                        input.fire();
+                        input.pressed = true;
+                    }
+                }
+                if (input.controllerAxisDirection !== undefined) {
+                    const axis = input.controllerAxisDirection[0];
+                    const direction = input.controllerAxisDirection[1];
+                    if (gamepads[i]?.axes[axis] === direction) {
+                        input.lastFiredAtTime = performance.now();
+                        input.fire();
+                        input.pressed = true;
+                    }
                 }
             }
         }
     }
 
     function handleSingleTriggerGamepadInput(input: Input): void {
-        if (canUseGamepad && input.controllerButtonIndex !== undefined) {
+        if (canUseGamepad) {
             const gamepads = navigator.getGamepads();
             for (let i = 0; i < gamepads.length; i++) {
-                if (gamepads[i]?.buttons[input.controllerButtonIndex]?.pressed) {
-                    if (!input.pressed) {
-                        input.fire();
-                        input.lastFiredAtTime = performance.now();
+                if (input.controllerButtonIndex !== undefined) {
+                    if (gamepads[i]?.buttons[input.controllerButtonIndex]?.pressed) {
+                        if (!input.pressed) {
+                            input.fire();
+                            input.lastFiredAtTime = performance.now();
+                        }
+                        input.pressed = true;
+                    } else {
+                        input.pressed = false;
                     }
-                    input.pressed = true;
-                } else {
-                    input.pressed = false;
+                }
+                if (input.controllerAxisDirection !== undefined) {
+                    const axis = input.controllerAxisDirection[0];
+                    const direction = input.controllerAxisDirection[1];
+                    if (gamepads[i]?.axes[axis] === direction) {
+                        if (!input.pressed) {
+                            input.fire();
+                            input.lastFiredAtTime = performance.now();
+                        }
+                        input.pressed = true;
+                    } else {
+                        input.pressed = false;
+                    }
                 }
             }
         }

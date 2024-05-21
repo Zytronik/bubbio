@@ -4,6 +4,7 @@ export interface Input {
     customKeyMap: string[];
     defaultKeyCode: string;
     controllerButtonIndex?: number;
+    controllerAxisDirection?: number[];
     isSingleTriggerAction: boolean;
     pressed: boolean;
     lastFiredAtTime: number;
