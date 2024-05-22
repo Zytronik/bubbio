@@ -8,6 +8,7 @@ export const angleLeftInput: Input = {
     controllerAxisDirection: [0, -1],
     isSingleTriggerAction: false,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -24,6 +25,7 @@ export const angleRightInput: Input = {
     controllerAxisDirection: [0, 1],
     isSingleTriggerAction: false,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -39,6 +41,7 @@ export const changeAPSInput: Input = {
     defaultKeyCode: "ShiftLeft",
     isSingleTriggerAction: false,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -58,6 +61,7 @@ export const centerCursorInput: Input = {
     controllerAxisDirection: [1, -1],
     isSingleTriggerAction: true,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -74,6 +78,7 @@ export const shootInput: Input = {
     controllerButtonIndex: 7,
     isSingleTriggerAction: true,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -90,6 +95,7 @@ export const holdInput: Input = {
     controllerButtonIndex: 8,
     isSingleTriggerAction: true,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -105,6 +111,7 @@ export const resetInput: Input = {
     defaultKeyCode: "KeyR",
     isSingleTriggerAction: true,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -120,6 +127,7 @@ export const backInput: Input = {
     defaultKeyCode: "Escape",
     isSingleTriggerAction: true,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -135,6 +143,7 @@ export const channelInput: Input = {
     defaultKeyCode: "F9",
     isSingleTriggerAction: true,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -150,6 +159,7 @@ export const debugTriggerGarbageInput: Input = {
     defaultKeyCode: "KeyU",
     isSingleTriggerAction: true,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -165,6 +175,7 @@ export const debugNetwork1: Input = {
     defaultKeyCode: "KeyI",
     isSingleTriggerAction: true,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -180,6 +191,7 @@ export const debugNetwork2: Input = {
     defaultKeyCode: "KeyO",
     isSingleTriggerAction: true,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -195,6 +207,7 @@ export const debugNetwork3: Input = {
     defaultKeyCode: "KeyP",
     isSingleTriggerAction: true,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: () => {
@@ -274,6 +287,7 @@ export const defaultBlocker: Input = {
     defaultKeyCode: "",
     isSingleTriggerAction: true,
     pressed: false,
+    controllerPressed: false,
     lastFiredAtTime: 0,
     releasedAtTime: 0,
     fire: /* eslint-disable @typescript-eslint/no-empty-function */ () => { /* eslint-enable @typescript-eslint/no-empty-function */ },

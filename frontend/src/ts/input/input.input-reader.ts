@@ -63,16 +63,16 @@ function handleKeyUp(event: KeyboardEvent): void {
 function handleHeldDownKeys(): void {
     allInputs.forEach((input: Input) => {
         if (input.enabled) {
-            if (!input.isSingleTriggerAction && input.pressed) {
+            if (!input.isSingleTriggerAction && (input.pressed || input.controllerPressed)) {
                 input.fire();
                 input.lastFiredAtTime = performance.now();
-                handleHeldGamepadInput(input)
+                handleHeldGamepadInput(input);
             }
-            if (!input.isSingleTriggerAction && !input.pressed) {
-                handleInitialGamepadInput(input)
+            if (!input.isSingleTriggerAction && !input.controllerPressed) {
+                handleInitialGamepadInput(input);
             }
             if (input.isSingleTriggerAction) {
-                handleSingleTriggerGamepadInput(input)
+                handleSingleTriggerGamepadInput(input);
             }
         }
     });
@@ -87,7 +87,7 @@ function handleHeldDownKeys(): void {
                         input.fire();
                         input.lastFiredAtTime = performance.now();
                     } else {
-                        input.pressed = false;
+                        input.controllerPressed = false;
                     }
                 }
                 if (input.controllerAxisDirection !== undefined) {
@@ -97,7 +97,7 @@ function handleHeldDownKeys(): void {
                         input.fire();
                         input.lastFiredAtTime = performance.now();
                     } else {
-                        input.pressed = false;
+                        input.controllerPressed = false;
                     }
                 }
             }
@@ -112,7 +112,7 @@ function handleHeldDownKeys(): void {
                     if (gamepads[i]?.buttons[input.controllerButtonIndex]?.pressed) {
                         input.lastFiredAtTime = performance.now();
                         input.fire();
-                        input.pressed = true;
+                        input.controllerPressed = true;
                     }
                 }
                 if (input.controllerAxisDirection !== undefined) {
@@ -121,7 +121,7 @@ function handleHeldDownKeys(): void {
                     if (gamepads[i]?.axes[axis] === direction) {
                         input.lastFiredAtTime = performance.now();
                         input.fire();
-                        input.pressed = true;
+                        input.controllerPressed = true;
                     }
                 }
             }
@@ -134,26 +134,26 @@ function handleHeldDownKeys(): void {
             for (let i = 0; i < gamepads.length; i++) {
                 if (input.controllerButtonIndex !== undefined) {
                     if (gamepads[i]?.buttons[input.controllerButtonIndex]?.pressed) {
-                        if (!input.pressed) {
+                        if (!input.controllerPressed) {
                             input.fire();
                             input.lastFiredAtTime = performance.now();
                         }
-                        input.pressed = true;
+                        input.controllerPressed = true;
                     } else {
-                        input.pressed = false;
+                        input.controllerPressed = false;
                     }
                 }
                 if (input.controllerAxisDirection !== undefined) {
                     const axis = input.controllerAxisDirection[0];
                     const direction = input.controllerAxisDirection[1];
                     if (gamepads[i]?.axes[axis] === direction) {
-                        if (!input.pressed) {
+                        if (!input.controllerPressed) {
                             input.fire();
                             input.lastFiredAtTime = performance.now();
                         }
-                        input.pressed = true;
+                        input.controllerPressed = true;
                     } else {
-                        input.pressed = false;
+                        input.controllerPressed = false;
                     }
                 }
             }

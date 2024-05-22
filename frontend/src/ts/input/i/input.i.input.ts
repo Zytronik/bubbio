@@ -7,6 +7,7 @@ export interface Input {
     controllerAxisDirection?: number[];
     isSingleTriggerAction: boolean;
     pressed: boolean;
+    controllerPressed: boolean;
     lastFiredAtTime: number;
     releasedAtTime: number;
     fire: () => void;

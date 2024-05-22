@@ -202,14 +202,18 @@ export function angleLeft(): void {
     const timePassed = performance.now() - angleLeftInput.lastFiredAtTime;
     const leftAmount = playerGameInstance.currentAPS * timePassed / 1000
     playerGameInstance.angle = cleanUpAngle(oldAngle - leftAmount, playerGameInstance.gameSettings);
-    updateAngleHistory();
+    if (timePassed > 33) {
+        updateAngleHistory();
+    }
 }
 export function angleRight(): void {
     const oldAngle = playerGameInstance.angle;
     const timePassed = performance.now() - angleRightInput.lastFiredAtTime;
     const rightAmount = playerGameInstance.currentAPS * timePassed / 1000
     playerGameInstance.angle = cleanUpAngle(oldAngle + rightAmount, playerGameInstance.gameSettings);
-    updateAngleHistory();
+    if (timePassed > 33) {
+        updateAngleHistory();
+    }
 }
 export function angleCenter(): void {
     playerGameInstance.angle = 90;
