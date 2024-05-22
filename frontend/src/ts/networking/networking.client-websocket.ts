@@ -74,13 +74,13 @@ function initializeSocket(): Socket {
         state.isConnected = true;
         state.connectionError = null;
         executeOnConnectCallbacks();
-        eventBus.emit('show-info-message', { message: 'Connected to Server', type: 'success' });
+        //eventBus.emit('show-info-message', { message: 'Connected to Server', type: 'success' });
     });
 
     socket.on('disconnect', () => {
         state.isConnected = false;
         state.connectionError = 'Disconnected';
-        eventBus.emit('show-info-message', { message: 'Disconnected from Server', type: 'error' });
+        //eventBus.emit('show-info-message', { message: 'Disconnected from Server', type: 'error' });
     });
 
     socket.on('connect_error', (error: Error) => {

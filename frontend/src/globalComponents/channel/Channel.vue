@@ -1,7 +1,7 @@
 <template>
   <transition name="slide-in">
     <div class="overlay channel-overlay" v-if="isVisible" @click.self="slideOverlayOut">
-      <button class="openChannelButton">Channel</button>
+      <button class="openChannelButton"><span class="triangle-left"></span>Channel<span class="triangle-right"></span></button>
       <div class="channel-container">
         <div class="channel-content">
           <div class="channel-centerContent">
@@ -449,7 +449,7 @@ export default {
 
 <style scoped>
 .channel-container {
-  background: rgb(30, 30, 30);
+  background: black;
   width: 100%;
   height: 90vh;
   overflow: hidden;

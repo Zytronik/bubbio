@@ -89,6 +89,11 @@ body.game-view .page-container {
     src: url(../fonts/thedeadarecoming.regular.ttf);
 }
 
+@font-face {
+    font-family: BebasNeue-Regular;
+    src: url(../fonts/BebasNeue-Regular.ttf);
+}
+
 .rank-letter {
     font-family: rankFont;
 }
@@ -191,34 +196,58 @@ button.goBackButton:focus {
     color: white;
     margin-top: unset;
     background-color: black;
+    border-top: 2px solid rgb(41, 41, 41);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.openChannelButton::before {
+.openChannelButton .triangle-left::after {
     position: absolute;
     content: '';
     width: 0px;
-    height: 1px;
-    border-style: solid;
-    border-width: 5vh 10vh 5vh 0;
-    border-color: transparent black transparent transparent;
-    display: inline-block;
-    vertical-align: middle;
+    height: 2px;
+    border-top: 5vh solid transparent;
+    border-right: 10vh solid black;
+    border-bottom: 5vh solid transparent;
+    right: calc(-10vh - 1px);
+    top: calc(-5vh + 1px);
+}
+
+.openChannelButton .triangle-left {
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    border-top: calc(5vh + 2px) solid transparent;
+    border-right: calc(10vh + 2px) solid rgb(41, 41, 41);
+    border-bottom: calc(5vh + 2px) solid transparent;
     right: 100%;
-    top: 0;
+    top: -2px;
 }
 
-.openChannelButton::after {
+.openChannelButton .triangle-right {
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    border-top: calc(5vh + 2px) solid transparent;
+    border-left: calc(10vh + 2px) solid rgb(41, 41, 41);
+    border-bottom: calc(5vh + 2px) solid transparent;
+    left: 100%;
+    top: -2px;
+
+}
+
+.openChannelButton .triangle-right::after {
     position: absolute;
     content: '';
     width: 0px;
-    height: 1px;
-    border-style: solid;
-    border-width: 5vh 0vh 5vh 10vh;
-    border-color: transparent transparent transparent black;
-    display: inline-block;
-    vertical-align: middle;
-    left: 100%;
-    top: 0;
+    height: 2px;
+    border-top: 5vh solid transparent;
+    border-left: 10vh solid black;
+    border-bottom: 5vh solid transparent;
+    left: calc(-10vh - 1px);
+    top: calc(-5vh + 1px);
+
 }
 
 .loader {
