@@ -37,7 +37,7 @@
       </component>
     </transition>
     <div class="bottomBar">
-      <button @click="openChannelOverlay" @mouseenter="playSound('menu_hover')" class="openChannelButton">Channel</button>
+      <button @click="openChannelOverlay" @mouseenter="playSound('menu_hover')" class="openChannelButton"><span class="triangle-left"></span>Channel<span class="triangle-right"></span></button>
     </div>
     <PageBackgroundCanvas />
   </article>

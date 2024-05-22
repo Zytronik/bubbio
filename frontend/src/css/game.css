@@ -86,7 +86,10 @@
     left: 50%;
     text-align: center;
     transform: translate(-50%, -50%);
-    width: 250%;
+    width: 150%;
+    font-size: 300%;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 @keyframes slideOutToGame {
@@ -236,8 +239,26 @@
     border-top: var(--game-board-border-width) solid white;
 }
 
-.gameUI-wrapper .board .preview .bubble {
+.gameUI-wrapper .board .preview > .bubble {
     background: transparent !important;
+}
+
+.gameUI-wrapper .board .preview {
+    position: relative;
+}
+
+.gameUI-wrapper .board .preview .hold {
+    position: absolute;
+    bottom: calc(-1 * var(--game-bubble-height) / 20);
+    left: calc(-1 * var(--game-bubble-height) / 20);
+}
+
+.gameUI-wrapper .board .preview .hold .bubble {
+    width: calc(var(--game-bubble-height) / 5);
+    min-width: calc(var(--game-bubble-height) / 5);
+    height: calc(var(--game-bubble-height) / 5);
+    min-height: calc(var(--game-bubble-height) / 5);
+    border-width: 0;
 }
 
 .gameUI-wrapper .board .preview .bubble:after {

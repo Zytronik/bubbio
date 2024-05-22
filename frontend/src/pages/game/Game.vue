@@ -5,7 +5,6 @@
 
 
 
-
     <div v-if="gameMode === 'sprint'" class="inGameStats">
       <div class="bottom">
         <div>
@@ -28,12 +27,17 @@
       </div>
       <div class="top">
         <transition name="fade">
-          <p v-if="playerGameVisuals.statNumbers.currentCombo > 0 || playerGameVisuals.statNumbers.currentCombo.value > 0">Combo {{
-            areRef ? playerGameVisuals.statNumbers.currentCombo.value : playerGameVisuals.statNumbers.currentCombo }}</p>
+          <p
+            v-if="playerGameVisuals.statNumbers.currentCombo > 0 || playerGameVisuals.statNumbers.currentCombo.value > 0">
+            Combo {{
+              areRef ? playerGameVisuals.statNumbers.currentCombo.value : playerGameVisuals.statNumbers.currentCombo }}
+          </p>
         </transition>
         <transition name="fade">
-          <p v-if="(areRef && playerGameVisuals.statNumbers.spikeNumber.value) || (!areRef && playerGameVisuals.statNumbers.spikeNumber)">Spike {{
-            areRef ? playerGameVisuals.statNumbers.spikeNumber.value : playerGameVisuals.statNumbers.spikeNumber }}</p>
+          <p
+            v-if="(areRef && playerGameVisuals.statNumbers.spikeNumber.value) || (!areRef && playerGameVisuals.statNumbers.spikeNumber)">
+            Spike {{
+              areRef ? playerGameVisuals.statNumbers.spikeNumber.value : playerGameVisuals.statNumbers.spikeNumber }}</p>
         </transition>
       </div>
     </div>
@@ -58,7 +62,8 @@
       <div class="bottom">
         <div>
           <p>Time</p>
-          <p v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
+          <p
+            v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
           </p>
         </div>
         <div>
@@ -81,10 +86,8 @@
 
     <div class="gameUI-wrapper">
       <div class="garbage-wrapper"
-        v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage"></div>
-      <!-- <div class="hold-wrapper">
-       <div class="hold-piece" v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></div>
-      </div> -->
+        v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage">
+      </div>
       <p class="queue-text"><span class="text-noWhiteSpaces">Q</span><span class="text-noWhiteSpaces">ueue</span></p>
       <div class="queue-wrapper">
         <div class="queue-overflow">
@@ -96,9 +99,9 @@
       <div class="board"
         v-html="areRef ? playerGameVisuals.asciiBoard.playGridASCII.value : playerGameVisuals.asciiBoard.playGridASCII">
       </div>
-      <span class="overlap-infos"
+      <div class="overlap-infos"
         v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText">
-      </span>
+      </div>
       <span class="username text-center" v-html="playerGameVisuals.playerName.toUpperCase()"></span>
     </div>
   </div>

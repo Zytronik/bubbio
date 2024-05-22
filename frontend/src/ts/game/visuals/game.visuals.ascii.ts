@@ -92,7 +92,6 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
         previewPosition.y = playGrid.previewBubble.location.y;
     }
 
-    const gridWidth = playGrid.gridWidth;
     let boardText = ""
     if (gameInstance.playGrid.previewBubble) {
         boardText += getTravelLineString(gameInstance.playGrid.previewBubble, gameInstance.playGrid.precisionWidth, gameInstance.playGrid.precisionHeight);
@@ -103,11 +102,10 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
             boardText += getDeathZoneLineString();
             once = false;
         }
-        boardText += getRegularRowString(row.fields, row.isSmallerRow, previewPosition, gameInstance.currentBubble);
+        boardText += getRegularRowString(row.fields, row.isSmallerRow, previewPosition, gameInstance.currentBubble, gameInstance.holdBubble);
     });
     boardText += getArrowLineString(gameInstance.angle, gameInstance.currentBubble, gameInstance.holdBubble);
     asciiRefs.playGridASCII.value = boardText;
-    /* asciiRefs.holdString.value = getHoldBubbleString(gameInstance.holdBubble); */
     asciiRefs.queueString.value = getBubbleQueueString(gameInstance.bubbleQueue, gameInstance.gameSettings.queuePreviewSize);
     asciiRefs.incomingGarbage.value = getIncomingGarbageString(gameInstance.queuedGarbage, gameInstance.playGrid.gridHeight + gameInstance.playGrid.extraGridHeight);
     if (gameInstance.gameState === GAME_STATE.VICTORY_SCREEN) {
@@ -135,13 +133,13 @@ function getDeathZoneLineString(): string {
     return "<div class='deathZoneLine'></div>";
 }
 
-function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosition: Coordinates, currrentBubble: Bubble): string {
+function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosition: Coordinates, currrentBubble: Bubble, holdBubble: Bubble | undefined): string {
     let rowString = "";
     rowString += isSmallerRow ? "<div class='row small'>" : "<div class='row'>";
 
     fields.forEach(field => {
         if (previewPosition.x === field.coords.x && previewPosition.y === field.coords.y) {
-            rowString += `<div class="preview">${currrentBubble.ascii}</div>`;
+            rowString += `<div class="preview">${currrentBubble.ascii}<div class="hold">${holdBubble ? holdBubble.ascii : ""}</div></div>`;
         } else {
             rowString += field.bubble ? `${field.bubble.ascii} ` : "<div class='field empty'></div>";
         }
@@ -175,10 +173,6 @@ function getTravelLineString(previewBubble: PreviewBubble, gridWidth: number, gr
     return lineString;
 }
 
-/* function getHoldBubbleString(holdBubble: Bubble | undefined): string {
-    return `${holdBubble ? `${holdBubble.ascii}` : ""}` + "\n";
-} */
-
 function getBubbleQueueString(bubbleQueue: Bubble[], previewLength: number): string {
     let queueString = "";
     for (let i = 0; i < previewLength; i++) {
@@ -197,64 +191,11 @@ function showASCIICountdownNumber(counter: number): string {
     return countDownSteps[counter];
 }
 
-const victoryASCII = `
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-██ ███ ██ ▄▄▄ ██ ██ ████ ███ ██ ▄▄▄ ██ ▀██ █ ██
-██▄▀▀▀▄██ ███ ██ ██ ████ █ █ ██ ███ ██ █ █ █▄██
-████ ████ ▀▀▀ ██▄▀▀▄████▄▀▄▀▄██ ▀▀▀ ██ ██▄ █▀██
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-`;
-
-const defeatASCII = `
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-██ ███ ██ ▄▄▄ ██ ██ ████ █████ ▄▄▄ ██ ▄▄▄ █▄▄ ▄▄█ ██
-██▄▀▀▀▄██ ███ ██ ██ ████ █████ ███ ██▄▄▄▀▀███ ███▄██
-████ ████ ▀▀▀ ██▄▀▀▄████ ▀▀ ██ ▀▀▀ ██ ▀▀▀ ███ ███▀██
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-`;
-
-const countDown3 = `
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-█████████████████████ ▄▄ ████████████████████
-███████████████████████▄▀████████████████████
-█████████████████████ ▀▀ ████████████████████
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-`;
-
-const countDown2 = `
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-█████████████████████ ▄ ████████████████████
-██████████████████████▀▄████████████████████
-█████████████████████ ▀▀████████████████████
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-`;
-
-const countDown1 = `
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-█████████████████████▀ █████████████████████
-██████████████████████ █████████████████████
-█████████████████████▀ ▀████████████████████
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-`;
-
-const countDownGO = `
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-██████████████████ ▄▄ ██ ▄▄▄ █ ████████████████
-██████████████████ █▀▀██ ███ █▄████████████████
-██████████████████ ▀▀▄██ ▀▀▀ █▀████████████████
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-`;
-const inMenu = `
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-█▄ ▄██ ▀██ ████ ▄▀▄ ██ ▄▄▄██ ▀██ ██ ██ ██
-██ ███ █ █ ████ █ █ ██ ▄▄▄██ █ █ ██ ██ ██
-█▀ ▀██ ██▄ ████ ███ ██ ▀▀▀██ ██▄ ██▄▀▀▄██
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-`;
-const disconnected = `
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-██ ▄▄▀█▄ ▄██ ▄▄▄ ██ ▄▄▀██ ▄▄▄ ██ ▀██ ██ ▀██ ██ ▄▄▄██ ▄▄▀█▄▄ ▄▄██ ▄▄▄██ ▄▄▀██
-██ ██ ██ ███▄▄▄▀▀██ █████ ███ ██ █ █ ██ █ █ ██ ▄▄▄██ ██████ ████ ▄▄▄██ ██ ██
-██ ▀▀ █▀ ▀██ ▀▀▀ ██ ▀▀▄██ ▀▀▀ ██ ██▄ ██ ██▄ ██ ▀▀▀██ ▀▀▄███ ████ ▀▀▀██ ▀▀ ██
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-`;
+const victoryASCII = `YOU WON!`;
+const defeatASCII = `YOU LOST!`;
+const countDown3 = `2`;
+const countDown2 = `2`;
+const countDown1 = `1`;
+const countDownGO = `GO!`;
+const inMenu = `IN MENU`;
+const disconnected = `DISCONNECTED`;
