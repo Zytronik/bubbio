@@ -18,24 +18,25 @@ export interface InputFrame {
     garbageAmount: number,
 }
 
-interface BoardHistoryFrame {
+export interface BoardHistoryFrame {
     frameTime: number,
     boardState: string,
 }
 
-interface BubbleQueueFrame {
+export interface BubbleQueueFrame {
     frameTime: number,
     currentBubble: Bubble,
-    heldBubble: Bubble,
-    seedState: number,
+    heldBubble?: Bubble,
+    queueSeedState: number,
+    garbageSeedState: number,
 }
 
-interface AngleFrame {
+export interface AngleFrame {
     frameTime: number,
     angle: number,
 }
 
-interface GarbageFrame {
+export interface GarbageFrame {
     frameTime: number,
     garbageAmount: number,
     seedState: number,

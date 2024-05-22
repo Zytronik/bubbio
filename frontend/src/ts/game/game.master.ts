@@ -13,14 +13,14 @@ import { network_countDownState, network_leaveGame, network_resetGame, network_s
 import eventBus from "../page/page.event-bus";
 import { getNextSeed } from "./logic/game.logic.random";
 import { GAME_INPUT } from "./network/i/game.network.i.game-input";
-import { InputFrame } from "./i/game.i.game-state-history";
+import { AngleFrame, BoardHistoryFrame, BubbleQueueFrame, GarbageFrame, InputFrame } from "./i/game.i.game-state-history";
 import { GameVisuals } from "./visuals/i/game.visuals.i.game-visuals";
 import { ref } from "vue";
 import { createStatGraphData } from "./logic/game.logic.stat-tracker";
 import { GAME_STATE } from "./i/game.e.state";
 import { getSprintSettings } from "./settings/game.settings.sprint";
 import { getHandlingSettings } from "./settings/game.settings.handling";
-import { setupGrid } from "./logic/game.logic.grid-manager";
+import { getGridAsString, setupGrid } from "./logic/game.logic.grid-manager";
 
 export const playerGameVisuals: GameVisuals = {
     asciiBoard: {
@@ -108,7 +108,7 @@ export function setupSprintGame(): void {
         onGameDefeat: sprintDeath,
         onGameVictory: sprintVictory,
     }
-    const onGarbageSend = function (garbageAmount: number): void {console.log("show fancy grafix")}
+    const onGarbageSend = function (garbageAmount: number): void { console.log("show fancy grafix") }
     const startSeed = getNextSeed(Date.now());
     const instance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed, "none", onGarbageSend);
     preparePlayerGameInstance(instance);
@@ -202,12 +202,14 @@ export function angleLeft(): void {
     const timePassed = performance.now() - angleLeftInput.lastFiredAtTime;
     const leftAmount = playerGameInstance.currentAPS * timePassed / 1000
     playerGameInstance.angle = cleanUpAngle(oldAngle - leftAmount, playerGameInstance.gameSettings);
+    updateAngleHistory();
 }
 export function angleRight(): void {
     const oldAngle = playerGameInstance.angle;
     const timePassed = performance.now() - angleRightInput.lastFiredAtTime;
     const rightAmount = playerGameInstance.currentAPS * timePassed / 1000
     playerGameInstance.angle = cleanUpAngle(oldAngle + rightAmount, playerGameInstance.gameSettings);
+    updateAngleHistory();
 }
 export function angleCenter(): void {
     playerGameInstance.angle = 90;
@@ -229,6 +231,8 @@ export function triggerShoot(): void {
     playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
     executeShot(playerGameInstance);
     network_sendInputs(playerGameInstance);
+    updateBoardHistory();
+    updateBubbleHistory();
 }
 export function triggerHold(): void {
     const inputFrame: InputFrame = {
@@ -241,7 +245,46 @@ export function triggerHold(): void {
     playerGameInstance.gameStateHistory.inputHistory.push(inputFrame);
     holdBubble(playerGameInstance);
     network_sendInputs(playerGameInstance);
+    updateBubbleHistory();
 }
 export function debugTriggerGarbage(): void {
     playerGameInstance.queuedGarbage += 1;
+}
+
+
+
+function updateBoardHistory(): void {
+    const boardFrame: BoardHistoryFrame = {
+        frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
+        boardState: getGridAsString(playerGameInstance.playGrid),
+    }
+    playerGameInstance.gameStateHistory.boardHistory.push(boardFrame);
+}
+
+function updateBubbleHistory(): void {
+    const bubbleFrame: BubbleQueueFrame = {
+        frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
+        currentBubble: playerGameInstance.currentBubble,
+        heldBubble: playerGameInstance.holdBubble,
+        queueSeedState: playerGameInstance.bubbleSeed,
+        garbageSeedState: playerGameInstance.garbageSeed,
+    }
+    playerGameInstance.gameStateHistory.bubbleQueueHistory.push(bubbleFrame);
+}
+
+function updateAngleHistory(): void {
+    const angleFrame: AngleFrame = {
+        frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
+        angle: playerGameInstance.angle,
+    }
+    playerGameInstance.gameStateHistory.angleHistory.push(angleFrame);
+}
+
+export function updateGarbageHistory(): void {
+    const garbageFrame: GarbageFrame = {
+        frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
+        garbageAmount: playerGameInstance.queuedGarbage,
+        seedState: playerGameInstance.garbageSeed,
+    }
+    playerGameInstance.gameStateHistory.sentgarbagehistory.push(garbageFrame);
 }

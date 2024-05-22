@@ -165,7 +165,7 @@ import NetworkEvaluation from '@/pages/game/NetworkEvaluation.vue';
 
 export default defineComponent({
     name: 'GameModeLayout',
-    components: { Game, Leaderboard, History, LineChart, MenuBackButtons },
+    components: { Game, Leaderboard, History, LineChart, MenuBackButtons, NetworkEvaluation },
     props: {
         backButtonData: {
             type: Array as PropType<BackButtonData[]>,
