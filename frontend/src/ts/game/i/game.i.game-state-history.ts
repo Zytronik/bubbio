@@ -6,8 +6,6 @@ export interface GameStateHistory {
     boardHistory: BoardHistoryFrame[],
     bubbleQueueHistory: BubbleQueueFrame[],
     angleHistory: AngleFrame[],
-    sentgarbagehistory: GarbageFrame[],
-    receivedgarbagehistory: GarbageFrame[],
 }
 
 export interface InputFrame {
@@ -34,10 +32,4 @@ export interface BubbleQueueFrame {
 export interface AngleFrame {
     frameTime: number,
     angle: number,
-}
-
-export interface GarbageFrame {
-    frameTime: number,
-    garbageAmount: number,
-    seedState: number,
 }

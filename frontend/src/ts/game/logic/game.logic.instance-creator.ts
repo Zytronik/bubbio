@@ -43,8 +43,6 @@ export function createGameInstance(
             boardHistory: [],
             bubbleQueueHistory: [],
             angleHistory: [],
-            sentgarbagehistory: [],
-            receivedgarbagehistory: []
         },
         processedInputsIndex: 0,
         matchID: givenMatchID,
@@ -79,8 +77,6 @@ export function resetGameInstance(gameInstance: GameInstance, seed: number): voi
     gameInstance.gameStateHistory.boardHistory = [];
     gameInstance.gameStateHistory.bubbleQueueHistory = [];
     gameInstance.gameStateHistory.angleHistory = [];
-    gameInstance.gameStateHistory.sentgarbagehistory = [];
-    gameInstance.gameStateHistory.receivedgarbagehistory = [];
     gameInstance.processedInputsIndex = 0;
     if (gameInstance.gameSettings.prefillBoard) {
         prefillBoard(gameInstance);

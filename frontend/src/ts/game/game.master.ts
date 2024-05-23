@@ -13,7 +13,7 @@ import { network_countDownState, network_leaveGame, network_resetGame, network_s
 import eventBus from "../page/page.event-bus";
 import { getNextSeed } from "./logic/game.logic.random";
 import { GAME_INPUT } from "./network/i/game.network.i.game-input";
-import { AngleFrame, BoardHistoryFrame, BubbleQueueFrame, GarbageFrame, InputFrame } from "./i/game.i.game-state-history";
+import { AngleFrame, BoardHistoryFrame, BubbleQueueFrame, InputFrame } from "./i/game.i.game-state-history";
 import { GameVisuals } from "./visuals/i/game.visuals.i.game-visuals";
 import { ref } from "vue";
 import { createStatGraphData } from "./logic/game.logic.stat-tracker";
@@ -67,8 +67,6 @@ export const playerGameInstance: GameInstance = {
         boardHistory: [],
         bubbleQueueHistory: [],
         angleHistory: [],
-        sentgarbagehistory: [],
-        receivedgarbagehistory: []
     },
     processedInputsIndex: 0,
     matchID: "none",
@@ -197,12 +195,14 @@ export function disableGameplay(): void {
 
 
 //Inputs
+let previousUpdate = 0;
 export function angleLeft(): void {
     const oldAngle = playerGameInstance.angle;
     const timePassed = performance.now() - angleLeftInput.lastFiredAtTime;
     const leftAmount = playerGameInstance.currentAPS * timePassed / 1000
     playerGameInstance.angle = cleanUpAngle(oldAngle - leftAmount, playerGameInstance.gameSettings);
-    if (timePassed > 33) {
+    if (performance.now() - previousUpdate > 16) {
+        previousUpdate = performance.now();
         updateAngleHistory();
     }
 }
@@ -211,12 +211,14 @@ export function angleRight(): void {
     const timePassed = performance.now() - angleRightInput.lastFiredAtTime;
     const rightAmount = playerGameInstance.currentAPS * timePassed / 1000
     playerGameInstance.angle = cleanUpAngle(oldAngle + rightAmount, playerGameInstance.gameSettings);
-    if (timePassed > 33) {
+    if (performance.now() - previousUpdate > 16) {
+        previousUpdate = performance.now();
         updateAngleHistory();
     }
 }
 export function angleCenter(): void {
     playerGameInstance.angle = 90;
+    updateAngleHistory();
 }
 export function changeAPS(): void {
     playerGameInstance.currentAPS = playerGameInstance.handlingSettings.toggleAPS;
@@ -282,13 +284,4 @@ function updateAngleHistory(): void {
         angle: playerGameInstance.angle,
     }
     playerGameInstance.gameStateHistory.angleHistory.push(angleFrame);
-}
-
-export function updateGarbageHistory(): void {
-    const garbageFrame: GarbageFrame = {
-        frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
-        garbageAmount: playerGameInstance.queuedGarbage,
-        seedState: playerGameInstance.garbageSeed,
-    }
-    playerGameInstance.gameStateHistory.sentgarbagehistory.push(garbageFrame);
 }

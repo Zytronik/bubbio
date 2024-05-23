@@ -37,6 +37,44 @@
                 </tr>
             </tbody>
         </table>
+        
+        <h2 @click="toggleBubble">Bubbles History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Frame Time</th>
+                    <th>Current Bubble</th>
+                    <th>Held Bubble</th>
+                    <th>Queue Seed</th>
+                    <th>Garbage Seed</th>
+                </tr>
+            </thead>
+            <tbody v-show="showBubble">
+                <tr v-for="bubbleFrame in bubbleQueueHistory" :key="bubbleFrame.indexID" class="row">
+                    <td>{{ bubbleFrame.frameTime }}</td>
+                    <td>{{ bubbleFrame.currentBubble.type }}</td>
+                    <td>{{ bubbleFrame.heldBubble }}</td>
+                    <td>{{ bubbleFrame.queueSeedState }}</td>
+                    <td>{{ bubbleFrame.garbageSeedState }}</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2 @click="toggleAngle">Angle History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Frame Time</th>
+                    <th>Angle</th>
+                </tr>
+            </thead>
+            <tbody v-show="showAngle">
+                <tr v-for="angleFrame in angleHistory" :key="angleFrame.indexID" class="row">
+                    <td>{{ angleFrame.frameTime }}</td>
+                    <td>{{ angleFrame.angle }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </template>
 
@@ -51,16 +89,22 @@
             const boardHistory = playerGameInstance.gameStateHistory.boardHistory;
             const bubbleQueueHistory = playerGameInstance.gameStateHistory.bubbleQueueHistory;
             const angleHistory = playerGameInstance.gameStateHistory.angleHistory;
-            const sentgarbagehistory = playerGameInstance.gameStateHistory.sentgarbagehistory;
-            const receivedgarbagehistory = playerGameInstance.gameStateHistory.receivedgarbagehistory;
             const showInput = ref(true);
             const showBoard = ref(true);
+            const showBubble = ref(true);
+            const showAngle = ref(true);
 
             const toggleInput = () => {
                 showInput.value = !showInput.value;
             };
             const toggleBoard = () => {
                 showBoard.value = !showBoard.value;
+            };
+            const toggleBubble = () => {
+                showBubble.value = !showBubble.value;
+            };
+            const toggleAngle = () => {
+                showAngle.value = !showAngle.value;
             };
 
             onMounted(() => {
@@ -74,12 +118,14 @@
                 boardHistory,
                 bubbleQueueHistory,
                 angleHistory,
-                sentgarbagehistory,
-                receivedgarbagehistory,
                 toggleInput,
                 toggleBoard,
+                toggleBubble,
+                toggleAngle,
                 showInput,
                 showBoard,
+                showBubble,
+                showAngle,
             }
         }
     };
