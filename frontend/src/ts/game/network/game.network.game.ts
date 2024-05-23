@@ -6,7 +6,9 @@ import { GAME_STATE } from "../i/game.e.state";
 import { dto_Inputs } from "./dto/game.network.dto.input";
 import { dto_CountDown } from "./dto/game.network.dto.count-down";
 import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
+import { dto_AngleUpdate } from "./dto/game.network.dto.angle-update";
 
+const I_ANGLE_INPUTS = "input_angleInputs";
 const I_QUEUE_INPUTS = "input_queueUpGameInputs";
 const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
 const I_COUNT_DOWN_STATE = "I_COUNT_DOWN_STATE";
@@ -92,6 +94,19 @@ export function network_sendInputs(gameInstance: GameInstance): void {
         state.socket.emit(I_QUEUE_INPUTS, inputdata);
     } else {
         console.error("network_sendInputs()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
+    }
+}
+
+export function network_updateAngle(gameInstance: GameInstance): void {
+    if (state.socket) {
+        const angleData: dto_AngleUpdate = {
+            gameMode: gameInstance.gameMode,
+            matchID: gameInstance.matchID,
+            angle: gameInstance.angle,
+        }
+        state.socket.emit(I_ANGLE_INPUTS, angleData);
+    } else {
+        console.error("network_updateAngle()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }
 

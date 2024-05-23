@@ -9,7 +9,7 @@ import { createGameInstance, getEmptyStats, resetGameInstance } from "./logic/ga
 import { GAME_MODE } from "./settings/i/game.settings.e.game-modes";
 import { GameTransitions } from "./i/game.i.game-transitions";
 import { holdBubble } from "./logic/game.logic.bubble-manager";
-import { network_countDownState, network_leaveGame, network_resetGame, network_setupGame, network_sendInputs } from "./network/game.network.game";
+import { network_countDownState, network_leaveGame, network_resetGame, network_setupGame, network_sendInputs, network_updateAngle } from "./network/game.network.game";
 import eventBus from "../page/page.event-bus";
 import { getNextSeed } from "./logic/game.logic.random";
 import { GAME_INPUT } from "./network/i/game.network.i.game-input";
@@ -204,6 +204,7 @@ export function angleLeft(): void {
     if (performance.now() - previousUpdate > 16) {
         previousUpdate = performance.now();
         updateAngleHistory();
+        network_updateAngle(playerGameInstance);
     }
 }
 export function angleRight(): void {
@@ -214,6 +215,7 @@ export function angleRight(): void {
     if (performance.now() - previousUpdate > 16) {
         previousUpdate = performance.now();
         updateAngleHistory();
+        network_updateAngle(playerGameInstance);
     }
 }
 export function angleCenter(): void {

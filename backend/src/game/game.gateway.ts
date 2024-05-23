@@ -29,6 +29,7 @@ import { on } from 'events';
 import { UserService } from 'src/user/user.service';
 import { LobbyGateway } from 'src/lobby/lobby.gateway';
 import { SprintService } from 'src/sprint/sprint.service';
+import { dto_AngleUpdate } from './network/dto/game.network.dto.angle-update';
 
 
 /*
@@ -52,6 +53,7 @@ const O_RANKED_SHOW_MATCH_SCORE = "output_rankedShowMatchScore";
 const O_RANKED_PREPARE_NEXT_ROUND = "output_rankedPrepareNextRound";
 const O_RANKED_SHOW_END_SCREEN = "output_rankedShowEndScreen";
 
+const I_ANGLE_INPUTS = "input_angleInputs";
 const I_QUEUE_INPUTS = "input_queueUpGameInputs";
 const O_QUEUE_INPUTS = "output_highestInputIndexReceived";
 const I_COUNT_DOWN_STATE = "I_COUNT_DOWN_STATE";
@@ -92,8 +94,6 @@ export class GameGateway implements OnGatewayDisconnect {
     private glickoService: GlickoService,
     private rankedService: RankedService,
     private userService: UserService,
-    private sprintService: SprintService,
-    private lobbyGateway: LobbyGateway,
   ) { }
 
   handleDisconnect(client: Socket): void {
@@ -493,6 +493,26 @@ export class GameGateway implements OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage(I_ANGLE_INPUTS)
+  adjustAngle(client: Socket, angleData: dto_AngleUpdate): void {
+    let game: OngoingGame;
+    if (angleData.gameMode === GAME_MODE.RANKED) {
+      const match = ongoingRankedMatches.get(angleData.matchID);
+      if (match === undefined) {
+        client.emit(O_DISCONNECTED)
+        console.error("match is undefined", ongoingRankedMatches)
+        return;
+      }
+      game = match.ongoingGamesMap.get(client.id);
+    } else if (angleData.gameMode === GAME_MODE.SPRINT) {
+      game = ongoingSingeplayerGamesMap.get(client.id);
+    }
+    if (game?.gameInstance) {
+      game.gameInstance.angle = angleData.angle;
+      this.updatePlayerSpectator(game);
+    }
+  }
+
   @SubscribeMessage(I_COUNT_DOWN_STATE)
   countDown(client: Socket, gameStateData: dto_CountDown): void {
     let game: OngoingGame;
@@ -537,7 +557,7 @@ export class GameGateway implements OnGatewayDisconnect {
         game.gameInstance.stats.gameDuration = winningMoveAtTime;
         calculateTimeStats(game.gameInstance.stats, winningMoveAtTime);
         //TODO: Save game stats to database
-        if(client.data && client.data.role === "User"){
+        if (client.data && client.data.role === "User") {
           const username = await this.lobbyGateway.lobbyData.getUsername(client.id);
           const userId = await this.userService.getUserIdByUsername(username);
           this.sprintService.saveSprintToDB(userId, game.gameInstance.stats);
