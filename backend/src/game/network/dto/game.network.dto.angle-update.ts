@@ -4,4 +4,5 @@ export interface dto_AngleUpdate {
     gameMode: GAME_MODE,
     matchID: string,
     angle: number,
+    frameTime: number,
 }

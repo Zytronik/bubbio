@@ -65,7 +65,7 @@ const purple: Bubble = {
     type: 5,
 }
 const white: Bubble = {
-    ascii: `<div class="field bubble" style=" background: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"></div>`, 
+    ascii: `<div class="field bubble" style=" background: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"></div>`,
     type: 6,
 }
 export const allBubbles: Bubble[] = [

@@ -23,7 +23,7 @@ export interface GameSettings {
 
     prefillBoard: boolean,
     prefillBoardAmount: number,
-    refillBoard:boolean,
+    refillBoard: boolean,
     refillBoardAtLine: number,
     refillAmount: number,
     bubbleBagSize: number,

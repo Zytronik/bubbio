@@ -238,3 +238,14 @@ function getAdjacentFieldVectors(playGrid: Grid, gridPosition: Coordinates): Coo
     ]
     return adjacentFieldVectors;
 }
+
+export function getGridAsString(playGrid: Grid): string {
+    let gridAsString = '';
+    playGrid.rows.forEach(row => {
+        row.fields.forEach(field => {
+            gridAsString += field.bubble ? field.bubble.type : '-';
+        });
+        gridAsString += '\n';
+    });
+    return gridAsString;
+}

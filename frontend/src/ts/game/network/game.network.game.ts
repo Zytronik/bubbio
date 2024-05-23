@@ -17,6 +17,8 @@ const O_DISCONNECTED = "output_disconnected";
 const I_SINGLEPLAYER_SETUP_GAME = "I_SINGLEPLAYER_SETUP_GAME";
 const I_SINGLEPLAYER_RESET_GAME = "I_SINGLEPLAYER_RESET_GAME";
 const I_SINGLEPLAYER_LEAVE_GAME = "I_SINGLEPLAYER_LEAVE_GAME";
+const I_SINGLEPLAYER_NETWORK_EVAL = "I_SINGLEPLAYER_NETWORK_EVAL";
+const O_SINGLEPLAYER_NETWORK_EVAL = "O_SINGLEPLAYER_NETWORK_EVAL";
 
 const DO_LOG_ERROR = "debugOutput_logError";
 
@@ -103,6 +105,7 @@ export function network_updateAngle(gameInstance: GameInstance): void {
             gameMode: gameInstance.gameMode,
             matchID: gameInstance.matchID,
             angle: gameInstance.angle,
+            frameTime: performance.now() - gameInstance.stats.gameStartTime,
         }
         state.socket.emit(I_ANGLE_INPUTS, angleData);
     } else {
@@ -124,5 +127,19 @@ export function network_leaveGame(): void {
         network_stopListenToQueuedInputsIndex();
     } else {
         console.error("network_leaveGame()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
+    }
+}
+
+export function network_getNetworkEval(): void {
+    if (state.socket) {
+        state.socket.emit(I_SINGLEPLAYER_NETWORK_EVAL);
+        if (!registeredGameEvents.has(O_SINGLEPLAYER_NETWORK_EVAL)) {
+            state.socket.on(O_SINGLEPLAYER_NETWORK_EVAL, (data) => {
+                console.log("network_getNetworkEval()", data);
+            });
+            registeredGameEvents.add(O_QUEUE_INPUTS);
+        }
+    } else {
+        console.error("network_getNetworkEval()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
     }
 }

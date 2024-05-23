@@ -30,6 +30,9 @@ import { UserService } from 'src/user/user.service';
 import { LobbyGateway } from 'src/lobby/lobby.gateway';
 import { SprintService } from 'src/sprint/sprint.service';
 import { dto_AngleUpdate } from './network/dto/game.network.dto.angle-update';
+import { GameInstance } from './i/game.i.game-instance';
+import { AngleFrame, BoardHistoryFrame, BubbleQueueFrame, InputFrame } from './i/game.i.game-state-history';
+import { getGridAsString } from './logic/game.logic.grid-manager';
 
 
 /*
@@ -63,6 +66,8 @@ const O_DISCONNECTED = "output_disconnected";
 const I_SINGLEPLAYER_SETUP_GAME = "I_SINGLEPLAYER_SETUP_GAME";
 const I_SINGLEPLAYER_RESET_GAME = "I_SINGLEPLAYER_RESET_GAME";
 const I_SINGLEPLAYER_LEAVE_GAME = "I_SINGLEPLAYER_LEAVE_GAME";
+const I_SINGLEPLAYER_NETWORK_EVAL = "I_SINGLEPLAYER_NETWORK_EVAL";
+const O_SINGLEPLAYER_NETWORK_EVAL = "O_SINGLEPLAYER_NETWORK_EVAL";
 
 const J_SPECTATOR_ENTRIES = "join_spectatorEntriesRoom";
 const L_SPECTATOR_ENTRIES = "leave_spectatorEntriesRoom";
@@ -94,6 +99,8 @@ export class GameGateway implements OnGatewayDisconnect {
     private glickoService: GlickoService,
     private rankedService: RankedService,
     private userService: UserService,
+    private sprintService: SprintService,
+    private lobbyGateway: LobbyGateway,
   ) { }
 
   handleDisconnect(client: Socket): void {
@@ -472,8 +479,11 @@ export class GameGateway implements OnGatewayDisconnect {
               if (inputFrame.input === GAME_INPUT.SHOOT) {
                 game.gameInstance.angle = inputFrame.angle;
                 executeShot(game.gameInstance);
+                // updateBoardHistory(game.gameInstance, inputFrame.frameTime);
+                // updateBubbleHistory(game.gameInstance, inputFrame.frameTime);
               } else if (inputFrame.input === GAME_INPUT.HOLD) {
                 holdBubble(game.gameInstance);
+                // updateBubbleHistory(game.gameInstance, inputFrame.frameTime);
               } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
                 game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
                 if (game.gameInstance.queuedGarbage >= game.gameInstance.gameSettings.garbageToKill) {
@@ -481,6 +491,8 @@ export class GameGateway implements OnGatewayDisconnect {
                 }
               }
               game.gameInstance.stats.gameDuration = inputFrame.frameTime;
+              // console.log("push")
+              // game.gameInstance.gameStateHistory.inputHistory.push(inputFrame);
             }
           }
           this.updatePlayerSpectator(game)
@@ -490,6 +502,25 @@ export class GameGateway implements OnGatewayDisconnect {
           console.error(error)
         }
       }
+    }
+
+    function updateBoardHistory(instance: GameInstance, atTime: number): void {
+      const boardFrame: BoardHistoryFrame = {
+        frameTime: atTime,
+        boardState: getGridAsString(instance.playGrid),
+      }
+      instance.gameStateHistory.boardHistory.push(boardFrame);
+    }
+
+    function updateBubbleHistory(instance: GameInstance, atTime: number): void {
+      const bubbleFrame: BubbleQueueFrame = {
+        frameTime: atTime,
+        currentBubble: instance.currentBubble,
+        heldBubble: instance.holdBubble,
+        queueSeedState: instance.bubbleSeed,
+        garbageSeedState: instance.garbageSeed,
+      }
+      instance.gameStateHistory.bubbleQueueHistory.push(bubbleFrame);
     }
   }
 
@@ -509,7 +540,16 @@ export class GameGateway implements OnGatewayDisconnect {
     }
     if (game?.gameInstance) {
       game.gameInstance.angle = angleData.angle;
+      updateAngleHistory(game.gameInstance, angleData.frameTime);
       this.updatePlayerSpectator(game);
+    }
+
+    function updateAngleHistory(instance: GameInstance, atTime: number): void {
+      const angleFrame: AngleFrame = {
+        frameTime: atTime,
+        angle: instance.angle,
+      }
+      instance.gameStateHistory.angleHistory.push(angleFrame);
     }
   }
 
@@ -584,6 +624,12 @@ export class GameGateway implements OnGatewayDisconnect {
     game.queuedInputs = [];
     resetGameInstance(game.gameInstance, seed);
     this.updatePlayerSpectator(game);
+  }
+
+  @SubscribeMessage(I_SINGLEPLAYER_NETWORK_EVAL)
+  singlePlayerNetworkEval(client: Socket): void {
+    const game = ongoingSingeplayerGamesMap.get(client.id);
+    client.emit(O_SINGLEPLAYER_NETWORK_EVAL, game.gameInstance.gameStateHistory);
   }
 
   @SubscribeMessage(I_SINGLEPLAYER_LEAVE_GAME)
