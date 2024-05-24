@@ -62,7 +62,7 @@ import { applySavedSettings, enableBackInputs, enableChannelInput, enableNetwork
 import { setupDebugListeners } from "./ts/game/network/game.network.debug";
 import { RankInfo } from './ts/page/i/page.i-rank-info';
 import { loadBackgroundCanvas } from './ts/page/page.background-canvas';
-import { loadAudioFiles, playSound } from './ts/asset/asset.howler-load';
+import { loadAudioFiles, playSound, playSoundtrack, stopSoundtrack } from './ts/asset/asset.howler-load';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -267,7 +267,8 @@ export default {
 
     /* General */
     onMounted(async () => {
-      waitForLoadingScreen();
+      await waitForLoadingScreen();
+      playSoundtrack('menu_soundtrack');
       addSocketConnectListener(setupDebugListeners);
       enableBackInputs();
       enableChannelInput();
@@ -288,6 +289,7 @@ export default {
         showInfoMessage(infoMessageData.message, infoMessageData.type);
       });
       window.addEventListener('beforeunload', clearGuestCookies);
+      window.addEventListener('beforeunload', stopSoundtrack);
     });
 
     onUnmounted(() => {
@@ -296,6 +298,7 @@ export default {
       eventBus.off('show-info-message');
       eventBus.off('navigationDirectionChanged');
       clearGuestCookies();
+      stopSoundtrack();
     });
 
     return {

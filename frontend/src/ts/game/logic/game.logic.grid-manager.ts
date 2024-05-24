@@ -4,6 +4,7 @@ import { Row } from "../i/game.i.row";
 import { Coordinates } from "../i/game.i.grid-coordinates";
 import { GameSettings } from "../settings/i/game.settings.i.game-settings";
 import { Bubble } from "../i/game.i.bubble";
+import { playSound } from "@/ts/asset/asset.howler-load";
 
 export function setupGrid(settings: GameSettings): Grid {
     const precisionWidth = settings.widthPrecisionUnits;
@@ -101,6 +102,7 @@ export function dissolveBubbles(playGrid: Grid, collidedAtField: Field, colorToC
     const result = new Set<string>();
     findAdjacentBubbles(x, y, colorToCheck, visited, result);
     if (result.size >= 3) {
+        playSound("clear");
         result.forEach(xyString => {
             const x = parseInt(xyString.split(komma)[0]);
             const y = parseInt(xyString.split(komma)[1]);
@@ -180,6 +182,7 @@ export function dissolveBubbles(playGrid: Grid, collidedAtField: Field, colorToC
 }
 
 export function addGarbageToGrid(garbage: Bubble[], grid: Grid): void {
+    playSound("incomingGarbage");
     for (let h = grid.rows.length - 1; h > 0; h--) {
         for (let w = 0; w < grid.gridWidth - 1; w++) {
             const field = grid.rows[h].fields[w];

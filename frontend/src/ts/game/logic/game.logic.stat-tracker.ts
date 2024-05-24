@@ -1,3 +1,4 @@
+import { playSound } from "@/ts/asset/asset.howler-load";
 import { GameInstance } from "../i/game.i.game-instance";
 import { GameStats } from "../i/game.i.game-stats";
 import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
@@ -13,6 +14,7 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
     if (attack > 0){
         if (gameStats.spikeAnimationStart + SPIKE_COUNTER_TIMEFRAME > performance.now()) {
             gameStats.spikeNumber += attack;
+            playSound("spike");
         } else {
             gameStats.spikeNumber = attack;
         }
