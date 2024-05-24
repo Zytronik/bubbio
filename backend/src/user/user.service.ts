@@ -300,7 +300,7 @@ export class UserService {
         });
     }
 
-    async updateUserInputSettings(userId: number, inputSettings: string): Promise<void> {
+    async updateUserSettings(userId: number, inputSettings: string): Promise<void> {
         await this.prisma.user.update({
             where: { id: userId },
             data: { inputSettings },

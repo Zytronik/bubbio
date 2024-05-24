@@ -1,8 +1,11 @@
 import { angleCenter, angleLeft, angleRight, changeAPS, debugTriggerGarbage, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
 import { network_clearOngoingGames, network_getOngoingGames } from "../game/network/game.network.debug";
+import { DEFAULT_APS, TOGGLE_APS } from "../game/settings/ref/game.settings.ref.all-handling-settings";
+import { NumberSetting } from "../game/settings/ref/i/game.settings.ref.i.number-setting";
 import { checkUserAuthentication } from "../networking/networking.auth";
 import { httpClient } from "../networking/networking.http-client";
 import { openChannelOverlay } from "../page/page.page-manager";
+import { Input } from "./i/input.i.input";
 import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, debugTriggerGarbageInput, backInput, holdInput, resetInput, shootInput, defaultBlocker, channelInput, debugNetwork2, debugNetwork3, debugNetwork1 } from "./input.all-inputs";
 
 export function enableGameInputs(): void {
@@ -89,8 +92,13 @@ export function disableNetworkDebugInputs(): void {
     debugNetwork3.enabled = false;
 }
 
-export async function applySavedInputSettings(): Promise<void> {
-    let settings = null;
+interface Settings {
+    handleSettings: { toggleAPS: number, defaultAPS: number },
+    inputSettings: Input[]
+}
+
+export async function applySavedSettings(): Promise<void> {
+    let settings: Settings | null = null;
 
     if (checkUserAuthentication() && !sessionStorage.getItem('isGuest')) {
         try {
@@ -105,37 +113,45 @@ export async function applySavedInputSettings(): Promise<void> {
             console.error('Error fetching input settings:', error);
         }
     } else {
-        const savedSettings = localStorage.getItem('userInputSettings');
+        const savedSettings = localStorage.getItem('settings');
         if (savedSettings) {
             settings = JSON.parse(savedSettings);
         }
     }
 
-    if (Array.isArray(settings)) {
-        settings.forEach(savedSetting => {
-            const input = allInputs.find(input => input.name === savedSetting.name);
-            if (input && savedSetting.customKeyMap) {
-                input.customKeyMap = savedSetting.customKeyMap;
+    if (settings && Array.isArray(settings.inputSettings)) {
+        settings.inputSettings.forEach(inputSetting => {
+            const input = allInputs.find(input => input.name === inputSetting.name);
+            if (input && inputSetting.customKeyMap) {
+
+                input.customKeyMap = inputSetting.customKeyMap;
             }
         });
+
+        DEFAULT_APS.refNumber.value = settings.handleSettings.defaultAPS ?? DEFAULT_APS.defaultValue;
+        TOGGLE_APS.refNumber.value = settings.handleSettings.toggleAPS ?? TOGGLE_APS.defaultValue;
     }
 }
 
-export async function saveInputs() {
+export async function saveSettings() {
+    const settings = {
+        "handleSettings": {"toggleAPS" : TOGGLE_APS.refNumber.value, "defaultAPS": DEFAULT_APS.refNumber.value},
+        "inputSettings": allInputs
+    }
     if (checkUserAuthentication() && !sessionStorage.getItem('isGuest')) { //if is logged in
         try {
             const token = localStorage.getItem('authToken');
-            const payload = JSON.stringify({ inputSettings: JSON.stringify(allInputs) });
-            await httpClient.post('/users/updateInputSettings', payload, {
+            const payload = { settings: JSON.stringify(settings) };
+            await httpClient.post('/users/settings/update', payload, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
             });
         } catch (error) {
-            console.error('Error submitting input Settings:', error);
+            console.error('Error submitting Settings:', error);
         }
     } else {
-        localStorage.setItem('userInputSettings', JSON.stringify(allInputs));
+        localStorage.setItem('settings', JSON.stringify(settings));
     }
 }
