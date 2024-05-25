@@ -9,19 +9,19 @@
           <div class="ratingDetails">
             <p v-if="userData.isRanked" class="rating">{{ userData.rating }}<span>±{{ userData.ratingDeviation }}</span>
             </p>
-            <img v-if="userData?.rankInfos && userData.isRanked" class="rank-img"
+            <img v-if="userData?.rankInfos && userData.isRanked && userData.rankInfos.iconName" class="rank-img"
               :src="getRankImagePath(userData.rankInfos.iconName)" :alt="userData?.rankInfos.name">
             <p v-else class="unranked">Unranked</p>
           </div>
           <div v-if="userData.isRanked" class="progressBar-wrapper">
-            <img v-if="userData?.rankInfos && userData.rankInfos?.prevRank" class="prevRank hidden rank-img"
+            <img v-if="userData?.rankInfos && userData.rankInfos?.prevRank && userData.rankInfos.prevRank.iconName" class="prevRank hidden rank-img"
               :src="getRankImagePath(userData.rankInfos.prevRank.iconName)" :alt="userData.rankInfos.prevRank.name">
             <div class="progressBar">
               <div class="progressBarFill" :style="{
                 'width': getProgressBarFillWidth()
               }"></div>
             </div>
-            <img v-if="userData?.rankInfos && userData.rankInfos?.nextRank" class="nextRank hidden rank-img"
+            <img v-if="userData?.rankInfos && userData.rankInfos?.nextRank && userData.rankInfos.nextRank.iconName" class="nextRank hidden rank-img"
               :src="getRankImagePath(userData.rankInfos.nextRank.iconName)" :alt="userData.rankInfos.nextRank.name">
           </div>
         </div>
@@ -201,13 +201,10 @@ export default {
           if (data) {
             let updatedPbUrl = getDefaultProfilePbURL();
             updatedPbUrl = data.pbUrl ? data.pbUrl : getDefaultProfilePbURL();
-            console.log('updatedPbUrl', updatedPbUrl);
             userData.value = {
               ...data,
               pbUrl: updatedPbUrl,
             };
-            console.log('userData', userData.value);
-            console.log('data', data);
           }
         }
         eventBus.setUserData(userData.value);
