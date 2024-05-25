@@ -9,9 +9,8 @@ import { getGarbageAmount, receiveGarbageAndCheckDead } from "./game.logic.garba
 import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 
 export function executeShot(playerGameInstance: GameInstance): void {
-    const bubblesCleared = shootBubble(playerGameInstance);
-    let hasDied = false;
-    if (!(bubblesCleared > 0)) {
+    let hasDied = shootBubble(playerGameInstance);
+    if (!hasDied) {
         hasDied = receiveGarbageAndCheckDead(playerGameInstance);
         if (hasDied) {
             return;
@@ -33,7 +32,7 @@ export function executeShot(playerGameInstance: GameInstance): void {
     updateBubbleQueueAndCurrent(playerGameInstance);
 }
 
-export function shootBubble(game: GameInstance): number {
+export function shootBubble(game: GameInstance): boolean {
     const angle = game.angle;
     const grid = game.playGrid;
     const bubble = game.currentBubble;
@@ -70,8 +69,9 @@ export function shootBubble(game: GameInstance): number {
 
     if (bubblesCleared < 3 && grid.rows[gridField.coords.y].isInDeathZone) {
         game.gameTransitions.onGameDefeat();
+        return true;
     }
-    return bubblesCleared;
+    return false;
 }
 
 export function calculatePreview(game: GameInstance): void {
