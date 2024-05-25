@@ -206,6 +206,8 @@ export default {
               ...data,
               pbUrl: updatedPbUrl,
             };
+            console.log('userData', userData.value);
+            console.log('data', data);
           }
         }
         eventBus.setUserData(userData.value);
