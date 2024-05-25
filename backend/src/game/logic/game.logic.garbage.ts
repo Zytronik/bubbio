@@ -29,7 +29,7 @@ export function receiveGarbageAndCheckDead(gameInstance: GameInstance): boolean 
             addGarbageToGrid(garbage, gameInstance.playGrid);
             gameInstance.queuedGarbage--;
             hasDied = checkIfGarbageKills(gameInstance);
-            if (!hasDied && (i === maxAtOnce - 1 || gameInstance.queuedGarbage === 0)) {
+            if (hasDied && (i === maxAtOnce - 1 || gameInstance.queuedGarbage === 0)) {
                 gameInstance.gameTransitions.onGameDefeat();
                 return true;
             } else if (gameInstance.queuedGarbage === 0) {
