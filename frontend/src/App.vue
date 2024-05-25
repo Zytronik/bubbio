@@ -271,8 +271,6 @@ export default {
 
     /* General */
     onMounted(async () => {
-      await waitForLoadingScreen();
-      playSoundtrack('menu_soundtrack');
       addSocketConnectListener(setupDebugListeners);
       enableBackInputs();
       enableChannelInput();
@@ -288,6 +286,8 @@ export default {
       }
       showUserPageFromURL();
       addSocketConnectListener(initOnIsUserInRoomAlready);
+      await waitForLoadingScreen();
+      playSoundtrack('menu_soundtrack');
       eventBus.on('navigationDirectionChanged', updateDirection);
       eventBus.on('show-info-message', (infoMessageData: InfoMessageData) => {
         showInfoMessage(infoMessageData.message, infoMessageData.type);
