@@ -199,7 +199,9 @@ export default {
         } else {
           const data = await fetchUserData();
           if (data) {
-            const updatedPbUrl = data.pbUrl ? data.pbUrl : getDefaultProfilePbURL();
+            let updatedPbUrl = getDefaultProfilePbURL();
+            updatedPbUrl = data.pbUrl ? data.pbUrl : getDefaultProfilePbURL();
+            console.log('updatedPbUrl', updatedPbUrl);
             userData.value = {
               ...data,
               pbUrl: updatedPbUrl,
