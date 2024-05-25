@@ -198,6 +198,7 @@ p {
 .row .cell:nth-of-type(2) {
   flex: 1.8;
   text-align: left;
+  z-index: 1;
 }
 
 .row:nth-of-type(3) .cell:first-of-type p {
@@ -237,6 +238,8 @@ p {
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
 }
 
 .user-info img {
