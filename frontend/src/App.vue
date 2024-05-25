@@ -3,7 +3,7 @@
     <LoadingScreen :isLoading="isLoading" />
     <div class="topbar">
       <div v-if="isAuthenticated && userData" @click="showMyProfile" class="profile-wrapper">
-        <img class="profile-pic" :src="userData?.pbUrl" alt="Profile Picture">
+        <img v-if="userData.pbUrl" class="profile-pic" :src="userData.pbUrl" alt="Profile Picture">
         <div class="profile-content">
           <h3>{{ userData?.username.toUpperCase() }}</h3>
           <div class="ratingDetails">
