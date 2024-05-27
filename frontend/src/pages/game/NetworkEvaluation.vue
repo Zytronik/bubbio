@@ -1,5 +1,10 @@
 <template>
   <div class="scrollable">
+    <h1>Network Evaluation</h1>
+    <span>Total Mismatches: {{ evaluationData.totalMismatches }}</span><br>
+    <span>Total Matches: {{ evaluationData.totalMatches }}</span><br>
+    <span>{{ evaluationData.inputErrors.value }}</span>
+    <br><br>
     <h2 @click="toggleInput">Input History</h2>
     <table>
       <thead>
@@ -93,7 +98,7 @@
 <script>
 import { playerGameInstance } from "@/ts/game/game.master";
 import { onMounted, ref } from "vue";
-import { network_getNetworkEval } from "../../ts/game/network/game.network.game";
+import { network_getNetworkEval, evaluationData } from "../../ts/game/network/game.network.game";
 
 export default {
   name: "NetworkEvaluation",
@@ -138,6 +143,7 @@ export default {
       showBoard,
       showBubble,
       showAngle,
+      evaluationData,
     };
   },
 };
