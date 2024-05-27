@@ -176,7 +176,7 @@ export default defineComponent({
     const currentId = ref(1);
     const speedFactor = ref(10);
     const mmSettings = ref<MmSettings>()
-    const amountOfMultipleUsers = ref(10000);
+    const amountOfMultipleUsers = ref(3000);
 
     onMounted(() => {
       changeBackgroundTo("black");
