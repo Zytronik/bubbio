@@ -11,7 +11,7 @@ interface MatchmakingQueue {
 export class MatchmakingSimulationService {
     private socketMmRoomName: string = 'matchmakingSimulationVue_389w4389w4uhbf803w4bnf83wn4f803w4fsdjkngsdfr';
     private queue: MatchmakingQueue = {};
-    private speedFactor = 1000;
+    private speedFactor = 10;
     private startGap = 100; // Startwert für den akzeptablen Skill Gap
     private gapIncreaseInterval = 10000 / this.speedFactor; // Zeit in Millisekunden, nach der der Skill Gap erhöht wird
     private matchmakingIntervalTime = 5000 / this.speedFactor;

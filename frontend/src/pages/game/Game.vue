@@ -9,7 +9,7 @@
       <div class="bottom">
         <div>
           <p>Time</p>
-          <p
+          <p class="time"
             v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
           </p>
         </div>
@@ -62,7 +62,7 @@
       <div class="bottom">
         <div>
           <p>Time</p>
-          <p
+          <p class="time"
             v-html="areRef ? playerGameVisuals.statNumbers.formattedCurrentTime.value : playerGameVisuals.statNumbers.formattedCurrentTime">
           </p>
         </div>
@@ -109,8 +109,9 @@
 </template>
 
 <script lang="ts">
+import { DEFAULT_APS } from '@/ts/game/settings/ref/game.settings.ref.all-handling-settings';
 import { GameMode } from '@/ts/page/e/page.e-leaderboard';
-import { PropType, defineComponent } from 'vue';
+import { PropType, defineComponent, onMounted } from 'vue';
 
 export default defineComponent({
   name: 'GamePage',
@@ -129,6 +130,12 @@ export default defineComponent({
       required: true,
       validator: (value: string): boolean => Object.values(GameMode).includes(value as GameMode),
     },
+  },
+  setup() {
+    onMounted(() => {
+      console.log(DEFAULT_APS.defaultValue);
+    });
+    return {};
   },
 });
 

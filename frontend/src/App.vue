@@ -3,25 +3,25 @@
     <LoadingScreen :isLoading="isLoading" />
     <div class="topbar">
       <div v-if="isAuthenticated && userData" @click="showMyProfile" class="profile-wrapper">
-        <img class="profile-pic" :src="userData?.pbUrl" alt="Profile Picture">
+        <img v-if="userData.pbUrl" class="profile-pic" :src="userData.pbUrl" alt="Profile Picture">
         <div class="profile-content">
           <h3>{{ userData?.username.toUpperCase() }}</h3>
           <div class="ratingDetails">
             <p v-if="userData.isRanked" class="rating">{{ userData.rating }}<span>±{{ userData.ratingDeviation }}</span>
             </p>
-            <img v-if="userData?.rankInfos && userData.isRanked" class="rank-img"
+            <img v-if="userData?.rankInfos && userData.isRanked && userData.rankInfos.iconName" class="rank-img"
               :src="getRankImagePath(userData.rankInfos.iconName)" :alt="userData?.rankInfos.name">
             <p v-else class="unranked">Unranked</p>
           </div>
           <div v-if="userData.isRanked" class="progressBar-wrapper">
-            <img v-if="userData?.rankInfos && userData.rankInfos?.prevRank" class="prevRank hidden rank-img"
+            <img v-if="userData?.rankInfos && userData.rankInfos?.prevRank && userData.rankInfos.prevRank.iconName" class="prevRank hidden rank-img"
               :src="getRankImagePath(userData.rankInfos.prevRank.iconName)" :alt="userData.rankInfos.prevRank.name">
             <div class="progressBar">
               <div class="progressBarFill" :style="{
                 'width': getProgressBarFillWidth()
               }"></div>
             </div>
-            <img v-if="userData?.rankInfos && userData.rankInfos?.nextRank" class="nextRank hidden rank-img"
+            <img v-if="userData?.rankInfos && userData.rankInfos?.nextRank && userData.rankInfos.nextRank.iconName" class="nextRank hidden rank-img"
               :src="getRankImagePath(userData.rankInfos.nextRank.iconName)" :alt="userData.rankInfos.nextRank.name">
           </div>
         </div>
@@ -58,11 +58,11 @@ import eventBus from './ts/page/page.event-bus';
 import { attachInputReader } from './ts/input/input.input-reader';
 import { httpClient } from './ts/networking/networking.http-client';
 import { getDefaultProfilePbURL, getRankImagePath } from './ts/networking/paths';
-import { applySavedInputSettings, enableBackInputs, enableChannelInput, enableNetworkDebugInputs } from './ts/input/input.input-manager';
+import { applySavedSettings, enableBackInputs, enableChannelInput, enableNetworkDebugInputs } from './ts/input/input.input-manager';
 import { setupDebugListeners } from "./ts/game/network/game.network.debug";
 import { RankInfo } from './ts/page/i/page.i-rank-info';
 import { loadBackgroundCanvas } from './ts/page/page.background-canvas';
-import { loadAudioFiles, playSound } from './ts/asset/asset.howler-load';
+import { loadAudioFiles, playSound, playSoundtrack, stopSoundtrack } from './ts/asset/asset.howler-load';
 
 interface InfoMessageComponent {
   showMessage: (message: string, type: string) => void;
@@ -185,7 +185,7 @@ export default {
 
     watch(() => isAuthenticated.value, () => {
       updateProfileData();
-      applySavedInputSettings();
+      applySavedSettings();
     });
 
     async function updateProfileData() {
@@ -199,7 +199,8 @@ export default {
         } else {
           const data = await fetchUserData();
           if (data) {
-            const updatedPbUrl = data.pbUrl ? data.pbUrl : getDefaultProfilePbURL();
+            let updatedPbUrl = getDefaultProfilePbURL();
+            updatedPbUrl = data.pbUrl ? data.pbUrl : getDefaultProfilePbURL();
             userData.value = {
               ...data,
               pbUrl: updatedPbUrl,
@@ -257,7 +258,7 @@ export default {
       await loadBackgroundCanvas();
       if (!userData.value) {
         await updateProfileData();
-        await applySavedInputSettings();
+        await applySavedSettings();
       }
       await loadAudioFiles();
       //TODO add Promises for other loading tasks
@@ -267,7 +268,6 @@ export default {
 
     /* General */
     onMounted(async () => {
-      waitForLoadingScreen();
       addSocketConnectListener(setupDebugListeners);
       enableBackInputs();
       enableChannelInput();
@@ -283,11 +283,14 @@ export default {
       }
       showUserPageFromURL();
       addSocketConnectListener(initOnIsUserInRoomAlready);
+      await waitForLoadingScreen();
+      playSoundtrack('menu_soundtrack');
       eventBus.on('navigationDirectionChanged', updateDirection);
       eventBus.on('show-info-message', (infoMessageData: InfoMessageData) => {
         showInfoMessage(infoMessageData.message, infoMessageData.type);
       });
       window.addEventListener('beforeunload', clearGuestCookies);
+      window.addEventListener('beforeunload', stopSoundtrack);
     });
 
     onUnmounted(() => {
@@ -296,6 +299,7 @@ export default {
       eventBus.off('show-info-message');
       eventBus.off('navigationDirectionChanged');
       clearGuestCookies();
+      stopSoundtrack();
     });
 
     return {

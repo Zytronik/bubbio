@@ -18,6 +18,16 @@
     margin-right: calc(15px + 6 * var(--game-bubble-border-width));
 }
 
+.game-wrapper .inGameStats .time {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.game-wrapper .inGameStats .time span {
+    width: 10%;
+    text-align: right;
+}
+
 .game-wrapper .inGameStats .bottom {
     position: absolute;
     bottom: 0;
@@ -326,7 +336,7 @@
     padding: var(--game-board-padding) 0;
     border: var(--game-board-border-width) solid white;
     border-left: none;
-    width: calc((5 * var(--game-bubble-height) + 4 * var(--game-board-padding) + 9 * var(--game-board-border-width)) - var(--game-bubble-height) / 2);
+    width: calc((5 * var(--game-bubble-height) + 5 * var(--game-board-padding) + 10 * var(--game-bubble-border-width)) - (0.5 * var(--game-bubble-height) + var(--game-bubble-border-width) + var(--game-board-padding)));
 }
 
 .gameUI-wrapper .queue-overflow {

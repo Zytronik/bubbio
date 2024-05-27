@@ -39,7 +39,7 @@ export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNum
     if (calculateCurrentTime) {
         gameDuration = performance.now() - gameStats.gameStartTime;
     }
-    const formattedCurrentTimeString = formatTimeNumberToString(gameDuration);
+    const formattedCurrentTimeString = formatTimeNumberToHTML(gameDuration);
     calculateTimeStats(gameInstance.stats, gameDuration)
     statStrings.formattedCurrentTime.value = formattedCurrentTimeString;
     statStrings.bubbleClearToWin.value = gameStats.bubbleClearToWin;
@@ -72,4 +72,13 @@ export function formatTimeNumberToString(milliseconds: number): string {
     const seconds = totalSeconds % 60;
 
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${hundredths.toString().padStart(2, '0')}`;
+}
+
+export function formatTimeNumberToHTML(milliseconds: number): string {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hundredths = Math.floor((milliseconds % 1000) / 10);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return `<span>${minutes.toString().padStart(2, '0')}</span>:<span>${seconds.toString().padStart(2, '0')}</span>.<span>${hundredths.toString().padStart(2, '0')}</span>`;
 }

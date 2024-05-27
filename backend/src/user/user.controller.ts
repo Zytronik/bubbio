@@ -4,7 +4,7 @@ import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ValidateImagePipe } from './validateImgPipeline';
-import { UpdateInputSettingsDto } from './dto/user.dto.inputSettings';
+import { UpdateSettingsDto } from './dto/user.dto.updateSettings';
 import { AuthenticatedRequest } from 'src/auth/e/auth.e-auth-request';
 import { CheckUsernameDto } from 'src/auth/dto/auth.dto.check-username';
 
@@ -58,10 +58,10 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('updateInputSettings')
-  async updateInputSettings(@Req() req: AuthenticatedRequest, @Body() updateInputSettingsDto: UpdateInputSettingsDto) {
+  @Post('settings/update')
+  async updateSettings(@Req() req: AuthenticatedRequest, @Body() updateSettingsDto: UpdateSettingsDto) {
     const userId = req.user.userId;
-    await this.userService.updateUserInputSettings(userId, updateInputSettingsDto.inputSettings);
+    await this.userService.updateUserSettings(userId, updateSettingsDto.settings);
   }
 
   @UseGuards(JwtAuthGuard)

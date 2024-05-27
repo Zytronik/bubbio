@@ -36,5 +36,4 @@ export class MatchmakingSimulationGateway implements OnGatewayDisconnect {
     handlePlayerLeftMmVue(@ConnectedSocket() client: Socket) {
         this.matchmakingSimulationService.userLeftMmSimVue(client);
     }
-
 }

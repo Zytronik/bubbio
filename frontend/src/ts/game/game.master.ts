@@ -21,6 +21,7 @@ import { GAME_STATE } from "./i/game.e.state";
 import { getSprintSettings } from "./settings/game.settings.sprint";
 import { getHandlingSettings } from "./settings/game.settings.handling";
 import { getGridAsString, setupGrid } from "./logic/game.logic.grid-manager";
+import { playSound } from "../asset/asset.howler-load";
 
 export const playerGameVisuals: GameVisuals = {
     asciiBoard: {
@@ -229,6 +230,7 @@ export function revertAPS(): void {
     playerGameInstance.currentAPS = playerGameInstance.handlingSettings.defaultAPS;
 }
 export function triggerShoot(): void {
+    playSound("shoot");
     const inputFrame: InputFrame = {
         indexID: playerGameInstance.gameStateHistory.inputHistory.length,
         frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
@@ -243,6 +245,7 @@ export function triggerShoot(): void {
     updateBubbleHistory();
 }
 export function triggerHold(): void {
+    playSound("hold");
     const inputFrame: InputFrame = {
         indexID: playerGameInstance.gameStateHistory.inputHistory.length,
         frameTime: performance.now() - playerGameInstance.stats.gameStartTime,
