@@ -7,6 +7,10 @@ import { dto_Inputs } from "./dto/game.network.dto.input";
 import { dto_CountDown } from "./dto/game.network.dto.count-down";
 import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
 import { dto_AngleUpdate } from "./dto/game.network.dto.angle-update";
+import { InputFrame } from "../i/game.i.game-state-history";
+import { NetworkEvaluation } from "./i/game.network.i.evaluation-data";
+import { ref } from "vue";
+import { playerGameInstance } from "../game.master";
 
 const I_ANGLE_INPUTS = "input_angleInputs";
 const I_QUEUE_INPUTS = "input_queueUpGameInputs";
@@ -130,16 +134,57 @@ export function network_leaveGame(): void {
     }
 }
 
+export const evaluationData: NetworkEvaluation = {
+    totalMatches: ref(0),
+    totalMismatches: ref(0),
+    inputErrors: ref(""),
+    boardErrors: ref(""),
+    queueErrors: ref(""),
+    angleErrors: ref(""),
+}
 export function network_getNetworkEval(): void {
     if (state.socket) {
         state.socket.emit(I_SINGLEPLAYER_NETWORK_EVAL);
         if (!registeredGameEvents.has(O_SINGLEPLAYER_NETWORK_EVAL)) {
             state.socket.on(O_SINGLEPLAYER_NETWORK_EVAL, (data) => {
-                console.log("network_getNetworkEval()", data);
+                evaluationData.totalMatches.value = 0;
+                evaluationData.totalMismatches.value = 0;
+                evaluationData.inputErrors.value = "";
+                evaluationData.boardErrors.value = "";
+                evaluationData.queueErrors.value = "";
+                evaluationData.angleErrors.value = "";
+                const history = playerGameInstance.gameStateHistory;
+                history.inputHistory.forEach((inputFrame, index) => {
+                    if (data.inputHistory[index]) {
+                        compareInputFrames(inputFrame, data.inputHistory[index])
+                    } else {
+                        evaluationData.totalMismatches.value++;
+                        evaluationData.inputErrors.value += `InputHistory ${index}: missing\n`;
+                    }
+                });
             });
             registeredGameEvents.add(O_QUEUE_INPUTS);
         }
     } else {
         console.error("network_getNetworkEval()", "YOU DONT HAVE ANY SOCKETS!", "state.socket was null");
+    }
+
+    function compareInputFrames(frameA: InputFrame, frameB: InputFrame): boolean {
+        let inputsMatch = true;
+        if (frameA.input !== frameB.input) {
+            evaluationData.inputErrors.value += `InputHistory ${frameA.indexID}: input mismatch: ${frameA.input}/${frameB.input}\n`;
+            inputsMatch = false;
+        }
+        if (frameA.angle !== frameB.angle) {
+            evaluationData.inputErrors.value += `InputHistory ${frameA.indexID}: angle mismatch: ${frameA.angle}/${frameB.angle}\n`;
+            inputsMatch = false;
+        }
+        if (frameA.garbageAmount !== frameB.garbageAmount) {
+            evaluationData.inputErrors.value += `InputHistory ${frameA.indexID}: garbageAmount mismatch: ${frameA.garbageAmount}/${frameB.garbageAmount}\n`;
+            inputsMatch = false;
+        }
+        evaluationData.totalMismatches.value += inputsMatch ? 0 : 1;
+        evaluationData.totalMatches.value += inputsMatch ? 1 : 0;
+        return inputsMatch;
     }
 }
