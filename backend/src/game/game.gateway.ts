@@ -479,11 +479,11 @@ export class GameGateway implements OnGatewayDisconnect {
               if (inputFrame.input === GAME_INPUT.SHOOT) {
                 game.gameInstance.angle = inputFrame.angle;
                 executeShot(game.gameInstance);
-                // updateBoardHistory(game.gameInstance, inputFrame.frameTime);
-                // updateBubbleHistory(game.gameInstance, inputFrame.frameTime);
+                updateBoardHistory(game.gameInstance, inputFrame.frameTime);
+                updateBubbleHistory(game.gameInstance, inputFrame.frameTime);
               } else if (inputFrame.input === GAME_INPUT.HOLD) {
                 holdBubble(game.gameInstance);
-                // updateBubbleHistory(game.gameInstance, inputFrame.frameTime);
+                updateBubbleHistory(game.gameInstance, inputFrame.frameTime);
               } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
                 game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
                 if (game.gameInstance.queuedGarbage >= game.gameInstance.gameSettings.garbageToKill) {
@@ -491,8 +491,6 @@ export class GameGateway implements OnGatewayDisconnect {
                 }
               }
               game.gameInstance.stats.gameDuration = inputFrame.frameTime;
-              // console.log("push")
-              // game.gameInstance.gameStateHistory.inputHistory.push(inputFrame);
             }
           }
           this.updatePlayerSpectator(game)
