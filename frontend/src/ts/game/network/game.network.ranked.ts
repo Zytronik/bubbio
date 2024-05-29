@@ -18,6 +18,7 @@ import { dto_ScoreScreen } from "./dto/game.network.dto.score-screen";
 import { GAME_INPUT } from "./i/game.network.i.game-input";
 import { InputFrame } from "../i/game.i.game-state-history";
 import { GameInstance } from "../i/game.i.game-instance";
+import { stopSoundtrack } from "@/ts/asset/asset.howler-load";
 
 const O_RANKED_MATCH_FOUND = "output_rankedMatchFound";
 const O_RANKED_SETUP_GAME_INSTANCE = "output_rankedSetupGameInstance";
@@ -174,6 +175,7 @@ function network_listenToIngameUpdates(): void {
             endScreenData.player2Data = data.player2Data;
             network_stopListeningToServer();
             eventBus.emit("vue_showEndScreen");
+            stopSoundtrack();
         });
         socket.on(O_RANKED_PREPARE_NEXT_ROUND, (data: dto_GameSetup) => {
             setupGameInstance(data);

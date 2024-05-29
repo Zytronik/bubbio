@@ -160,7 +160,7 @@ import { UserData } from '@/ts/page/i/page.i.user-data';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { BackButtonData } from './i/i-buttonData';
 import { transitionEndScreenPageToDashboard, transitionOutOfGame, transitionToGame } from '@/ts/page/page.css-transitions';
-import { playSound } from '@/ts/asset/asset.howler-load';
+import { playSound, playSoundtrack, stopSoundtrack } from '@/ts/asset/asset.howler-load';
 import NetworkEvaluation from '@/pages/game/NetworkEvaluation.vue';
 
 export default defineComponent({
@@ -218,6 +218,7 @@ export default defineComponent({
                 },()=>{
                     leaveGame();
                     showDashboard();
+                    playSoundtrack("menu_soundtrack");
                     backInput.fire = backInputOnLoad.value;
                 }, () => {
                     enableBackInputs();
@@ -231,7 +232,6 @@ export default defineComponent({
                     showDashboard();
                     isResultView.value = true;
                 }, ()=>{
-                    leaveGame();
                     isResultView.value = false;
                 });
                 backInput.fire = backInputOnLoad.value;
@@ -244,6 +244,7 @@ export default defineComponent({
                 disableBackInputs();
             },()=>{
                 showResultView();
+                playSoundtrack("menu_soundtrack");
             },()=>{
                 enableBackInputs();
                 enableResetInput();
@@ -253,6 +254,7 @@ export default defineComponent({
 
         function play() {
             playSound('button_play');
+            stopSoundtrack();
             backInput.fire = goBack;
             transitionToGame(() => {
                 startGame();

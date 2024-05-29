@@ -234,7 +234,7 @@ import { PlayerData } from '@/ts/game/network/dto/game.network.dto.end-screen';
 import { CountUp } from 'countup.js';
 import { formatDateToAgoText } from '@/ts/page/page.page-utils';
 import { transitionEndScreenPageToRankedDashboard, transitionOutOfGame } from '@/ts/page/page.css-transitions';
-import { playSound } from '@/ts/asset/asset.howler-load';
+import { playSound, playSoundtrack, stopSoundtrack } from '@/ts/asset/asset.howler-load';
 
 interface PlayerMatchmakingStats {
   userId: number;
@@ -370,6 +370,7 @@ export default {
       isInQueue.value = false;
       stopPassedTimeCountdown();
       playMatchFoundAnimation();
+      stopSoundtrack();
     }
 
     function playMatchFoundAnimation() {
@@ -475,6 +476,7 @@ export default {
         specialBackButtonBehavior.value = true;
         animateElo();
       }, () => {
+        playSoundtrack('menu_soundtrack');
         disableResetInput();
         backInput.fire = goBackToRankedPage;
         enableBackInputs();

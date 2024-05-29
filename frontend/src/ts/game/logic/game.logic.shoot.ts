@@ -7,6 +7,7 @@ import { Grid } from "../i/game.i.grid";
 import { Coordinates } from "../i/game.i.grid-coordinates";
 import { getGarbageAmount, receiveGarbageAndCheckDead } from "./game.logic.garbage";
 import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
+import { playSound } from "@/ts/asset/asset.howler-load";
 
 export function executeShot(playerGameInstance: GameInstance): void {
     let hasDied = shootBubble(playerGameInstance);
@@ -52,7 +53,7 @@ export function shootBubble(game: GameInstance): boolean {
     }
     const gridField = snapToNextEmptyField(grid, bubbleCoords);
     gridField.bubble = bubble;
-    const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type);
+    const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type, bounceAmount > 0);
     const attack = getGarbageAmount(bubblesCleared, game.stats.currentCombo, bounceAmount > 0)
     let defense = 0;
     game.stats.attack += attack;

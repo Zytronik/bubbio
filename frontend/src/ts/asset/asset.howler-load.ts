@@ -6,12 +6,17 @@ const audioFiles: Record<string, { path: string; volume: number }> = {
     menu_hover: { path: '/sounds/menu_hover.wav', volume: 0.1 },
     button_play: { path: '/sounds/button_play.wav', volume: 0.3 },
     menu_soundtrack: { path: '/sounds/menu_soundtrack.mp3', volume: 0.3 },
+    game_soundtrack: { path: '/sounds/game_soundtrack.mp3', volume: 0.3 },
     shoot: { path: '/sounds/shoot.mp3', volume: 0.3 },
     clear: { path: '/sounds/clear.mp3', volume: 0.5 },
     hold: { path: '/sounds/hold.mp3', volume: 0.1 },
     wallBounce: { path: '/sounds/wallBounce.mp3', volume: 0.3 },
     spike: { path: '/sounds/spike.mp3', volume: 0.3 },
     incomingGarbage: { path: '/sounds/incomingGarbage.mp3', volume: 0.3 },
+    countDown3: { path: '/sounds/countDown3.mp3', volume: 2 },
+    countDown2: { path: '/sounds/countDown2.mp3', volume: 2 },
+    countDown1: { path: '/sounds/countDown1.mp3', volume: 2 },
+    countDownGo: { path: '/sounds/countDownGo.mp3', volume: 2 },
 };
 
 Howler.volume(0.8); // Change global volume.
@@ -20,6 +25,7 @@ Howler.autoUnlock = true;
 export const sounds: Record<string, Howl> = {};
 
 export function playSound(sound: string) {
+    //console.log('playSound', sound);
     if (sounds[sound]) {
         sounds[sound].play();
     }
@@ -39,7 +45,9 @@ export function playSoundtrack(sound: string) {
         const soundtrackPlaying = localStorage.getItem('soundtrackPlaying');
         if (!howl.playing() && soundtrackPlaying !== sound) {
             howl.loop(true);
+            howl.volume(0);
             howl.play();
+            howl.fade(0, audioFiles[sound].volume, 5000); // Fade in over 5 seconds
             localStorage.setItem('soundtrackPlaying', sound);
         }
     }
