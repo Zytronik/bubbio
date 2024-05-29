@@ -17,8 +17,8 @@ export default {
   components: { GameModeLayout },
   setup() {
     const backButtonData = ref<BackButtonData[]>([
-      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/score.png'), disabled: false },
       { pageState: PAGE_STATE.sprintPage, iconSrc: require('@/img/icons/sprint.png'), disabled: true },
+      { pageState: PAGE_STATE.soloMenu, iconSrc: require('@/img/icons/score.png'), disabled: false },
     ]);
     const gameMode = GameMode.Score;
     const leaderboardFields = ['gameDuration', 'bubblesPerSecond'];

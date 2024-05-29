@@ -21,7 +21,7 @@ import { GAME_STATE } from "./i/game.e.state";
 import { getSprintSettings } from "./settings/game.settings.sprint";
 import { getHandlingSettings } from "./settings/game.settings.handling";
 import { getGridAsString, setupGrid } from "./logic/game.logic.grid-manager";
-import { playSound } from "../asset/asset.howler-load";
+import { playSound, playSoundtrack, stopSoundtrack } from "../asset/asset.howler-load";
 
 export const playerGameVisuals: GameVisuals = {
     asciiBoard: {
@@ -118,6 +118,7 @@ export function setupSprintGame(): void {
         playerGameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
         disableGameplay();
         eventBus.emit("sprintVictory");
+        stopSoundtrack();
     }
     function sprintDeath(): void {
         playerGameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
@@ -146,7 +147,6 @@ export function preparePlayerGameInstance(instance: GameInstance): void {
     playerGameInstance.gameTransitions = instance.gameTransitions;
 }
 
-
 export function startGame(): void {
     playerGameInstance.gameTransitions.onGameStart();
 }
@@ -155,6 +155,7 @@ export function resetGame(): void {
 }
 export function leaveGame(): void {
     playerGameInstance.gameTransitions.onGameLeave();
+    stopSoundtrack();
 }
 export function rankedGameStart(): void {
     showCountDownAndStart();
@@ -171,6 +172,7 @@ function showCountDownAndStart(): void {
         enableGameInputs();
         enableResetInput();
         playerGameInstance.stats.gameStartTime = performance.now();
+        playSoundtrack("game_soundtrack");
     }
 }
 export function setGameStateAndNotify(gameState: GAME_STATE): void {
@@ -193,7 +195,6 @@ export function disableGameplay(): void {
     stopASCIIAnimation();
     stopStatDisplay();
 }
-
 
 //Inputs
 let previousUpdate = 0;
@@ -258,11 +259,10 @@ export function triggerHold(): void {
     network_sendInputs(playerGameInstance);
     updateBubbleHistory();
 }
+
 export function debugTriggerGarbage(): void {
     playerGameInstance.queuedGarbage += 1;
 }
-
-
 
 function updateBoardHistory(): void {
     const boardFrame: BoardHistoryFrame = {

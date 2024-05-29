@@ -93,7 +93,7 @@ export function getNearbyFields(playGrid: Grid, pointPosition: Coordinates): Fie
     return nearbyFields;
 }
 
-export function dissolveBubbles(playGrid: Grid, collidedAtField: Field, colorToCheck: number): number {
+export function dissolveBubbles(playGrid: Grid, collidedAtField: Field, colorToCheck: number, isWallBounce: boolean): number {
     let dissolvedBubblesAmount = 0;
     const komma = ','
     const x = collidedAtField.coords.x;
@@ -102,7 +102,11 @@ export function dissolveBubbles(playGrid: Grid, collidedAtField: Field, colorToC
     const result = new Set<string>();
     findAdjacentBubbles(x, y, colorToCheck, visited, result);
     if (result.size >= 3) {
-        playSound("clear");
+        if(isWallBounce){
+            playSound("wallBounce");
+        }else{
+            playSound("clear");
+        }
         result.forEach(xyString => {
             const x = parseInt(xyString.split(komma)[0]);
             const y = parseInt(xyString.split(komma)[1]);
