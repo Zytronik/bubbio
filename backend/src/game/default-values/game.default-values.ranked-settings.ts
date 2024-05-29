@@ -19,7 +19,7 @@ export const rankedSettings: GameSettings = {
     bubbleBagSize: 7,
     garbageMaxAtOnce: 3,
     garbageCleanAmount: 3,
-    garbageColorAmount: 3,
+    garbageColorAmount: 7,
     garbageToKill: 30,
     countDownDuration: 3000,
 }
