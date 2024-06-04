@@ -219,7 +219,7 @@ function showASCIICountdownNumber(counter: number): string {
 
 const victoryASCII = `YOU WON!`;
 const defeatASCII = `YOU LOST!`;
-const countDown3 = `2`;
+const countDown3 = `3`;
 const countDown2 = `2`;
 const countDown1 = `1`;
 const countDownGO = `GO!`;

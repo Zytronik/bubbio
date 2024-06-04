@@ -3,7 +3,7 @@ import { Howl, Howler } from 'howler';
 const audioFiles: Record<string, { path: string; volume: number }> = {
     menu_back: { path: '/sounds/menu_back.wav', volume: 0.3 },
     menu_front: { path: '/sounds/menu_front.wav', volume: 0.3 },
-    menu_hover: { path: '/sounds/menu_hover.wav', volume: 0.1 },
+    menu_hover: { path: '/sounds/menu_hover.wav', volume: 0.05 },
     button_play: { path: '/sounds/button_play.wav', volume: 0.3 },
     menu_soundtrack: { path: '/sounds/menu_soundtrack.mp3', volume: 0.3 },
     game_soundtrack: { path: '/sounds/game_soundtrack.mp3', volume: 0.3 },
@@ -17,6 +17,8 @@ const audioFiles: Record<string, { path: string; volume: number }> = {
     countDown2: { path: '/sounds/countDown2.mp3', volume: 2 },
     countDown1: { path: '/sounds/countDown1.mp3', volume: 2 },
     countDownGo: { path: '/sounds/countDownGo.mp3', volume: 2 },
+    win: { path: '/sounds/win.wav', volume: 0.3 },
+    lose: { path: '/sounds/lose.wav', volume: 0.3 },
 };
 
 Howler.volume(0.8); // Change global volume.

@@ -119,10 +119,12 @@ export function setupSprintGame(): void {
         disableGameplay();
         eventBus.emit("sprintVictory");
         stopSoundtrack();
+        playSound("win");
     }
     function sprintDeath(): void {
         playerGameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
         disableGameplay();
+        playSound("lose");
     }
 }
 export function preparePlayerGameInstance(instance: GameInstance): void {
