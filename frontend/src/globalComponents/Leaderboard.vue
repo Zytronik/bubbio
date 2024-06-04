@@ -223,6 +223,7 @@ p {
   box-sizing: border-box;
   display: flex;
   align-items: center;
+  z-index: 1;
 }
 
 .cell > p {
