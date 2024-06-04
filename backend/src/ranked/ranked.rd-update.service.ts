@@ -7,8 +7,7 @@ import { subDays } from 'date-fns';
 export class RdUpdateService {
   constructor(private prisma: PrismaService) {}
 
-  //@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  @Cron("* 48 * * * *")
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async updateRdValues() {
     const sevenDaysAgo = subDays(new Date(), 7);
 
@@ -34,7 +33,7 @@ export class RdUpdateService {
       const lastGame2 = user.rankedGamesAsUser2[0]?.submittedAt;
       const lastPlayed = lastGame1 > lastGame2 ? lastGame1 : lastGame2;
 
-      if ((!lastPlayed || new Date(lastPlayed) < sevenDaysAgo) && user.ratingDeviation < 250) {
+      if ((!lastPlayed || new Date(lastPlayed) < sevenDaysAgo) && user.ratingDeviation < 350) {
         // Update the RD value for the user, ensuring it does not exceed 250
         console.log(`Updating RD for user ${user.id}`);
         await this.prisma.user.update({
