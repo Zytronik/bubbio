@@ -176,7 +176,7 @@ export default defineComponent({
     const currentId = ref(1);
     const speedFactor = ref(10);
     const mmSettings = ref<MmSettings>()
-    const amountOfMultipleUsers = ref(3000);
+    const amountOfMultipleUsers = ref(1000);
 
     onMounted(() => {
       changeBackgroundTo("black");
@@ -419,7 +419,7 @@ export default defineComponent({
     const chartCanvas = ref<any>(null);
     const chartInstance = ref<any>(null);
 
-    const debouncedUpdateChart = debounce(updateChart, 1000);
+    const debouncedUpdateChart = debounce(updateChart, 10000);
 
     function updateChart() {
       if (!chartCanvas.value || !chartCanvas.value.getContext) {

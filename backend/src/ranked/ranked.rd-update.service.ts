@@ -7,7 +7,8 @@ import { subDays } from 'date-fns';
 export class RdUpdateService {
   constructor(private prisma: PrismaService) {}
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  //@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron("0 37 * * * *")
   async updateRdValues() {
     const sevenDaysAgo = subDays(new Date(), 7);
 
