@@ -71,4 +71,17 @@ export function getUserOnlineStatus(username: string): Promise<boolean>{
     });
 }
 
+export async function getSprintRecord(id: string) {
+    const token = localStorage.getItem('authToken');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    try {
+        const response = await httpClient.get(`/sprint/${id}`, {
+            headers: headers
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch sprint records: ", error);
+        return undefined;
+    }
+}
 

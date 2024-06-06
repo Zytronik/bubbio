@@ -217,4 +217,11 @@ export class SprintService {
         });
     }
 
+    async getSprint(sprintId: string) {
+        return await this.prisma.sprint.findUnique({
+            where: {
+                id: parseInt(sprintId),
+            },
+        });
+    }
 }

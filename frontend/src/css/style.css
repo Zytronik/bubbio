@@ -209,8 +209,8 @@ button.goBackButton:focus {
     border-top: 5vh solid transparent;
     border-right: 10vh solid black;
     border-bottom: 5vh solid transparent;
-    right: calc(-10vh - 1px);
-    top: calc(-5vh + 1px);
+    right: calc(-10vh - 2px);
+    top: -5vh;
 }
 
 .openChannelButton .triangle-left {
@@ -219,7 +219,7 @@ button.goBackButton:focus {
     height: 0px;
     border-top: calc(5vh + 2px) solid transparent;
     border-right: calc(10vh + 2px) solid rgb(41, 41, 41);
-    border-bottom: calc(5vh + 2px) solid transparent;
+    border-bottom: calc(5vh + 1px) solid transparent;
     right: 100%;
     top: -2px;
 }
@@ -230,7 +230,7 @@ button.goBackButton:focus {
     height: 0px;
     border-top: calc(5vh + 2px) solid transparent;
     border-left: calc(10vh + 2px) solid rgb(41, 41, 41);
-    border-bottom: calc(5vh + 2px) solid transparent;
+    border-bottom: calc(5vh + 1px) solid transparent;
     left: 100%;
     top: -2px;
 
@@ -244,8 +244,8 @@ button.goBackButton:focus {
     border-top: 5vh solid transparent;
     border-left: 10vh solid black;
     border-bottom: 5vh solid transparent;
-    left: calc(-10vh - 1px);
-    top: calc(-5vh + 1px);
+    left: calc(-10vh - 2px);
+    top: -5vh;
 
 }
 

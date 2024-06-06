@@ -25,7 +25,7 @@
                         <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
                             <Leaderboard :gameMode="gameMode" :fields="leaderboardFields" :sortBy="leaderboardSortByField"
                                 :sortDirection="SortDirection.Asc" :leaderboardCategory="LeaderboardCategory.Global"
-                                :limit="30" />
+                                :limit="30"  />
                         </div>
                         <div v-if="currentLeaderboard === 'National'" class="l-tab national-tab">
                             <Leaderboard :gameMode="gameMode" :fields="leaderboardFields" :sortBy="leaderboardSortByField"
@@ -56,7 +56,7 @@
                         <p class="diff" v-if="diffToPb">Diff to pb: {{ formatTimeNumberToString(diffToPb ?? 0) }}</p>
                         <p class="pb" v-if="diffToPb === 0">Personal Best!</p>
                     </div>
-                    <button class="retry" @click="play()">Retry</button>
+                    <button v-if="!hideRetryButton" class="retry" @click="play()">Retry</button>
                 </div>
                 <LineChart v-if="resultStats" :data="resultStats.bpsGraph ?? []" />
                 <div v-if="resultStats">
@@ -152,14 +152,14 @@ import { formatDateTime } from '@/ts/page/page.page-utils';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
 import { formatFieldValue, getFullName } from '@/ts/page/i/page.i.stat-display';
 import { triggerConfettiAnimation } from '@/ts/page/page.visuals';
-import { getSprintDifferenceToPB } from '@/ts/page/page.page-requests';
+import { getSprintDifferenceToPB, getSprintRecord } from '@/ts/page/page.page-requests';
 import { disableBackInputs, disableResetInput, enableBackInputs, enableResetInput } from '@/ts/input/input.input-manager';
 import { backInput, resetInput } from '@/ts/input/input.all-inputs';
 import eventBus from '@/ts/page/page.event-bus';
 import { UserData } from '@/ts/page/i/page.i.user-data';
 import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { BackButtonData } from './i/i-buttonData';
-import { transitionEndScreenPageToDashboard, transitionOutOfGame, transitionToGame } from '@/ts/page/page.css-transitions';
+import { transitionDashboardToResultView, transitionEndScreenPageToDashboard, transitionOutOfGame, transitionToGame } from '@/ts/page/page.css-transitions';
 import { playSound, playSoundtrack, stopSoundtrack } from '@/ts/asset/asset.howler-load';
 import NetworkEvaluation from '@/pages/game/NetworkEvaluation.vue';
 
@@ -185,7 +185,7 @@ export default defineComponent({
             required: true,
         },
     },
-    setup() {
+    setup(props) {
         const specialBackButtonBehavior = ref(false);
         const currentLeaderboard = ref<string>('Global');
         const leaderboardTabs = ref<string[]>(['Global', 'National', 'Me']);
@@ -199,13 +199,16 @@ export default defineComponent({
         const isGuest = Boolean(isGuestString && isGuestString.toLowerCase() === 'true');
         const backInputOnLoad = ref<() => void>(() => "");
         const diffToPb = ref<number | undefined>(0);
+        const hideRetryButton = ref<boolean>(false);
 
         onUnmounted(() => {
             eventBus.off("sprintVictory");
+            eventBus.off("leaderboardRecordClicked");
         });
 
         onMounted(() => {
             eventBus.on("sprintVictory", transitionToResultView);
+            eventBus.on("leaderboardRecordClicked", leaderboardRecordClicked);
             backInputOnLoad.value = backInput.fire;
         });
 
@@ -243,7 +246,7 @@ export default defineComponent({
                 disableResetInput();
                 disableBackInputs();
             },()=>{
-                showResultView();
+                showResultView(playerGameInstance.stats);
                 playSoundtrack("menu_soundtrack");
             },()=>{
                 enableBackInputs();
@@ -270,6 +273,7 @@ export default defineComponent({
             isDashboard.value = true;
             isResultView.value = false;
             specialBackButtonBehavior.value = false;
+            hideRetryButton.value = false;
         }
 
         function showGameView() {
@@ -277,10 +281,14 @@ export default defineComponent({
             isDashboard.value = false;
             isResultView.value = false;
             specialBackButtonBehavior.value = false;
+            hideRetryButton.value = false;
         }
 
-        async function showResultView() {
-            resultStats.value = playerGameInstance.stats;
+        async function showResultView(stats: Partial<GameStats>) {
+            isResultView.value = true;
+            isGaming.value = false;
+            isDashboard.value = false;
+            resultStats.value = stats;
             if(!isGuest){
                 if (resultStats.value.gameDuration !== undefined) {
                     diffToPb.value = await getSprintDifferenceToPB(resultStats.value.gameDuration);
@@ -292,9 +300,6 @@ export default defineComponent({
                 diffToPb.value = undefined;
             }
             specialBackButtonBehavior.value = true;
-            isGaming.value = false;
-            isDashboard.value = false;
-            isResultView.value = true;
         }
 
         function openNetworkEvaluation() {
@@ -313,6 +318,22 @@ export default defineComponent({
             isResultView.value = true;
             isNetworkEval.value = false;
             specialBackButtonBehavior.value = false;
+        }
+
+        async function leaderboardRecordClicked(id: string) {
+            if(props.gameMode === GameMode.Sprint){
+                const sprint = await getSprintRecord(id);
+                sprint["bpsGraph"] = JSON.parse(sprint["bpsGraph"]);
+                transitionDashboardToResultView('.gameMode-dashboard', '.gameComplete', () => {
+                    disableResetInput();
+                    showResultView(sprint);
+                    hideRetryButton.value = true;
+                    isDashboard.value = true;
+                }, ()=>{
+                    isDashboard.value = false;
+                });
+                backInput.fire = backInputOnLoad.value;
+            }
         }
 
         return {
@@ -343,6 +364,10 @@ export default defineComponent({
             openNetworkEvaluation,
             isNetworkEval,
             closeNetworkEvaluation,
+            leaderboardRecordClicked,
+            getSprintRecord,
+            transitionDashboardToResultView,
+            hideRetryButton,
         };
     },
 });
@@ -401,7 +426,7 @@ export default defineComponent({
 }
 
 .resultValue {
-    width: 70%;
+    width: 100%;
     border: 1px solid white;
     display: flex;
     justify-content: center;

@@ -75,11 +75,11 @@
                   </div>
                 </div>
               </transition>
-              <transition name="fade">
+              <!-- <transition name="fade">
                 <div v-if="currentTab === 'Leaderboards'" class="tab-content">
                   <LeaderboardsTab />
                 </div>
-              </transition>
+              </transition> -->
               <transition name="fade">
                 <div v-if="currentTab === 'Spectate'" class="tab-content">
                   <SpectateTab />
@@ -134,7 +134,7 @@ import { httpClient } from '@/ts/networking/networking.http-client';
 import axios from 'axios';
 import UserProfileOverlay from '../UserProfileOverlay.vue';
 import SpectateTab from './components/SpectateTab.vue';
-import LeaderboardsTab from './components/LeaderboardsTab.vue';
+//import LeaderboardsTab from './components/LeaderboardsTab.vue';
 import state from '@/ts/networking/networking.client-websocket';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
 import useChatStore from '@/ts/page/page.globalChat';
@@ -150,11 +150,11 @@ import { playSound } from '@/ts/asset/asset.howler-load';
 
 export default {
   name: "ChannelOverlay",
-  components: { UserProfileOverlay, SpectateTab, LeaderboardsTab },
+  components: { UserProfileOverlay, SpectateTab/* , LeaderboardsTab */ },
   data() {
     return {
       currentTab: 'Dashboard',
-      tabs: ['Dashboard', 'Leaderboards', 'Spectate'],
+      tabs: ['Dashboard', /* 'Leaderboards', */ 'Spectate'],
     };
   },
   setup() {
