@@ -284,7 +284,7 @@ export default defineComponent({
             hideRetryButton.value = false;
         }
 
-        async function showResultView(stats: Partial<GameStats>) {
+        async function showResultView(stats: Partial<GameStats>, isRun = true) {
             isResultView.value = true;
             isGaming.value = false;
             isDashboard.value = false;
@@ -293,7 +293,7 @@ export default defineComponent({
                 if (resultStats.value.gameDuration !== undefined) {
                     diffToPb.value = await getSprintDifferenceToPB(resultStats.value.gameDuration);
                 }
-                if (diffToPb.value === 0) {
+                if (diffToPb.value === 0 && isRun) {
                     triggerConfettiAnimation(".page-container");
                 }
             }else{
@@ -323,10 +323,12 @@ export default defineComponent({
         async function leaderboardRecordClicked(id: string) {
             if(props.gameMode === GameMode.Sprint){
                 const sprint = await getSprintRecord(id);
+                console.log(sprint["bpsGraph"]);
                 sprint["bpsGraph"] = JSON.parse(sprint["bpsGraph"]);
+                console.log(sprint);
                 transitionDashboardToResultView('.gameMode-dashboard', '.gameComplete', () => {
                     disableResetInput();
-                    showResultView(sprint);
+                    showResultView(sprint, false);
                     hideRetryButton.value = true;
                     isDashboard.value = true;
                 }, ()=>{
