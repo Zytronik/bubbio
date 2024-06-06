@@ -72,9 +72,31 @@
             <h2>Audio Settings</h2>
             <div class="audio-settings">
               <div class="audio-setting setting">
-                <div>
-                  <h3>Volume</h3>
-                  <p>Adjust the volume of the game.</p>
+                <div class="desc" :title="MUSIC_VOLUME.description">
+                  <h3>{{ MUSIC_VOLUME.name }}</h3>
+                </div>
+                <div class="keys">
+                  <div @click="resetMusicVolume" class="resetColumn">
+                    <span>Reset</span>
+                  </div>
+                  <div class="slidecontainer">
+                    <input v-model="musicVolumeValue" @input="updateMusicVolume" @change="updateMusicVolume" type="range" :min="MUSIC_VOLUME.min" :max="MUSIC_VOLUME.max" step="0.01" class="slider" id="musicVolumeRange">
+                    <p>Value: <span>{{ Math.round(musicVolumeValue * 100) }}%</span></p>
+                  </div>
+                </div>
+              </div>
+              <div class="audio-setting setting">
+                <div class="desc" :title="SFX_VOLUME.description">
+                  <h3>{{ SFX_VOLUME.name }}</h3>
+                </div>
+                <div class="keys">
+                  <div @click="resetSfxVolume" class="resetColumn">
+                    <span>Reset</span>
+                  </div>
+                  <div class="slidecontainer">
+                    <input v-model="sfxVolumeValue" @input="updateSfxVolume" @change="updateSfxVolume" type="range" :min="SFX_VOLUME.min" :max="SFX_VOLUME.max" step="0.01" class="slider" id="sfxVolumeRange">
+                    <p>Value: <span>{{ Math.round(sfxVolumeValue * 100) }}%</span></p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -133,6 +155,7 @@ import eventBus from '@/ts/page/page.event-bus';
 import { allInputs } from '@/ts/input/input.all-inputs';
 import { Input } from '@/ts/input/i/input.i.input';
 import { DEFAULT_APS, TOGGLE_APS } from '@/ts/game/settings/ref/game.settings.ref.all-handling-settings';
+import { MUSIC_VOLUME, SFX_VOLUME, resetMusicVolume, resetSfxVolume, setMusicVolume, setSfxVolume } from '@/ts/asset/asset.howler-load';
 
 export default {
   name: 'ConfigPage',
@@ -276,6 +299,24 @@ export default {
       },
     });
 
+    const musicVolumeValue = computed({
+      get() {
+        return MUSIC_VOLUME.refNumber.value;
+      },
+      set(newValue) {
+        MUSIC_VOLUME.refNumber.value = newValue;
+      },
+    });
+
+    const sfxVolumeValue = computed({
+      get() {
+        return SFX_VOLUME.refNumber.value;
+      },
+      set(newValue) {
+        SFX_VOLUME.refNumber.value = newValue;
+      },
+    });
+
     function updateDefaultAPS(){
       const sliderEle = document.getElementById('defaultApsRange') as HTMLInputElement;
       const sliderValueEle = sliderEle.nextElementSibling?.querySelector('span');
@@ -291,6 +332,26 @@ export default {
       if (!sliderValueEle) return;
       sliderValueEle.innerText = sliderEle.value;
       TOGGLE_APS.refNumber.value = parseInt(sliderEle.value);
+      saveSettings();
+    }
+
+    function updateMusicVolume(){
+      const sliderEle = document.getElementById('musicVolumeRange') as HTMLInputElement;
+      const sliderValueEle = sliderEle.nextElementSibling?.querySelector('span');
+      if (!sliderValueEle) return;
+      const floatValue = parseFloat(sliderEle.value);
+      sliderValueEle.innerText = Math.round(floatValue * 100).toString() + "%";
+      setMusicVolume(floatValue);      
+      saveSettings();
+    }
+
+    function updateSfxVolume(){
+      const sliderEle = document.getElementById('sfxVolumeRange') as HTMLInputElement;
+      const sliderValueEle = sliderEle.nextElementSibling?.querySelector('span');
+      if (!sliderValueEle) return;
+      const floatValue = parseFloat(sliderEle.value);
+      sliderValueEle.innerText = Math.round(floatValue * 100).toString() + "%";
+      setSfxVolume(floatValue);
       saveSettings();
     }
 
@@ -324,6 +385,16 @@ export default {
       resetSlider,
       defaultApsValue,
       toggleApsValue,
+      MUSIC_VOLUME,
+      SFX_VOLUME,
+      musicVolumeValue,
+      sfxVolumeValue,
+      updateMusicVolume,
+      updateSfxVolume,
+      setSfxVolume,
+      setMusicVolume,
+      resetMusicVolume,
+      resetSfxVolume,
     }
   }
 }
@@ -381,7 +452,8 @@ button.logOutBtn:hover {
 }
 
 .input-setting,
-.handling-setting {
+.handling-setting,
+.audio-setting {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -389,13 +461,15 @@ button.logOutBtn:hover {
 }
 
 .input-setting .desc,
-.handling-setting .desc {
+.handling-setting .desc,
+.audio-setting .desc {
   width: 30%;
   position: relative;
 }
 
 .input-setting .keys,
-.handling-setting .keys {
+.handling-setting .keys,
+.audio-setting .keys {
   width: 70%;
   display: flex;
   flex-direction: row;
@@ -403,7 +477,8 @@ button.logOutBtn:hover {
 }
 
 .input-setting .keys,
-.handling-setting .keys{
+.handling-setting .keys,
+.audio-setting .keys{
   display: flex;
   flex-direction: row;
 }
@@ -412,6 +487,9 @@ button.logOutBtn:hover {
 .handling-setting .resetColumn,
 .handling-setting .keys .slidecontainer > p,
 .handling-setting .desc,
+.audio-setting .resetColumn,
+.audio-setting .keys .slidecontainer > p,
+.audio-setting .desc,
 .input-setting .desc,
 .input-setting .customKeys>div {
   background-color: rgb(53, 53, 53);
@@ -423,24 +501,28 @@ button.logOutBtn:hover {
 }
 
 .input-setting .resetColumn,
-.handling-setting .resetColumn {
+.handling-setting .resetColumn,
+.audio-setting .resetColumn {
   background-color: rgb(53, 53, 53);
   transition: 200ms;
   cursor: pointer;
 }
 
 .input-setting .resetColumn:hover
-.handling-setting .resetColumn:hover {
+.handling-setting .resetColumn:hover,
+.audio-setting .resetColumn:hover{
   background-color: rgb(73, 73, 73);
 }
 
 .input-setting .desc,
-.handling-setting .desc {
+.handling-setting .desc,
+.audio-setting .desc {
   justify-content: flex-start;
 }
 
 .input-setting .keys .resetColumn,
-.handling-setting .keys .resetColumn {
+.handling-setting .keys .resetColumn,
+.audio-setting .keys .resetColumn {
   width: 15%;
   position: relative;
   opacity: 0.7;
@@ -453,12 +535,14 @@ button.logOutBtn:hover {
   transition: 300ms;
 }
 
-.handling-setting .keys .slidecontainer>p {
+.handling-setting .keys .slidecontainer>p,
+.audio-setting .keys .slidecontainer>p {
   width: 10%;
   background-color: unset;
 }
 
-.handling-setting .keys .slidecontainer>p>span {
+.handling-setting .keys .slidecontainer>p>span,
+.audio-setting .keys .slidecontainer>p>span {
   min-width: 50%;
   margin-left: 10px;
 }
@@ -468,7 +552,8 @@ button.logOutBtn:hover {
 }
 
 .input-setting h3,
-.handling-setting h3 {
+.handling-setting h3,
+.audio-setting h3 {
   margin-bottom: unset;
 }
 
@@ -491,7 +576,8 @@ button.logOutBtn:hover {
 }
 
 .input-setting .keys .customKeys,
-.handling-setting .keys .slidecontainer {
+.handling-setting .keys .slidecontainer,
+.audio-setting .keys .slidecontainer {
   width: 85%;
   display: flex;
   flex-direction: row;
