@@ -5,12 +5,14 @@
         <div class="page-container">
             <div v-if="isDashboard" class="gameMode-dashboard page-dashboard">
                 <div class="content-title">
-                    <h1><span class="text-noWhiteSpaces">{{ gameMode[0] }}</span><span class="text-noWhiteSpaces">{{ gameMode.slice(1) }}</span></h1>
+                    <h1><span class="text-noWhiteSpaces">{{ gameMode[0] }}</span><span class="text-noWhiteSpaces">{{
+                            gameMode.slice(1) }}</span></h1>
                 </div>
                 <div class="play-wrapper">
-                        <button @mouseenter="playSound('menu_hover')" v-if="gameMode != 'score'" class="playButton" @click="play()"><span>Play</span></button>
-                        <p v-else><br>Highscore Mode is not available yet.</p>
-                    </div>
+                    <button @mouseenter="playSound('menu_hover')" v-if="gameMode != 'score'" class="playButton"
+                        @click="play()"><span>Play</span></button>
+                    <p v-else><br>Highscore Mode is not available yet.</p>
+                </div>
                 <div class="content">
                     <div class="content-wrapper">
                         <div class="l-tab-buttons">
@@ -23,19 +25,19 @@
                             </button>
                         </div>
                         <div v-if="currentLeaderboard === 'Global'" class="l-tab global-tab">
-                            <Leaderboard :gameMode="gameMode" :fields="leaderboardFields" :sortBy="leaderboardSortByField"
-                                :sortDirection="SortDirection.Asc" :leaderboardCategory="LeaderboardCategory.Global"
-                                :limit="30"  />
+                            <Leaderboard :gameMode="gameMode" :fields="leaderboardFields"
+                                :sortBy="leaderboardSortByField" :sortDirection="SortDirection.Asc"
+                                :leaderboardCategory="LeaderboardCategory.Global" :limit="30" />
                         </div>
                         <div v-if="currentLeaderboard === 'National'" class="l-tab national-tab">
-                            <Leaderboard :gameMode="gameMode" :fields="leaderboardFields" :sortBy="leaderboardSortByField"
-                                :sortDirection="SortDirection.Asc" :leaderboardCategory="LeaderboardCategory.National"
-                                :limit="30" />
+                            <Leaderboard :gameMode="gameMode" :fields="leaderboardFields"
+                                :sortBy="leaderboardSortByField" :sortDirection="SortDirection.Asc"
+                                :leaderboardCategory="LeaderboardCategory.National" :limit="30" />
                         </div>
                         <div v-if="currentLeaderboard === 'Me'" class="l-tab national-tab">
                             <History v-if="!isGuest" :gameMode="gameMode"
-                            :fields="['submittedAt', 'bubblesCleared', 'gameDuration', 'bubblesPerSecond']"
-                            :sortBy="'submittedAt'" :sortDirection="SortDirection.Desc" :limit="10" />
+                                :fields="['submittedAt', 'bubblesCleared', 'gameDuration', 'bubblesPerSecond']"
+                                :sortBy="'submittedAt'" :sortDirection="SortDirection.Desc" :limit="10" />
                             <h4 v-else><br>Log in for Stats and Submit Scores.</h4>
                         </div>
                     </div>
@@ -47,7 +49,10 @@
             </div>
 
             <div v-if="isResultView" class="gameComplete">
-                <button @click="openNetworkEvaluation()">Network Evaluation</button>
+                <div class="topbar">
+                    <button @click="openNetworkEvaluation()">Network Evaluation</button>
+                    <p v-if="sprintRecordDate">{{ sprintRecordDate }}</p>
+                </div>
                 <div class="top">
                     <div class="resultValue">
                         <p v-if="resultStats" class="rValue">{{ formatTimeNumberToString(resultStats.gameDuration ?? 0)
@@ -131,7 +136,7 @@
 
             <div v-if="isNetworkEval">
                 <button @click="closeNetworkEvaluation()">Result Screen</button>
-                <NetworkEvaluation/>
+                <NetworkEvaluation />
             </div>
         </div>
     </div>
@@ -148,7 +153,7 @@ import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import { leaveGame, playerGameInstance, playerGameVisuals, setupSprintGame, startGame } from '@/ts/game/game.master';
 import { goToState } from '@/ts/page/page.page-manager';
 import { formatTimeNumberToString } from '@/ts/game/visuals/game.visuals.stat-display';
-import { formatDateTime } from '@/ts/page/page.page-utils';
+import { formatDateTime, formatDateToAgoText } from '@/ts/page/page.page-utils';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
 import { formatFieldValue, getFullName } from '@/ts/page/i/page.i.stat-display';
 import { triggerConfettiAnimation } from '@/ts/page/page.visuals';
@@ -200,6 +205,7 @@ export default defineComponent({
         const backInputOnLoad = ref<() => void>(() => "");
         const diffToPb = ref<number | undefined>(0);
         const hideRetryButton = ref<boolean>(false);
+        const sprintRecordDate = ref<string>('');
 
         onUnmounted(() => {
             eventBus.off("sprintVictory");
@@ -246,6 +252,7 @@ export default defineComponent({
         }
 
         function transitionToResultView() {
+            sprintRecordDate.value = "";
             transitionOutOfGame(false, ()=>{
                 disableResetInput();
                 disableBackInputs();
@@ -329,6 +336,8 @@ export default defineComponent({
                 playSound('menu_front');
                 const sprint = await getSprintRecord(id);
                 sprint["bpsGraph"] = JSON.parse(sprint["bpsGraph"]);
+                console.log(sprint);
+                sprintRecordDate.value = formatDateToAgoText(sprint.submittedAt);
                 transitionDashboardToResultView('.gameMode-dashboard', '.gameComplete', () => {
                     disableResetInput();
                     disableBackInputs();
@@ -374,6 +383,7 @@ export default defineComponent({
             getSprintRecord,
             transitionDashboardToResultView,
             hideRetryButton,
+            sprintRecordDate,
         };
     },
 });
@@ -458,6 +468,18 @@ export default defineComponent({
 
 .gameComplete .top {
     height: 15%;
+}
+
+.gameComplete .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.gameComplete .topbar p {
+    font-size: 150%;
+    margin: unset;
 }
 
 .back-buttons{
