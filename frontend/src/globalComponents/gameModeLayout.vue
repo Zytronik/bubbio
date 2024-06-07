@@ -336,7 +336,6 @@ export default defineComponent({
                 playSound('menu_front');
                 const sprint = await getSprintRecord(id);
                 sprint["bpsGraph"] = JSON.parse(sprint["bpsGraph"]);
-                console.log(sprint);
                 sprintRecordDate.value = formatDateToAgoText(sprint.submittedAt);
                 transitionDashboardToResultView('.gameMode-dashboard', '.gameComplete', () => {
                     disableResetInput();

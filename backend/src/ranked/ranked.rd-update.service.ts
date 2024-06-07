@@ -35,7 +35,6 @@ export class RdUpdateService {
 
       if ((!lastPlayed || new Date(lastPlayed) < sevenDaysAgo) && user.ratingDeviation < 350) {
         // Update the RD value for the user, ensuring it does not exceed 250
-        console.log(`Updating RD for user ${user.id}`);
         await this.prisma.user.update({
           where: { id: user.id },
           data: { ratingDeviation: { increment: 1 } },

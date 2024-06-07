@@ -61,8 +61,6 @@ export class SprintService {
                 throw new Error('User does not exist');
             }
 
-            console.log(sprintStats.bpsGraph);
-
             return await this.prisma.sprint.create({
                 data: {
                     userId: userId,

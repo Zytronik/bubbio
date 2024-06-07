@@ -3,7 +3,7 @@ import state from "../../networking/networking.client-websocket";
 import { dto_VersusScreen } from "./dto/game.network.dto.vs-screen";
 import { dto_GameSetup } from "./dto/game.network.dto.game-setup";
 import { disableGameplay, playerGameInstance, playerGameVisuals, preparePlayerGameInstance, rankedGameStart, startGame } from "../game.master";
-import { createGameInstance, getEmptyStats } from "../logic/game.logic.instance-creator";
+import { createGameInstance } from "../logic/game.logic.instance-creator";
 import { GameTransitions } from "../i/game.i.game-transitions";
 import { getHandlingSettings } from "../settings/game.settings.handling";
 import { disableBackInputs, disableChannelInput, disableResetInput } from "@/ts/input/input.input-manager";
@@ -12,7 +12,7 @@ import { GAME_STATE } from "../i/game.e.state";
 import { network_listenToQueuedInputsIndex, network_sendInputs, network_stopListenToQueuedInputsIndex } from "./game.network.game";
 import { dto_GameInstance } from "./dto/game.network.dto.game-instance";
 import { GameVisuals, getEmptyGameVisuals } from "../visuals/i/game.visuals.i.game-visuals";
-import { fillStatStrings, resetStatDisplays } from "../visuals/game.visuals.stat-display";
+import { resetStatDisplays } from "../visuals/game.visuals.stat-display";
 import { dto_EndScreen } from "./dto/game.network.dto.end-screen";
 import { dto_ScoreScreen } from "./dto/game.network.dto.score-screen";
 import { GAME_INPUT } from "./i/game.network.i.game-input";
@@ -203,6 +203,7 @@ function setupGameInstance(data: dto_GameSetup): void {
             disableGameplay();
         },
     };
+    /* eslint-disable */
     const onGarbageSend = function (amount: number): void { }
     /* eslint-enable @typescript-eslint/no-empty-function */
     const instance = createGameInstance(

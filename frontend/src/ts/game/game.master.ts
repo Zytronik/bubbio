@@ -79,6 +79,7 @@ export const playerGameInstance: GameInstance = {
         onGameDefeat: () => { },
         onGameVictory: () => { },
     },
+    // eslint-disable-next-line
     sendGarbage: (garbageAmount: number) => { }
     /* eslint-enable @typescript-eslint/no-empty-function */
 };
@@ -107,6 +108,7 @@ export function setupSprintGame(): void {
         onGameDefeat: sprintDeath,
         onGameVictory: sprintVictory,
     }
+    // eslint-disable-next-line
     const onGarbageSend = function (garbageAmount: number): void { console.log("show fancy grafix") }
     const startSeed = getNextSeed(Date.now());
     const instance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed, "none", onGarbageSend);

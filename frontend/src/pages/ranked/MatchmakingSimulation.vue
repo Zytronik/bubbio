@@ -416,7 +416,9 @@ export default defineComponent({
       statistics.value.lowestRatingDifference = Math.min(statistics.value.lowestRatingDifference, ratingDifference);
     }
 
+    // eslint-disable-next-line
     const chartCanvas = ref<any>(null);
+    // eslint-disable-next-line
     const chartInstance = ref<any>(null);
 
     const debouncedUpdateChart = debounce(updateChart, 10000);
@@ -483,6 +485,7 @@ export default defineComponent({
         chartInstance.value.destroy();
       }
 
+      // eslint-disable-next-line
       const config: any = {
         type: 'line',
         data: data,

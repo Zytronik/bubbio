@@ -7,7 +7,6 @@ import { Grid } from "../i/game.i.grid";
 import { Coordinates } from "../i/game.i.grid-coordinates";
 import { getGarbageAmount, receiveGarbageAndCheckDead } from "./game.logic.garbage";
 import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
-import { playSound } from "@/ts/asset/asset.howler-load";
 
 export function executeShot(playerGameInstance: GameInstance): void {
     const shootResult = shootBubble(playerGameInstance);

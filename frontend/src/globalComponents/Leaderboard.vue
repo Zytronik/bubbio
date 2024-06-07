@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, onUnmounted, PropType, ref, SetupContext } from 'vue';
+import { computed, defineComponent, onMounted, onUnmounted, PropType, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
@@ -99,7 +99,7 @@ export default defineComponent({
       default: 20,
     },
   },
-  setup(props, { emit }: SetupContext) {
+  setup(props) {
     const leaderboard = ref<LeaderboardEntry[]>([]);
     const loading = ref<boolean>(true);
     const noEntries = ref<boolean>(false);

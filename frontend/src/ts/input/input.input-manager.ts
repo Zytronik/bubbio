@@ -3,7 +3,6 @@ import { MUSIC_VOLUME, SFX_VOLUME } from "../asset/asset.howler-load";
 import { angleCenter, angleLeft, angleRight, changeAPS, debugTriggerGarbage, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
 import { network_clearOngoingGames, network_getOngoingGames } from "../game/network/game.network.debug";
 import { DEFAULT_APS, TOGGLE_APS } from "../game/settings/ref/game.settings.ref.all-handling-settings";
-import { NumberSetting } from "../game/settings/ref/i/game.settings.ref.i.number-setting";
 import { checkUserAuthentication } from "../networking/networking.auth";
 import { httpClient } from "../networking/networking.http-client";
 import { openChannelOverlay } from "../page/page.page-manager";
