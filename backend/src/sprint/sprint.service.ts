@@ -14,7 +14,6 @@ export class SprintService {
     ) { }
 
     async saveSprintToDB(userId: number, sprintStats: GameStats): Promise<any> {
-        console.log(userId);
         // Create Sprint
         const newSprint = await this.createSprint(userId, sprintStats);
         const sprintTime = sprintStats.gameDuration;
@@ -61,6 +60,8 @@ export class SprintService {
             if (!userExists) {
                 throw new Error('User does not exist');
             }
+
+            console.log(sprintStats.bpsGraph);
 
             return await this.prisma.sprint.create({
                 data: {

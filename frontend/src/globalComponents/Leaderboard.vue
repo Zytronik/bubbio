@@ -160,7 +160,6 @@ export default defineComponent({
       });
     }
 
-
     function removeLeaderboardClickEvents() {
       // eslint-disable-next-line
       const leaderboardRecords = document.querySelectorAll('.leaderboard .row') as NodeListOf<HTMLElement>;

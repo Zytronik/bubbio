@@ -204,11 +204,13 @@ export default defineComponent({
         onUnmounted(() => {
             eventBus.off("sprintVictory");
             eventBus.off("leaderboardRecordClicked");
+            eventBus.off("historyRecordClicked");
         });
 
         onMounted(() => {
             eventBus.on("sprintVictory", transitionToResultView);
-            eventBus.on("leaderboardRecordClicked", leaderboardRecordClicked);
+            eventBus.on("leaderboardRecordClicked", recordClicked);
+            eventBus.on("historyRecordClicked", recordClicked);
             backInputOnLoad.value = backInput.fire;
         });
 
@@ -232,12 +234,14 @@ export default defineComponent({
             if (isResultView.value) {
                 transitionEndScreenPageToDashboard('.gameMode-dashboard', '.gameComplete', () => {
                     disableResetInput();
+                    disableBackInputs();
                     showDashboard();
                     isResultView.value = true;
                 }, ()=>{
+                    backInput.fire = backInputOnLoad.value;
+                    enableBackInputs();
                     isResultView.value = false;
                 });
-                backInput.fire = backInputOnLoad.value;
             }
         }
 
@@ -320,21 +324,21 @@ export default defineComponent({
             specialBackButtonBehavior.value = false;
         }
 
-        async function leaderboardRecordClicked(id: string) {
+        async function recordClicked(id: string) {
             if(props.gameMode === GameMode.Sprint){
+                playSound('menu_front');
                 const sprint = await getSprintRecord(id);
-                console.log(sprint);
                 sprint["bpsGraph"] = JSON.parse(sprint["bpsGraph"]);
-                console.log(sprint);
                 transitionDashboardToResultView('.gameMode-dashboard', '.gameComplete', () => {
                     disableResetInput();
+                    disableBackInputs();
                     showResultView(sprint, false);
                     hideRetryButton.value = true;
                     isDashboard.value = true;
                 }, ()=>{
+                    enableBackInputs();
                     isDashboard.value = false;
                 });
-                backInput.fire = backInputOnLoad.value;
             }
         }
 
@@ -366,7 +370,7 @@ export default defineComponent({
             openNetworkEvaluation,
             isNetworkEval,
             closeNetworkEvaluation,
-            leaderboardRecordClicked,
+            recordClicked,
             getSprintRecord,
             transitionDashboardToResultView,
             hideRetryButton,

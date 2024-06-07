@@ -23,7 +23,7 @@ import { dto_CountDown } from './network/dto/game.network.dto.count-down';
 import { dto_ScoreScreen } from './network/dto/game.network.dto.score-screen';
 import { dto_EndScreen } from './network/dto/game.network.dto.end-screen';
 import { GlickoService } from 'src/ranked/glicko.service';
-import { calculateTimeStats } from './logic/game.logic.stat-tracker';
+import { calculateTimeStats, createStatGraphData } from './logic/game.logic.stat-tracker';
 import { RankedService } from 'src/ranked/ranked.service';
 import { on } from 'events';
 import { UserService } from 'src/user/user.service';
@@ -598,6 +598,7 @@ export class GameGateway implements OnGatewayDisconnect {
         if (client.data && client.data.role === "User") {
           const username = await this.lobbyGateway.lobbyData.getUsername(client.id);
           const userId = await this.userService.getUserIdByUsername(username);
+          createStatGraphData(game.gameInstance);
           this.sprintService.saveSprintToDB(userId, game.gameInstance.stats);
         }
       }.bind(this)
