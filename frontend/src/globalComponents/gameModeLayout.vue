@@ -323,7 +323,7 @@ export default defineComponent({
         async function leaderboardRecordClicked(id: string) {
             if(props.gameMode === GameMode.Sprint){
                 const sprint = await getSprintRecord(id);
-                console.log(sprint["bpsGraph"]);
+                console.log(sprint);
                 sprint["bpsGraph"] = JSON.parse(sprint["bpsGraph"]);
                 console.log(sprint);
                 transitionDashboardToResultView('.gameMode-dashboard', '.gameComplete', () => {
