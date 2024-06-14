@@ -174,9 +174,9 @@ export default defineComponent({
     const queue = ref<User[]>([]);
     const matches = ref<Match[]>([]);
     const currentId = ref(1);
-    const speedFactor = ref(10);
+    const speedFactor = ref(100);
     const mmSettings = ref<MmSettings>()
-    const amountOfMultipleUsers = ref(1000);
+    const amountOfMultipleUsers = ref(100);
 
     onMounted(() => {
       changeBackgroundTo("black");
