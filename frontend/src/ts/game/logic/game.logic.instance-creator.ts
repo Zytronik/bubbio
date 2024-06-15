@@ -31,6 +31,7 @@ export function createGameInstance(
         currentAPS: handlingSettings.defaultAPS,
         currentBubble: {
             ascii: "",
+            preview: "",
             type: 0,
         },
         bubbleQueue: [],
@@ -65,6 +66,7 @@ export function resetGameInstance(gameInstance: GameInstance, seed: number): voi
     gameInstance.currentAPS = gameInstance.handlingSettings.defaultAPS;
     gameInstance.currentBubble = {
         ascii: "",
+        preview: "",
         type: 0,
     };
     gameInstance.holdBubble = undefined;

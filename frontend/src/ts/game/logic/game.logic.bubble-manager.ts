@@ -42,30 +42,37 @@ function getBubbleBag(gameInstance: GameInstance): Bubble[] {
 
 const red: Bubble = {
     ascii: `<div class="field bubble" style="background: rgb(255, 0, 0); border-color: rgb(255, 0, 0);"></div>`,
+    preview: `<div class="preview" style="border-color: rgb(255, 0, 0);">`,
     type: 0,
 }
 const orange: Bubble = {
-    ascii: `<div class="field bubble" style="background: rgb(255, 166, 65); border-color: rgb(255, 166, 65);"></div>`,
+    ascii: `<div class="field bubble" style="background: rgb(255, 179, 92); border-color: rgb(255, 179, 92);"></div>`,
+    preview: `<div class="preview" style="border-color: rgb(255, 0, 0);">`,
     type: 1,
 }
 const yellow: Bubble = {
     ascii: `<div class="field bubble" style="background: rgb(255, 255, 0); border-color: rgb(255, 255, 0);"></div>`,
+    preview: `<div class="preview" style="border-color: rgb(255, 0, 0);">`,
     type: 2,
 }
 const green: Bubble = {
-    ascii: `<div class="field bubble" style=" background: rgb(34, 211, 28); border-color: rgb(34, 211, 28);"></div>`,
+    ascii: `<div class="field bubble" style=" background: rgb(9, 255, 0); border-color: rgb(9, 100, 0);"></div>`,
+    preview: `<div class="preview" style="border-color: rgb(255, 0, 0);">`,
     type: 3,
 }
 const cyan: Bubble = {
     ascii: `<div class="field bubble" style="background: rgb(0, 255, 255); border-color: rgb(0, 255, 255);"></div>`,
+    preview: `<div class="preview" style="border-color: rgb(255, 0, 0);">`,
     type: 4,
 }
 const purple: Bubble = {
     ascii: `<div class="field bubble" style=" background: rgb(255, 0, 255); border-color: rgb(255, 0, 255);"></div>`,
+    preview: `<div class="preview" style="border-color: rgb(255, 0, 0);">`,
     type: 5,
 }
 const white: Bubble = {
-    ascii: `<div class="field bubble" style=" background: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"></div>`,
+    ascii: `<div class="field bubble" style=" background: rgb(255, 255, 255); border-color: rgb(99, 99, 99);"></div>`,
+    preview: `<div class="preview" style="border-color: rgb(255, 0, 0);">`,
     type: 6,
 }
 export const allBubbles: Bubble[] = [
