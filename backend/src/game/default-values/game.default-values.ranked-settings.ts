@@ -24,4 +24,4 @@ export const rankedSettings: GameSettings = {
     countDownDuration: 3000,
 }
 
-export const rankedFirstTo = 3;
+export const rankedFirstTo = 2;
