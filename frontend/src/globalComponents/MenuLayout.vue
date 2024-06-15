@@ -7,11 +7,14 @@
     <MenuBackButtons v-if="backButtonData && backButtonData.length > 0" :buttonData="backButtonData" />
     <div class="page-wrapper">
       <div class="menu-wrapper">
-        <div v-for="(button, index) in filteredMenuButtonsData" :key="index" :class="[
+        <div v-for="(button, index) in menuButtonsData" :key="index" :class="[
           'menu-btn',
           button.title.toLowerCase().replace(/\s+/g, '-'),
-          { 'short-btn': !button.bigButton }
-        ]" @click="handleButtonClick(button)" @mouseenter="playSound('menu_hover')">
+          { 'short-btn': !button.bigButton },
+          { 'disabled-btn': isDisabled(button)}
+        ]" 
+         @mouseenter="playSound('menu_hover')" 
+         v-bind="getButtonAttributes(button)">
           <div>
             <div class="text">
               <span class="text-noWhiteSpaces">{{ button.title[0] }}</span>
@@ -60,34 +63,42 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
-
+  setup() {
     const currentUserID = computed(() => {
       const userData = eventBus.getUserData();
       return userData && userData.id ? userData.id.toString() : null;
     });
 
-    const filteredMenuButtonsData = computed(() => {
-      return props.menuButtonsData.filter(button => {
-        return !button.authIds || (currentUserID.value && button.authIds.includes(currentUserID.value));
-      });
-    });
+    function isDisabled(button :MenuButtonData) {
+      return button.authIds && (!currentUserID.value || !button.authIds.includes(currentUserID.value));
+    }
 
     function handleButtonClick(button :MenuButtonData) {
       playSound('menu_front');
       goToState(button.pageState);
     }
 
+    function getButtonAttributes(button: MenuButtonData) {
+      return isDisabled(button) ? {} : { onClick: () => handleButtonClick(button) };
+    }
+
     return {
       goToState,
       PAGE_STATE,
       changeBackgroundTo,
-      filteredMenuButtonsData,
       handleButtonClick,
       playSound,
+      isDisabled,
+      getButtonAttributes,
     }
   }
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+  .disabled-btn {
+    filter: grayscale(80%);
+    opacity: 0.3;
+    pointer-events: none;
+  }
+</style>

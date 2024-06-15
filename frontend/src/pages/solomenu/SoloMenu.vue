@@ -33,6 +33,7 @@ export default {
         iconSrc: require(`@/img/icons/score.png`),
         pageState: PAGE_STATE.scorePage,
         bigButton: false,
+        authIds: ["1", "2", "3"],
       },
       {
         title: "Pixitesting",
