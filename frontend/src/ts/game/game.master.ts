@@ -57,7 +57,6 @@ export const playerGameInstance: GameInstance = {
     currentAPS: 0,
     currentBubble: {
         ascii: "",
-        preview: "",
         type: 0,
     },
     bubbleQueue: [],
