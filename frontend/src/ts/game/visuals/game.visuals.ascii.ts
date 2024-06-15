@@ -165,7 +165,13 @@ function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosi
 
     fields.forEach(field => {
         if (previewPosition.x === field.coords.x && previewPosition.y === field.coords.y) {
-            rowString += `<div class="preview">${currrentBubble.ascii}<div class="hold">${holdBubble ? holdBubble.ascii : ""}</div></div>`;
+            let cssClass = "";
+            if(currrentBubble.type === 6){
+                cssClass = "colorBlindWhite";
+            }else if(currrentBubble.type === 3){
+                cssClass = "colorBlindGreen";
+            }
+            rowString += `<div class="preview ${cssClass}">${currrentBubble.ascii}<div class="hold">${holdBubble ? holdBubble.ascii : ""}</div></div>`;
         } else {
             rowString += field.bubble ? `${field.bubble.ascii} ` : "<div class='field empty'></div>";
         }

@@ -240,6 +240,30 @@
     background: transparent !important;
 }
 
+.gameUI-wrapper .board .preview.colorBlindWhite::after {
+    content: "";
+    position: absolute;
+    width: calc(100% - var(--game-bubble-border-width) * 2);
+    height: calc(100% - var(--game-bubble-border-width) * 2);
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    border: calc(var(--game-bubble-border-width) / 2) solid rgb(255, 255, 255);
+}
+
+.gameUI-wrapper .board .preview.colorBlindGreen::after {
+    content: "";
+    position: absolute;
+    width: calc(100% - var(--game-bubble-border-width) * 2);
+    height: calc(100% - var(--game-bubble-border-width) * 2);
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    border: calc(var(--game-bubble-border-width) / 2) solid rgb(9, 255, 0);
+}
+
 .gameUI-wrapper .board .preview {
     position: relative;
 }
