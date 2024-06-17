@@ -144,7 +144,6 @@
 </template>
 
 <script lang="ts">
-import { changeBackgroundTo, goToState } from '@/ts/page/page.page-manager';
 import { Ref, SetupContext, computed, ref } from 'vue';
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
 import { httpClient } from '@/ts/networking/networking.http-client';
@@ -156,6 +155,7 @@ import { allInputs } from '@/ts/input/input.all-inputs';
 import { Input } from '@/ts/input/i/input.i.input';
 import { DEFAULT_APS, TOGGLE_APS } from '@/ts/game/settings/ref/game.settings.ref.all-handling-settings';
 import { MUSIC_VOLUME, SFX_VOLUME, resetMusicVolume, resetSfxVolume, setMusicVolume, setSfxVolume } from '@/ts/asset/asset.howler-load';
+import { goToState } from '@/ts/page/page.page-manager';
 
 export default {
   name: 'ConfigPage',
@@ -373,7 +373,6 @@ export default {
       logOut,
       isAuthenticated,
       backButtonData,
-      changeBackgroundTo,
       allInputs,
       handleCustomKey,
       handleResetCustomKey,

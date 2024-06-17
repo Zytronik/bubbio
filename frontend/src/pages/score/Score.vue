@@ -6,9 +6,8 @@
 
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
-import { changeBackgroundTo } from '@/ts/page/page.page-manager';
 import GameModeLayout from '@/globalComponents/gameModeLayout.vue';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { BackButtonData } from '@/globalComponents/i/i-buttonData';
 import { GameMode } from '@/ts/page/e/page.e-leaderboard';
 
@@ -24,10 +23,6 @@ export default {
     const leaderboardFields = ['gameDuration', 'bubblesPerSecond'];
     const leaderboardSortByField = 'gameDuration';
 
-    onMounted(() => {
-      changeBackgroundTo('linear-gradient(45deg, rgba(43,156,221,1) 0%, rgba(198,141,63,1) 100%)');
-    });
-
     return {
       backButtonData,
       PAGE_STATE,
@@ -40,7 +35,4 @@ export default {
 </script>
 
 <style>
-#scorePage .back-buttons::before {
-  background: linear-gradient(45deg, rgba(96, 221, 43, 1) 0%, rgba(198, 63, 135, 1) 100%);
-}
 </style>
