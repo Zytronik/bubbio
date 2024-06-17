@@ -39,7 +39,7 @@
     <div class="bottomBar">
       <button @click="openChannelOverlay" @mouseenter="playSound('menu_hover')" class="openChannelButton"><span class="triangle-left"></span>Channel<span class="triangle-right"></span></button>
     </div>
-    <PageBackgroundCanvas />
+    <PageBackgroundCanvas v-if="!isWerkschauURL()" />
   </article>
 </template>
 
@@ -267,10 +267,14 @@ export default {
     }
 
     /* Werkschau */
-    function  isWerkschauURL() {
-      if (window.location.pathname.includes('/werkschau')) {
+    function  onWerkschauURL() {
+      if (isWerkschauURL()) {
         goToState(PAGE_STATE.werkschauPage);
       }
+    }
+
+    function isWerkschauURL() {
+      return window.location.pathname.includes('/werkschau');
     }
 
     /* General */
@@ -289,7 +293,7 @@ export default {
         showLoginForm();
       }
       showUserPageFromURL();
-      isWerkschauURL();
+      onWerkschauURL();
       addSocketConnectListener(initOnIsUserInRoomAlready);
       await waitForLoadingScreen();
       playSoundtrack('menu_soundtrack');
@@ -333,6 +337,7 @@ export default {
       getProgressBarFillWidth,
       isLoading,
       playSound,
+      isWerkschauURL,
     };
   },
 }

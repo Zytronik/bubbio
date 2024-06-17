@@ -10,6 +10,10 @@
             <span class="text-noWhiteSpaces">anking</span>
           </h1>
           <div class="title-bg"></div>
+          <div class="top"><span class="text-noWhiteSpaces">T</span><span class="text-noWhiteSpaces">op 100</span></div>
+          <div class="sprint-title">
+            <h2><span class="text-noWhiteSpaces">S</span><span class="text-noWhiteSpaces">rint</span></h2>
+          </div>
         </div>
         <div class="werkschau-content">
           <div class="werkschau-content-wrapper">
@@ -189,7 +193,7 @@ export default {
 
           setTimeout(() => {
             newRecordElement.classList.remove('me');
-          }, 10000);
+          }, 15000);
         }
         loading.value = false;
       }, 1000);
@@ -222,17 +226,69 @@ export default {
 #werkschau {
   --werkschau-color: rgb(253, 82, 0);
   --werkschau-bg-color: rgba(253, 82, 0, 0.5);
+  background-color: rgb(25, 25, 25);
 }
 
-h1 {
-  font-size: 6em;
+.top {
+  position: fixed;
+  top: 12%;
+  z-index: 1;
+  right: 9%;
+  font-size: 4em;
   margin: 0;
   display: flex;
   align-items: flex-end;
   text-transform: uppercase;
   font-style: italic;
   position: fixed;
-  top: 4%;
+  font-weight: bold;
+  transform: rotate(18deg);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1) rotate(18deg);
+  }
+
+  50% {
+    transform: scale(1.1) rotate(18deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(18deg);
+  }
+}
+
+.sprint-title {
+    position: fixed;
+    right: -2%;
+    bottom: 20%;
+    transform: rotate(90deg) skewY(-10deg);
+    text-transform: uppercase;
+    z-index: 10;
+}
+
+.sprint-title h2 {
+    margin: 0;
+    font-size: 7em;
+    display: flex;
+    align-items: flex-end;
+}
+
+.sprint-title span:first-of-type {
+    font-size: 150%;
+}
+
+h1 {
+  font-size: 5.5em;
+  margin: 0;
+  display: flex;
+  align-items: flex-end;
+  text-transform: uppercase;
+  font-style: italic;
+  position: fixed;
+  top: 5%;
 }
 
 .title-bg {
@@ -243,16 +299,17 @@ h1 {
   z-index: -2;
   border-right: 65vw solid transparent;
   border-bottom: 3em solid var(--werkschau-color);
-  height: 7%;
+  height: 8%;
   width: 5%;
 }
 
-h1 > span:nth-of-type(1),
-h1 > span:nth-of-type(3) {
+h1>span:nth-of-type(1),
+h1>span:nth-of-type(3),
+.top>span:nth-of-type(1) {
   font-size: 150%;
 }
 
-h1 > span:nth-of-type(3) {
+h1>span:nth-of-type(3) {
   margin-left: 0.3em;
 }
 
@@ -268,9 +325,11 @@ h1 {
   0% {
     background-position: 0;
   }
+
   50% {
-    background-position:60vw;
+    background-position: 60vw;
   }
+
   100% {
     background-position: 60vw;
   }
