@@ -40,7 +40,7 @@ export const changeAPSInput: Input = {
     customKeyMap: ["ShiftLeft", "", ""],
     defaultKeyCode: "ShiftLeft",
     controllerButtonIndex: 0,
-    isSingleTriggerAction: false,
+    isSingleTriggerAction: true,
     pressed: false,
     controllerPressed: false,
     lastFiredAtTime: 0,
