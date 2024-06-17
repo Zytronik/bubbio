@@ -7,8 +7,8 @@ import { NewsGateway } from 'src/news/news.gateway';
 
 @Injectable()
 export class SprintService {
-    private werkschauPlayer1ID: number = 1;
-    private werkschauPlayer2ID: number = 5;
+    private werkschauPlayer1ID: number = 46;
+    private werkschauPlayer2ID: number = 47;
 
     constructor(
         private prisma: PrismaService,
