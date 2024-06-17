@@ -266,6 +266,13 @@ export default {
       endLoading();
     }
 
+    /* Werkschau */
+    function  isWerkschauURL() {
+      if (window.location.pathname.includes('/werkschau')) {
+        goToState(PAGE_STATE.werkschauPage);
+      }
+    }
+
     /* General */
     onMounted(async () => {
       addSocketConnectListener(setupDebugListeners);
@@ -282,6 +289,7 @@ export default {
         showLoginForm();
       }
       showUserPageFromURL();
+      isWerkschauURL();
       addSocketConnectListener(initOnIsUserInRoomAlready);
       await waitForLoadingScreen();
       playSoundtrack('menu_soundtrack');

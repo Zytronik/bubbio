@@ -36,8 +36,14 @@ export class SprintController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':sprintId')
+  @Get('record/:sprintId')
   async getSprint(@Param('sprintId') sprintId: string) {
     return await this.sprintService.getSprint(sprintId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('werkschauLeaderboard')
+  async getWerkschauLeaderboard() {
+    return await this.sprintService.getWerkschauLeaderboard();
   }
 }
