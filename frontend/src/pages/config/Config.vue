@@ -135,7 +135,7 @@
             </div>
             <div class="account-setting setting">
               <div>
-                <h3>LogOut of Account</h3>
+                <h3>Log out of Account</h3>
                 <p>Logs the User out of the Account</p>
               </div>
               <button class="logOutBtn" @click="logOut">Log Out</button>

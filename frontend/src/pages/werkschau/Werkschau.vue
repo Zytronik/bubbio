@@ -133,6 +133,7 @@ export default {
 
     const filteredLeaderboard = computed(() => {
       return leaderboard.value.map(entry => {
+        // eslint-disable-next-line
         const { userId, ...rest } = entry;
         return rest;
       });

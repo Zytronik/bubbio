@@ -50,7 +50,7 @@
 
             <div v-if="isResultView" class="gameComplete">
                 <div class="topbar">
-                    <button @click="openNetworkEvaluation()">Network Evaluation</button>
+                    <!-- <button @click="openNetworkEvaluation()">Network Evaluation</button> -->
                     <p v-if="sprintRecordDate">{{ sprintRecordDate }}</p>
                 </div>
                 <div class="top">
