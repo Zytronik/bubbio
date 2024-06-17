@@ -39,33 +39,34 @@ function getBubbleBag(gameInstance: GameInstance): Bubble[] {
     return bag;
 }
 
-
+//https://coolors.co/530e58-455ba6-a2ea6f-f6cd29-ea5151-fff3fe-6adaca
+//https://ivomynttinen.com/content/3-blog/20150928-ios-design-guidelines/ios-color-theme.jpg
 const red: Bubble = {
-    ascii: `<div class="field bubble" style="background: #EA5151; border-color: #EA5151;"></div>`,
+    ascii: `<div class="field bubble" style="background: #ff4539; border-color: #ff4539;"></div>`,
     type: 0,
 }
 const orange: Bubble = {
-    ascii: `<div class="field bubble" style="background: #F6CD29; border-color: #3d330c;"></div>`,
+    ascii: `<div class="field bubble" style="background: #ff9f0a; border-color: #ff9f0a;"></div>`,
     type: 1,
 }
 const yellow: Bubble = {
-    ascii: `<div class="field bubble" style="background: #A2EA6F; border-color: #354d24;"></div>`,
+    ascii: `<div class="field bubble" style="background: #ffff12; border-color: #ffff12;"></div>`,
     type: 2,
 }
 const green: Bubble = {
-    ascii: `<div class="field bubble" style=" background: #6ADACA; border-color: #6ADACA;"></div>`,
+    ascii: `<div class="field bubble" style=" background: #32d74c; border-color: rgb(9, 100, 0);"></div>`,
     type: 3,
 }
 const cyan: Bubble = {
-    ascii: `<div class="field bubble" style="background: #455BA6; border-color: #455BA6;"></div>`,
+    ascii: `<div class="field bubble" style="background: #63d2ff; border-color: #63d2ff;"></div>`,
     type: 4,
 }
 const purple: Bubble = {
-    ascii: `<div class="field bubble" style=" background: #530E58; border-color: #530E58;"></div>`,
+    ascii: `<div class="field bubble" style=" background: #bf5bf3; border-color: #bf5bf3;"></div>`,
     type: 5,
 }
 const white: Bubble = {
-    ascii: `<div class="field bubble" style=" background: #FFF0FA; border-color: #280027;"></div>`,
+    ascii: `<div class="field bubble" style=" background: rgb(255, 255, 255); border-color: rgb(99, 99, 99);"></div>`,
     type: 6,
 }
 export const allBubbles: Bubble[] = [
