@@ -26,7 +26,7 @@ export class MatchmakingService {
     private gapIncreaseInterval = 5000; // Zeit in Millisekunden, nach der der Skill Gap erhöht wird
     private matchmakingIntervalTime = 5000; 
     private minGapIncreaseAmount = 20; // Minimale Erhöhung des Skill Gaps
-    private gapIncreaseAmount = 150; // Erhöhung des Skill Gaps
+    private gapIncreaseAmount = 300; // Erhöhung des Skill Gaps
     private maxGap = 1500; // Maximale Erweiterung des Skill Gaps
     private matchmakingInterval: NodeJS.Timeout | null = null;
 

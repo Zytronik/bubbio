@@ -248,7 +248,7 @@ export class SprintService {
             orderBy: {
                 gameDuration: 'asc',
             },
-            take: 20,
+            take: 100,
             select: {
                 id: true,
                 userId: true,
