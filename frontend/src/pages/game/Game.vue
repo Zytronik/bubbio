@@ -84,8 +84,10 @@
 
     <div class="gameUI-wrapper">
       <p class="hold-text"><span class="text-noWhiteSpaces">H</span><span class="text-noWhiteSpaces">old</span></p>
-      <div class="hold-wrapper" v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></div>
-      <div class="garbage-wrapper"
+      <div class="hold-wrapper">
+        <div class="" v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></div>
+      </div>
+        <div class="garbage-wrapper"
         v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage">
       </div>
       <p class="queue-text"><span class="text-noWhiteSpaces">Q</span><span class="text-noWhiteSpaces">ueue</span></p>

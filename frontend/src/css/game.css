@@ -53,7 +53,7 @@
 
 .game-wrapper .inGameStats .top {
     position: absolute;
-    top: 30%;
+    top: 34%;
     right: 0;
     width: 100%;
 }
@@ -312,7 +312,11 @@
     right: calc(100% + 3 * var(--game-board-border-width));
     top: 0%;
     border: var(--game-board-border-width) solid white;
-    padding: var(--game-board-padding);
+    height: calc(var(--game-bubble-height) + var(--game-board-border-width) + 2 * var(--game-board-padding));
+    width: calc(var(--game-bubble-height) + var(--game-board-border-width) + 2 * var(--game-board-padding));
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .gameUI-wrapper .queue-wrapper {
@@ -341,13 +345,13 @@
 }
 
 .gameUI-wrapper .queue-text {
-    top: 50%;
+    top: 43vh;
     left: 100%;
     transform: rotate(90deg) translate(-50% , 108%);
 }
 
 .gameUI-wrapper .hold-text {
-    top: 25%;
+    top: 22vh;
     right: 100%;
     transform: rotate(90deg) translate(-50% , -8%);
 }
