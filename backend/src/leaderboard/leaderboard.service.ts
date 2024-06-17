@@ -128,7 +128,7 @@ export class LeaderboardService {
                         pbUrl: record.pbUrl,
                     },
                     userId: record.id,
-                    rating: `${Math.round(record.rating)} Elo`,
+                    rating: `${Math.floor(record.rating)} Elo`,
                 };
             }));
             const ranksOfUsers = await this.ranksService.getRanksOfUsers(formattedLeaderboard.map(record => record.userId));
