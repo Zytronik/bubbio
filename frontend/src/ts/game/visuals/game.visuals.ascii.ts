@@ -130,8 +130,9 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
         }
         boardText += getRegularRowString(row.fields, row.isSmallerRow, previewPosition, gameInstance.currentBubble, gameInstance.holdBubble);
     });
-    boardText += getArrowLineString(gameInstance.angle, gameInstance.currentBubble, gameInstance.holdBubble);
+    boardText += getArrowLineString(gameInstance.angle, gameInstance.currentBubble);
     asciiRefs.playGridASCII.value = boardText;
+    asciiRefs.holdString.value = getHoldString(gameInstance.holdBubble);
     asciiRefs.queueString.value = getBubbleQueueString(gameInstance.bubbleQueue, gameInstance.gameSettings.queuePreviewSize);
     asciiRefs.incomingGarbage.value = getIncomingGarbageString(gameInstance.queuedGarbage, gameInstance.playGrid.gridHeight + gameInstance.playGrid.extraGridHeight);
     if (gameInstance.gameState === GAME_STATE.VICTORY_SCREEN) {
@@ -153,6 +154,10 @@ export function fillAsciiStrings(gameInstance: GameInstance, asciiRefs: AsciiBoa
     } else {
         asciiRefs.floatingText.value = "";
     }
+}
+
+function getHoldString(holdBubble: Bubble | undefined): string {
+    return "<div class='hold-piece'>"+(holdBubble ? holdBubble.ascii : "")+"</div>";
 }
 
 function getDeathZoneLineString(): string {
@@ -181,12 +186,11 @@ function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosi
     return rowString;
 }
 
-function getArrowLineString(angle: number, currentBubble: Bubble, holdBubble: Bubble | undefined): string {
+function getArrowLineString(angle: number, currentBubble: Bubble): string {
     return "<div class='arrowLine'>"+
         "<div class='crossbow' style='transform: translate(-50%, 50%) rotate(" + angle + "deg)'>"+
             "<div class='current-piece' style='transform: rotate(-" + angle + "deg)'>" + currentBubble.ascii + "</div>"+
         "</div>"+
-        "<div class='hold-piece'>"+(holdBubble ? holdBubble.ascii : "")+"</div>"+
     "</div>";
 }
 

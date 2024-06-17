@@ -30,14 +30,14 @@
           <p
             v-if="playerGameVisuals.statNumbers.currentCombo > 0 || playerGameVisuals.statNumbers.currentCombo.value > 0">
             Combo {{
-              areRef ? playerGameVisuals.statNumbers.currentCombo.value : playerGameVisuals.statNumbers.currentCombo }}
+            areRef ? playerGameVisuals.statNumbers.currentCombo.value : playerGameVisuals.statNumbers.currentCombo }}
           </p>
         </transition>
         <transition name="fade">
           <p
             v-if="(areRef && playerGameVisuals.statNumbers.spikeNumber.value) || (!areRef && playerGameVisuals.statNumbers.spikeNumber)">
             Spike {{
-              areRef ? playerGameVisuals.statNumbers.spikeNumber.value : playerGameVisuals.statNumbers.spikeNumber }}</p>
+            areRef ? playerGameVisuals.statNumbers.spikeNumber.value : playerGameVisuals.statNumbers.spikeNumber }}</p>
         </transition>
       </div>
     </div>
@@ -82,9 +82,9 @@
 
 
 
-
-
     <div class="gameUI-wrapper">
+      <p class="hold-text"><span class="text-noWhiteSpaces">H</span><span class="text-noWhiteSpaces">old</span></p>
+      <div class="hold-wrapper" v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></div>
       <div class="garbage-wrapper"
         v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage">
       </div>

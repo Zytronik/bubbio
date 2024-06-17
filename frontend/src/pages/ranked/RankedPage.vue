@@ -210,7 +210,7 @@
 
 <script lang="ts">
 import { PAGE_STATE } from '@/ts/page/e/page.e-page-state';
-import { changeBackgroundTo, goToState, openProfile } from '@/ts/page/page.page-manager';
+import { goToState, openProfile } from '@/ts/page/page.page-manager';
 import { SetupContext, computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import MenuBackButtons from '@/globalComponents/MenuBackButtons.vue';
 import state from '@/ts/networking/networking.client-websocket';
@@ -608,7 +608,6 @@ export default {
       goToState,
       PAGE_STATE,
       backButtonData,
-      changeBackgroundTo,
       toggleQueue,
       isInQueue,
       playerStats,
