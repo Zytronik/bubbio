@@ -75,12 +75,26 @@ export async function getSprintRecord(id: string) {
     const token = localStorage.getItem('authToken');
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     try {
-        const response = await httpClient.get(`/sprint/${id}`, {
+        const response = await httpClient.get(`/sprint/record/${id}`, {
             headers: headers
         });
         return response.data;
     } catch (error) {
         console.error("Failed to fetch sprint records: ", error);
+        return undefined;
+    }
+}
+
+export async function getWerkschauLeaderboard() {
+    const token = localStorage.getItem('authToken');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    try {
+        const response = await httpClient.get("/sprint/werkschauLeaderboard", {
+            headers: headers
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch werkschau leaderboard: ", error);
         return undefined;
     }
 }

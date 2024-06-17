@@ -310,6 +310,25 @@ export const matchmakingSimulationToMultiMenuTransition: PageTransition = {
     }
 }
 
+/* Werkschau */
+export const werkschauToMainMenuTransition: PageTransition = {
+    name: "werkschauToMainMenuTransition",
+    origin: PAGE_STATE.werkschauPage,
+    destination: PAGE_STATE.mainMenu,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + werkschauToMainMenuTransition.name);
+    }
+}
+
+export const mainMenuToWerkschauTransition: PageTransition = {
+    name: "mainMenuToWerkschauTransition",
+    origin: PAGE_STATE.mainMenu,
+    destination: PAGE_STATE.werkschauPage,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + mainMenuToWerkschauTransition.name);
+    }
+}
+
 
 export const allPossibleTransitions: PageTransition[] = [
     mainMenuToSettingsPageTransition,
@@ -346,4 +365,6 @@ export const allPossibleTransitions: PageTransition[] = [
     pixiTestToSoloMenuTransition,
     multiMenuToMatchmakingSimulationTransition,
     matchmakingSimulationToMultiMenuTransition,
+    werkschauToMainMenuTransition,
+    mainMenuToWerkschauTransition,
 ];

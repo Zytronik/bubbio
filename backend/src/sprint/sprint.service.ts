@@ -3,14 +3,20 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { NewsService } from 'src/news/news.service';
 import { GameStats } from 'src/game/i/game.i.game-stats';
+import { NewsGateway } from 'src/news/news.gateway';
 
 @Injectable()
 export class SprintService {
+    private werkschauPlayer1ID: number = 46;
+    private werkschauPlayer2ID: number = 47;
+
     constructor(
         private prisma: PrismaService,
+        private newsGateway: NewsGateway,
         private newsService: NewsService,
         @Inject(forwardRef(() => UserService))
         private userService: UserService,
+        
     ) { }
 
     async saveSprintToDB(userId: number, sprintStats: GameStats): Promise<any> {
@@ -20,6 +26,11 @@ export class SprintService {
 
         // Get User by ID
         const user = await this.userService.getUserById(userId);
+
+        //werkschau only
+        if (userId === this.werkschauPlayer1ID || userId === this.werkschauPlayer2ID) {
+            this.updateWerkschauLeaderboard(newSprint.id);
+        }
 
         // Check if the new sprint time is in the top 5
         const amountOfTopSprints = 5;
@@ -217,10 +228,49 @@ export class SprintService {
     }
 
     async getSprint(sprintId: string) {
+        if(!sprintId) {
+            throw new Error('No sprint ID provided');
+        }
         return await this.prisma.sprint.findUnique({
             where: {
                 id: parseInt(sprintId),
             },
         });
+    }
+
+    async getWerkschauLeaderboard() {
+        const leaderboardRecords = await this.prisma.sprint.findMany({
+            where: {
+                userId: {
+                    in: [this.werkschauPlayer1ID, this.werkschauPlayer2ID],
+                },
+            },
+            orderBy: {
+                gameDuration: 'asc',
+            },
+            take: 100,
+            select: {
+                id: true,
+                userId: true,
+                gameDuration: true,
+                submittedAt: true,
+                bubblesCleared: true,
+                bubblesShot: true,
+                bubblesPerSecond: true,
+                highestBubbleClear: true,
+                user: {
+                    select: {
+                        username: true,
+                        pbUrl: true,
+                    },
+                },
+            },
+        });
+        return leaderboardRecords;
+    }
+
+    async updateWerkschauLeaderboard(currentSprintId: number) {
+        const leaderboard = await this.getWerkschauLeaderboard();
+        this.newsGateway.server.emit('newWerkschauRecord', { leaderboard, currentSprintId});
     }
 }

@@ -12,4 +12,5 @@ export enum PAGE_STATE {
 
     pixiTest = 'pixiTest',
     matchmakingSimulation = 'matchmakingSimulation',
+    werkschauPage = 'werkschauPage',
 }
