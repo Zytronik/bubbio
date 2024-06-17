@@ -23,11 +23,11 @@ export class MatchmakingService {
     private queue: MatchmakingQueue = {};
     private socketMmRoomName: string = 'matchmakingVue_ilkjadsrhngijaerhgipusearoiugjeasroiughbqaerougbqerutbqer';
     private startGap = 100; // Startwert für den akzeptablen Skill Gap
-    private gapIncreaseInterval = 10000; // Zeit in Millisekunden, nach der der Skill Gap erhöht wird
-    private matchmakingIntervalTime = 5000;
-    private minGapIncreaseAmount = 10; // Minimale Erhöhung des Skill Gaps
-    private gapIncreaseAmount = 100; // Erhöhung des Skill Gaps
-    private maxGap = 800; // Maximale Erweiterung des Skill Gaps
+    private gapIncreaseInterval = 5000; // Zeit in Millisekunden, nach der der Skill Gap erhöht wird
+    private matchmakingIntervalTime = 5000; 
+    private minGapIncreaseAmount = 20; // Minimale Erhöhung des Skill Gaps
+    private gapIncreaseAmount = 150; // Erhöhung des Skill Gaps
+    private maxGap = 1500; // Maximale Erweiterung des Skill Gaps
     private matchmakingInterval: NodeJS.Timeout | null = null;
 
     constructor(
