@@ -10,6 +10,31 @@
         </div>
         <div v-if="currentTab === 'Input Settings'" class="tab-content input-tab">
           <div class="tab-wrapper">
+            <h2>Input Settings</h2>
+            <div class="input-settings" v-if="allInputs && allInputs.length > 0">
+              <div v-for="(input, index) in allInputs" :key="index" class="input-setting setting">
+                <div class="desc" :title="input.description">
+                  <h3 :title="input.description">{{ input.name }}</h3>
+                </div>
+                <div class="keys">
+                  <div @click="resetInput(input, $event.currentTarget)" class="resetColumn">
+                    <span>Reset</span>
+                  </div>
+                  <div v-if="input.customKeyMap" class="customKeys">
+                    <div v-for="(key, keyIndex) in input.customKeyMap" :key="`key-${keyIndex}`"
+                      @click="handleCustomKey($event, keyIndex, index)"
+                      @contextmenu.prevent="handleResetCustomKey($event, keyIndex, input)">
+                      <p>{{ key || 'Not Set' }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p>Press Right-Click to unbind.</p>
+          </div>
+        </div>
+        <div v-if="currentTab === 'Handling Settings'" class="tab-content handling-tab">
+          <div class="tab-wrapper">
             <h2>Handling Settings</h2>
             <div class="handling-settings">
               <div class="handling-setting setting">
@@ -41,27 +66,6 @@
                 </div>
               </div>
             </div>
-            <h2>Input Settings</h2>
-            <div class="input-settings" v-if="allInputs && allInputs.length > 0">
-              <div v-for="(input, index) in allInputs" :key="index" class="input-setting setting">
-                <div class="desc" :title="input.description">
-                  <h3 :title="input.description">{{ input.name }}</h3>
-                </div>
-                <div class="keys">
-                  <div @click="resetInput(input, $event.currentTarget)" class="resetColumn">
-                    <span>Reset</span>
-                  </div>
-                  <div v-if="input.customKeyMap" class="customKeys">
-                    <div v-for="(key, keyIndex) in input.customKeyMap" :key="`key-${keyIndex}`"
-                      @click="handleCustomKey($event, keyIndex, index)"
-                      @contextmenu.prevent="handleResetCustomKey($event, keyIndex, input)">
-                      <p>{{ key || 'Not Set' }}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <p>Press Right-Click to unbind.</p>
           </div>
         </div>
         <div v-if="currentTab === 'Graphics Settings'" class="tab-content graphics-tab">
@@ -163,7 +167,7 @@ export default {
   data() {
     return {
       currentTab: 'Input Settings',
-      tabs: ['Input Settings', 'Graphics Settings', 'Audio Settings', 'Account Settings'],
+      tabs: ['Input Settings', 'Handling Settings', 'Graphics Settings', 'Audio Settings', 'Account Settings'],
     };
   },
   setup(_: unknown, { emit }: SetupContext) {
