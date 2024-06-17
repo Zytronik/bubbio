@@ -39,6 +39,7 @@ export const changeAPSInput: Input = {
     description: "Change the angle per second of the cannon",
     customKeyMap: ["ShiftLeft", "", ""],
     defaultKeyCode: "ShiftLeft",
+    controllerButtonIndex: 0,
     isSingleTriggerAction: false,
     pressed: false,
     controllerPressed: false,
