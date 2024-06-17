@@ -262,7 +262,7 @@ export default {
 
 .sprint-title {
     position: fixed;
-    right: -2%;
+    right: 0%;
     bottom: 20%;
     transform: rotate(90deg) skewY(-10deg);
     text-transform: uppercase;
@@ -281,14 +281,14 @@ export default {
 }
 
 h1 {
-  font-size: 5.5em;
+  font-size: 6.5em;
   margin: 0;
   display: flex;
   align-items: flex-end;
   text-transform: uppercase;
   font-style: italic;
   position: fixed;
-  top: 5%;
+  top: 6%;
 }
 
 .title-bg {
@@ -298,9 +298,9 @@ h1 {
   left: 0;
   z-index: -2;
   border-right: 65vw solid transparent;
-  border-bottom: 3em solid var(--werkschau-color);
-  height: 8%;
-  width: 5%;
+  border-bottom: 3.5em solid var(--werkschau-color);
+  height: 9%;
+  width: 10%;
 }
 
 h1>span:nth-of-type(1),
