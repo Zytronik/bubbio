@@ -58,7 +58,7 @@ import eventBus from './ts/page/page.event-bus';
 import { attachInputReader } from './ts/input/input.input-reader';
 import { httpClient } from './ts/networking/networking.http-client';
 import { getDefaultProfilePbURL, getRankImagePath } from './ts/networking/paths';
-import { applySavedSettings, enableBackInputs, enableChannelInput, enableNetworkDebugInputs } from './ts/input/input.input-manager';
+import { applySavedSettings, enableBackInputs, enableChannelInput } from './ts/input/input.input-manager';
 import { setupDebugListeners } from "./ts/game/network/game.network.debug";
 import { RankInfo } from './ts/page/i/page.i-rank-info';
 import { loadBackgroundCanvas } from './ts/page/page.background-canvas';
@@ -274,7 +274,6 @@ export default {
       addSocketConnectListener(setupDebugListeners);
       enableBackInputs();
       enableChannelInput();
-      enableNetworkDebugInputs();
       setupTransitionFunctions();
       initializeGlobalSocket();
       isAuthenticated.value = checkUserAuthentication();

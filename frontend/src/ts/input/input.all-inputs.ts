@@ -54,11 +54,28 @@ export const changeAPSInput: Input = {
 };
 
 export const centerCursorInput: Input = {
-    name: "Set Cursor to 90°",
+    name: "Set angle to 90°",
     description: "Set the angle of the cannon to 90°",
     customKeyMap: ["ArrowUp", "", ""],
     defaultKeyCode: "ArrowUp",
     controllerAxisDirection: [1, -1],
+    isSingleTriggerAction: true,
+    pressed: false,
+    controllerPressed: false,
+    lastFiredAtTime: 0,
+    releasedAtTime: 0,
+    fire: () => {
+        console.error("no fire event attached to keyCode: " + shootInput.name);
+    },
+    enabled: false,
+};
+
+export const mirrorCursorInput: Input = {
+    name: "Mirror current Angle",
+    description: "Mirror the angle to the other side.",
+    customKeyMap: ["ArrowDown", "", ""],
+    defaultKeyCode: "ArrowDown",
+    controllerAxisDirection: [1, 1],
     isSingleTriggerAction: true,
     pressed: false,
     controllerPressed: false,
@@ -152,70 +169,6 @@ export const channelInput: Input = {
     enabled: false,
 };
 
-export const debugTriggerGarbageInput: Input = {
-    name: "Trigger Garbage",
-    description: "Adds Garbage to the grid",
-    customKeyMap: ["KeyU", "", ""],
-    defaultKeyCode: "KeyU",
-    isSingleTriggerAction: true,
-    pressed: false,
-    controllerPressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
-    fire: () => {
-        console.error("no fire event attached to keyCode: " + debugTriggerGarbageInput.name);
-    },
-    enabled: false,
-};
-
-export const debugNetwork1: Input = {
-    name: "debugNetwork1",
-    description: "debugNetwork1",
-    customKeyMap: ["KeyI", "", ""],
-    defaultKeyCode: "KeyI",
-    isSingleTriggerAction: true,
-    pressed: false,
-    controllerPressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
-    fire: () => {
-        console.error("no fire event attached to keyCode: " + debugNetwork3.name);
-    },
-    enabled: false,
-};
-
-export const debugNetwork2: Input = {
-    name: "debugNetwork2",
-    description: "debugNetwork2",
-    customKeyMap: ["KeyO", "", ""],
-    defaultKeyCode: "KeyO",
-    isSingleTriggerAction: true,
-    pressed: false,
-    controllerPressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
-    fire: () => {
-        console.error("no fire event attached to keyCode: " + debugNetwork2.name);
-    },
-    enabled: false,
-};
-
-export const debugNetwork3: Input = {
-    name: "debugNetwork3",
-    description: "debugNetwork3",
-    customKeyMap: ["KeyP", "", ""],
-    defaultKeyCode: "KeyP",
-    isSingleTriggerAction: true,
-    pressed: false,
-    controllerPressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
-    fire: () => {
-        console.error("no fire event attached to keyCode: " + debugNetwork3.name);
-    },
-    enabled: false,
-};
-
 export const allInputs: Input[] = [
     angleLeftInput,
     angleRightInput,
@@ -226,10 +179,7 @@ export const allInputs: Input[] = [
     resetInput,
     backInput,
     channelInput,
-    // debugTriggerGarbageInput,
-    // debugNetwork1,
-    // debugNetwork2,
-    // debugNetwork3,
+    mirrorCursorInput,
 ]
 
 const allKeyCodes = [
