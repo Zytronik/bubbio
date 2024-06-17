@@ -14,12 +14,14 @@ import { FriendsModule } from './friends/friends.module';
 import { LobbyModule } from './lobby/lobby.module';
 import { ScoreModule } from './score/score.module';
 import { MatchmakingSimulationModule } from './matchmakingSimulation/matchmakingSimulation.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     SprintModule,
     ScoreModule,

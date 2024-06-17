@@ -15,7 +15,7 @@
         </div>
       </div>
       <div class="body">
-        <div class="row" v-for="(entry, index) in historyData" :key="index">
+        <div class="row" v-for="(entry, index) in historyData" :key="index" :data-id="entry.id">
           <div class="cell" v-for="field in orderedFields" :key="field">
             {{ formatFieldValue(entry[field], field) }}
           </div>
@@ -31,7 +31,8 @@ import { GameStats } from '@/ts/game/i/game.i.game-stats';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { GameMode, SortDirection } from '@/ts/page/e/page.e-leaderboard';
 import { formatFieldValue, getFullName } from '@/ts/page/i/page.i.stat-display';
-import { PropType, defineComponent, onMounted, ref, watchEffect } from 'vue';
+import eventBus from '@/ts/page/page.event-bus';
+import { PropType, defineComponent, onMounted, onUnmounted, ref, watchEffect } from 'vue';
 
 interface HistoryEntry extends GameStats {
   userId: number;
@@ -113,11 +114,38 @@ export default defineComponent({
     onMounted(async () => {
       await fetchHistoryData();
       sortAndFilterFields();
+      setupHistoryClickEvents();
+    });
+
+    onUnmounted(() => {
+      removeHistoryClickEvents();
     });
 
     watchEffect(() => {
       fetchHistoryData();
     });
+
+    function setupHistoryClickEvents() {
+      // eslint-disable-next-line
+      const historyRecords = document.querySelectorAll('.history .row') as NodeListOf<HTMLElement>;
+      historyRecords.forEach((record) => {
+        const handleClick = () => {
+          eventBus.emit('historyRecordClicked', record.dataset.id);
+        };
+        record.addEventListener('click', handleClick);
+        record.dataset.clickHandler = handleClick.toString();
+      });
+    }
+
+    function removeHistoryClickEvents() {
+      // eslint-disable-next-line
+      const historyRecords = document.querySelectorAll('.history .row') as NodeListOf<HTMLElement>;
+      historyRecords.forEach((record) => {
+        const handleClick = new Function(`return ${record.dataset.clickHandler}`)();
+        record.removeEventListener('click', handleClick);
+        delete record.dataset.clickHandler;
+      });
+    }
 
     return {
       loading,
@@ -157,6 +185,12 @@ p {
   flex-direction: row;
   text-align: center;
   padding: 0 15px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.row:hover {
+  background-color: rgba(149, 149, 149, 0.1);
 }
 
 .cell {

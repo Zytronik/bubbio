@@ -9,9 +9,9 @@ import { getGarbageAmount, receiveGarbageAndCheckDead } from "./game.logic.garba
 import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 
 export function executeShot(playerGameInstance: GameInstance): void {
-    let hasDied = shootBubble(playerGameInstance);
-    if (!hasDied) {
-        hasDied = receiveGarbageAndCheckDead(playerGameInstance);
+    const shootResult = shootBubble(playerGameInstance);
+    if (!shootResult.hasdied && shootResult.clearAmount === 0) {
+        const hasDied = receiveGarbageAndCheckDead(playerGameInstance);
         if (hasDied) {
             return;
         }
@@ -32,7 +32,7 @@ export function executeShot(playerGameInstance: GameInstance): void {
     updateBubbleQueueAndCurrent(playerGameInstance);
 }
 
-export function shootBubble(game: GameInstance): boolean {
+export function shootBubble(game: GameInstance): {hasdied: boolean, clearAmount: number} {
     const angle = game.angle;
     const grid = game.playGrid;
     const bubble = game.currentBubble;
@@ -52,7 +52,7 @@ export function shootBubble(game: GameInstance): boolean {
     }
     const gridField = snapToNextEmptyField(grid, bubbleCoords);
     gridField.bubble = bubble;
-    const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type);
+    const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type, bounceAmount > 0);
     const attack = getGarbageAmount(bubblesCleared, game.stats.currentCombo, bounceAmount > 0)
     let defense = 0;
     game.stats.attack += attack;
@@ -69,9 +69,9 @@ export function shootBubble(game: GameInstance): boolean {
 
     if (bubblesCleared < 3 && grid.rows[gridField.coords.y].isInDeathZone) {
         game.gameTransitions.onGameDefeat();
-        return true;
+        return {hasdied: true, clearAmount: bubblesCleared};
     }
-    return false;
+    return {hasdied: false, clearAmount: bubblesCleared};
 }
 
 export function calculatePreview(game: GameInstance): void {

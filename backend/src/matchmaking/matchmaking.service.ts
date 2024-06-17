@@ -24,9 +24,10 @@ export class MatchmakingService {
     private socketMmRoomName: string = 'matchmakingVue_ilkjadsrhngijaerhgipusearoiugjeasroiughbqaerougbqerutbqer';
     private startGap = 100; // Startwert für den akzeptablen Skill Gap
     private gapIncreaseInterval = 5000; // Zeit in Millisekunden, nach der der Skill Gap erhöht wird
-    private matchmakingIntervalTime = 5000;
-    private gapIncreaseAmount = 100; // Erhöhung des Skill Gaps
-    private maxGap = 1000; // Maximale Erweiterung des Skill Gaps
+    private matchmakingIntervalTime = 5000; 
+    private minGapIncreaseAmount = 20; // Minimale Erhöhung des Skill Gaps
+    private gapIncreaseAmount = 300; // Erhöhung des Skill Gaps
+    private maxGap = 1500; // Maximale Erweiterung des Skill Gaps
     private matchmakingInterval: NodeJS.Timeout | null = null;
 
     constructor(
@@ -105,13 +106,26 @@ export class MatchmakingService {
 
             const currentTime = Date.now();
             const timeDiff = currentTime - searchStart;
-            const currentGap = Math.min(this.startGap + Math.floor(timeDiff / this.gapIncreaseInterval) * this.gapIncreaseAmount, this.maxGap);
+            //const currentGap = Math.min(this.startGap + Math.floor(timeDiff / this.gapIncreaseInterval) * this.gapIncreaseAmount, this.maxGap);
+            const currentGap = Math.min( //uses the time difference to calculate the current gap
+                this.startGap + Math.max(
+                    Math.log(1 + Math.floor(timeDiff / this.gapIncreaseInterval)) * this.gapIncreaseAmount,
+                    this.minGapIncreaseAmount
+                ), 
+                this.maxGap
+            );
             for (let j = i + 1; j < userIds.length; j++) {
                 const opponentId = parseInt(userIds[j]);
                 const opponent = this.queue[opponentId];
                 if (!opponent) continue;
 
                 const ratingDiff = Math.abs(glicko - opponent.glicko);
+                /* console.log('Time Diff:', timeDiff);
+                console.log('Gap Increase Interval:', this.gapIncreaseInterval);
+                console.log('Loop:', timeDiff / this.gapIncreaseInterval);
+                console.log('Logarithmic Increase:', Math.log(1 + timeDiff / this.gapIncreaseInterval));
+                console.log('Current Gap:', currentGap);
+                console.log('-----------------------------------------'); */
                 if (ratingDiff <= currentGap) {
                     matches.push([userId, opponentId]);
                     break;

@@ -219,20 +219,6 @@
     position: relative;
 }
 
-.gameUI-wrapper .field.bubble:after {
-	content: "";
-	position: absolute;
-	display: block;
-	top: 10%;
-	left: 70%;
-	height: 40%;
-	width: 20%;
-	border-radius: 50%;
-	background: white;
-	overflow: hidden;
-    z-index: 1;
-}
-
 .gameUI-wrapper .field.bubble:before {
 	content: "";
 	position: absolute;
@@ -241,8 +227,9 @@
     left: calc(-1 * var(--game-bubble-border-width));
     width: calc(100% + 2 * var(--game-bubble-border-width));
     height: calc(100% + 2 * var(--game-bubble-border-width));
-    border-radius: 50%;
-    background: linear-gradient(to left, rgba(126, 148, 191, 0.2), rgba(136, 191, 176, 0.2));
+    background-image: url("../img/bubble2.png");
+    background-position: center;
+    background-size: cover;
 }
 
 .gameUI-wrapper .board .deathZoneLine {
@@ -251,6 +238,30 @@
 
 .gameUI-wrapper .board .preview > .bubble {
     background: transparent !important;
+}
+
+.gameUI-wrapper .board .preview.colorBlindWhite::after {
+    content: "";
+    position: absolute;
+    width: calc(100% - var(--game-bubble-border-width) * 2);
+    height: calc(100% - var(--game-bubble-border-width) * 2);
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    border: calc(var(--game-bubble-border-width) / 1.5) solid rgb(255, 255, 255);
+}
+
+.gameUI-wrapper .board .preview.colorBlindGreen::after {
+    content: "";
+    position: absolute;
+    width: calc(100% - var(--game-bubble-border-width) * 2);
+    height: calc(100% - var(--game-bubble-border-width) * 2);
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    border: calc(var(--game-bubble-border-width) / 1.5) solid rgb(9, 255, 0);
 }
 
 .gameUI-wrapper .board .preview {

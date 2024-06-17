@@ -1,6 +1,6 @@
 import { checkUserAuthentication, logUserOut } from "../networking/networking.auth";
 import { PAGE_STATE } from "./e/page.e-page-state";
-import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToMultiMenuTransition, roomListingToMultiMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, roomPageToMultiMenuTransition, multiMenuToSoloMenuTransition, soloMenuToSprintPageTransition, spintPageToSoloMenuTransition, mainMenuToSoloMenuTransition, soloMenuToMainMenuTransition, multiMenuToRoomListingTransition, multiMenuToMainMenuTransition, soloMenuToMultiMenuTransition, soloMenuTosettingsPageTransition, multiMenuToSettingsPageTransition, settingsPageToMultiMenuTransition, settingsPageToSoloMenuTransition, multiMenuToRankedPageTransition, rankedPageToMultiMenuTransition, rankedPageToRoomListingTransition, roomListingToRankedPageTransition, scorePageToSoloMenuTransition, scorePageToSprintPageTransition, soloMenuToScorePageTransition, spintPageToScorePageTransition, soloMenuToPixiTestTransition, pixiTestToSoloMenuTransition, matchmakingSimulationToMultiMenuTransition, multiMenuToMatchmakingSimulationTransition } from "./page.possible-transitions";
+import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToMultiMenuTransition, roomListingToMultiMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, roomPageToMultiMenuTransition, multiMenuToSoloMenuTransition, soloMenuToSprintPageTransition, spintPageToSoloMenuTransition, mainMenuToSoloMenuTransition, soloMenuToMainMenuTransition, multiMenuToRoomListingTransition, multiMenuToMainMenuTransition, soloMenuToMultiMenuTransition, soloMenuTosettingsPageTransition, multiMenuToSettingsPageTransition, settingsPageToMultiMenuTransition, settingsPageToSoloMenuTransition, multiMenuToRankedPageTransition, rankedPageToMultiMenuTransition, rankedPageToRoomListingTransition, roomListingToRankedPageTransition, scorePageToSoloMenuTransition, scorePageToSprintPageTransition, soloMenuToScorePageTransition, spintPageToScorePageTransition, soloMenuToPixiTestTransition, pixiTestToSoloMenuTransition, matchmakingSimulationToMultiMenuTransition, multiMenuToMatchmakingSimulationTransition, mainMenuToWerkschauTransition, werkschauToMainMenuTransition } from "./page.possible-transitions";
 import { Page } from "./i/page.i-page";
 import StartMenu from '../../pages/startmenu/StartMenu.vue';
 import Room from '../../pages/room/Room.vue';
@@ -17,6 +17,7 @@ import MultiMenu from '../../pages/multimenu/MultiMenu.vue';
 import { ref } from 'vue';
 import eventBus from "./page.event-bus";
 import { playSound } from "../asset/asset.howler-load";
+import Werkschau from "@/pages/werkschau/Werkschau.vue";
 
 export const pages: Page[] = [
     { title: 'StartMenu', pageState: PAGE_STATE.mainMenu, component: StartMenu },
@@ -31,7 +32,8 @@ export const pages: Page[] = [
     { title: 'Score', pageState: PAGE_STATE.scorePage, component: Score },
 
     { title: 'PixiTest', pageState: PAGE_STATE.pixiTest, component: PixiCanvas },
-    { title: 'MatchmakingSimulation', pageState: PAGE_STATE.matchmakingSimulation, component: MatchmakingSimulation }
+    { title: 'MatchmakingSimulation', pageState: PAGE_STATE.matchmakingSimulation, component: MatchmakingSimulation },
+    { title: 'Werkschau', pageState: PAGE_STATE.werkschauPage, component: Werkschau },
 ];
 
 export function setupTransitionFunctions() {
@@ -69,6 +71,8 @@ export function setupTransitionFunctions() {
     pixiTestToSoloMenuTransition.transitionFunction = pixiTestToSoloMenu;
     multiMenuToMatchmakingSimulationTransition.transitionFunction = multiMenuToMatchmakingSimulation;
     matchmakingSimulationToMultiMenuTransition.transitionFunction = matchmakingSimulationToMultiMenu;
+    werkschauToMainMenuTransition.transitionFunction = werkschauToMainMenu;
+    mainMenuToWerkschauTransition.transitionFunction = mainMenuToWerkschau;
 }
 
 export const currentPageState = ref<PAGE_STATE>(PAGE_STATE.mainMenu);
@@ -231,6 +235,14 @@ function multiMenuToMatchmakingSimulation(){
 }
 
 function matchmakingSimulationToMultiMenu(){
+    // console.log("current page: " + currentPageState.value);
+}
+
+function werkschauToMainMenu(){
+    // console.log("current page: " + currentPageState.value);
+}
+
+function mainMenuToWerkschau(){
     // console.log("current page: " + currentPageState.value);
 }
 

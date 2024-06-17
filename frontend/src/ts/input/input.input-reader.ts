@@ -140,6 +140,9 @@ function handleHeldDownKeys(): void {
                         }
                         input.controllerPressed = true;
                     } else {
+                        if(input.controllerPressed && input.release) {
+                            input.release();
+                        }
                         input.controllerPressed = false;
                     }
                 }

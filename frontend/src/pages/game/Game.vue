@@ -109,9 +109,8 @@
 </template>
 
 <script lang="ts">
-import { DEFAULT_APS } from '@/ts/game/settings/ref/game.settings.ref.all-handling-settings';
 import { GameMode } from '@/ts/page/e/page.e-leaderboard';
-import { PropType, defineComponent, onMounted } from 'vue';
+import { PropType, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'GamePage',
@@ -130,13 +129,7 @@ export default defineComponent({
       required: true,
       validator: (value: string): boolean => Object.values(GameMode).includes(value as GameMode),
     },
-  },
-  setup() {
-    onMounted(() => {
-      console.log(DEFAULT_APS.defaultValue);
-    });
-    return {};
-  },
+  }
 });
 
 </script>

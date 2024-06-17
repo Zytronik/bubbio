@@ -21,7 +21,7 @@ import { GAME_STATE } from "./i/game.e.state";
 import { getSprintSettings } from "./settings/game.settings.sprint";
 import { getHandlingSettings } from "./settings/game.settings.handling";
 import { getGridAsString, setupGrid } from "./logic/game.logic.grid-manager";
-import { playSound } from "../asset/asset.howler-load";
+import { playSound, playSoundtrack, stopSoundtrack } from "../asset/asset.howler-load";
 
 export const playerGameVisuals: GameVisuals = {
     asciiBoard: {
@@ -79,6 +79,7 @@ export const playerGameInstance: GameInstance = {
         onGameDefeat: () => { },
         onGameVictory: () => { },
     },
+    // eslint-disable-next-line
     sendGarbage: (garbageAmount: number) => { }
     /* eslint-enable @typescript-eslint/no-empty-function */
 };
@@ -107,6 +108,7 @@ export function setupSprintGame(): void {
         onGameDefeat: sprintDeath,
         onGameVictory: sprintVictory,
     }
+    // eslint-disable-next-line
     const onGarbageSend = function (garbageAmount: number): void { console.log("show fancy grafix") }
     const startSeed = getNextSeed(Date.now());
     const instance = createGameInstance(gameMode, gameSettings, handlingSettings, transitions, startSeed, "none", onGarbageSend);
@@ -118,10 +120,13 @@ export function setupSprintGame(): void {
         playerGameInstance.gameState = GAME_STATE.VICTORY_SCREEN;
         disableGameplay();
         eventBus.emit("sprintVictory");
+        stopSoundtrack();
+        playSound("win");
     }
     function sprintDeath(): void {
         playerGameInstance.gameState = GAME_STATE.DEFEAT_SCREEN;
         disableGameplay();
+        playSound("lose");
     }
 }
 export function preparePlayerGameInstance(instance: GameInstance): void {
@@ -146,7 +151,6 @@ export function preparePlayerGameInstance(instance: GameInstance): void {
     playerGameInstance.gameTransitions = instance.gameTransitions;
 }
 
-
 export function startGame(): void {
     playerGameInstance.gameTransitions.onGameStart();
 }
@@ -155,6 +159,7 @@ export function resetGame(): void {
 }
 export function leaveGame(): void {
     playerGameInstance.gameTransitions.onGameLeave();
+    stopSoundtrack();
 }
 export function rankedGameStart(): void {
     showCountDownAndStart();
@@ -171,6 +176,7 @@ function showCountDownAndStart(): void {
         enableGameInputs();
         enableResetInput();
         playerGameInstance.stats.gameStartTime = performance.now();
+        playSoundtrack("game_soundtrack");
     }
 }
 export function setGameStateAndNotify(gameState: GAME_STATE): void {
@@ -193,7 +199,6 @@ export function disableGameplay(): void {
     stopASCIIAnimation();
     stopStatDisplay();
 }
-
 
 //Inputs
 let previousUpdate = 0;
@@ -262,11 +267,10 @@ export function triggerHold(): void {
     network_sendInputs(playerGameInstance);
     updateBubbleHistory();
 }
+
 export function debugTriggerGarbage(): void {
     playerGameInstance.queuedGarbage += 1;
 }
-
-
 
 function updateBoardHistory(): void {
     const boardFrame: BoardHistoryFrame = {

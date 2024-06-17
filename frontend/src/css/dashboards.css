@@ -23,13 +23,13 @@
 }
 
 button.retry {
-    width: 30%;
+    width: 40%;
     font-size: 300%;
     cursor: pointer;
     border: none;
 }
 
-.page-wrapper .moveResultScreen-left {
+.page-wrapper .positionAbsolute {
     position: absolute;
 }
 
@@ -261,7 +261,7 @@ button.retry {
     background: white;
 }
 
-.page-wrapper .page-container div.addLeftTransitionToFixedElements {
+.page-wrapper .page-container div.addTransitionToFixedElements {
     transition: 0.5s;
 }
 
@@ -271,6 +271,10 @@ button.retry {
 
 .page-wrapper .slideLeftToCenter {
     animation: slideLeftToCenter 0.5s forwards;
+}
+
+.page-wrapper .slideRightToCenter {
+    animation: slideRightToCenter 0.5s forwards;
 }
 
 @keyframes slideToRight {
@@ -291,4 +295,18 @@ button.retry {
     to {
         transform: translateX(0);
     }
+}
+
+@keyframes slideRightToCenter {
+    from {
+        transform: translateX(110%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+.page-wrapper .positionRight {
+    transform: translateX(110%);
 }

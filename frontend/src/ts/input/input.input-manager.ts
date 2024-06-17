@@ -1,3 +1,5 @@
+import debounce from "debounce";
+import { MUSIC_VOLUME, SFX_VOLUME } from "../asset/asset.howler-load";
 import { angleCenter, angleLeft, angleMirror, angleRight, changeAPS, debugTriggerGarbage, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
 import { DEFAULT_APS, TOGGLE_APS } from "../game/settings/ref/game.settings.ref.all-handling-settings";
 import { checkUserAuthentication } from "../networking/networking.auth";
@@ -76,6 +78,7 @@ export function disableChannelInput(): void {
 
 interface Settings {
     handleSettings: { toggleAPS: number, defaultAPS: number },
+    audioSettings: { musicVolume: number, sfxVolume: number },
     inputSettings: Input[]
 }
 
@@ -101,24 +104,43 @@ export async function applySavedSettings(): Promise<void> {
         }
     }
 
-    if (settings && Array.isArray(settings.inputSettings)) {
-        settings.inputSettings.forEach(inputSetting => {
-            const input = allInputs.find(input => input.name === inputSetting.name);
-            if (input && inputSetting.customKeyMap) {
+    if (settings) {
+        if (Array.isArray(settings.inputSettings)) {
+            settings.inputSettings.forEach(inputSetting => {
+                const input = allInputs.find(input => input.name === inputSetting.name);
+                if (input && inputSetting.customKeyMap) {
+                    input.customKeyMap = inputSetting.customKeyMap;
+                }
+            });
+        }
 
-                input.customKeyMap = inputSetting.customKeyMap;
-            }
-        });
+        if (settings.handleSettings) {
+            DEFAULT_APS.refNumber.value = settings.handleSettings.defaultAPS ?? DEFAULT_APS.defaultValue;
+            TOGGLE_APS.refNumber.value = settings.handleSettings.toggleAPS ?? TOGGLE_APS.defaultValue;
+        }
 
-        DEFAULT_APS.refNumber.value = settings.handleSettings.defaultAPS ?? DEFAULT_APS.defaultValue;
-        TOGGLE_APS.refNumber.value = settings.handleSettings.toggleAPS ?? TOGGLE_APS.defaultValue;
+        if (settings.audioSettings) {
+            MUSIC_VOLUME.refNumber.value = settings.audioSettings.musicVolume ?? MUSIC_VOLUME.defaultValue;
+            SFX_VOLUME.refNumber.value = settings.audioSettings.sfxVolume ?? SFX_VOLUME.defaultValue;
+        } else {
+            console.warn('Audio settings are not defined in the fetched settings.');
+            MUSIC_VOLUME.refNumber.value = MUSIC_VOLUME.defaultValue;
+            SFX_VOLUME.refNumber.value = SFX_VOLUME.defaultValue;
+        }
+    } else {
+        console.warn('Settings could not be loaded.');
+        DEFAULT_APS.refNumber.value = DEFAULT_APS.defaultValue;
+        TOGGLE_APS.refNumber.value = TOGGLE_APS.defaultValue;
+        MUSIC_VOLUME.refNumber.value = MUSIC_VOLUME.defaultValue;
+        SFX_VOLUME.refNumber.value = SFX_VOLUME.defaultValue;
     }
 }
 
-export async function saveSettings() {
+export async function saveSettingsDebounced() {
     const settings = {
         "handleSettings": {"toggleAPS" : TOGGLE_APS.refNumber.value, "defaultAPS": DEFAULT_APS.refNumber.value},
-        "inputSettings": allInputs
+        "audioSettings": {"musicVolume": MUSIC_VOLUME.refNumber.value, "sfxVolume": SFX_VOLUME.refNumber.value},
+        "inputSettings": allInputs,
     }
     if (checkUserAuthentication() && !sessionStorage.getItem('isGuest')) { //if is logged in
         try {
@@ -137,3 +159,5 @@ export async function saveSettings() {
         localStorage.setItem('settings', JSON.stringify(settings));
     }
 }
+
+export const saveSettings = debounce(saveSettingsDebounced, 1000);

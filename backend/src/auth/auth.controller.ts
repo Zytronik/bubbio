@@ -33,7 +33,6 @@ export class AuthController {
 
     @Post('change-password')
     async changePassword(@Body() body: { token: string; password: string }): Promise<any> {
-        console.log(body.token, body.password);
         if (!body.token || !body.password) {
             throw new BadRequestException({
                 message: ['Missing token or New Password'],

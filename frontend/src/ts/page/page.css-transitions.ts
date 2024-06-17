@@ -10,7 +10,7 @@ export async function transitionEndScreenPageToRankedDashboard(dashboardSelector
     const resultScreen = document.querySelector(endScreenSelector) as HTMLElement;
     const container = document.querySelector('.page-container') as HTMLElement;
     container.classList.add('flex-row'); //add flex-row to container
-    dashboard.classList.add('moveResultScreen-left'); //position dashboard to the left
+    dashboard.classList.add('positionAbsolute'); //position dashboard to the left
     resultScreen.classList.add('slideToRight'); //slide result screen to the left
     dashboard.classList.add('slideLeftToCenter'); //slide dashboard to the left
     setTimeout(() => {
@@ -18,7 +18,7 @@ export async function transitionEndScreenPageToRankedDashboard(dashboardSelector
             onEnd();
         }
         resultScreen.classList.remove('slideToRight'); //reset styles
-        dashboard.classList.remove('moveResultScreen-left'); //reset styles
+        dashboard.classList.remove('positionAbsolute'); //reset styles
         dashboard.classList.remove('slideLeftToCenter'); //reset styles
         container.classList.remove('flex-row') //remove flex-row from container
     }, 500);
@@ -34,7 +34,7 @@ export async function transitionEndScreenPageToDashboard(dashboardSelector: stri
     const content = document.querySelector('.page-dashboard .content') as HTMLElement;
     const playWrapper = document.querySelector('.page-dashboard .play-wrapper') as HTMLElement;
     const contentTitle = document.querySelector('.page-dashboard .content-title') as HTMLElement;
-    dashboard.classList.add('moveResultScreen-left'); //position dashboard to the left
+    dashboard.classList.add('positionAbsolute'); //position dashboard to the left
 
     const contentLeft = window.getComputedStyle(content,null).getPropertyValue("left");
     const playWrapperLeft = window.getComputedStyle(playWrapper,null).getPropertyValue("left");
@@ -47,9 +47,9 @@ export async function transitionEndScreenPageToDashboard(dashboardSelector: stri
     resultScreen.classList.add('slideToRight'); //slide result screen to the left
 
     setTimeout(() => {
-        content.classList.add('addLeftTransitionToFixedElements');
-        playWrapper.classList.add('addLeftTransitionToFixedElements');
-        contentTitle.classList.add('addLeftTransitionToFixedElements');
+        content.classList.add('addTransitionToFixedElements');
+        playWrapper.classList.add('addTransitionToFixedElements');
+        contentTitle.classList.add('addTransitionToFixedElements');
         content.style.left = contentLeft;
         playWrapper.style.left = playWrapperLeft;
         contentTitle.style.left = contentTitleLeft;
@@ -64,16 +64,56 @@ export async function transitionEndScreenPageToDashboard(dashboardSelector: stri
         playWrapper.classList.remove('moveFixedLeftOutOfScreen');
         contentTitle.classList.remove('moveFixedLeftOutOfScreen');
 
-        content.classList.remove('addLeftTransitionToFixedElements');
-        playWrapper.classList.remove('addLeftTransitionToFixedElements');
-        contentTitle.classList.remove('addLeftTransitionToFixedElements');
+        content.classList.remove('addTransitionToFixedElements');
+        playWrapper.classList.remove('addTransitionToFixedElements');
+        contentTitle.classList.remove('addTransitionToFixedElements');
 
         content.style.removeProperty('left');
         playWrapper.style.removeProperty('left');
         contentTitle.style.removeProperty('left');
         
         resultScreen.classList.remove('slideToRight'); //reset styles
-        dashboard.classList.remove('moveResultScreen-left'); //reset styles
+        dashboard.classList.remove('positionAbsolute'); //reset styles
+    }, 501);
+}
+
+export async function transitionDashboardToResultView(dashboardSelector: string, endScreenSelector: string, onStart?: () => void, onEnd?: () => void){
+    if (onStart) {
+        onStart();
+    }
+    await nextTick(); // if i dont do this, dashboard is undefined
+    const dashboard = document.querySelector(dashboardSelector) as HTMLElement;
+    const resultScreen = document.querySelector(endScreenSelector) as HTMLElement;
+    const content = document.querySelector('.page-dashboard .content') as HTMLElement;
+    const playWrapper = document.querySelector('.page-dashboard .play-wrapper') as HTMLElement;
+    const contentTitle = document.querySelector('.page-dashboard .content-title') as HTMLElement;
+    
+    dashboard.classList.add('positionAbsolute');
+    resultScreen.classList.add('positionRight');
+
+    content.classList.add('addTransitionToFixedElements');
+    playWrapper.classList.add('addTransitionToFixedElements');
+    contentTitle.classList.add('addTransitionToFixedElements');
+
+    content.style.left = "-100%";
+    playWrapper.style.left = "-100%";
+    contentTitle.style.left = "-100%";
+
+    resultScreen.classList.add('slideRightToCenter');
+
+    setTimeout(() => {
+        if (onEnd) {
+            onEnd();
+        }
+
+        resultScreen.classList.remove('positionRight');
+
+        content.classList.remove('addTransitionToFixedElements');
+        playWrapper.classList.remove('addTransitionToFixedElements');
+        contentTitle.classList.remove('addTransitionToFixedElements');
+
+        resultScreen.classList.remove('slideRightToCenter');
+        dashboard.classList.remove('positionAbsolute');
     }, 501);
 }
 

@@ -1,6 +1,7 @@
 <template>
   <div class="chartContainer">
     <div class="chartWrapper">
+      <p class="notAvailable" v-if="!data.length">No data available.</p>
       <canvas ref="chartCanvas"></canvas>
     </div>
   </div>
@@ -129,10 +130,24 @@ export default defineComponent({
 .chartWrapper {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 .chartContainer canvas {
   width: 100% !important;
   height: 100% !important;
+}
+
+.notAvailable {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: unset;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 100px;
 }
 </style>

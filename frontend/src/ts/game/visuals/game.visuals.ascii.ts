@@ -7,6 +7,7 @@ import { calculatePreview } from "../logic/game.logic.shoot";
 import { Bubble } from "../i/game.i.bubble";
 import { GAME_STATE } from "../i/game.e.state";
 import { PreviewBubble } from "../i/game.i.preview-bubble";
+import { playSound } from "@/ts/asset/asset.howler-load";
 
 let asciiAnimationRunning = false;
 let asciiAnimationFrameId: number | null = null;
@@ -51,20 +52,41 @@ export function stopCountdownAnimation(): void {
     }
 }
 
+let hasPlayedSoundGo = false;
+let hasPlayedSound1 = false;
+let hasPlayedSound2 = false;
+let hasPlayedSound3 = false;
+
 function asciiCountdownAnimation(): void {
     const elapsedTime = performance.now() - countdownStartTime;
     const asciiRefs = playerGameVisuals.asciiBoard;
     if (elapsedTime < countdownDuration / 4) {
         asciiRefs.floatingText.value = showASCIICountdownNumber(0);
+        if(!hasPlayedSound3){
+            playSound("countDown3");
+            hasPlayedSound3 = true;
+        }
         setGameStateAndNotify(GAME_STATE.COUNTDOWN_3);
     } else if (elapsedTime < countdownDuration / 2) {
         asciiRefs.floatingText.value = showASCIICountdownNumber(1);
+        if(!hasPlayedSound2){
+            playSound("countDown2");
+            hasPlayedSound2 = true;
+        }
         setGameStateAndNotify(GAME_STATE.COUNTDOWN_2);
     } else if (elapsedTime < countdownDuration / 4 * 3) {
         asciiRefs.floatingText.value = showASCIICountdownNumber(2);
+        if(!hasPlayedSound1){
+            playSound("countDown1");
+            hasPlayedSound1 = true;
+        }
         setGameStateAndNotify(GAME_STATE.COUNTDOWN_1);
     } else {
         asciiRefs.floatingText.value = showASCIICountdownNumber(3);
+        if(!hasPlayedSoundGo){
+            playSound("countDownGo");
+            hasPlayedSoundGo = true;
+        }
         setGameStateAndNotify(GAME_STATE.COUNTDOWN_GO);
     }
     if (elapsedTime < countdownDuration && countdownAnimationRunning) {
@@ -73,6 +95,10 @@ function asciiCountdownAnimation(): void {
         stopCountdownAnimation();
         setGameStateAndNotify(GAME_STATE.IN_GAME);
         onCountdownFinished();
+        hasPlayedSoundGo = false;
+        hasPlayedSound1 = false;
+        hasPlayedSound2 = false;
+        hasPlayedSound3 = false;
     }
 }
 
@@ -139,7 +165,13 @@ function getRegularRowString(fields: Field[], isSmallerRow: boolean, previewPosi
 
     fields.forEach(field => {
         if (previewPosition.x === field.coords.x && previewPosition.y === field.coords.y) {
-            rowString += `<div class="preview">${currrentBubble.ascii}<div class="hold">${holdBubble ? holdBubble.ascii : ""}</div></div>`;
+            let cssClass = "";
+            if(currrentBubble.type === 6){
+                cssClass = "colorBlindWhite";
+            }else if(currrentBubble.type === 3){
+                cssClass = "colorBlindGreen";
+            }
+            rowString += `<div class="preview ${cssClass}">${currrentBubble.ascii}<div class="hold">${holdBubble ? holdBubble.ascii : ""}</div></div>`;
         } else {
             rowString += field.bubble ? `${field.bubble.ascii} ` : "<div class='field empty'></div>";
         }
@@ -193,7 +225,7 @@ function showASCIICountdownNumber(counter: number): string {
 
 const victoryASCII = `YOU WON!`;
 const defeatASCII = `YOU LOST!`;
-const countDown3 = `2`;
+const countDown3 = `3`;
 const countDown2 = `2`;
 const countDown1 = `1`;
 const countDownGO = `GO!`;

@@ -174,9 +174,9 @@ export default defineComponent({
     const queue = ref<User[]>([]);
     const matches = ref<Match[]>([]);
     const currentId = ref(1);
-    const speedFactor = ref(10);
+    const speedFactor = ref(100);
     const mmSettings = ref<MmSettings>()
-    const amountOfMultipleUsers = ref(10000);
+    const amountOfMultipleUsers = ref(100);
 
     onMounted(() => {
       changeBackgroundTo("black");
@@ -416,10 +416,12 @@ export default defineComponent({
       statistics.value.lowestRatingDifference = Math.min(statistics.value.lowestRatingDifference, ratingDifference);
     }
 
+    // eslint-disable-next-line
     const chartCanvas = ref<any>(null);
+    // eslint-disable-next-line
     const chartInstance = ref<any>(null);
 
-    const debouncedUpdateChart = debounce(updateChart, 1000);
+    const debouncedUpdateChart = debounce(updateChart, 10000);
 
     function updateChart() {
       if (!chartCanvas.value || !chartCanvas.value.getContext) {
@@ -483,6 +485,7 @@ export default defineComponent({
         chartInstance.value.destroy();
       }
 
+      // eslint-disable-next-line
       const config: any = {
         type: 'line',
         data: data,

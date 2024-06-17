@@ -42,6 +42,7 @@ export default {
         iconSrc: require(`@/img/icons/rooms.png`),
         pageState: PAGE_STATE.roomListing,
         bigButton: false,
+        authIds: ["1", "2", "3"],
       },
     ]);
 

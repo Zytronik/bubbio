@@ -45,7 +45,7 @@ const red: Bubble = {
     type: 0,
 }
 const orange: Bubble = {
-    ascii: `<div class="field bubble" style="background: rgb(255, 136, 0); border-color: rgb(255, 136, 0);"></div>`,
+    ascii: `<div class="field bubble" style="background: rgb(255, 150, 29); border-color: rgb(255, 150, 29);"></div>`,
     type: 1,
 }
 const yellow: Bubble = {
@@ -53,7 +53,7 @@ const yellow: Bubble = {
     type: 2,
 }
 const green: Bubble = {
-    ascii: `<div class="field bubble" style=" background: rgb(32, 226, 25); border-color: rgb(32, 226, 25);"></div>`,
+    ascii: `<div class="field bubble" style=" background: rgb(9, 255, 0); border-color: rgb(9, 100, 0);"></div>`,
     type: 3,
 }
 const cyan: Bubble = {
@@ -65,7 +65,7 @@ const purple: Bubble = {
     type: 5,
 }
 const white: Bubble = {
-    ascii: `<div class="field bubble" style=" background: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"></div>`,
+    ascii: `<div class="field bubble" style=" background: rgb(255, 255, 255); border-color: rgb(99, 99, 99);"></div>`,
     type: 6,
 }
 export const allBubbles: Bubble[] = [

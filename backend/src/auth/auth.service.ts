@@ -34,9 +34,6 @@ export class AuthService {
             // Fallback to the direct IP address of the request.
             ip = req.socket.remoteAddress;
         }
-
-        console.log(`Client IP: ${ip}`);
-
         return ip;
     }
 

@@ -15,7 +15,7 @@
         <div class="shape hidden"></div>
         <div class="spacer hidden"></div>
         <div class="row" v-for="(entry, index) in leaderboard" :key="index"
-          :class="{ 'me': entry.userId === userData?.id }">
+          :class="{ 'me': entry.userId === userData?.id }" :data-id="entry.id">
           <div class="cell">
             <p>#{{ index + 1 }}</p>
           </div>
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, PropType, ref } from 'vue';
+import { computed, defineComponent, onMounted, onUnmounted, PropType, ref } from 'vue';
 import { httpClient } from '@/ts/networking/networking.http-client';
 import { GameMode, LeaderboardCategory, SortDirection } from '@/ts/page/e/page.e-leaderboard';
 import { checkUserAuthentication } from '@/ts/networking/networking.auth';
@@ -138,7 +138,37 @@ export default defineComponent({
 
     onMounted(async () => {
       await fetchLeaderboardData();
+      setupLeaderboardClickEvents();
     });
+
+    onUnmounted(() => {
+      removeLeaderboardClickEvents();
+    });
+
+    function setupLeaderboardClickEvents() {
+      // eslint-disable-next-line
+      const leaderboardRecords = document.querySelectorAll('.leaderboard .row') as NodeListOf<HTMLElement>;
+      leaderboardRecords.forEach((record) => {
+        const handleClick = (event: Event) => {
+          const target = event.target as HTMLElement;
+          if (!target.closest('.user-info')) {
+            eventBus.emit('leaderboardRecordClicked', record.dataset.id);
+          }
+        };
+        record.addEventListener('click', handleClick);
+        record.dataset.clickHandler = handleClick.toString();
+      });
+    }
+
+    function removeLeaderboardClickEvents() {
+      // eslint-disable-next-line
+      const leaderboardRecords = document.querySelectorAll('.leaderboard .row') as NodeListOf<HTMLElement>;
+      leaderboardRecords.forEach((record) => {
+        const handleClick = new Function(`return ${record.dataset.clickHandler}`)();
+        record.removeEventListener('click', handleClick);
+        delete record.dataset.clickHandler;
+      });
+    }
 
     return {
       leaderboard,
@@ -183,6 +213,12 @@ p {
   display: flex;
   flex-direction: row;
   text-align: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.row:hover {
+  background-color: rgba(149, 149, 149, 0.2);
 }
 
 .head {
@@ -198,6 +234,7 @@ p {
 .row .cell:nth-of-type(2) {
   flex: 1.8;
   text-align: left;
+  z-index: 1;
 }
 
 .row:nth-of-type(3) .cell:first-of-type p {
@@ -222,6 +259,7 @@ p {
   box-sizing: border-box;
   display: flex;
   align-items: center;
+  z-index: 1;
 }
 
 .cell > p {
@@ -236,7 +274,8 @@ p {
   display: flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
+  position: relative;
+  z-index: 1;
 }
 
 .user-info img {

@@ -234,7 +234,7 @@ import { PlayerData } from '@/ts/game/network/dto/game.network.dto.end-screen';
 import { CountUp } from 'countup.js';
 import { formatDateToAgoText } from '@/ts/page/page.page-utils';
 import { transitionEndScreenPageToRankedDashboard, transitionOutOfGame } from '@/ts/page/page.css-transitions';
-import { playSound } from '@/ts/asset/asset.howler-load';
+import { playSound, playSoundtrack, stopSoundtrack } from '@/ts/asset/asset.howler-load';
 
 interface PlayerMatchmakingStats {
   userId: number;
@@ -370,6 +370,7 @@ export default {
       isInQueue.value = false;
       stopPassedTimeCountdown();
       playMatchFoundAnimation();
+      stopSoundtrack();
     }
 
     function playMatchFoundAnimation() {
@@ -418,27 +419,29 @@ export default {
       const player1 = document.querySelector('.scores-wrapper .player1') as HTMLElement;
       const player2 = document.querySelector('.scores-wrapper .player2') as HTMLElement;
       const firstTo = document.querySelector('.scores-wrapper .firstTo') as HTMLElement;
-      if (player1 && player2) {
-        player1.classList.add('slide-in-from-left');
-        player2.classList.add('slide-in-from-right');
-        setTimeout(() => {
-          firstTo.classList.add('fadeIn05');
-        }, 500); // css duration
-        setTimeout(() => {
-          firstTo.classList.add('fadeOut05');
+      setTimeout(() => {
+        if (player1 && player2) {
+          player1.classList.add('slide-in-from-left');
+          player2.classList.add('slide-in-from-right');
           setTimeout(() => {
-            player1.classList.add('slide-out-to-left');
-            player2.classList.add('slide-out-to-right');
-            setTimeout(() => {
-              player1.classList.remove('slide-in-from-left', 'slide-out-to-left');
-              player2.classList.remove('slide-in-from-right', 'slide-out-to-right');
-              firstTo.classList.remove('fadeIn05', 'fadeOut05');
-              showScores.value = false;
-              onAnimationnEnd();
-            }, 500);//css animation duration
+            firstTo.classList.add('fadeIn05');
           }, 500); // css duration
-        }, 3000);
-      }
+          setTimeout(() => {
+            firstTo.classList.add('fadeOut05');
+            setTimeout(() => {
+              player1.classList.add('slide-out-to-left');
+              player2.classList.add('slide-out-to-right');
+              setTimeout(() => {
+                player1.classList.remove('slide-in-from-left', 'slide-out-to-left');
+                player2.classList.remove('slide-in-from-right', 'slide-out-to-right');
+                firstTo.classList.remove('fadeIn05', 'fadeOut05');
+                showScores.value = false;
+                onAnimationnEnd();
+              }, 500);//css animation duration
+            }, 500); // css duration
+          }, 3000);
+        }
+      }, 500);
     }
 
     function showMatchScore() {
@@ -475,6 +478,7 @@ export default {
         specialBackButtonBehavior.value = true;
         animateElo();
       }, () => {
+        playSoundtrack('menu_soundtrack');
         disableResetInput();
         backInput.fire = goBackToRankedPage;
         enableBackInputs();

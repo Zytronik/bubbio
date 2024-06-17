@@ -23,7 +23,7 @@ import { dto_CountDown } from './network/dto/game.network.dto.count-down';
 import { dto_ScoreScreen } from './network/dto/game.network.dto.score-screen';
 import { dto_EndScreen } from './network/dto/game.network.dto.end-screen';
 import { GlickoService } from 'src/ranked/glicko.service';
-import { calculateTimeStats } from './logic/game.logic.stat-tracker';
+import { calculateTimeStats, createStatGraphData } from './logic/game.logic.stat-tracker';
 import { RankedService } from 'src/ranked/ranked.service';
 import { on } from 'events';
 import { UserService } from 'src/user/user.service';
@@ -479,11 +479,11 @@ export class GameGateway implements OnGatewayDisconnect {
               if (inputFrame.input === GAME_INPUT.SHOOT) {
                 game.gameInstance.angle = inputFrame.angle;
                 executeShot(game.gameInstance);
-                // updateBoardHistory(game.gameInstance, inputFrame.frameTime);
-                // updateBubbleHistory(game.gameInstance, inputFrame.frameTime);
+                updateBoardHistory(game.gameInstance, inputFrame.frameTime);
+                updateBubbleHistory(game.gameInstance, inputFrame.frameTime);
               } else if (inputFrame.input === GAME_INPUT.HOLD) {
                 holdBubble(game.gameInstance);
-                // updateBubbleHistory(game.gameInstance, inputFrame.frameTime);
+                updateBubbleHistory(game.gameInstance, inputFrame.frameTime);
               } else if (inputFrame.input === GAME_INPUT.GARBAGE_RECEIVED) {
                 game.gameInstance.queuedGarbage += inputFrame.garbageAmount;
                 if (game.gameInstance.queuedGarbage >= game.gameInstance.gameSettings.garbageToKill) {
@@ -491,8 +491,6 @@ export class GameGateway implements OnGatewayDisconnect {
                 }
               }
               game.gameInstance.stats.gameDuration = inputFrame.frameTime;
-              // console.log("push")
-              // game.gameInstance.gameStateHistory.inputHistory.push(inputFrame);
             }
           }
           this.updatePlayerSpectator(game)
@@ -600,6 +598,7 @@ export class GameGateway implements OnGatewayDisconnect {
         if (client.data && client.data.role === "User") {
           const username = await this.lobbyGateway.lobbyData.getUsername(client.id);
           const userId = await this.userService.getUserIdByUsername(username);
+          createStatGraphData(game.gameInstance);
           this.sprintService.saveSprintToDB(userId, game.gameInstance.stats);
         }
       }.bind(this)

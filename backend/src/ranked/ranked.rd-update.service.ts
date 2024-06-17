@@ -33,7 +33,7 @@ export class RdUpdateService {
       const lastGame2 = user.rankedGamesAsUser2[0]?.submittedAt;
       const lastPlayed = lastGame1 > lastGame2 ? lastGame1 : lastGame2;
 
-      if ((!lastPlayed || new Date(lastPlayed) < sevenDaysAgo) && user.ratingDeviation < 250) {
+      if ((!lastPlayed || new Date(lastPlayed) < sevenDaysAgo) && user.ratingDeviation < 350) {
         // Update the RD value for the user, ensuring it does not exceed 250
         await this.prisma.user.update({
           where: { id: user.id },
