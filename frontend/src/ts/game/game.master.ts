@@ -228,6 +228,10 @@ export function angleCenter(): void {
     playerGameInstance.angle = 90;
     updateAngleHistory();
 }
+export function angleMirror(): void {
+    playerGameInstance.angle = Math.abs(playerGameInstance.angle - 180);
+    updateAngleHistory();
+}
 export function changeAPS(): void {
     playerGameInstance.currentAPS = playerGameInstance.handlingSettings.toggleAPS;
 }
