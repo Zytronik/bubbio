@@ -249,3 +249,15 @@ export function getGridAsString(playGrid: Grid): string {
     });
     return gridAsString;
 }
+
+export function checkPerfectClear(playGrid: Grid): boolean {
+    let hasCleared = true;
+    playGrid.rows.forEach(row => {
+        row.fields.forEach(field => {
+            if (field.bubble != undefined) {
+                hasCleared = false;
+            }
+        });
+    });
+    return hasCleared;
+}

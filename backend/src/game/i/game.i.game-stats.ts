@@ -22,6 +22,8 @@ export interface GameStats {
 
     spikeNumber: number,
     spikeAnimationStart: number,
+    pcText: boolean,
+    pcTextAnimationStart: number,
     
     clear3: number,
     clear4: number,
@@ -33,6 +35,8 @@ export interface GameStats {
 
     wallBounces: number,
     wallBounceClears: number,
+
+    perfectClears: number,
 
     currentCombo: number,
     highestCombo: number,
