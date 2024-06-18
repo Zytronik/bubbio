@@ -52,7 +52,7 @@ export function shootBubble(game: GameInstance): {hasdied: boolean, clearAmount:
     }
     const gridField = snapToNextEmptyField(grid, bubbleCoords);
     gridField.bubble = bubble;
-    const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type, bounceAmount > 0);
+    const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type);
     const hasPerfectCleared = checkPerfectClear(grid);
     const attack = getGarbageAmount(bubblesCleared, game.stats.currentCombo, hasPerfectCleared);
     let defense = 0;
