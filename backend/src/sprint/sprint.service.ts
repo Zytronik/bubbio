@@ -5,7 +5,7 @@ import { NewsService } from 'src/news/news.service';
 import { GameStats } from 'src/game/i/game.i.game-stats';
 import { NewsGateway } from 'src/news/news.gateway';
 import { GameInstance } from 'src/game/i/game.i.game-instance';
-import { GameStateHistory } from 'src/game/i/game.i.game-state-history';
+import { GameStateHistory, compressReplayData } from 'src/game/i/game.i.game-state-history';
 
 @Injectable()
 export class SprintService {
@@ -93,19 +93,13 @@ export class SprintService {
                     clear3wb: gameInstance.stats.clear3wb,
                     clear4wb: gameInstance.stats.clear4wb,
                     clear5wb: gameInstance.stats.clear5wb,
-                    gameStateHistory: this.compressReplayData(gameInstance.gameStateHistory),
+                    gameStateHistory: JSON.stringify(compressReplayData(gameInstance.gameStateHistory)),
                 },
             });
         } catch (error) {
             console.error('Failed to create sprint due to:', error);
         }
     }
-
-    compressReplayData(gameStateHistory: GameStateHistory){
-        //TODO
-        return JSON.stringify(gameStateHistory);
-    }
-
 
     async getHistory(params: { userId: number, sortBy: string, sortDirection: string, limit: number }): Promise<any> {
         const { userId, sortBy, sortDirection, limit } = params;
