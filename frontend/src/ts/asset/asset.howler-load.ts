@@ -21,6 +21,7 @@ const audioFiles: Record<string, { path: string; volume: number; type: 'music' |
     countDownGo: { path: '/sounds/countDownGo.mp3', volume: 2, type: 'sfx' },
     win: { path: '/sounds/win.wav', volume: 0.3, type: 'sfx' },
     lose: { path: '/sounds/lose.wav', volume: 0.3, type: 'sfx' },
+    perfectClear: { path: '/sounds/allClear.mp3', volume: 0.3, type: 'sfx' },
 }
 
 export const MUSIC_VOLUME: NumberSetting = {

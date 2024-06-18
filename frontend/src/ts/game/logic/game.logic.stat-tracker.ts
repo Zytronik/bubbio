@@ -23,6 +23,7 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
 
     if (PC) {
         gameStats.pcText = true;
+        playSound("perfectClear");
         gameStats.pcTextAnimationStart = performance.now();
     }
 
