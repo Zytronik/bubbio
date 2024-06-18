@@ -93,6 +93,7 @@ model Sprint {
   clear3wb            Int             @default(0)
   clear4wb            Int             @default(0)
   clear5wb            Int             @default(0)
+  gameStateHistory    String          @default("[]")
 }
 
 model Score {

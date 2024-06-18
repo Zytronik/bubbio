@@ -4,6 +4,8 @@ import { UserService } from 'src/user/user.service';
 import { NewsService } from 'src/news/news.service';
 import { GameStats } from 'src/game/i/game.i.game-stats';
 import { NewsGateway } from 'src/news/news.gateway';
+import { GameInstance } from 'src/game/i/game.i.game-instance';
+import { GameStateHistory } from 'src/game/i/game.i.game-state-history';
 
 @Injectable()
 export class SprintService {
@@ -19,10 +21,10 @@ export class SprintService {
         
     ) { }
 
-    async saveSprintToDB(userId: number, sprintStats: GameStats): Promise<any> {
+    async saveSprintToDB(userId: number, gameInstance: GameInstance): Promise<any> {
         // Create Sprint
-        const newSprint = await this.createSprint(userId, sprintStats);
-        const sprintTime = sprintStats.gameDuration;
+        const newSprint = await this.createSprint(userId, gameInstance);
+        const sprintTime = gameInstance.stats.gameDuration;
 
         // Get User by ID
         const user = await this.userService.getUserById(userId);
@@ -63,7 +65,7 @@ export class SprintService {
         return leaderboardRecords;
     }
 
-    async createSprint(userId: number, sprintStats: GameStats): Promise<any> {
+    async createSprint(userId: number, gameInstance: GameInstance): Promise<any> {
         try {
             const userExists = await this.prisma.user.findUnique({
                 where: { id: userId },
@@ -75,27 +77,33 @@ export class SprintService {
             return await this.prisma.sprint.create({
                 data: {
                     userId: userId,
-                    bpsGraph: JSON.stringify(sprintStats.bpsGraph),
-                    bubblesCleared: sprintStats.bubblesCleared,
-                    bubblesShot: sprintStats.bubblesShot,
-                    bubblesPerSecond: sprintStats.bubblesPerSecond,
-                    gameDuration: sprintStats.gameDuration,
-                    highestBubbleClear: sprintStats.highestBubbleClear,
-                    wallBounces: sprintStats.wallBounces,
-                    wallBounceClears: sprintStats.wallBounceClears,
-                    highestCombo: sprintStats.highestCombo,
-                    bubbleClearToWin: sprintStats.bubbleClearToWin,
-                    clear3: sprintStats.clear3,
-                    clear4: sprintStats.clear4,
-                    clear5: sprintStats.clear5,
-                    clear3wb: sprintStats.clear3wb,
-                    clear4wb: sprintStats.clear4wb,
-                    clear5wb: sprintStats.clear5wb,
+                    bpsGraph: JSON.stringify(gameInstance.stats.bpsGraph),
+                    bubblesCleared: gameInstance.stats.bubblesCleared,
+                    bubblesShot: gameInstance.stats.bubblesShot,
+                    bubblesPerSecond: gameInstance.stats.bubblesPerSecond,
+                    gameDuration: gameInstance.stats.gameDuration,
+                    highestBubbleClear: gameInstance.stats.highestBubbleClear,
+                    wallBounces: gameInstance.stats.wallBounces,
+                    wallBounceClears: gameInstance.stats.wallBounceClears,
+                    highestCombo: gameInstance.stats.highestCombo,
+                    bubbleClearToWin: gameInstance.stats.bubbleClearToWin,
+                    clear3: gameInstance.stats.clear3,
+                    clear4: gameInstance.stats.clear4,
+                    clear5: gameInstance.stats.clear5,
+                    clear3wb: gameInstance.stats.clear3wb,
+                    clear4wb: gameInstance.stats.clear4wb,
+                    clear5wb: gameInstance.stats.clear5wb,
+                    gameStateHistory: this.compressReplayData(gameInstance.gameStateHistory),
                 },
             });
         } catch (error) {
             console.error('Failed to create sprint due to:', error);
         }
+    }
+
+    compressReplayData(gameStateHistory: GameStateHistory){
+        //TODO
+        return JSON.stringify(gameStateHistory);
     }
 
 

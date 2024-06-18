@@ -599,7 +599,7 @@ export class GameGateway implements OnGatewayDisconnect {
           const username = await this.lobbyGateway.lobbyData.getUsername(client.id);
           const userId = await this.userService.getUserIdByUsername(username);
           createStatGraphData(game.gameInstance);
-          this.sprintService.saveSprintToDB(userId, game.gameInstance.stats);
+          this.sprintService.saveSprintToDB(userId, game.gameInstance);
         }
       }.bind(this)
     }

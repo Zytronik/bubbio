@@ -9,7 +9,7 @@ export function getSprintSettings(): GameSettings {
     const refillAmount = Math.ceil(prefillAmount / 3);
     let sprintVictoryCondition = 100;
     if(isLocal){
-        sprintVictoryCondition = 300;
+        sprintVictoryCondition = 100;
     }
     return {
         gridWidth: GRID_WIDTH.defaultValue,
