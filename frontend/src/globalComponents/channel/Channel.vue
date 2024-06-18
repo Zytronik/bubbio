@@ -308,7 +308,7 @@ export default {
 
     function animateStat(element: HTMLElement | null, endVal: number, isHours = false) {
       if (element) {
-        const formatFn = isHours ? (num: number) => `${Math.round(num)}h` : (num: number) => `${num}`;
+        const formatFn = isHours ? (num: number) => `${num}h` : (num: number) => `${num}`;
 
         const countUp = new CountUp(element, endVal, { formattingFn: formatFn });
         if (!countUp.error) {
@@ -321,7 +321,7 @@ export default {
       try {
         const response = await httpClient.get('/sprint/globalStats');
         stats.value.gamesPlayed = response.data.totalGames;
-        stats.value.totalPlayTime = response.data.totalPlayTime / 1000 / 60 / 60;
+        stats.value.totalPlayTime = response.data.totalPlayTime;
         if (state.socket) {
           state.socket.emit('fetchGlobalStats');
         }

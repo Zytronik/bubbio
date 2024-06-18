@@ -169,7 +169,7 @@ export class SprintService {
     async getGlobalStats(){
         const totalSprintDuration = await this.getTotalSprintDuration();
         const totalRankedDuration = await this.getTotalRankedDuration();
-        const totalPlayTime = totalSprintDuration + totalRankedDuration;
+        const totalPlayTime = Math.round((totalSprintDuration + totalRankedDuration) / 1000 / 60 / 60);
         const totalGames = await this.getTotalGamesPlayed();
         return {totalPlayTime, totalGames};
     }
