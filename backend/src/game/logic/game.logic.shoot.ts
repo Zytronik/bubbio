@@ -1,5 +1,5 @@
 import { getVelocity } from "./game.logic.angle";
-import { dissolveBubbles, getNearbyFields } from "./game.logic.grid-manager";
+import { checkPerfectClear, dissolveBubbles, getNearbyFields } from "./game.logic.grid-manager";
 import { trackBubbleShot } from "./game.logic.stat-tracker";
 import { Field } from "../i/game.i.field";
 import { GameInstance } from "../i/game.i.game-instance";
@@ -52,8 +52,9 @@ export function shootBubble(game: GameInstance): {hasdied: boolean, clearAmount:
     }
     const gridField = snapToNextEmptyField(grid, bubbleCoords);
     gridField.bubble = bubble;
-    const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type);
-    const attack = getGarbageAmount(bubblesCleared, game.stats.currentCombo, bounceAmount > 0)
+    const bubblesCleared = dissolveBubbles(grid, gridField, bubble.type, bounceAmount > 0);
+    const hasPerfectCleared = checkPerfectClear(grid);
+    const attack = getGarbageAmount(bubblesCleared, game.stats.currentCombo, hasPerfectCleared);
     let defense = 0;
     game.stats.attack += attack;
     if (attack > 0) {
@@ -65,7 +66,7 @@ export function shootBubble(game: GameInstance): {hasdied: boolean, clearAmount:
             game.queuedGarbage = 0;
         }
     }
-    trackBubbleShot(game, bounceAmount, bubblesCleared, attack, defense);
+    trackBubbleShot(game, bounceAmount, bubblesCleared, attack, defense, hasPerfectCleared);
 
     if (bubblesCleared < 3 && grid.rows[gridField.coords.y].isInDeathZone) {
         game.gameTransitions.onGameDefeat();
