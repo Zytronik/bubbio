@@ -7,9 +7,9 @@ import { AuthenticatedRequest } from 'src/auth/e/auth.e-auth-request';
 export class SprintController {
   constructor(private readonly sprintService: SprintService) { }
 
-  @Get('totalGames')
-  async getTotalGamesPlayed() {
-    return await this.sprintService.getTotalGamesPlayed();
+  @Get('globalStats')
+  async handleGetGlobalStats() {
+    return await this.sprintService.getGlobalStats();
   }
 
   @UseGuards(JwtAuthGuard)

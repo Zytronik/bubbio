@@ -139,6 +139,41 @@ export class SprintService {
         return this.prisma.sprint.count();
     }
 
+    async getTotalSprintDuration() {
+        const totalSprintDuration = await this.prisma.sprint.aggregate({
+            _sum: {
+                gameDuration: true,
+            },
+        });
+        return totalSprintDuration._sum.gameDuration;
+    }
+
+    async getTotalRankedDuration(): Promise<number> {
+        // Fetch all ranked games from the database
+        const rankedGames = await this.prisma.ranked.findMany();
+    
+        // Calculate the total duration
+        let totalDuration = 0;
+        for (const game of rankedGames) {
+            const user1Stats: GameStats = JSON.parse(game.user1Stats);
+            const user2Stats: GameStats = JSON.parse(game.user2Stats);
+            if(user1Stats[0] && user2Stats[0]){
+                totalDuration += user1Stats[0].gameDuration;
+                totalDuration += user2Stats[0].gameDuration;
+            }
+        }
+        
+        return totalDuration;
+    }
+
+    async getGlobalStats(){
+        const totalSprintDuration = await this.getTotalSprintDuration();
+        const totalRankedDuration = await this.getTotalRankedDuration();
+        const totalPlayTime = Math.round((totalSprintDuration + totalRankedDuration) / 1000 / 60 / 60);
+        const totalGames = await this.getTotalGamesPlayed();
+        return {totalPlayTime, totalGames};
+    }
+
     async getTotalGamesPlayedByUser(userId: number): Promise<number> {
         return this.prisma.sprint.count({
             where: {

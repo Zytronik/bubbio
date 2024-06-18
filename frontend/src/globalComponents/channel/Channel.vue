@@ -23,8 +23,8 @@
                       <p>People Online</p>
                     </div>
                     <div class="stat">
-                      <span ref="activeLobbiesRef">{{ stats.activeLobbies }}</span>
-                      <p>Active Lobbies</p>
+                      <span ref="totalPlayTimeRef">{{ stats.totalPlayTime }}h</span>
+                      <p>Total Playtime</p>
                     </div>
                     <div class="stat">
                       <span ref="registeredUsersRef">{{ stats.registeredUsers }}</span>
@@ -272,19 +272,19 @@ export default {
     /* Stats */
     interface GlobalStats {
       peopleOnline: number;
-      activeLobbies: number;
+      totalPlayTime: number;
       registeredUsers: number;
       gamesPlayed?: number;
     }
 
     const stats = ref({
       peopleOnline: 0,
-      activeLobbies: 0,
+      totalPlayTime: 0,
       registeredUsers: 0,
       gamesPlayed: 0,
     });
     const peopleOnlineRef = ref(null);
-    const activeLobbiesRef = ref(null);
+    const totalPlayTimeRef = ref(null);
     const registeredUsersRef = ref(null);
     const gamesPlayedRef = ref(null);
     let intervalId = 0;
@@ -293,22 +293,24 @@ export default {
     function handleGlobalStatsUpdate(globalStats: GlobalStats) {
       stats.value = {
         peopleOnline: globalStats.peopleOnline,
-        activeLobbies: globalStats.activeLobbies,
+        totalPlayTime: globalStats.totalPlayTime ?? stats.value.totalPlayTime,
         registeredUsers: globalStats.registeredUsers,
         gamesPlayed: globalStats.gamesPlayed ?? stats.value.gamesPlayed,
       };
       if (!initialAnimationDone.value) {
         animateStat(peopleOnlineRef.value, stats.value.peopleOnline);
-        animateStat(activeLobbiesRef.value, stats.value.activeLobbies);
+        animateStat(totalPlayTimeRef.value, stats.value.totalPlayTime, true);
         animateStat(registeredUsersRef.value, stats.value.registeredUsers);
         animateStat(gamesPlayedRef.value, stats.value.gamesPlayed);
         initialAnimationDone.value = true;
       }
     }
 
-    function animateStat(element: HTMLElement | null, endVal: number) {
+    function animateStat(element: HTMLElement | null, endVal: number, isHours = false) {
       if (element) {
-        const countUp = new CountUp(element, endVal);
+        const formatFn = isHours ? (num: number) => `${num}h` : (num: number) => `${num}`;
+
+        const countUp = new CountUp(element, endVal, { formattingFn: formatFn });
         if (!countUp.error) {
           countUp.start();
         }
@@ -317,8 +319,9 @@ export default {
 
     async function fetchStats() {
       try {
-        const response = await httpClient.get('/sprint/totalGames');
-        stats.value.gamesPlayed = response.data;
+        const response = await httpClient.get('/sprint/globalStats');
+        stats.value.gamesPlayed = response.data.totalGames;
+        stats.value.totalPlayTime = response.data.totalPlayTime;
         if (state.socket) {
           state.socket.emit('fetchGlobalStats');
         }
@@ -427,7 +430,7 @@ export default {
       messages,
       messagesContainer,
       peopleOnlineRef,
-      activeLobbiesRef,
+      totalPlayTimeRef,
       registeredUsersRef,
       gamesPlayedRef,
       isVisible,

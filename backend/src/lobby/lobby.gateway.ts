@@ -97,7 +97,6 @@ export class LobbyGateway implements OnGatewayConnection {
     const peopleOnline = this.lobbyData["noRoom"].length;
     const registeredUsers = await this.userService.getTotalRegisteredUsersCount();
     client.emit('fetchGlobalStats', {
-      activeLobbies,
       peopleOnline,
       registeredUsers,
     });
