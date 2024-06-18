@@ -30,14 +30,14 @@
           <p
             v-if="playerGameVisuals.statNumbers.currentCombo > 0 || playerGameVisuals.statNumbers.currentCombo.value > 0">
             Combo {{
-            areRef ? playerGameVisuals.statNumbers.currentCombo.value : playerGameVisuals.statNumbers.currentCombo }}
+              areRef ? playerGameVisuals.statNumbers.currentCombo.value : playerGameVisuals.statNumbers.currentCombo }}
           </p>
         </transition>
         <transition name="fade">
           <p
             v-if="(areRef && playerGameVisuals.statNumbers.spikeNumber.value) || (!areRef && playerGameVisuals.statNumbers.spikeNumber)">
             Spike {{
-            areRef ? playerGameVisuals.statNumbers.spikeNumber.value : playerGameVisuals.statNumbers.spikeNumber }}</p>
+              areRef ? playerGameVisuals.statNumbers.spikeNumber.value : playerGameVisuals.statNumbers.spikeNumber }}</p>
         </transition>
       </div>
     </div>
@@ -85,9 +85,11 @@
     <div class="gameUI-wrapper">
       <p class="hold-text"><span class="text-noWhiteSpaces">H</span><span class="text-noWhiteSpaces">old</span></p>
       <div class="hold-wrapper">
-        <div class="" v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString"></div>
+        <div class=""
+          v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString">
+        </div>
       </div>
-        <div class="garbage-wrapper"
+      <div class="garbage-wrapper"
         v-html="areRef ? playerGameVisuals.asciiBoard.incomingGarbage.value : playerGameVisuals.asciiBoard.incomingGarbage">
       </div>
       <p class="queue-text"><span class="text-noWhiteSpaces">Q</span><span class="text-noWhiteSpaces">ueue</span></p>
@@ -101,6 +103,10 @@
       <div class="board"
         v-html="areRef ? playerGameVisuals.asciiBoard.playGridASCII.value : playerGameVisuals.asciiBoard.playGridASCII">
       </div>
+      <transition name="fade">
+        <div v-if="areRef ? playerGameVisuals.statNumbers.showPC.value : playerGameVisuals.statNumbers.showPC"
+          class="overlap-infos allClear">All Clear</div>
+      </transition>
       <div class="overlap-infos"
         v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText">
       </div>
