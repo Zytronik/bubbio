@@ -41,6 +41,7 @@ export const playerGameVisuals: GameVisuals = {
         attackPerMinute: ref(0),
         currentCombo: ref(0),
         spikeNumber: ref(""),
+        showPC: ref(false),
     },
     timeDifference: 0,
     playerName: "",

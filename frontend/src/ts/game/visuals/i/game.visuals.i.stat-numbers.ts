@@ -10,4 +10,5 @@ export interface StatNumberRefs {
     attackPerMinute: Ref<number>,
     currentCombo: Ref<number>,
     spikeNumber: Ref<string>,
+    showPC: Ref<boolean>,
 }

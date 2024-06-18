@@ -4,7 +4,7 @@ import { GameStats } from "../i/game.i.game-stats";
 import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
 
 const SPIKE_COUNTER_TIMEFRAME = 1500;
-export function trackBubbleShot(game: GameInstance, wallBounces: number, amountCleared: number, attack: number, defense: number): void {
+export function trackBubbleShot(game: GameInstance, wallBounces: number, amountCleared: number, attack: number, defense: number, PC: boolean): void {
     const gameStats = game.stats;
     gameStats.bubblesShot++;
     gameStats.wallBounces += wallBounces;
@@ -21,10 +21,19 @@ export function trackBubbleShot(game: GameInstance, wallBounces: number, amountC
         gameStats.spikeAnimationStart = performance.now();
     }
 
+    if (PC) {
+        gameStats.pcText = true;
+        gameStats.pcTextAnimationStart = performance.now();
+    }
+
     if (amountCleared > 0) {
         trackClearedBubbles(wallBounces, amountCleared);
     } else {
         breakCombo();
+    }
+
+    if (PC) {
+        gameStats.perfectClears++;
     }
 
     gameStats.bubblesLeftToClear = gameStats.bubbleClearToWin - gameStats.bubblesCleared;

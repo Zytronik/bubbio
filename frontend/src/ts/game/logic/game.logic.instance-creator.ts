@@ -103,6 +103,8 @@ export function getEmptyStats(gameSettings: GameSettings): GameStats {
         defensePerBubble: 0,
         spikeNumber: 0,
         spikeAnimationStart: 0,
+        pcText: false,
+        pcTextAnimationStart: 0,
         clear3: 0,
         clear4: 0,
         clear5: 0,
@@ -112,6 +114,7 @@ export function getEmptyStats(gameSettings: GameSettings): GameStats {
         highestBubbleClear: 0,
         wallBounces: 0,
         wallBounceClears: 0,
+        perfectClears: 0,
         currentCombo: 0,
         highestCombo: 0,
     }

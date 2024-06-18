@@ -7,6 +7,7 @@ import { StatNumberRefs } from "./i/game.visuals.i.stat-numbers";
 let trackingFrameId: number | null = null;
 let statTrackingRunning = false;
 const SPIKE_COUNTER_TIMEFRAME = 1500;
+const PC_TEXT_TIMEFRAME = 2000;
 export function startStatDisplay(): void {
     if (!statTrackingRunning) {
         statTrackingRunning = true;
@@ -53,6 +54,14 @@ export function fillStatStrings(gameInstance: GameInstance, statStrings: StatNum
         statStrings.spikeNumber.value = "" + gameStats.spikeNumber;
     } else {
         statStrings.spikeNumber.value = "";
+    }
+    if (gameStats.pcText) {
+        if (gameStats.pcTextAnimationStart + PC_TEXT_TIMEFRAME > performance.now()) {
+            statStrings.showPC.value = true;
+        } else {
+            statStrings.showPC.value = false;
+            gameStats.pcText = false;
+        }
     }
 }
 
