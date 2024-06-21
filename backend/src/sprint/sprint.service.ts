@@ -9,8 +9,8 @@ import { GameStateHistory, compressReplayData } from 'src/game/i/game.i.game-sta
 
 @Injectable()
 export class SprintService {
-    private werkschauPlayer1ID: number = 46; //46
-    private werkschauPlayer2ID: number = 47; //47
+    private werkschauPlayer1ID: number = 1; //46
+    private werkschauPlayer2ID: number = 2; //47
 
     constructor(
         private prisma: PrismaService,

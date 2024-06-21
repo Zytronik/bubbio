@@ -130,6 +130,7 @@ export default {
     const leaderboard = ref<LeaderboardEntry[]>([]);
     const loading = ref(false);
     const noEntries = ref(false);
+    let scrollToTopTimeout: number | null = null;
 
     const filteredLeaderboard = computed(() => {
       return leaderboard.value.map(entry => {
@@ -153,18 +154,63 @@ export default {
       }
       addGameViewStyles();
       mountSocketListeners();
+      setupInteractionListeners(); // Interaktionslistener hinzufügen
+      resetScrollTimeout(); // Timeout für das erste Mal setzen
     });
 
     onUnmounted(() => {
       removeWerkschauFromUrl();
       removeGameViewStyles();
       unmountSocketListeners();
+      removeInteractionListeners(); // Interaktionslistener entfernen
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
     });
+
+    let scrollTimeout: number | undefined;
+
+    function resetScrollTimeout() {
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      scrollTimeout = setTimeout(() => {
+        scrollToTop();
+      }, 5000); // 5 seconds
+    }
+
+    function scrollToTop() {
+      const leaderboardWrapper = document.querySelector('.werkschau-content-wrapper');
+      if (leaderboardWrapper) {
+        leaderboardWrapper.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function setupInteractionListeners() {
+      const leaderboardWrapper = document.querySelector('.werkschau-content-wrapper');
+      if (leaderboardWrapper) {
+        leaderboardWrapper.addEventListener('scroll', resetScrollTimeout);
+        leaderboardWrapper.addEventListener('mousemove', resetScrollTimeout);
+        leaderboardWrapper.addEventListener('touchmove', resetScrollTimeout);
+        leaderboardWrapper.addEventListener('keydown', resetScrollTimeout);
+      }
+    }
+
+    function removeInteractionListeners() {
+      const leaderboardWrapper = document.querySelector('.werkschau-content-wrapper');
+      if (leaderboardWrapper) {
+        leaderboardWrapper.removeEventListener('scroll', resetScrollTimeout);
+        leaderboardWrapper.removeEventListener('mousemove', resetScrollTimeout);
+        leaderboardWrapper.removeEventListener('touchmove', resetScrollTimeout);
+        leaderboardWrapper.removeEventListener('keydown', resetScrollTimeout);
+      }
+    }
 
     function mountSocketListeners() {
       if (state.socket) {
         state.socket.on('newWerkschauRecord', (newRecord: NewRecord) => {
           newWerkschauRecord(newRecord);
+          resetScrollToTopTimeout();
         });
       }
     }
@@ -176,6 +222,7 @@ export default {
     }
 
     function newWerkschauRecord(newRecord: NewRecord) {
+      console.log('New Werkschau record:', newRecord);
       loading.value = true;
       //remove me class from previous record
       const previousRecordElement = document.querySelector('.row.me');
@@ -207,6 +254,19 @@ export default {
       }
     }
 
+    function startScrollToTopTimeout() {
+      scrollToTopTimeout = window.setTimeout(() => {
+        document.querySelector('.werkschau-content-wrapper')?.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 15000);
+    }
+
+    function resetScrollToTopTimeout() {
+      if (scrollToTopTimeout !== null) {
+        clearTimeout(scrollToTopTimeout);
+      }
+      startScrollToTopTimeout();
+    }
+
     return {
       goToState,
       PAGE_STATE,
@@ -221,6 +281,7 @@ export default {
   },
 };
 </script>
+
 
 
 <style scoped>
@@ -262,23 +323,23 @@ export default {
 }
 
 .sprint-title {
-    position: fixed;
-    right: 0%;
-    bottom: 20%;
-    transform: rotate(90deg) skewY(-10deg);
-    text-transform: uppercase;
-    z-index: 10;
+  position: fixed;
+  right: 0%;
+  bottom: 20%;
+  transform: rotate(90deg) skewY(-10deg);
+  text-transform: uppercase;
+  z-index: 10;
 }
 
 .sprint-title h2 {
-    margin: 0;
-    font-size: 7em;
-    display: flex;
-    align-items: flex-end;
+  margin: 0;
+  font-size: 7em;
+  display: flex;
+  align-items: flex-end;
 }
 
 .sprint-title span:first-of-type {
-    font-size: 150%;
+  font-size: 150%;
 }
 
 h1 {
