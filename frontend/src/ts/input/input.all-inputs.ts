@@ -177,12 +177,12 @@ export const allInputs: Input[] = [
     angleRightInput,
     changeAPSInput,
     centerCursorInput,
+    mirrorCursorInput,
     shootInput,
     holdInput,
     resetInput,
     backInput,
     channelInput,
-    mirrorCursorInput,
 ]
 
 const allKeyCodes = [
