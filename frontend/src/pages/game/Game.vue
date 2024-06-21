@@ -110,7 +110,7 @@
       <div class="overlap-infos"
         v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText">
       </div>
-      <span class="username text-center" v-html="playerGameVisuals.playerName.value.toUpperCase()"></span>
+      <span class="username text-center" v-html="areRef ? playerGameVisuals.playerName.value.toUpperCase() : playerGameVisuals.playerName.toUpperCase()"></span>
     </div>
   </div>
 
