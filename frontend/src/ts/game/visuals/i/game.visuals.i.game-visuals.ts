@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { Ref, ref } from "vue";
 import { AsciiBoardRefs } from "./game.visuals.i.ascii-board";
 import { StatNumberRefs } from "./game.visuals.i.stat-numbers";
 
@@ -6,7 +6,7 @@ export interface GameVisuals {
     asciiBoard: AsciiBoardRefs,
     statNumbers: StatNumberRefs,
     timeDifference: number,
-    playerName: string,
+    playerName: Ref<string>,
 }
 
 export function getEmptyGameVisuals(): GameVisuals {
@@ -31,6 +31,6 @@ export function getEmptyGameVisuals(): GameVisuals {
             showPC: ref(false),
         },
         timeDifference: 0,
-        playerName: "",
+        playerName: ref(""),
     }
 }

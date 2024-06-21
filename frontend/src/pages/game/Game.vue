@@ -83,7 +83,7 @@
 
 
     <div class="gameUI-wrapper">
-      <p class="hold-text"><span class="text-noWhiteSpaces">H</span><span class="text-noWhiteSpaces">old</span></p>
+      <p class="hold-text"><span class="text-noWhiteSpaces">S</span><span class="text-noWhiteSpaces">witch</span></p>
       <div class="hold-wrapper">
         <div class=""
           v-html="areRef ? playerGameVisuals.asciiBoard.holdString.value : playerGameVisuals.asciiBoard.holdString">
@@ -110,7 +110,7 @@
       <div class="overlap-infos"
         v-html="areRef ? playerGameVisuals.asciiBoard.floatingText.value : playerGameVisuals.asciiBoard.floatingText">
       </div>
-      <span class="username text-center" v-html="playerGameVisuals.playerName.toUpperCase()"></span>
+      <span class="username text-center" v-html="playerGameVisuals.playerName.value.toUpperCase()"></span>
     </div>
   </div>
 

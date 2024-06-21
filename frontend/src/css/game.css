@@ -182,8 +182,13 @@
     padding: var(--game-board-padding);
 }
 
+.RankedPage .gameUI-wrapper .board::before {
+    border-right-color: var(--ranked-color);
+    border-bottom-color: var(--ranked-color);
+}
+
 .gameUI-wrapper .board::before {
-    border-top: 40vh solid transparent;
+    border-top: 45vh solid transparent;
     border-right: var(--game-board-border-width) solid var(--sprint-color);
     content: "";
     position: absolute;
@@ -351,9 +356,9 @@
 }
 
 .gameUI-wrapper .hold-text {
-    top: 22vh;
+    top: 27vh;
     right: 100%;
-    transform: rotate(90deg) translate(-50% , -8%);
+    transform: rotate(90deg) translate(-50%, -65%);
 }
 
 .gameUI-wrapper .queue-text,

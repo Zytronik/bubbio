@@ -201,6 +201,17 @@
         <div v-if="isGaming" class="gaming-wrapper">
           <Game :playerGameVisuals="playerGameVisuals" :areRef="true" :gameMode="GameMode.Ranked" />
           <Game :playerGameVisuals="enemyVisuals" :areRef="true" :gameMode="GameMode.Ranked" />
+          <div class="scoreboard">
+            <div class="player1">
+              <p v-html="playerGameVisuals.playerName.value.toUpperCase()"></p>
+              <p>{{ player1Score }}</p>
+            </div>
+            <p>FT2</p>
+            <div class="player2">
+              <p>{{ player2Score }}</p>
+              <p v-html="enemyVisuals.playerName.value.toUpperCase()"></p>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -292,6 +303,8 @@ export default {
     const backInputOnLoad = ref<() => void>(() => "");
     let passedTimeInterval: ReturnType<typeof setInterval> | undefined = 0;
     const isLoggedIn = computed(() => checkUserAuthentication() && !sessionStorage.getItem('isGuest'));
+    const player1Score = ref<number>(0);
+    const player2Score = ref<number>(0);
 
     function getProgressBarFillWidth() {
       if (!playerStats.value || !playerStats.value.rankInfo.prevRank || !playerStats.value.rankInfo.nextRank) {
@@ -445,6 +458,13 @@ export default {
     }
 
     function showMatchScore() {
+      if(playerStats.value && playerStats.value.userId === scoreScreenData.player1Data.playerID) {
+        player1Score.value = scoreScreenData.player1Data.playerScore;
+        player2Score.value = scoreScreenData.player2Data.playerScore;
+      } else {
+        player1Score.value = scoreScreenData.player2Data.playerScore;
+        player2Score.value = scoreScreenData.player1Data.playerScore;
+      }
       slideScoresIn(() => {
         if (state.socket) {
           state.socket.emit(I_RANKED_SCREEN_TRANSITION_CONFIRMATION, scoreScreenData.matchID);
@@ -478,6 +498,8 @@ export default {
         specialBackButtonBehavior.value = true;
         animateElo();
       }, () => {
+        player1Score.value = 0;
+        player2Score.value = 0;
         playSoundtrack('menu_soundtrack');
         disableResetInput();
         backInput.fire = goBackToRankedPage;
@@ -645,6 +667,8 @@ export default {
       formatDateToAgoText,
       openProfile,
       playSound,
+      player1Score,
+      player2Score,
     }
   }
 };
@@ -1259,6 +1283,58 @@ p {
 .ranked-history .vs {
   width: 10%;
   justify-content: center;
+}
+
+.gaming-wrapper .scoreboard::before {
+  background-color: var(--ranked-color);
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: skew(10deg);
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.gaming-wrapper .scoreboard {
+  position: fixed;
+  left: 50%;
+  padding: 1vh 2vw;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  font-size: 2vh;
+  gap:3vw;
+  top: 0;
+}
+
+.gaming-wrapper .scoreboard >p::before {
+  content: "";
+  background-color: white;
+  position: absolute;
+  top: 50%;
+  height: 150%;
+  left: 50%;
+  transform: skew(-10deg) translate(-56%, -50%);
+  width: 160%;
+  z-index: -1;
+}
+
+.gaming-wrapper .scoreboard >p {
+  position: relative;
+  color: black;
+}
+
+.gaming-wrapper .scoreboard div {
+  display: flex;
+  flex-direction: row;
+  gap: 1vw;
+}
+
+.gaming-wrapper .scoreboard .player1 > p:last-of-type,
+.gaming-wrapper .scoreboard .player2 > p:first-of-type{
+  font-weight: bold;
 }
 
 </style>

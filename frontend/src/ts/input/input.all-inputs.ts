@@ -106,8 +106,8 @@ export const shootInput: Input = {
 };
 
 export const holdInput: Input = {
-    name: "Hold Bubble",
-    description: "Hold a bubble",
+    name: "Switch Bubble",
+    description: "Switch a bubble",
     customKeyMap: ["ControlLeft", "", ""],
     defaultKeyCode: "ControlLeft",
     controllerButtonIndex: 4,

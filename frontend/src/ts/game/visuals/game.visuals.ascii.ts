@@ -235,4 +235,3 @@ const countDown1 = `1`;
 const countDownGO = `GO!`;
 const inMenu = `IN MENU`;
 const disconnected = `DISCONNECTED`;
-const perfectClear = `PERFECT CLEAR`;

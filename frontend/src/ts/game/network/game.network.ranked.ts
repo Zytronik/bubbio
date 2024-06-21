@@ -134,7 +134,7 @@ function network_listenToIngameUpdates(): void {
         socket.on(O_PLAYER_SPECTATOR, (data: dto_GameInstance) => {
             enemyGameInstance = data.gameInstance;
             enemyGameInstance.stats.gameStartTime = playerGameInstance.stats.gameStartTime;
-            enemyVisuals.playerName = data.playerName;
+            enemyVisuals.playerName.value = data.playerName;
             fillAsciiStrings(enemyGameInstance, enemyVisuals.asciiBoard);
             if (playerGameInstance.gameState != GAME_STATE.IN_GAME 
                 && playerGameInstance.gameState != GAME_STATE.VICTORY_SCREEN
@@ -217,7 +217,7 @@ function setupGameInstance(data: dto_GameSetup): void {
     preparePlayerGameInstance(instance);
     fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
     fillAsciiStrings(playerGameInstance, enemyVisuals.asciiBoard);
-    playerGameVisuals.playerName = eventBus.getUserData()?.username ?? "";
+    playerGameVisuals.playerName.value = eventBus.getUserData()?.username ?? "";
 }
 
 export function network_stopListeningToServer(): void {
