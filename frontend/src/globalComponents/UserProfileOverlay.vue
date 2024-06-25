@@ -76,7 +76,7 @@
                             </div>
                         </div>
                     </div>
-                    <p v-if="userData.totalGameTime">Total Playtime: {{ userData.totalGameTime }}h</p>
+                    <p v-if="userData.totalGameTime">Total Playtime: {{ userData.totalGameTime }}</p>
                     
                 </div>
             </div>
