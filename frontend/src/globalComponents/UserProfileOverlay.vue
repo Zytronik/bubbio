@@ -76,6 +76,7 @@
                             </div>
                         </div>
                     </div>
+                    <p v-if="userData.totalGameTime">Total Playtime: {{ userData.totalGameTime }}h</p>
                     
                 </div>
             </div>
@@ -109,6 +110,7 @@ interface ProfileData {
     rankIcon: string;
     rankName: string;
     isRanked: boolean;
+    totalGameTime: number;
     sprintStats: SprintStats;
     highscoreStats: HighscoreStats;
     rankedStats: RankedStats;

@@ -36,6 +36,43 @@ export class RankedService {
         }
     }
 
+    async getTotalPlayTimeByUserID(userId: number): Promise<number> {
+        // Retrieve all games where the user participated as either user1 or user2
+        const games = await this.prisma.ranked.findMany({
+            where: {
+                OR: [
+                    { userId1: userId },
+                    { userId2: userId }
+                ]
+            },
+            select: {
+                userId1: true,
+                userId2: true,
+                user1Stats: true,
+                user2Stats: true
+            }
+        });
+    
+        let totalPlayTime = 0;
+    
+        // Iterate through each game and sum up the playtime
+        for (const game of games) {
+            let gameStats;
+            
+            if (game.userId1 === userId) {
+                gameStats = JSON.parse(game.user1Stats);
+            } else if (game.userId2 === userId) {
+                gameStats = JSON.parse(game.user2Stats);
+            }
+    
+            if (gameStats[0]) {
+                totalPlayTime += gameStats[0].gameDuration;
+            }
+        }
+    
+        return totalPlayTime;
+    }
+
     async getPlayedMatchesByUserID(userID: number) {
         try {
             const matches = await this.prisma.ranked.findMany({

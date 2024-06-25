@@ -170,8 +170,26 @@ export class SprintService {
         const totalSprintDuration = await this.getTotalSprintDuration();
         const totalRankedDuration = await this.getTotalRankedDuration();
         const totalPlayTime = Math.round((totalSprintDuration + totalRankedDuration) / 1000 / 60 / 60);
-        const totalGames = await this.getTotalGamesPlayed();
+        const totalSprintGames = await this.getTotalGamesPlayed();
+        const totalRankedGames = await this.getTotalRankedGamesPlayed();
+        const totalGames = totalSprintGames + totalRankedGames;
         return {totalPlayTime, totalGames};
+    }
+
+    async getTotalPlayTimeByUserID(userId: number) {
+        const totalSprintDuration = await this.prisma.sprint.aggregate({
+            _sum: {
+                gameDuration: true,
+            },
+            where: {
+                userId: userId,
+            },
+        });
+        return totalSprintDuration._sum.gameDuration || 0;
+    }
+
+    async getTotalRankedGamesPlayed(): Promise<number> {
+        return this.prisma.ranked.count();
     }
 
     async getTotalGamesPlayedByUser(userId: number): Promise<number> {
