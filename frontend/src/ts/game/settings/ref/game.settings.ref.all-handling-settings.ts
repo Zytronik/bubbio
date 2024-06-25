@@ -14,6 +14,6 @@ export const TOGGLE_APS: NumberSetting = {
     description: "Alternate Angle/Second - How fast the arrow moves while pressing the toggle button",
     refNumber: ref(10),
     defaultValue: 10,
-    min: 10,
+    min: 3,
     max: 500,
 }
