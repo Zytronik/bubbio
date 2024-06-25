@@ -12,7 +12,7 @@
           <div class="title-bg"></div>
           <div class="top"><span class="text-noWhiteSpaces">T</span><span class="text-noWhiteSpaces">op 100</span></div>
           <div class="sprint-title">
-            <h2><span class="text-noWhiteSpaces">S</span><span class="text-noWhiteSpaces">rint</span></h2>
+            <h2><span class="text-noWhiteSpaces">S</span><span class="text-noWhiteSpaces">print</span></h2>
           </div>
         </div>
         <div class="werkschau-content">
@@ -324,8 +324,8 @@ export default {
 
 .sprint-title {
   position: fixed;
-  right: 0%;
-  bottom: 20%;
+  right: -1%;
+  bottom: 29%;
   transform: rotate(90deg) skewY(-10deg);
   text-transform: uppercase;
   z-index: 10;
