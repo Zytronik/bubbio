@@ -208,7 +208,7 @@ export class UserService {
         const nationalRank = await this.getNationalRank(user.id);
         const totalSprintGameTime = await this.sprintService.getTotalPlayTimeByUserID(user.id);
         const totalRankedGameTime = await this.rankedService.getTotalPlayTimeByUserID(user.id);
-        const totalGameTime = Math.round((totalSprintGameTime + totalRankedGameTime) / 1000 / 60 / 60);
+        const totalGameTime = (totalSprintGameTime + totalRankedGameTime) / 1000 / 60 / 60;
 
         let rankInfos = await this.ranksService.getRankInfo(user.id);
         if (user.ratingDeviation >= unrankedRatingDeviation) {
@@ -222,7 +222,7 @@ export class UserService {
             rating: Math.floor(user.rating),
             ratingDeviation: Math.floor(user.ratingDeviation),
             isRanked: rankInfos.isRanked,
-            totalGameTime: totalGameTime,
+            totalGameTime: totalGameTime.toFixed(2),
             sprintStats: {
                 averageBubblesCleared: Math.round(sprintStats._avg.bubblesCleared * 100) /100,
                 averageBubblesPerSecond: Math.round(sprintStats._avg.bubblesPerSecond * 100) /100,
