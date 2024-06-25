@@ -52,7 +52,12 @@ export class LeaderboardService {
 
         return {
             where: whereClause,
-            include: {
+            select: {
+                bubblesPerSecond: true,
+                id: true,
+                userId: true,
+                submittedAt: true,
+                [criteria.sortBy]: true,
                 user: {
                     select: {
                         username: true,
