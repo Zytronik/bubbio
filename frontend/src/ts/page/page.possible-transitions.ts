@@ -329,6 +329,25 @@ export const mainMenuToWerkschauTransition: PageTransition = {
     }
 }
 
+/* Replay */
+export const replayToMainMenuTransition: PageTransition = {
+    name: "replayToMainMenuTransition",
+    origin: PAGE_STATE.replayPage,
+    destination: PAGE_STATE.mainMenu,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + replayToMainMenuTransition.name);
+    }
+}
+
+export const mainMenuToReplayTransition: PageTransition = {
+    name: "mainMenuToReplayTransition",
+    origin: PAGE_STATE.mainMenu,
+    destination: PAGE_STATE.replayPage,
+    transitionFunction: () => {
+        console.error("transition not yet defined for " + mainMenuToReplayTransition.name);
+    }
+}
+
 
 export const allPossibleTransitions: PageTransition[] = [
     mainMenuToSettingsPageTransition,
@@ -367,4 +386,6 @@ export const allPossibleTransitions: PageTransition[] = [
     matchmakingSimulationToMultiMenuTransition,
     werkschauToMainMenuTransition,
     mainMenuToWerkschauTransition,
+    replayToMainMenuTransition,
+    mainMenuToReplayTransition
 ];

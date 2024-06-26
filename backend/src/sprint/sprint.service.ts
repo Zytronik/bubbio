@@ -5,7 +5,7 @@ import { NewsService } from 'src/news/news.service';
 import { GameStats } from 'src/game/i/game.i.game-stats';
 import { NewsGateway } from 'src/news/news.gateway';
 import { GameInstance } from 'src/game/i/game.i.game-instance';
-import { GameStateHistory, compressReplayData } from 'src/game/i/game.i.game-state-history';
+import { CompressedGameStateHistory, GameStateHistory, compressReplayData, decompressReplayData } from 'src/game/i/game.i.game-state-history';
 
 @Injectable()
 export class SprintService {
@@ -327,5 +327,21 @@ export class SprintService {
     async updateWerkschauLeaderboard(currentSprintId: number) {
         const leaderboard = await this.getWerkschauLeaderboard();
         this.newsGateway.server.emit('newWerkschauRecord', { leaderboard, currentSprintId});
+    }
+
+    async getSprintReplay(sprintId: string): Promise<GameStateHistory | null> {
+        if(!sprintId) {
+            console.log('No sprint ID provided');
+        }
+        const sprint = await this.prisma.sprint.findUnique({
+            where: {
+                id: parseInt(sprintId),
+            },
+        });
+        if(!sprint) {
+            console.log('Sprint not found');
+        }
+        const gameStateHistory: CompressedGameStateHistory = JSON.parse(sprint.gameStateHistory);
+        return decompressReplayData(gameStateHistory);
     }
 }

@@ -277,6 +277,13 @@ export default {
       return window.location.pathname.includes('/werkschau');
     }
 
+    /* Replay */
+    function onReplayURL() {
+      if (window.location.pathname.includes('/replay')) {
+        goToState(PAGE_STATE.replayPage);
+      }
+    }
+
     /* General */
     onMounted(async () => {
       addSocketConnectListener(setupDebugListeners);
@@ -293,6 +300,7 @@ export default {
       }
       showUserPageFromURL();
       onWerkschauURL();
+      onReplayURL();
       addSocketConnectListener(initOnIsUserInRoomAlready);
       await waitForLoadingScreen();
       playSoundtrack('menu_soundtrack');

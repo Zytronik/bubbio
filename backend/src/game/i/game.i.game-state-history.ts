@@ -72,3 +72,18 @@ export function compressReplayData(history: GameStateHistory): CompressedGameSta
         a: history.angleHistory.map(frame => ({ t: frame.frameTime, a: frame.angle })),
     };
 }
+
+export function decompressReplayData(compressed: CompressedGameStateHistory): GameStateHistory | null {
+    try {
+        const decompressed: GameStateHistory = {
+            inputHistory: compressed.i.map(frame => ({ indexID: frame.n, frameTime: frame.t, input: frame.i, angle: frame.a, garbageAmount: frame.g })),
+            boardHistory: compressed.b.map(frame => ({ frameTime: frame.t, boardState: frame.b })),
+            bubbleQueueHistory: compressed.q.map(frame => ({ frameTime: frame.t, currentBubble: frame.c, heldBubble: frame.h, queueSeedState: frame.q, garbageSeedState: frame.g })),
+            angleHistory: compressed.a.map(frame => ({ frameTime: frame.t, angle: frame.a })),
+        };
+        return decompressed;
+    } catch (e) {
+        console.error('Failed to decompress replay data');
+    }
+    return null;
+}

@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Post, Body, Request, Query, Req, Param } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Query, Req, Param } from '@nestjs/common';
 import { SprintService } from './sprint.service';
 import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
 import { AuthenticatedRequest } from 'src/auth/e/auth.e-auth-request';
@@ -45,5 +45,10 @@ export class SprintController {
   @Get('werkschauLeaderboard')
   async getWerkschauLeaderboard() {
     return await this.sprintService.getWerkschauLeaderboard();
+  }
+
+  @Get('replay/:sprintId')
+  async handleGetSprintReplay(@Param('sprintId') sprintId: string) {
+    return await this.sprintService.getSprintReplay(sprintId);
   }
 }
