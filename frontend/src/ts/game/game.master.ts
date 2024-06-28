@@ -168,6 +168,7 @@ export function rankedGameStart(): void {
 
 
 function showCountDownAndStart(): void {
+    playerGameVisuals.statNumbers.showPC.value = false;
     fillAsciiStrings(playerGameInstance, playerGameVisuals.asciiBoard);
     resetStatDisplays(playerGameVisuals.statNumbers);
     startCountdownAnimation(playerGameInstance.gameSettings.countDownDuration, afterCountdown)
