@@ -1,5 +1,5 @@
 import { reactive, readonly, toRaw } from 'vue';
-import { UserData } from './i/page.i.user-data';
+import { UserData } from '../_interface/page.i.user-data';
 
 // Define a generic callback type with a flexible argument list
 type EventBusCallback<T = unknown> = (...args: T[]) => void;

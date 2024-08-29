@@ -1,6 +1,6 @@
 import { convertSeedToRandomNumber, getNextSeed } from "./game.logic.random";
-import { Bubble } from "../i/game.i.bubble";
-import { GameInstance } from "../i/game.i.game-instance";
+import { Bubble } from "../../_interface/game.i.bubble";
+import { GameInstance } from "../../_interface/game.i.game-instance";
 
 export function holdBubble(gameInstance: GameInstance): void {
     if (!gameInstance.holdBubble) {

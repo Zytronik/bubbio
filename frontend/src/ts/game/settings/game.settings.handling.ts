@@ -1,5 +1,5 @@
-import { HandlingSettings } from "./i/game.settings.i.handling-settings";
-import { DEFAULT_APS, TOGGLE_APS } from "./ref/game.settings.ref.all-handling-settings";
+import { HandlingSettings } from "../../_interface/game.settings.i.handling-settings";
+import { DEFAULT_APS, TOGGLE_APS } from "../../_constant/game.settings.ref.all-handling-settings";
 
 export function getHandlingSettings(): HandlingSettings {
     return {

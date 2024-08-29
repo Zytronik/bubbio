@@ -1,6 +1,6 @@
 import { ref } from "vue"
-import { BooleanSetting } from "./i/game.settings.ref.i.boolean-setting"
-import { NumberSetting } from "./i/game.settings.ref.i.number-setting"
+import { BooleanSetting } from "../_interface/game.settings.ref.i.boolean-setting"
+import { NumberSetting } from "../_interface/game.settings.ref.i.number-setting"
 
 export const GRID_WIDTH: NumberSetting = {
     name: "Grid Width",

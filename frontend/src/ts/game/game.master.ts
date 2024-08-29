@@ -1,27 +1,27 @@
 import { fillAsciiStrings, startASCIIAnimation, startCountdownAnimation, stopASCIIAnimation, stopCountdownAnimation } from "./visuals/game.visuals.ascii";
-import { GameInstance } from "./i/game.i.game-instance";
+import { GameInstance } from "../_interface/game.i.game-instance";
 import { disableChannelInput, disableGameInputs, disableResetInput, enableChannelInput, enableGameInputs, enableResetInput } from "../input/input.input-manager";
 import { cleanUpAngle } from "./logic/game.logic.angle";
 import { angleLeftInput, angleRightInput } from "../input/input.all-inputs";
 import { executeShot } from "./logic/game.logic.shoot";
 import { resetStatDisplays, startStatDisplay, stopStatDisplay } from "./visuals/game.visuals.stat-display";
 import { createGameInstance, getEmptyStats, resetGameInstance } from "./logic/game.logic.instance-creator";
-import { GAME_MODE } from "./settings/i/game.settings.e.game-modes";
-import { GameTransitions } from "./i/game.i.game-transitions";
+import { GAME_MODE } from "../_constant/game.settings.e.game-modes";
+import { GameTransitions } from "../_interface/game.i.game-transitions";
 import { holdBubble } from "./logic/game.logic.bubble-manager";
 import { network_countDownState, network_leaveGame, network_resetGame, network_setupGame, network_sendInputs, network_updateAngle } from "./network/game.network.game";
 import eventBus from "../page/page.event-bus";
 import { getNextSeed } from "./logic/game.logic.random";
-import { GAME_INPUT } from "./network/i/game.network.i.game-input";
-import { AngleFrame, BoardHistoryFrame, BubbleQueueFrame, InputFrame } from "./i/game.i.game-state-history";
-import { GameVisuals } from "./visuals/i/game.visuals.i.game-visuals";
+import { GAME_INPUT } from "../_interface/game.network.i.game-input";
+import { AngleFrame, BoardHistoryFrame, BubbleQueueFrame, InputFrame } from "../_interface/game.i.game-state-history";
+import { GameVisuals } from "../_interface/game.visuals.i.game-visuals";
 import { ref } from "vue";
 import { createStatGraphData } from "./logic/game.logic.stat-tracker";
-import { GAME_STATE } from "./i/game.e.state";
+import { GAME_STATE } from "../_constant/game.e.state";
 import { getSprintSettings } from "./settings/game.settings.sprint";
 import { getHandlingSettings } from "./settings/game.settings.handling";
 import { getGridAsString, setupGrid } from "./logic/game.logic.grid-manager";
-import { playSound, playSoundtrack, stopSoundtrack } from "../asset/asset.howler-load";
+import { playSound, playSoundtrack, stopSoundtrack } from "../preload/asset.howler-load";
 
 export const playerGameVisuals: GameVisuals = {
     asciiBoard: {

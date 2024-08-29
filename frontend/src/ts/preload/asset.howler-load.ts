@@ -1,6 +1,6 @@
 import { Howl, Howler } from 'howler';
 import { ref } from 'vue';
-import { NumberSetting } from '../game/settings/ref/i/game.settings.ref.i.number-setting';
+import { NumberSetting } from '../_interface/game.settings.ref.i.number-setting';
 
 const audioFiles: Record<string, { path: string; volume: number; type: 'music' | 'sfx' }> = {
     menu_back: { path: '/sounds/menu_back.wav', volume: 0.3, type: 'sfx' },

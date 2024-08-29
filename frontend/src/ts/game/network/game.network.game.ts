@@ -1,14 +1,14 @@
-import state from "../../networking/networking.client-websocket";
+import state from "../../network/networking.client-websocket";
 import eventBus from "@/ts/page/page.event-bus";
-import { GameInstance } from "../i/game.i.game-instance";
-import { dto_GameSetup } from "./dto/game.network.dto.game-setup";
-import { GAME_STATE } from "../i/game.e.state";
-import { dto_Inputs } from "./dto/game.network.dto.input";
-import { dto_CountDown } from "./dto/game.network.dto.count-down";
-import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
-import { dto_AngleUpdate } from "./dto/game.network.dto.angle-update";
-import { InputFrame } from "../i/game.i.game-state-history";
-import { NetworkEvaluation } from "./i/game.network.i.evaluation-data";
+import { GameInstance } from "../../_interface/game.i.game-instance";
+import { dto_GameSetup } from "../../_dto/game.network.dto.game-setup";
+import { GAME_STATE } from "../../_constant/game.e.state";
+import { dto_Inputs } from "../../_dto/game.network.dto.input";
+import { dto_CountDown } from "../../_dto/game.network.dto.count-down";
+import { GAME_MODE } from "../../_constant/game.settings.e.game-modes";
+import { dto_AngleUpdate } from "../../_dto/game.network.dto.angle-update";
+import { InputFrame } from "../../_interface/game.i.game-state-history";
+import { NetworkEvaluation } from "../../_interface/game.network.i.evaluation-data";
 import { ref } from "vue";
 import { playerGameInstance } from "../game.master";
 

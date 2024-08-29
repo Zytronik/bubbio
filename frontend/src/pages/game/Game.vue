@@ -152,4 +152,4 @@ export default defineComponent({
 .fade-leave-to {
   opacity: 0;
 }
-</style>
+</style>@/ts/constant/page.e-leaderboard

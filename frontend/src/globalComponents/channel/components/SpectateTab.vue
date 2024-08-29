@@ -80,4 +80,4 @@ export default defineComponent({
   font-size: 3vh;
   --game-bubble-height: 2.4vh;
 }
-</style>
+</style>@/ts/constant/page.e-leaderboard

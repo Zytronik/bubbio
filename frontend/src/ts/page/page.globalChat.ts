@@ -1,6 +1,6 @@
 // src/store/useChatStore.ts
 import { reactive, toRefs } from 'vue';
-import state, { addSocketConnectListener } from '@/ts/networking/networking.client-websocket';
+import state, { addSocketConnectListener } from '@/ts/network/networking.client-websocket';
 
 interface GlobalChatMessage {
     username: string;

@@ -1,13 +1,13 @@
-import { Coordinates } from "../i/game.i.grid-coordinates";
-import { Field } from "../i/game.i.field";
-import { AsciiBoardRefs } from "./i/game.visuals.i.ascii-board";
-import { GameInstance } from "../i/game.i.game-instance";
+import { Coordinates } from "../../_interface/game.i.grid-coordinates";
+import { Field } from "../../_interface/game.i.field";
+import { AsciiBoardRefs } from "../../_interface/game.visuals.i.ascii-board";
+import { GameInstance } from "../../_interface/game.i.game-instance";
 import { playerGameInstance, playerGameVisuals, setGameStateAndNotify } from "../game.master";
 import { calculatePreview } from "../logic/game.logic.shoot";
-import { Bubble } from "../i/game.i.bubble";
-import { GAME_STATE } from "../i/game.e.state";
-import { PreviewBubble } from "../i/game.i.preview-bubble";
-import { playSound } from "@/ts/asset/asset.howler-load";
+import { Bubble } from "../../_interface/game.i.bubble";
+import { GAME_STATE } from "../../_constant/game.e.state";
+import { PreviewBubble } from "../../_interface/game.i.preview-bubble";
+import { playSound } from "@/ts/preload/asset.howler-load";
 
 let asciiAnimationRunning = false;
 let asciiAnimationFrameId: number | null = null;

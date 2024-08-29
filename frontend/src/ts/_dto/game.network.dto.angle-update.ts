@@ -1,4 +1,4 @@
-import { GAME_MODE } from "../../settings/i/game.settings.e.game-modes";
+import { GAME_MODE } from "../_constant/game.settings.e.game-modes";
 
 export interface dto_AngleUpdate {
     gameMode: GAME_MODE,

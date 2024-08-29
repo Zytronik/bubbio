@@ -1,6 +1,6 @@
-import { isLocal } from "@/ts/networking/paths";
-import { GameSettings } from "./i/game.settings.i.game-settings";
-import { COLLISION_DETECTION_FACTOR, COUNTDOWN_DURATION, GARBAGE_CLEAN_AMOUNT, GARBAGE_COLOR_AMOUNT, GARBAGE_MAX_AT_ONCE, GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH, MAX_ANGLE, MIN_ANGLE, QUEUE_PREVIEW_SIZE, REFILL_AMOUNT, WIDTH_PRECISION_UNITS } from "./ref/game.settings.ref.all-game-settings";
+import { isLocal } from "@/ts/network/paths";
+import { GameSettings } from "../../_interface/game.settings.i.game-settings";
+import { COLLISION_DETECTION_FACTOR, COUNTDOWN_DURATION, GARBAGE_CLEAN_AMOUNT, GARBAGE_COLOR_AMOUNT, GARBAGE_MAX_AT_ONCE, GRID_EXTRA_HEIGHT, GRID_HEIGHT, GRID_WIDTH, MAX_ANGLE, MIN_ANGLE, QUEUE_PREVIEW_SIZE, REFILL_AMOUNT, WIDTH_PRECISION_UNITS } from "../../_constant/game.settings.ref.all-game-settings";
 
 export function getSprintSettings(): GameSettings {
     const bagSize = 10;

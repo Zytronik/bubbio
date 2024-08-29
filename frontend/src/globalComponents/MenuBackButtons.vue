@@ -90,3 +90,4 @@ export default defineComponent({
   animation: shrinkWidth 0.4s forwards;
 }
 </style>
+@/ts/preload/asset.howler-load@/ts/constant/page.e-page-state../ts/_interface/i-buttonData

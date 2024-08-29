@@ -1,4 +1,4 @@
-import { GameStats } from "../../i/game.i.game-stats";
+import { GameStats } from "../_interface/game.i.game-stats";
 
 export interface dto_EndScreen {
     matchID: string;

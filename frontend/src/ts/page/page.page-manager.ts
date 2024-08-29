@@ -1,7 +1,7 @@
-import { checkUserAuthentication, logUserOut } from "../networking/networking.auth";
-import { PAGE_STATE } from "./e/page.e-page-state";
+import { checkUserAuthentication, logUserOut } from "../network/networking.auth";
+import { PAGE_STATE } from "../_constant/page.e-page-state";
 import { mainMenuToSettingsPageTransition, allPossibleTransitions, gamePageToMainMenuTransition, gamePageToRoomPageTransition, mainMenuToMultiMenuTransition, roomListingToMultiMenuTransition, roomListingToRoomPageTransition, roomPageToRoomListingTransition, settingsPageToMainMenuTransition, roomPageToMultiMenuTransition, multiMenuToSoloMenuTransition, soloMenuToSprintPageTransition, spintPageToSoloMenuTransition, mainMenuToSoloMenuTransition, soloMenuToMainMenuTransition, multiMenuToRoomListingTransition, multiMenuToMainMenuTransition, soloMenuToMultiMenuTransition, soloMenuTosettingsPageTransition, multiMenuToSettingsPageTransition, settingsPageToMultiMenuTransition, settingsPageToSoloMenuTransition, multiMenuToRankedPageTransition, rankedPageToMultiMenuTransition, rankedPageToRoomListingTransition, roomListingToRankedPageTransition, scorePageToSoloMenuTransition, scorePageToSprintPageTransition, soloMenuToScorePageTransition, spintPageToScorePageTransition, soloMenuToPixiTestTransition, pixiTestToSoloMenuTransition, matchmakingSimulationToMultiMenuTransition, multiMenuToMatchmakingSimulationTransition, mainMenuToWerkschauTransition, werkschauToMainMenuTransition, replayToMainMenuTransition, mainMenuToReplayTransition } from "./page.possible-transitions";
-import { Page } from "./i/page.i-page";
+import { Page } from "../_interface/page.i-page";
 import StartMenu from '../../pages/startmenu/StartMenu.vue';
 import Room from '../../pages/room/Room.vue';
 import Game from '../../pages/game/Game.vue';
@@ -16,7 +16,7 @@ import SoloMenu from '../../pages/solomenu/SoloMenu.vue';
 import MultiMenu from '../../pages/multimenu/MultiMenu.vue';
 import { ref } from 'vue';
 import eventBus from "./page.event-bus";
-import { playSound } from "../asset/asset.howler-load";
+import { playSound } from "../preload/asset.howler-load";
 import Werkschau from "@/pages/werkschau/Werkschau.vue";
 import Replay from "@/pages/replay/Replay.vue";
 

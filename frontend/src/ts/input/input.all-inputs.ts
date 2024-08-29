@@ -1,4 +1,4 @@
-import { Input } from "./i/input.i.input";
+import { Input } from "../_interface/input.i.input";
 
 export const angleLeftInput: Input = {
     name: "Angle Left",

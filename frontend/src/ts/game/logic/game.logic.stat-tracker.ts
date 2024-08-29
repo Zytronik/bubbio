@@ -1,7 +1,7 @@
-import { playSound } from "@/ts/asset/asset.howler-load";
-import { GameInstance } from "../i/game.i.game-instance";
-import { GameStats } from "../i/game.i.game-stats";
-import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
+import { playSound } from "@/ts/preload/asset.howler-load";
+import { GameInstance } from "../../_interface/game.i.game-instance";
+import { GameStats } from "../../_interface/game.i.game-stats";
+import { GAME_MODE } from "../../_constant/game.settings.e.game-modes";
 
 const SPIKE_COUNTER_TIMEFRAME = 1500;
 export function trackBubbleShot(game: GameInstance, wallBounces: number, amountCleared: number, attack: number, defense: number, PC: boolean): void {

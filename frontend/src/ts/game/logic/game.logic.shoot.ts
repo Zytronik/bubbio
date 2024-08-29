@@ -1,10 +1,10 @@
 import { getVelocity } from "./game.logic.angle";
 import { checkPerfectClear, dissolveBubbles, getNearbyFields } from "./game.logic.grid-manager";
 import { trackBubbleShot } from "./game.logic.stat-tracker";
-import { Field } from "../i/game.i.field";
-import { GameInstance } from "../i/game.i.game-instance";
-import { Grid } from "../i/game.i.grid";
-import { Coordinates } from "../i/game.i.grid-coordinates";
+import { Field } from "../../_interface/game.i.field";
+import { GameInstance } from "../../_interface/game.i.game-instance";
+import { Grid } from "../../_interface/game.i.grid";
+import { Coordinates } from "../../_interface/game.i.grid-coordinates";
 import { getGarbageAmount, receiveGarbageAndCheckDead } from "./game.logic.garbage";
 import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
 

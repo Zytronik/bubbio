@@ -1,8 +1,8 @@
 import { playerGameInstance, playerGameVisuals } from "../game.master";
-import { GameInstance } from "../i/game.i.game-instance";
+import { GameInstance } from "../../_interface/game.i.game-instance";
 import { calculateTimeStats } from "../logic/game.logic.stat-tracker";
 import { enemyGameInstance, enemyVisuals } from "../network/game.network.ranked";
-import { StatNumberRefs } from "./i/game.visuals.i.stat-numbers";
+import { StatNumberRefs } from "../../_interface/game.visuals.i.stat-numbers";
 
 let trackingFrameId: number | null = null;
 let statTrackingRunning = false;

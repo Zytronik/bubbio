@@ -1,5 +1,5 @@
-import state from "../networking/networking.client-websocket";
-import { httpClient } from "../networking/networking.http-client";
+import state from "../network/networking.client-websocket";
+import { httpClient } from "../network/networking.http-client";
 
 export function getFlagImagePath(countryCode: string) {
     if (countryCode) {

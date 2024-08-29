@@ -1,5 +1,5 @@
-import { formatTimeNumberToString } from "../../game/visuals/game.visuals.stat-display";
-import { formatDateToAgoText } from "../page.page-utils";
+import { formatTimeNumberToString } from "../game/visuals/game.visuals.stat-display";
+import { formatDateToAgoText } from "../page/page.page-utils";
 
 export interface StatDisplay {
     fullName: string;

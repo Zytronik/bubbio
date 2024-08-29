@@ -620,4 +620,4 @@ p {
 .history .row div:nth-child(2) {
   flex: 0.6;
 }
-</style>
+</style>@/ts/interface/page.i.stat-display@/ts/constant/page.e-page-state@/ts/network/networking.client-websocket@/ts/network/paths

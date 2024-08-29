@@ -1,4 +1,4 @@
-import { Input } from "./i/input.i.input";
+import { Input } from "../_interface/input.i.input";
 import { allInputs, defaultBlocker } from "./input.all-inputs";
 
 let hasAttachedAlready = false;

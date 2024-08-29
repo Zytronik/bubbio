@@ -35,4 +35,4 @@ export default {
 </script>
 
 <style>
-</style>
+</style>@/ts/constant/page.e-leaderboard@/ts/constant/page.e-page-state@/ts/_interface/i-buttonData

@@ -48,3 +48,4 @@ export default {
 </script>
 
 <style scoped></style>
+@/ts/constant/page.e-page-state@/ts/_interface/i-menuButtonData

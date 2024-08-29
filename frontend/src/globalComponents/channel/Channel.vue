@@ -891,4 +891,4 @@ export default {
 .fade-leave-active {
   animation-name: fadeOut;
 }
-</style>
+</style>@/ts/preload/asset.howler-load@/ts/interface/page.i.stat-display@/ts/network/networking.http-client@/ts/network/networking.client-websocket@/ts/network/networking.auth@/ts/network/paths

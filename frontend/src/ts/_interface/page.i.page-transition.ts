@@ -1,4 +1,4 @@
-import { PAGE_STATE } from "../e/page.e-page-state";
+import { PAGE_STATE } from "../_constant/page.e-page-state";
 
 export interface PageTransition {
     name: string,

@@ -1,5 +1,5 @@
-import state from "../../networking/networking.client-websocket";
-import { dto_GameInstance } from "./dto/game.network.dto.game-instance";
+import state from "../../network/networking.client-websocket";
+import { dto_GameInstance } from "../../_dto/game.network.dto.game-instance";
 
 const DI_GET_ONGOING_GAMES = "debugInput_getAllOngoingGames";
 const DO_GET_ONGOING_GAMES = "debugOutput_getAllOngoingGames";

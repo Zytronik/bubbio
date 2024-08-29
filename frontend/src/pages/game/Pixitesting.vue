@@ -53,4 +53,4 @@ export default defineComponent({
   align-items: center;
   background: gray;
 }
-</style>
+</style>@/ts/preload/asset.pixi-visuals-export@/ts/constant/page.e-page-state

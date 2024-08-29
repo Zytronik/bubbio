@@ -1,11 +1,11 @@
 import { reactive } from "vue";
-import state from "../../networking/networking.client-websocket";
+import state from "../../network/networking.client-websocket";
 import { allSpectationEntries, playerNameInstanceMap, playerNameVisualsMap } from "../spectate/spectate.spectator";
 import { fillAsciiStrings } from "../visuals/game.visuals.ascii";
 import { fillStatStrings } from "../visuals/game.visuals.stat-display";
-import { getEmptyGameVisuals } from "../visuals/i/game.visuals.i.game-visuals";
-import { dto_GameInstance } from "./dto/game.network.dto.game-instance";
-import { dto_SpectationEntry } from "./dto/game.network.dto.spectation-entry";
+import { getEmptyGameVisuals } from "../../_interface/game.visuals.i.game-visuals";
+import { dto_GameInstance } from "../../_dto/game.network.dto.game-instance";
+import { dto_SpectationEntry } from "../../_dto/game.network.dto.spectation-entry";
 
 const J_SPECTATOR_ENTRIES = "join_spectatorEntriesRoom";
 const L_SPECTATOR_ENTRIES = "leave_spectatorEntriesRoom";

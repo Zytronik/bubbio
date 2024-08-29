@@ -1,13 +1,13 @@
-import { GameInstance } from "../i/game.i.game-instance";
+import { GameInstance } from "../../_interface/game.i.game-instance";
 import { resetGrid, setupGrid } from "./game.logic.grid-manager";
-import { GameStats } from "../i/game.i.game-stats";
-import { GameTransitions } from "../i/game.i.game-transitions";
+import { GameStats } from "../../_interface/game.i.game-stats";
+import { GameTransitions } from "../../_interface/game.i.game-transitions";
 import { updateBubbleQueueAndCurrent } from "./game.logic.bubble-manager";
-import { GameSettings } from "../settings/i/game.settings.i.game-settings";
-import { GAME_MODE } from "../settings/i/game.settings.e.game-modes";
-import { HandlingSettings } from "../settings/i/game.settings.i.handling-settings";
+import { GameSettings } from "../../_interface/game.settings.i.game-settings";
+import { GAME_MODE } from "../../_constant/game.settings.e.game-modes";
+import { HandlingSettings } from "../../_interface/game.settings.i.handling-settings";
 import { prefillBoard } from "./game.logic.garbage";
-import { GAME_STATE } from "../i/game.e.state";
+import { GAME_STATE } from "../../_constant/game.e.state";
 
 export function createGameInstance(
     gameMode: GAME_MODE,

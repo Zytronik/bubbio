@@ -1,11 +1,11 @@
 import debounce from "debounce";
-import { MUSIC_VOLUME, SFX_VOLUME } from "../asset/asset.howler-load";
+import { MUSIC_VOLUME, SFX_VOLUME } from "../preload/asset.howler-load";
 import { angleCenter, angleLeft, angleMirror, angleRight, changeAPS, debugTriggerGarbage, resetGame, revertAPS, triggerHold, triggerShoot } from "../game/game.master";
-import { DEFAULT_APS, TOGGLE_APS } from "../game/settings/ref/game.settings.ref.all-handling-settings";
-import { checkUserAuthentication } from "../networking/networking.auth";
-import { httpClient } from "../networking/networking.http-client";
+import { DEFAULT_APS, TOGGLE_APS } from "../_constant/game.settings.ref.all-handling-settings";
+import { checkUserAuthentication } from "../network/networking.auth";
+import { httpClient } from "../network/networking.http-client";
 import { openChannelOverlay } from "../page/page.page-manager";
-import { Input } from "./i/input.i.input";
+import { Input } from "../_interface/input.i.input";
 import { allInputs, angleLeftInput, angleRightInput, centerCursorInput, changeAPSInput, backInput, holdInput, resetInput, shootInput, defaultBlocker, channelInput, mirrorCursorInput } from "./input.all-inputs";
 
 export function enableGameInputs(): void {

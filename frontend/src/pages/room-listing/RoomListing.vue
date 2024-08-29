@@ -152,4 +152,4 @@ a {
 .active-rooms p {
   text-align: center;
 }
-</style>
+</style>@/ts/constant/page.e-page-state@/ts/network/networking.client-websocket

@@ -1,4 +1,4 @@
-import { MultiMod, ToggleMod } from "./i/game.settings.ref.i.mod";
+import { MultiMod, ToggleMod } from "../_interface/game.settings.ref.i.mod";
 
 export const digMod: ToggleMod = {
     abr: "D",

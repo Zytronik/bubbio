@@ -1,4 +1,4 @@
-import { PAGE_STATE } from "@/ts/page/e/page.e-page-state";
+import { PAGE_STATE } from "@/ts/_constant/page.e-page-state";
 
 export interface BackButtonData {
   iconSrc: string;

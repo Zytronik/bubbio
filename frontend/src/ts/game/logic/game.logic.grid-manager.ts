@@ -1,10 +1,10 @@
-import { Field } from "../i/game.i.field";
-import { Grid } from "../i/game.i.grid";
-import { Row } from "../i/game.i.row";
-import { Coordinates } from "../i/game.i.grid-coordinates";
-import { GameSettings } from "../settings/i/game.settings.i.game-settings";
-import { Bubble } from "../i/game.i.bubble";
-import { playSound } from "@/ts/asset/asset.howler-load";
+import { Field } from "../../_interface/game.i.field";
+import { Grid } from "../../_interface/game.i.grid";
+import { Row } from "../../_interface/game.i.row";
+import { Coordinates } from "../../_interface/game.i.grid-coordinates";
+import { GameSettings } from "../../_interface/game.settings.i.game-settings";
+import { Bubble } from "../../_interface/game.i.bubble";
+import { playSound } from "@/ts/preload/asset.howler-load";
 
 export function setupGrid(settings: GameSettings): Grid {
     const precisionWidth = settings.widthPrecisionUnits;
