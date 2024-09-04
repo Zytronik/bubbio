@@ -1,0 +1,11 @@
+-   animation has a beginning and an end
+-   thus also a duration
+-   maybe multiple different durations 
+        do something 100ms
+        followed by 200ms
+        trigger this function 
+        another animation for 400ms
+        trigger function on end
+[100, 2000, ]
+
+are css animations entirely different than pixi animations?
