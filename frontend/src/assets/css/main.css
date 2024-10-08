@@ -1,0 +1,63 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--app-bg-color);
+  color: var(--app-font-color);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  font-family: 'Roboto', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+p {
+  margin: unset;
+}
+
+#app {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+main {
+  padding: 5vh 0;
+  height: 100vh;
+  display: flex;
+}
+
+.rank-img {
+  filter: invert(1);
+}
+
+.text-noWhiteSpaces {
+  display: block;
+  height: 0.75em;
+  line-height: 0.75em;
+}
+
+:root {
+  --menu-btn-height: 180px;
+  --menu-btn-border-width: 14px;
+  --multiplayer-color: rgb(218, 0, 99);
+  --singleplayer-color: rgb(12, 167, 137);
+  --config-color: rgb(250, 199, 16);
+  --sprint-color: rgb(29, 179, 157);
+  --highscore-color: rgb(17, 178, 135);
+  --pixi-color: rgb(14, 122, 88);
+  --ranked-color: rgb(160, 0, 24);
+  --roomListing-color: rgb(129, 33, 81);
+  --app-bg-color: #202020;
+  --app-font-color: #fff;
+  --header-height: 100px;
+  --header-profile-width: 380px;
+}
+
+.hide {
+  display: none;
+}
