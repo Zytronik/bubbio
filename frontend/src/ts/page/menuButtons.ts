@@ -1,6 +1,6 @@
 import { useUserStore } from '@/stores/userStore';
 import { MenuButton } from '../_interface/menuButton';
-import { setPage } from './pageManager';
+import { transitionPageAnimation } from '../animation/transitionPage';
 
 export function isButtonDisabled(button: MenuButton): boolean {
   const userStore = useUserStore();
@@ -18,7 +18,7 @@ export function isButtonDisabled(button: MenuButton): boolean {
 }
 
 function handleMenuButtonClick(button: MenuButton) {
-  setPage(button.page);
+  transitionPageAnimation(button.page);
 }
 
 export function getMenuButtonAttributes(button: MenuButton) {

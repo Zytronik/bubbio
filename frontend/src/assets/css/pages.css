@@ -1,12 +1,14 @@
 .pageContainer {
   height: 100%;
   width: 100%;
+  position: relative;
+  transition: 1s;
 }
 
 .pageTitle {
   position: absolute;
   z-index: 1;
-  top: calc(var(--header-height) / 4);
+  top: calc(var(--header-height) / -4);
   left: calc(var(--header-profile-width) / 4);
   text-transform: uppercase;
 }

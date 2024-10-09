@@ -5,11 +5,11 @@
     <ToastMessages />
     <LoginOverlay v-if="showLogin" />
     <AppSidebar :back-buttons="currentBackButtons" :background-color="currentPageColor" />
-    <transition>
-      <div class="pageContainer" v-if="currentComponent">
-        <component :is="currentComponent" :key="currentPage" />
-      </div>
-    </transition>
+    <!-- <transition> -->
+    <div class="pageContainer" v-if="currentComponent">
+      <component :is="currentComponent" :key="currentPage" />
+    </div>
+    <!-- </transition> -->
     <!-- <div>
       <div>
         <p>Client ID: {{ userSession.clientId }}</p>

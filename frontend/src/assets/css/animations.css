@@ -1,0 +1,38 @@
+.transitionPage-pageContainer-slideOutFromRight {
+    animation: slideOutFromRight 150ms ease-in-out forwards;
+}
+
+.transitionPage-pageContainer-slideInFromRight {
+    animation: slideInFromRight 150ms ease-in-out forwards;
+}
+
+.transitionPage-sideBar-slideInFromLeft {
+    animation: slideInFromLeftMargin100px 400ms ease-in-out forwards;
+}
+
+@keyframes slideInFromLeftMargin100px {
+    0% {
+        margin-left: -100px;
+    }
+    100% {
+        margin-left: 0px;
+    }
+}
+
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(100vw);
+    }
+    100% {
+        transform: translateX(0vw);
+    }
+}
+
+@keyframes slideOutFromRight {
+    0% {
+        transform: translateX(0vw);
+    }
+    100% {
+        transform: translateX(-100vw);
+    }
+}
