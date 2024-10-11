@@ -8,9 +8,9 @@ import { RankedController } from './ranked.controller';
 import { RdUpdateService } from './ranked.rd-update.service';
 
 @Module({
-  imports: [forwardRef(() => UsersModule), PrismaModule],
-  providers: [GlickoService, RanksService, RankedService, RdUpdateService],
-  exports: [RanksService, GlickoService, RankedService],
-  controllers: [RankedController],
+    imports: [forwardRef(() => UsersModule), PrismaModule],
+    providers: [GlickoService, RanksService, RankedService, RdUpdateService],
+    exports: [RanksService, GlickoService, RankedService],
+    controllers: [RankedController],
 })
 export class RankedModule {}

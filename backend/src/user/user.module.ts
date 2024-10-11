@@ -6,9 +6,9 @@ import { FileStorageService } from './file-storage.service';
 import { RankedModule } from 'src/ranked/ranked.module';
 
 @Module({
-  imports: [forwardRef(() => RankedModule)],
-  providers: [UserService, PrismaService, FileStorageService],
-  controllers: [UserController],
-  exports: [UserService],
+    imports: [forwardRef(() => RankedModule)],
+    providers: [UserService, PrismaService, FileStorageService],
+    controllers: [UserController],
+    exports: [UserService],
 })
 export class UsersModule {}

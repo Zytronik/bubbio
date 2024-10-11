@@ -11,21 +11,23 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { UsersModule } from 'src/user/user.module';
 
 @Module({
-  imports: [
-    UsersModule,
-    PrismaModule,
-    PassportModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: configService.get<string>('JWT_EXI') },
-      }),
-      inject: [ConfigService],
-    }),
-  ],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard, TokensCleanupService],
-  controllers: [AuthController],
-  exports: [AuthService, JwtModule],
+    imports: [
+        UsersModule,
+        PrismaModule,
+        PassportModule,
+        JwtModule.registerAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                secret: configService.get<string>('JWT_SECRET'),
+                signOptions: {
+                    expiresIn: configService.get<string>('JWT_EXI'),
+                },
+            }),
+            inject: [ConfigService],
+        }),
+    ],
+    providers: [AuthService, JwtStrategy, JwtAuthGuard, TokensCleanupService],
+    controllers: [AuthController],
+    exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

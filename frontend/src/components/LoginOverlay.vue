@@ -1,148 +1,84 @@
 <template>
   <div class="overlay login-overlay">
-    <div class="login-container">
+    <div class="overlay-container">
       <transition name="fade" mode="out-in">
         <div :key="currentFormKey">
-          <form
-            @submit.prevent="handleCheckUsername"
-            v-show="showUsernameForm"
-            key="username-form"
-          >
+          <form @submit.prevent="handleCheckUsername" v-show="showUsernameForm" key="username-form">
             <h2>Welcome!</h2>
             <p>Please enter your username to join.</p>
-            <input
-              type="text"
-              id="username"
-              placeholder="Username"
-              v-model="formData.username"
-              required
-            />
+            <input type="text" id="username" placeholder="Username" v-model="formData.username" required />
 
             <div v-if="errorMessage" class="error-message">
               {{ errorMessage }}
             </div>
 
-            <button type="submit">Join</button>
-            <button type="button" @click="handlePlayAsGuest">
+            <button class="primary" type="submit">Join</button>
+            <button class="primary" type="button" @click="handlePlayAsGuest">
               Play as Guest
             </button>
           </form>
 
-          <form
-            @submit.prevent="handleRegister"
-            v-show="showRegister"
-            key="register-form"
-          >
+          <form @submit.prevent="handleRegister" v-show="showRegister" key="register-form">
             <h2>Want to join?</h2>
             <p>
               The username <strong>{{ formData.username }}</strong> hasn't been
-              registered. Claim it now!
+              registered.<br>Claim it now!
             </p>
-            <input
-              type="email"
-              id="email"
-              placeholder="Email (Only used for PW reset)"
-              v-model="formData.email"
-              required
-            />
-            <input
-              type="password"
-              id="passwordRegister"
-              placeholder="Password"
-              v-model="formData.password"
-              required
-            />
-            <input
-              type="password"
-              id="passwordRegisterAgain"
-              placeholder="Repeat Password"
-              v-model="formData.passwordAgain"
-              required
-            />
+            <input type="email" id="email" placeholder="Email (Only used for PW reset)" v-model="formData.email"
+              required />
+            <input type="password" id="passwordRegister" placeholder="Password" v-model="formData.password" required />
+            <input type="password" id="passwordRegisterAgain" placeholder="Repeat Password"
+              v-model="formData.passwordAgain" required />
 
             <div v-if="errorMessage" class="error-message">
               {{ errorMessage }}
             </div>
 
-            <button type="submit">Register</button>
-            <button type="button" @click="backtoUsernameForm">Back</button>
+            <button class="primary" type="submit">Register</button>
+            <button class="primary" type="button" @click="backtoUsernameForm">Back</button>
           </form>
 
-          <form
-            @submit.prevent="handleLogin"
-            v-show="showLogin"
-            key="login-form"
-          >
+          <form @submit.prevent="handleLogin" v-show="showLogin" key="login-form">
             <h2>Good to see you again!</h2>
             <p>
               The username <strong>{{ formData.username }}</strong> is
-              registered. please enter your password to log in
+              registered.<br>Please enter your password to log in.
             </p>
-            <input
-              type="password"
-              id="passwordLogin"
-              placeholder="Password"
-              v-model="formData.password"
-              required
-            />
+            <input type="password" id="passwordLogin" placeholder="Password" v-model="formData.password" required />
 
             <div v-if="errorMessage" class="error-message">
               {{ errorMessage }}
             </div>
 
-            <button type="submit">Login</button>
-            <button type="button" @click="toForgotPwForm">I Forgot</button>
-            <button type="button" @click="backtoUsernameForm">Back</button>
+            <button class="primary" type="submit">Login</button>
+            <button class="primary" type="button" @click="toForgotPwForm">I Forgot</button>
+            <button class="primary" type="button" @click="backtoUsernameForm">Back</button>
           </form>
 
-          <form
-            @submit.prevent="handleForgotPw"
-            v-show="showForgotPw"
-            key="forgotPw-form"
-          >
+          <form @submit.prevent="handleForgotPw" v-show="showForgotPw" key="forgotPw-form">
             <h2>Reset your Password</h2>
             <p>Please enter your email to reset your password.</p>
-            <input
-              type="email"
-              id="emailForgot"
-              placeholder="Email"
-              v-model="formData.emailForgot"
-              required
-            />
+            <input type="email" id="emailForgot" placeholder="Email" v-model="formData.emailForgot" required />
 
             <div v-if="errorMessage" class="error-message">
               {{ errorMessage }}
             </div>
-            <button type="submit">Send Email</button>
-            <button type="button" @click="backtoLoginForm">Back</button>
+            <button class="primary" type="submit">Send Email</button>
+            <button class="primary" type="button" @click="backtoLoginForm">Back</button>
           </form>
 
-          <form
-            @submit.prevent="handleChangePw"
-            v-show="showChangePw"
-            key="changePw-form"
-          >
+          <form @submit.prevent="handleChangePw" v-show="showChangePw" key="changePw-form">
             <h2>Change your Password</h2>
             <p>Please enter your new password.</p>
-            <input
-              type="password"
-              id="newPassword"
-              placeholder="New Password"
-              v-model="formData.newPassword"
-              required
-            />
-            <input
-              type="password"
-              id="newPasswordAgain"
-              placeholder="Repeat New Password"
-              v-model="formData.newPasswordAgain"
-              required
-            />
+            <input type="password" id="newPassword" placeholder="New Password" v-model="formData.newPassword"
+              required />
+            <input type="password" id="newPasswordAgain" placeholder="Repeat New Password"
+              v-model="formData.newPasswordAgain" required />
 
             <div v-if="errorMessage" class="error-message">
               {{ errorMessage }}
             </div>
-            <button type="submit">Change Password</button>
+            <button class="primary" type="submit">Change Password</button>
           </form>
         </div>
       </transition>
@@ -407,16 +343,21 @@ export default {
 </script>
 
 <style scoped>
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
+form button:first-of-type {
+  margin-top: 15px;
+}
+
+p {
+  margin-bottom: 15px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

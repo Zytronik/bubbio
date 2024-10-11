@@ -3,13 +3,12 @@
   <main>
     <LoadingScreen :is-loading="pageIsLoading" />
     <ToastMessages />
+    <PatchNotes />
     <LoginOverlay v-if="showLogin" />
     <AppSidebar :back-buttons="currentBackButtons" :background-color="currentPageColor" />
-    <!-- <transition> -->
     <div class="pageContainer" v-if="currentComponent">
       <component :is="currentComponent" :key="currentPage" />
     </div>
-    <!-- </transition> -->
     <!-- <div>
       <div>
         <p>Client ID: {{ userSession.clientId }}</p>
@@ -48,6 +47,7 @@ import { waitForLoadingScreen } from './ts/page/preload';
 import AppFooter from './components/AppFooter.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import { initPageTransitionWatcher } from './ts/page/pageManager';
+import PatchNotes from './components/PatchNotes.vue';
 
 export default {
   name: 'App',
@@ -58,7 +58,7 @@ export default {
     LoginOverlay,
     ToastMessages,
     LoadingScreen,
-
+    PatchNotes,
   },
   setup() {
     const pageStore = usePageStore();

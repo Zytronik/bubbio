@@ -7,6 +7,7 @@ import './assets/css/animations.css';
 import './assets/css/pages.css';
 import './assets/css/menus.css';
 import './assets/css/all.min.css';
+import './assets/css/forms.css';
 
 const app = createApp(App);
 const pinia = createPinia();

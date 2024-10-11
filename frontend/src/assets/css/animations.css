@@ -1,18 +1,57 @@
-.transitionPage-pageContainer-slideOutFromRight {
-    animation: slideOutFromRight 150ms ease-in-out forwards;
+.transitionPageForwards-pageContainer-slideOutFromRight {
+    animation: slideOutFromRight 150ms ease forwards;
 }
 
-.transitionPage-pageContainer-slideInFromRight {
-    animation: slideInFromRight 150ms ease-in-out forwards;
+.transitionPageForwards-pageContainer-slideInFromRight {
+    animation: slideInFromRight 150ms ease forwards;
 }
 
-.transitionPage-sideBar-slideInFromLeft {
-    animation: slideInFromLeftMargin100px 400ms ease-in-out forwards;
+.transitionPageForwards-sideBar-slideInFromLeft {
+    animation: slideInFromLeftMargin200px 400ms ease forwards;
 }
 
-@keyframes slideInFromLeftMargin100px {
+.transitionPageBackwards-sideBar-slideOutToLeft {
+    animation: slideOutToLeft 400ms ease forwards;
+}
+
+.transitionPageBackwards-pageContainer-slideOutFromLeft {
+    animation: slideOutFromLeft 150ms ease forwards;
+}
+
+.transitionPageBackwards-pageContainer-slideInFromLeft {
+    animation: slideInFromLeft 150ms ease forwards;
+}
+
+@keyframes slideInFromLeft {
     0% {
-        margin-left: -100px;
+        transform: translateX(-100vw);
+    }
+    100% {
+        transform: translateX(0vw);
+    }
+}
+
+@keyframes slideOutFromLeft {
+    0% {
+        transform: translateX(0vw);
+    }
+    100% {
+        transform: translateX(100vw);
+    }
+}
+
+@keyframes slideOutToLeft {
+    0% {
+        margin-left: 0px;
+    }
+    100% {
+        margin-left: -200px;
+    }
+}
+
+@keyframes slideInFromLeftMargin200px {
+    0% {
+        margin-left: -200px;
     }
     100% {
         margin-left: 0px;

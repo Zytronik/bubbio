@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { BackButton } from '@/ts/_interface/backButton';
-import { setPage } from '@/ts/page/pageManager';
+import { transitionPageBackwardsAnimation } from '@/ts/animation/transitionPageBackwards';
 import { defineComponent, PropType } from 'vue';
 
 
@@ -24,13 +24,13 @@ export default defineComponent({
   },
   setup(props) {
     function handleButtonClick(btn: BackButton) {
-      setPage(btn.page);
+      transitionPageBackwardsAnimation(btn.page);
     }
 
     function goBack() {
       const activeButton = (props.backButtons as BackButton[]).find(btn => !btn.disabled);
       if (activeButton) {
-        setPage(activeButton.page);
+        transitionPageBackwardsAnimation(activeButton.page);
       }
     }
 
@@ -52,6 +52,7 @@ export default defineComponent({
   flex-direction: column;
   padding: 5% 0;
   justify-content: space-evenly;
+  margin-left: -200px;
 }
 
 .backButton {

@@ -9,122 +9,112 @@ export class AnimationSequence {
         this.isAborted = false;
     }
 
-    play() {
-        let currentDelay = 0;
+    async play() {
+        for (const animation of this.animations) {
+            if (this.isAborted) break;
+            await this.runAnimation(animation);
+        }
+    }
 
-        this.animations.forEach((animation, index) => {
-            setTimeout(async () => {
-                if (this.isAborted) return;
+    private runAnimation(animation: AnimationConfig): Promise<void> {
+        return new Promise(resolve => {
+            const element = document.querySelector(
+                animation.selector,
+            ) as HTMLElement;
 
-                // Wait for the element if it's not immediately available
-                const element = await this.waitForElement(animation.selector);
+            if (element) {
+                // Call onStart if provided
+                animation.onStart?.();
 
-                if (element) {
-                    // Call onStart if provided
-                    animation.onStart?.();
+                // Handle adding or removing a CSS property instantly
+                if (
+                    animation.addProperty &&
+                    animation.propertyName &&
+                    animation.value
+                ) {
+                    const cssPropertyName = this.toKebabCase(
+                        animation.propertyName,
+                    );
 
-                    // Handle adding or removing a CSS property instantly
-                    if (
-                        animation.addProperty &&
-                        animation.propertyName &&
-                        animation.value
-                    ) {
-                        const cssPropertyName = animation.propertyName.replace(
-                            /[A-Z]/g,
-                            match => `-${match.toLowerCase()}`,
-                        );
+                    element.style.setProperty(cssPropertyName, animation.value);
 
-                        element.style.setProperty(
-                            cssPropertyName,
-                            animation.value,
-                        );
+                    animation._appliedProperty = cssPropertyName;
 
-                        // Store the property for potential removal on abort
-                        animation._appliedProperty = cssPropertyName;
-
-                        animation.onEnd?.();
-                    } else if (
-                        animation.removeProperty &&
-                        animation.propertyName
-                    ) {
-                        const cssPropertyName = animation.propertyName.replace(
-                            /[A-Z]/g,
-                            match => `-${match.toLowerCase()}`,
-                        );
-
-                        element.style.removeProperty(cssPropertyName);
-                        animation.onEnd?.();
+                    // Await onEnd if provided and then resolve
+                    if (animation.onEnd) {
+                        Promise.resolve(animation.onEnd()).then(resolve);
+                    } else {
+                        resolve();
                     }
+                } else if (animation.removeProperty && animation.propertyName) {
+                    const cssPropertyName = this.toKebabCase(
+                        animation.propertyName,
+                    );
 
-                    // Handle class-based animations with duration
-                    if (animation.className && animation.duration) {
-                        element.classList.add(animation.className);
+                    element.style.removeProperty(cssPropertyName);
 
-                        setTimeout(() => {
-                            if (!this.isAborted && animation.className) {
-                                element.classList.remove(animation.className);
-                                animation.onEnd?.();
-                            } else {
-                                this.removeAllAnimationClasses();
-                                this.removeAllProperties();
-                            }
-                        }, animation.duration);
+                    // Await onEnd if provided and then resolve
+                    if (animation.onEnd) {
+                        Promise.resolve(animation.onEnd()).then(resolve);
+                    } else {
+                        resolve();
                     }
                 }
-            }, currentDelay);
 
-            currentDelay += (animation.duration || 0) + (animation.delay || 0);
+                // Handle class-based animations with duration
+                if (animation.className && animation.duration) {
+                    element.classList.add(animation.className);
+
+                    setTimeout(() => {
+                        if (!this.isAborted && animation.className) {
+                            element.classList.remove(animation.className);
+
+                            // Await onEnd if provided and then resolve
+                            if (animation.onEnd) {
+                                Promise.resolve(animation.onEnd()).then(
+                                    resolve,
+                                );
+                            } else {
+                                resolve();
+                            }
+                        } else {
+                            this.removeAnimationClass(animation);
+                            resolve();
+                        }
+                    }, animation.duration);
+                } else {
+                    resolve();
+                }
+            } else {
+                resolve(); // If element not found, resolve immediately
+            }
         });
     }
 
     abort() {
         this.isAborted = true;
         this.removeAllAnimationClasses();
-        this.removeAllProperties();
     }
 
     private removeAllAnimationClasses() {
         this.animations.forEach(animation => {
-            const element = document.querySelector(
-                animation.selector,
-            ) as HTMLElement;
-            if (element && animation.className) {
-                element.classList.remove(animation.className);
-            }
+            this.removeAnimationClass(animation);
         });
     }
 
-    private removeAllProperties() {
-        this.animations.forEach(animation => {
-            const element = document.querySelector(
-                animation.selector,
-            ) as HTMLElement;
-            if (element && animation._appliedProperty) {
-                element.style.removeProperty(animation._appliedProperty);
-            }
-        });
+    private removeAnimationClass(animation: AnimationConfig) {
+        const element = document.querySelector(
+            animation.selector,
+        ) as HTMLElement;
+        if (element && animation.className) {
+            element.classList.remove(animation.className);
+        }
     }
 
-    private waitForElement(
-        selector: string,
-        timeout = 5000,
-    ): Promise<HTMLElement | null> {
-        return new Promise(resolve => {
-            const intervalTime = 100;
-            let elapsedTime = 0;
-            const interval = setInterval(() => {
-                const element = document.querySelector(selector) as HTMLElement;
-                if (element) {
-                    clearInterval(interval);
-                    resolve(element);
-                } else {
-                    elapsedTime += intervalTime;
-                    if (elapsedTime >= timeout) {
-                        clearInterval(interval);
-                        resolve(null);
-                    }
-                }
-            }, intervalTime);
-        });
+    private toKebabCase(propertyName: string): string {
+        return propertyName.replace(
+            /[A-Z]/g,
+            match => `-${match.toLowerCase()}`,
+        );
     }
 }
