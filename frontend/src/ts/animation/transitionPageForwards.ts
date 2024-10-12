@@ -4,33 +4,39 @@ import { AnimationSequence } from './animationSequence';
 import { AnimationConfig } from '../_interface/animationConfig';
 
 export function transitionPageForwardsAnimation(transitionToPage: PAGE) {
-    const animations: AnimationConfig[] = [
-        {
-            selector: '.pageContainer',
-            className: 'transitionPageForwards-pageContainer-slideOutFromRight',
-            duration: 150,
-            onEnd: () => {
-                setPage(transitionToPage);
-            },
-        },
-        {
-            selector: '.pageContainer',
-            className: 'transitionPageForwards-pageContainer-slideInFromRight',
-            duration: 150,
-        },
-        {
-            selector: '.sidebar',
-            className: 'transitionPageForwards-sideBar-slideInFromLeft',
-            duration: 400,
-        },
-        {
-            selector: '.sidebar',
-            addProperty: true,
-            propertyName: 'margin-left',
-            value: '0px',
-        },
-    ];
+  const animations: AnimationConfig[] = [
+    {
+      selector: '.pageWrapper',
+      className: 'transitionPageForwards-pageWrapper-slideOutFromRight',
+      duration: 150,
+      onEnd: () => {
+        setPage(transitionToPage);
+      },
+    },
+    {
+      selector: '.sidebar',
+      addProperty: true,
+      propertyName: 'margin-left',
+      value: '-150px',
+    },
+    {
+      selector: '.pageContainer',
+      className: 'transitionPageForwards-pageContainer-slideInFromRight',
+      duration: 150,
+    },
+    {
+      selector: '.sidebar',
+      className: 'transitionPageForwards-sideBar-slideInFromLeft',
+      duration: 400,
+    },
+    {
+      selector: '.sidebar',
+      addProperty: true,
+      propertyName: 'margin-left',
+      value: '0px',
+    },
+  ];
 
-    const animationSequence = new AnimationSequence(animations);
-    animationSequence.play();
+  const animationSequence = new AnimationSequence(animations);
+  animationSequence.play();
 }

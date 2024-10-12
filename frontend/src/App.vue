@@ -5,10 +5,12 @@
     <ToastMessages />
     <PatchNotes />
     <LoginOverlay v-if="showLogin" />
-    <AppSidebar :back-buttons="currentBackButtons" :background-color="currentPageColor" />
-    <div class="pageContainer" v-if="currentComponent">
-      <component :is="currentComponent" :key="currentPage" />
-    </div>
+    <article class="pageWrapper">
+      <AppSidebar :back-buttons="currentBackButtons" :background-color="currentPageColor" />
+      <section class="pageContainer" :class="currentPageName" v-if="currentComponent">
+        <component :is="currentComponent" :key="currentPage" />
+      </section>
+    </article>
     <!-- <div>
       <div>
         <p>Client ID: {{ userSession.clientId }}</p>
@@ -64,6 +66,7 @@ export default {
     const pageStore = usePageStore();
     const currentPage = storeToRefs(pageStore);
     const currentComponent = computed(() => pages[pageStore.currentPage].component);
+    const currentPageName = computed(() => pageStore.currentPage);
     const currentBackButtons = computed(() => pages[pageStore.currentPage].backButtons);
     const currentPageColor = computed(() => pages[pageStore.currentPage].color);
     const showLogin = computed(() => !pageStore.isLoggedIn);
@@ -91,6 +94,7 @@ export default {
     return {
       currentComponent,
       currentBackButtons,
+      currentPageName,
       currentPageColor,
       currentPage,
       showLogin,

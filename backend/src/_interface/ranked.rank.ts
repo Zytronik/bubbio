@@ -1,21 +1,21 @@
 export interface RankInfo {
-    ascii: string;
-    name: string;
-    iconName: string;
-    percentile: number;
-    prevRank?: Rank;
-    nextRank?: Rank;
+  ascii: string;
+  name: string;
+  iconName: string;
+  percentile: number;
+  prevRank?: Rank;
+  nextRank?: Rank;
 }
 
 export interface Rank {
-    ascii: string;
-    percentile: number;
-    name: string;
-    iconName: string;
+  ascii: string;
+  percentile: number;
+  name: string;
+  iconName: string;
 }
 
 export interface Ratings {
-    rating: number;
-    ratingDeviation: number;
-    volatility: number;
+  rating: number;
+  ratingDeviation: number;
+  volatility: number;
 }

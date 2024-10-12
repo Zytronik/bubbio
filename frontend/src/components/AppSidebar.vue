@@ -52,7 +52,6 @@ export default defineComponent({
   flex-direction: column;
   padding: 5% 0;
   justify-content: space-evenly;
-  margin-left: -200px;
 }
 
 .backButton {

@@ -1,77 +1,77 @@
-.transitionPageForwards-pageContainer-slideOutFromRight {
-    animation: slideOutFromRight 150ms ease forwards;
+.transitionPageForwards-pageWrapper-slideOutFromRight {
+  animation: slideOutFromRight 150ms ease forwards;
 }
 
 .transitionPageForwards-pageContainer-slideInFromRight {
-    animation: slideInFromRight 150ms ease forwards;
+  animation: slideInFromRight 150ms ease forwards;
 }
 
 .transitionPageForwards-sideBar-slideInFromLeft {
-    animation: slideInFromLeftMargin200px 400ms ease forwards;
+  animation: slideInFromLeftMargin150px 400ms ease forwards;
 }
 
 .transitionPageBackwards-sideBar-slideOutToLeft {
-    animation: slideOutToLeft 400ms ease forwards;
+  animation: slideOutToLeftMargin150px 400ms ease forwards;
 }
 
 .transitionPageBackwards-pageContainer-slideOutFromLeft {
-    animation: slideOutFromLeft 150ms ease forwards;
+  animation: slideOutFromLeft 150ms ease forwards;
 }
 
-.transitionPageBackwards-pageContainer-slideInFromLeft {
-    animation: slideInFromLeft 150ms ease forwards;
+.transitionPageBackwards-pageWrapper-slideInFromLeft {
+  animation: slideInFromLeft 150ms ease forwards;
 }
 
 @keyframes slideInFromLeft {
-    0% {
-        transform: translateX(-100vw);
-    }
-    100% {
-        transform: translateX(0vw);
-    }
+  0% {
+    transform: translateX(-100vw);
+  }
+  100% {
+    transform: translateX(0vw);
+  }
 }
 
 @keyframes slideOutFromLeft {
-    0% {
-        transform: translateX(0vw);
-    }
-    100% {
-        transform: translateX(100vw);
-    }
+  0% {
+    transform: translateX(0vw);
+  }
+  100% {
+    transform: translateX(100vw);
+  }
 }
 
-@keyframes slideOutToLeft {
-    0% {
-        margin-left: 0px;
-    }
-    100% {
-        margin-left: -200px;
-    }
+@keyframes slideOutToLeftMargin150px {
+  0% {
+    margin-left: 0px;
+  }
+  100% {
+    margin-left: -150px;
+  }
 }
 
-@keyframes slideInFromLeftMargin200px {
-    0% {
-        margin-left: -200px;
-    }
-    100% {
-        margin-left: 0px;
-    }
+@keyframes slideInFromLeftMargin150px {
+  0% {
+    margin-left: -150px;
+  }
+  100% {
+    margin-left: 0px;
+  }
 }
 
 @keyframes slideInFromRight {
-    0% {
-        transform: translateX(100vw);
-    }
-    100% {
-        transform: translateX(0vw);
-    }
+  0% {
+    transform: translateX(100vw);
+  }
+  100% {
+    transform: translateX(0vw);
+  }
 }
 
 @keyframes slideOutFromRight {
-    0% {
-        transform: translateX(0vw);
-    }
-    100% {
-        transform: translateX(-100vw);
-    }
+  0% {
+    transform: translateX(0vw);
+  }
+  100% {
+    transform: translateX(-100vw);
+  }
 }

@@ -7,16 +7,16 @@ import { UsersModule } from './user/user.module';
 import { SessionModule } from './session/session.module';
 
 @Module({
-    imports: [
-        ConfigModule.forRoot({
-            isGlobal: true,
-        }),
-        ScheduleModule.forRoot(),
-        AuthModule,
-        MailModule,
-        UsersModule,
-        SessionModule,
-    ],
-    providers: [],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ScheduleModule.forRoot(),
+    AuthModule,
+    MailModule,
+    UsersModule,
+    SessionModule,
+  ],
+  providers: [],
 })
 export class AppModule {}
