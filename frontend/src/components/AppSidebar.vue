@@ -1,6 +1,6 @@
 <template>
   <div v-if="backButtons" class="sidebar" :style="{ backgroundColor: backgroundColor }" @click.self="goBack()">
-    <div v-for="(button, index) in backButtons" :key="index" class="backButton"
+    <div v-for="(button, index) in backButtons" :key="index" class="backButton" @mouseenter="handleButtonHover()"
       :class="button.disabled ? 'disabled' : ''" @click="handleButtonClick(button)">
       <div>
         <img :src="button.iconSrc" />
@@ -10,6 +10,7 @@
 </template>
 
 <script lang="ts">
+import { useSoundStore } from '@/stores/soundStore';
 import { BackButton } from '@/ts/_interface/backButton';
 import { transitionPageBackwardsAnimation } from '@/ts/animation/transitionPageBackwards';
 import { defineComponent, PropType } from 'vue';
@@ -27,6 +28,10 @@ export default defineComponent({
       transitionPageBackwardsAnimation(btn.page);
     }
 
+    function handleButtonHover() {
+      useSoundStore().playSound('menu_hover');
+    }
+
     function goBack() {
       const activeButton = (props.backButtons as BackButton[]).find(btn => !btn.disabled);
       if (activeButton) {
@@ -37,6 +42,7 @@ export default defineComponent({
     return {
       handleButtonClick,
       goBack,
+      handleButtonHover,
     };
   },
 

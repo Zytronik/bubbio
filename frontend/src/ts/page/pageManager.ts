@@ -12,7 +12,10 @@ export function canTransitionTo(newPage: PAGE): boolean {
 }
 
 export function setPage(newPage: PAGE) {
-  if (checkUserAuthentication()) {
+  if (
+    checkUserAuthentication() ||
+    (!checkUserAuthentication() && newPage == PAGE.startMenu)
+  ) {
     if (canTransitionTo(newPage)) {
       transitionPage(newPage);
     } else {

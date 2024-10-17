@@ -2,8 +2,10 @@ import { PAGE } from '../_constant/pages';
 import { setPage } from '../page/pageManager';
 import { AnimationSequence } from './animationSequence';
 import { AnimationConfig } from '../_interface/animationConfig';
+import { useSoundStore } from '@/stores/soundStore';
 
 export function transitionPageForwardsAnimation(transitionToPage: PAGE) {
+  useSoundStore().playSound('menu_front');
   const animations: AnimationConfig[] = [
     {
       selector: '.pageWrapper',

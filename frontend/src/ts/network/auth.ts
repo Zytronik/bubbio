@@ -5,6 +5,8 @@ import { jwtDecode, type JwtPayload } from 'jwt-decode';
 import { usePageStore } from '@/stores/pageStore';
 import { useSocketStore } from '@/stores/socketStore';
 import { UserSession } from '../_interface/userDetails';
+import { PAGE } from '../_constant/pages';
+import { transitionPageBackwardsAnimation } from '../animation/transitionPageBackwards';
 export async function checkIfUsernameIsTakenAndValid(
   username: string,
 ): Promise<AuthResponse> {
@@ -216,6 +218,7 @@ export async function logUserOut() {
     }
   }
   clearClientState();
+  transitionPageBackwardsAnimation(PAGE.startMenu);
   pageStore.setLoginStatus(false);
   const socketStore = useSocketStore();
   socketStore.reconnectSocket();

@@ -13,7 +13,7 @@
         <SliderSetting title="Lorem ipsum" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
           :min="0" :max="100" :initialValue="50" />
         <ButtonSetting title="Lorem ipsum" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-          buttonText="Lorem Ipsum" />
+          buttonText="Lorem Ipsum" :action="() => { }" />
       </div>
     </div>
   </div>
@@ -35,6 +35,10 @@
   <div v-if="currentTab === 'Account Settings'" class="tab-content input-tab">
     <div class="tab-wrapper">
       <h2>Account Settings</h2>
+      <div class="account-settings settings-wrapper">
+        <ButtonSetting title="Log out of Account" description="Logs the User out of the Account" buttonText="Log out"
+          :action="logUserOut" />
+      </div>
     </div>
   </div>
 </template>
@@ -44,6 +48,7 @@ import { defineComponent } from 'vue';
 import KeySetting from '@/components/settings/KeySetting.vue';
 import SliderSetting from '@/components/settings/SliderSetting.vue';
 import ButtonSetting from '@/components/settings/ButtonSetting.vue';
+import { logUserOut } from '@/ts/network/auth';
 
 export default defineComponent({
   name: 'SettingsPage',
@@ -56,6 +61,11 @@ export default defineComponent({
     return {
       currentTab: 'Input Settings',
       tabs: ['Input Settings', 'Handling Settings', 'Graphics Settings', 'Audio Settings', 'Account Settings'],
+    };
+  },
+  setup() {
+    return {
+      logUserOut,
     };
   },
 });

@@ -11,7 +11,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
+
+type ActionFunction = () => void | Promise<void>;
 
 export default defineComponent({
     name: 'ButtonSetting',
@@ -28,10 +30,14 @@ export default defineComponent({
             type: String,
             required: true,
         },
+        action: {
+            type: Function as PropType<ActionFunction>,
+            required: true,
+        },
     },
     methods: {
-        triggerAction() {
-            console.log('Button action triggered');
+        async triggerAction() {
+            await this.action();
         },
     },
 });

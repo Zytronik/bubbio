@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.41",
-    "@types/howler": "^2.2.11",
+    "@types/howler": "^2.2.12",
     "@types/webpack-env": "^1.18.4",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",

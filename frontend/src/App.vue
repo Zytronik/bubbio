@@ -50,6 +50,7 @@ import AppFooter from './components/AppFooter.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import { initPageTransitionWatcher } from './ts/page/pageManager';
 import PatchNotes from './components/PatchNotes.vue';
+import { useSoundStore } from './stores/soundStore';
 
 export default {
   name: 'App',
@@ -81,10 +82,13 @@ export default {
     initPageTransitionWatcher();
     checkUserAuthentication();
 
+    const soundStore = useSoundStore();
+
     onMounted(async () => {
       await waitForLoadingScreen();
       pageIsLoading.value = false;
       //do stuff after this---------
+      soundStore.playSound("menu_soundtrack");
     });
 
     onUnmounted(() => {

@@ -2,8 +2,10 @@ import { PAGE } from '../_constant/pages';
 import { setPage } from '../page/pageManager';
 import { AnimationSequence } from './animationSequence';
 import { AnimationConfig } from '../_interface/animationConfig';
+import { useSoundStore } from '@/stores/soundStore';
 
 export function transitionPageBackwardsAnimation(transitionToPage: PAGE) {
+  useSoundStore().playSound('menu_back');
   const animations: AnimationConfig[] = [
     {
       selector: '.sidebar',
