@@ -360,4 +360,12 @@ p {
 .fade-leave-to {
   opacity: 0;
 }
+
+button+button {
+  margin-top: 10px;
+}
+
+label {
+  margin-bottom: 8px;
+}
 </style>

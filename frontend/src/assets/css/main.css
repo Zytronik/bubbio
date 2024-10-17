@@ -14,6 +14,12 @@ body {
   line-height: var(--font-normal-line-height);
 }
 
+body {
+  background-image: url('../img/bg.png');
+  background-position: center;
+  background-size: cover;
+}
+
 * {
   box-sizing: border-box;
   text-transform: uppercase;
@@ -21,6 +27,10 @@ body {
 
 p {
   margin: unset;
+}
+
+strong {
+  font-weight: 700;
 }
 
 h2 {
@@ -69,6 +79,7 @@ main {
   --ranked-color: rgb(160, 0, 24);
   --roomListing-color: rgb(129, 33, 81);
   --app-bg-color: #202020;
+  --light-bg-color: #353535;
   --app-font-color: #fff;
   --header-height: 100px;
   --header-profile-width: 380px;

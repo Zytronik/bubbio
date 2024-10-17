@@ -8,6 +8,12 @@
   align-items: end;
 }
 
+.startMenu,
+.soloMenu,
+.multiMenu {
+  padding: unset;
+}
+
 .disabledMenuBtn {
   filter: grayscale(80%);
   opacity: 0.3;

@@ -24,14 +24,24 @@ export default {
   position: absolute;
   width: 100vw;
   height: calc(var(--header-height) / 2);
-  z-index: 1;
   bottom: 0;
   left: 0;
   right: 0;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+}
+
+.bottomBar::after {
+  content: "";
+  position: absolute;
+  width: 100vw;
+  height: 100%;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background-color: black;
+  z-index: 0;
 }
 
 .openChannelButton:hover {
@@ -44,7 +54,6 @@ svg {
   left: 50%;
   transform: translateX(-50%);
   height: var(--header-height);
-  z-index: -1;
 }
 
 .openChannelButton {
