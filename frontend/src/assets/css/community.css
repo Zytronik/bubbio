@@ -1,0 +1,33 @@
+.openChannelButton:hover {
+  background-color: rgb(4, 4, 4);
+}
+
+.openChannelButton + svg {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: var(--header-height);
+}
+
+.openChannelButton {
+  position: absolute;
+  background-color: transparent;
+  bottom: 0;
+  z-index: 1;
+  font-size: 2em;
+  left: 50%;
+  transform: translateX(-50%);
+  outline: none;
+  border: none;
+  height: var(--header-height);
+  width: var(--header-profile-width);
+  cursor: pointer;
+  transition: 200ms;
+  text-transform: uppercase;
+  color: white;
+  margin-top: unset;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

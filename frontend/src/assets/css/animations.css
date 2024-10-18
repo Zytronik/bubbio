@@ -22,6 +22,32 @@
   animation: slideInFromLeft 150ms ease forwards;
 }
 
+.openCommunityOverlay-community-slideInFromBottom {
+  animation: slideInFromBottom 150ms ease forwards;
+}
+
+.closeCommunityOverlay-community-slideToBottom {
+  animation: slideToBottom 150ms ease forwards;
+}
+
+@keyframes slideToBottom {
+  0% {
+    transform: translateY(0vh);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes slideInFromBottom {
+  0% {
+    transform: translateY(100vh);
+  }
+  100% {
+    transform: translateY(0vh);
+  }
+}
+
 @keyframes slideInFromLeft {
   0% {
     transform: translateX(-100vw);

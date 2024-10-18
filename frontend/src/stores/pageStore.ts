@@ -5,6 +5,7 @@ export const usePageStore = defineStore('page', {
   state: () => ({
     currentPage: PAGE.startMenu,
     isLoggedIn: false,
+    showCommunity: false,
   }),
   actions: {
     setPage(page: PAGE) {
@@ -12,6 +13,12 @@ export const usePageStore = defineStore('page', {
     },
     setLoginStatus(isLoggedIn: boolean) {
       this.isLoggedIn = isLoggedIn;
+    },
+    showCommunityOverlay() {
+      this.showCommunity = true;
+    },
+    hideCommunityOverlay() {
+      this.showCommunity = false;
     },
   },
 });

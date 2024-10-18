@@ -4,6 +4,7 @@
     <LoadingScreen :is-loading="pageIsLoading" />
     <ToastMessages />
     <PatchNotes />
+    <CommunityOverlay v-if="showCommunity" />
     <LoginOverlay v-if="showLogin" />
     <article class="pageWrapper">
       <AppSidebar :back-buttons="currentBackButtons" :background-color="currentPageColor" />
@@ -44,13 +45,14 @@ import LoginOverlay from './components/LoginOverlay.vue';
 import ToastMessages from './components/ToastMessages.vue';
 import { useSocketStore } from './stores/socketStore';
 import { useUserStore } from './stores/userStore';
-import LoadingScreen from './components/LoadingScreen.vue';
+import LoadingScreen from './components/LoadingOverlay.vue';
 import { waitForLoadingScreen } from './ts/page/preload';
 import AppFooter from './components/AppFooter.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import { initPageTransitionWatcher } from './ts/page/pageManager';
 import PatchNotes from './components/PatchNotes.vue';
 import { useSoundStore } from './stores/soundStore';
+import CommunityOverlay from './components/CommunityOverlay.vue';
 
 export default {
   name: 'App',
@@ -62,6 +64,7 @@ export default {
     ToastMessages,
     LoadingScreen,
     PatchNotes,
+    CommunityOverlay,
   },
   setup() {
     const pageStore = usePageStore();
@@ -73,6 +76,7 @@ export default {
     const showLogin = computed(() => !pageStore.isLoggedIn);
     const socketStore = useSocketStore();
     const pageIsLoading = ref(true);
+    const showCommunity = computed(() => pageStore.showCommunity);
 
     //temp --------
     const userStore = useUserStore();
@@ -105,6 +109,7 @@ export default {
       userSession,
       logUserOut,
       pageIsLoading,
+      showCommunity,
     };
   },
 };
