@@ -1,8 +1,9 @@
 import { usePageStore } from '@/stores/pageStore';
-import { pages, PAGE } from '@/ts/_constant/pages';
+import { pages } from '@/ts/_constant/pages';
 import { watchEffect } from 'vue';
 import { checkUserAuthentication } from '../network/auth';
 import { useSocketStore } from '@/stores/socketStore';
+import { PAGE } from '../_enum/page';
 
 export function canTransitionTo(newPage: PAGE): boolean {
   const pageStore = usePageStore();

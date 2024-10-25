@@ -1,6 +1,6 @@
 <template>
   <div class="topbar">
-    <div class="profile-wrapper" v-if="isGuestOrLoggedIn(userSession)">
+    <div class="profile-wrapper" v-if="isGuestOrLoggedIn(userSession)" @click="openCommunityOverlay()">
       <img class="profile-pic" :src="getUserPbUrl(userSession)" alt="Profile Picture">
       <div class="profile-content">
         <h3>{{ userSession.username }}</h3>
@@ -28,6 +28,7 @@
 <script lang="ts">
 import { useUserStore } from '@/stores/userStore';
 import { getUserPbUrl, getUserRankImgUrl } from '@/ts/_constant/paths';
+import { openCommunityOverlay } from '@/ts/animation/openCommunityOverlay';
 import { isGuestOrLoggedIn, logUserOut } from '@/ts/network/auth';
 import { computed } from 'vue';
 
@@ -57,6 +58,7 @@ export default {
       getUserRankImgUrl,
       isGuestOrLoggedIn,
       getProgressBarFillWidth,
+      openCommunityOverlay,
     };
   },
 };

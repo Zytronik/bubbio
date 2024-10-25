@@ -1,4 +1,4 @@
-import { PAGE } from '../_constant/pages';
+import { PAGE } from '../_enum/page';
 
 export interface BackButton {
   iconSrc: string;

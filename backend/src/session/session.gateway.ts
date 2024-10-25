@@ -74,12 +74,23 @@ export class SessionGateway
     console.log(`${username} disconnected.`);
   }
 
-  @SubscribeMessage('updateUser')
-  handleUserUpdate(client: Socket, payload: { currentPage: string }) {
+  @SubscribeMessage('updateUserPage')
+  handleUpdateUserPage(client: Socket, payload: { currentPage: string }) {
     const userSession = this.activeUsers.get(client.id);
     if (userSession) {
       userSession.currentPage = payload.currentPage;
       this.activeUsers.set(client.id, userSession);
+    }
+  }
+
+  @SubscribeMessage('updateUser')
+  async handleUpdateUser(client: Socket) {
+    const token = client.handshake.query.token as string;
+    const decodedToken = this.sessionService.decodeToken(token);
+    const userId = decodedToken.userId;
+    const userDetails = await this.sessionService.getDbUserDetails(userId);
+    if (userDetails) {
+      client.emit('updateUser', userDetails);
     }
   }
 }

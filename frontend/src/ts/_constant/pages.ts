@@ -6,16 +6,7 @@ import StartMenu from '../../pages/StartMenu.vue';
 import SprintPage from '../../pages/SprintPage.vue';
 import ScorePage from '../../pages/ScorePage.vue';
 import PixiTest from '../../pages/PixiTest.vue';
-
-export enum PAGE {
-  startMenu = 'startMenu',
-  soloMenu = 'soloMenu',
-  multiMenu = 'multiMenu',
-  settings = 'settings',
-  sprintPage = 'sprintPage',
-  scorePage = 'scorePage',
-  pixiTest = 'pixiTest',
-}
+import { PAGE } from '../_enum/page';
 
 export const pages: Pages = {
   [PAGE.startMenu]: {

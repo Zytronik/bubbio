@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { PAGE } from '@/ts/_constant/pages';
+import { PAGE } from '@/ts/_enum/page';
 import { MenuButton } from '@/ts/_interface/menuButton';
 import { getMenuButtonAttributes, isButtonDisabled } from '@/ts/page/menuButtons';
 import { setPage } from '@/ts/page/pageManager';

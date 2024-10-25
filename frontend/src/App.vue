@@ -12,24 +12,6 @@
         <component :is="currentComponent" :key="currentPage" />
       </section>
     </article>
-    <!-- <div>
-      <div>
-        <p>Client ID: {{ userSession.clientId }}</p>
-        <p>Current Page: {{ userSession.currentPage }}</p>
-        <p>Username: {{ userSession.username }}</p>
-        <p>Role: {{ userSession.role }}</p>
-        <div v-if="userSession.userDetails">
-          <p>User ID: {{ userSession.userDetails.id }}</p>
-          <p>Email: {{ userSession.userDetails.email }}</p>
-          <p>Is Ranked: {{ userSession.isRanked }}</p>
-          <p>Percentile: {{ userSession.userDetails.percentile }}</p>
-          <p>Rank: {{ userSession.userDetails.rank.name }}</p>
-          <p>Global Rank: {{ userSession.userDetails.globalRank }}</p>
-          <p>Probably Around: {{ userSession.userDetails.probablyAroundRank.name }}</p>
-        </div>
-      </div>
-      <button @click="logUserOut">Logout</button>
-    </div> -->
   </main>
   <AppFooter />
 </template>
@@ -44,7 +26,6 @@ import { checkUserAuthentication, logUserOut } from './ts/network/auth';
 import LoginOverlay from './components/LoginOverlay.vue';
 import ToastMessages from './components/ToastMessages.vue';
 import { useSocketStore } from './stores/socketStore';
-import { useUserStore } from './stores/userStore';
 import LoadingScreen from './components/LoadingOverlay.vue';
 import { waitForLoadingScreen } from './ts/page/preload';
 import AppFooter from './components/AppFooter.vue';
@@ -78,11 +59,6 @@ export default {
     const pageIsLoading = ref(true);
     const showCommunity = computed(() => pageStore.showCommunity);
 
-    //temp --------
-    const userStore = useUserStore();
-    const userSession = computed(() => userStore.userSession);
-    //temp --------
-
     initPageTransitionWatcher();
     checkUserAuthentication();
 
@@ -106,7 +82,6 @@ export default {
       currentPageColor,
       currentPage,
       showLogin,
-      userSession,
       logUserOut,
       pageIsLoading,
       showCommunity,
