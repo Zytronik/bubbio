@@ -1,4 +1,4 @@
-import type { UserSession } from '@/ts/_interface/userDetails';
+import { UserSession } from '@/ts/_interface/userDetails';
 import { defineStore } from 'pinia';
 
 export const useUserStore = defineStore('user', {

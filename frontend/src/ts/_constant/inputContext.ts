@@ -1,0 +1,6 @@
+export enum INPUT_CONTEXT {
+    DISABLED = "DISABLED",
+    MENU = "MENU",
+    GAME_WITH_RESET = "GAME_WITH_RESET",
+    GAME_NO_RESET = "GAME_NO_RESET",
+}

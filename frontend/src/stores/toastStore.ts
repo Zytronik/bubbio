@@ -1,4 +1,4 @@
-import type { Toast } from '@/ts/_interface/toast';
+import { Toast } from '@/ts/_interface/toast';
 import { defineStore } from 'pinia';
 import { nextTick } from 'vue';
 

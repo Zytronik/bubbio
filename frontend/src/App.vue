@@ -12,6 +12,7 @@
         <component :is="currentComponent" :key="currentPage" />
       </section>
     </article>
+    <PixiCanvas/>
     <!-- <div>
       <div>
         <p>Client ID: {{ userSession.clientId }}</p>
@@ -53,12 +54,14 @@ import { initPageTransitionWatcher } from './ts/page/pageManager';
 import PatchNotes from './components/PatchNotes.vue';
 import { useSoundStore } from './stores/soundStore';
 import CommunityOverlay from './components/CommunityOverlay.vue';
+import PixiCanvas from './components/PixiCanvas.vue';
 
 export default {
   name: 'App',
   components: {
     AppHeader,
     AppFooter,
+    PixiCanvas,
     AppSidebar,
     LoginOverlay,
     ToastMessages,
