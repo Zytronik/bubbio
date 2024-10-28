@@ -12,8 +12,6 @@
           :keys="['A', 'B', 'C']" />
         <SliderSetting title="Lorem ipsum" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
           :min="0" :max="100" :initialValue="50" />
-        <ButtonSetting title="Lorem ipsum" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-          buttonText="Lorem Ipsum" :action="() => { }" />
       </div>
     </div>
   </div>
@@ -36,6 +34,12 @@
     <div class="tab-wrapper">
       <h2>Account Settings</h2>
       <div class="account-settings settings-wrapper">
+        <FileUploadSetting title="Change Profile Picture"
+          description="The img must be less then 2MB and in jpg or png format." buttonText="Upload"
+          :uploadFileType=UploadFileType.ProfilePicture />
+        <FileUploadSetting title="Change Profile Banner"
+          description="We recommend the following img dimensions: 1920px x 170px" buttonText="Upload"
+          :uploadFileType=UploadFileType.ProfileBanner />
         <ButtonSetting title="Log out of Account" description="Logs the User out of the Account" buttonText="Log out"
           :action="logUserOut" />
       </div>
@@ -48,7 +52,9 @@ import { defineComponent } from 'vue';
 import KeySetting from '@/components/settings/KeySetting.vue';
 import SliderSetting from '@/components/settings/SliderSetting.vue';
 import ButtonSetting from '@/components/settings/ButtonSetting.vue';
+import FileUploadSetting from '@/components/settings/FileUploadSetting.vue';
 import { logUserOut } from '@/ts/network/auth';
+import { UploadFileType } from '@/ts/_enum/uploadFileType';
 
 export default defineComponent({
   name: 'SettingsPage',
@@ -56,6 +62,7 @@ export default defineComponent({
     KeySetting,
     SliderSetting,
     ButtonSetting,
+    FileUploadSetting,
   },
   data() {
     return {
@@ -66,6 +73,7 @@ export default defineComponent({
   setup() {
     return {
       logUserOut,
+      UploadFileType,
     };
   },
 });
@@ -85,11 +93,11 @@ export default defineComponent({
 }
 
 .settings .text {
-  width: 40%;
+  width: 45%;
 }
 
 .settings .keys {
-  width: 60%;
+  width: 55%;
   display: flex;
   align-items: center;
 }

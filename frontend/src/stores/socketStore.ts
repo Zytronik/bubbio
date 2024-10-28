@@ -8,7 +8,7 @@ import {
 import { useUserStore } from '@/stores/userStore';
 import { usePageStore } from '@/stores/pageStore';
 import { isLocal, socketIoHost } from '@/ts/_constant/paths';
-import { UserSession } from '@/ts/_interface/userDetails';
+import { UserDetails, UserSession } from '@/ts/_interface/userDetails';
 
 export const useSocketStore = defineStore('socket', {
   state: () => ({
@@ -84,31 +84,42 @@ export const useSocketStore = defineStore('socket', {
           resolve(userSession); // Resolve the Promise with UserSession
         });
 
+        this.webSocket.on('updateUser', (userDetails: UserDetails) => {
+          userStore.updateUserDetails(userDetails);
+          console.log('User updated:', userDetails);
+        });
+
         this.updateUserPage(pageStore.currentPage);
       });
     },
 
-    updateUserPage(currentPage: string) {
+    updateCurrentUser(): void {
+      if (this.webSocket) {
+        this.webSocket.emit('updateUser');
+      }
+    },
+
+    updateUserPage(currentPage: string): void {
       const userStore = useUserStore();
       if (this.webSocket) {
-        this.webSocket.emit('updateUser', { currentPage });
+        this.webSocket.emit('updateUserPage', { currentPage });
         userStore.updateCurrentPage(currentPage);
       }
     },
 
-    disconnectSocket() {
+    disconnectSocket(): void {
       if (this.webSocket) {
         this.webSocket.disconnect();
         console.log('WebSocket connection closed');
       }
     },
 
-    reconnectSocket() {
+    reconnectSocket(): void {
       this.disconnectSocket();
       this.initSocket();
     },
 
-    simulateNetworkDisconnect() {
+    simulateNetworkDisconnect(): void {
       setTimeout(() => {
         if (this.webSocket?.io.engine) {
           // Forcefully close the connection (simulate a network issue)

@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Socket, Server } from 'socket.io';
-import { UserSession } from 'src/_interface/session.userSession';
+import { UserDetails, UserSession } from 'src/_interface/session.userSession';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -24,9 +24,7 @@ export class SessionService {
     server: Server,
   ): Promise<UserSession> {
     try {
-      const decodedToken = this.jwtService.verify(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-      });
+      const decodedToken = this.decodeToken(token);
       const userId = decodedToken.userId;
       const username = decodedToken.username.toUpperCase();
       const userDetails = await this.userService.getUserDetailsById(userId);
@@ -117,5 +115,15 @@ export class SessionService {
       console.log(value.username, value.clientId);
     });
     console.log('------------------------------');
+  }
+
+  decodeToken(token: string) {
+    return this.jwtService.verify(token, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+    });
+  }
+
+  async getDbUserDetails(userID: number): Promise<UserDetails> {
+    return await this.userService.getUserDetailsById(userID);
   }
 }

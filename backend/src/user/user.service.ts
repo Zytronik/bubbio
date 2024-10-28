@@ -13,6 +13,7 @@ import { UserDetails } from 'src/_interface/session.userSession';
 import { RankInfo, Ratings } from 'src/_interface/ranked.rank';
 import { unrankedRatingDeviation } from 'src/ranked/ranks';
 import { RanksService } from 'src/ranked/ranks.service';
+import { FileStorageService } from './file-storage.service';
 
 @Injectable()
 export class UserService {
@@ -20,6 +21,7 @@ export class UserService {
     private prisma: PrismaService,
     @Inject(forwardRef(() => RanksService))
     private ranksService: RanksService,
+    private fileStorageService: FileStorageService,
   ) {}
 
   async createUser(
@@ -395,5 +397,29 @@ export class UserService {
       return false;
     }
     return true;
+  }
+
+  async updateProfileImgs(
+    userId: number,
+    file: Express.Multer.File,
+    imgType: 'pb' | 'banner',
+  ): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const fieldToUpdate = imgType === 'pb' ? 'pbUrl' : 'bannerUrl';
+    const oldFilename = user[fieldToUpdate];
+
+    // Upload the new file to DigitalOcean Spaces and get the URL
+    const fileUrl = await this.fileStorageService.uploadFile(file, imgType);
+
+    // Update the database with the new file URL
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { [fieldToUpdate]: fileUrl },
+    });
+
+    // Delete the old file from DigitalOcean Spaces if it's different from the new one
+    if (oldFilename && oldFilename !== fileUrl) {
+      await this.fileStorageService.deleteFile(oldFilename, imgType);
+    }
   }
 }

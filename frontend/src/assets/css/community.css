@@ -1,7 +1,3 @@
-.openChannelButton:hover {
-  background-color: rgb(4, 4, 4);
-}
-
 .openChannelButton + svg {
   position: absolute;
   bottom: 0;
@@ -13,7 +9,7 @@
 .openChannelButton {
   position: absolute;
   background-color: transparent;
-  bottom: 0;
+  top: 0;
   z-index: 1;
   font-size: 2em;
   left: 50%;
@@ -22,7 +18,6 @@
   border: none;
   height: var(--header-height);
   width: var(--header-profile-width);
-  cursor: pointer;
   transition: 200ms;
   text-transform: uppercase;
   color: white;

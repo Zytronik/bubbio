@@ -1,4 +1,4 @@
-import { UserSession } from '@/ts/_interface/userDetails';
+import type { UserDetails, UserSession } from '@/ts/_interface/userDetails';
 import { defineStore } from 'pinia';
 
 export const useUserStore = defineStore('user', {
@@ -19,6 +19,9 @@ export const useUserStore = defineStore('user', {
         ...newSession,
         currentPage: this.userSession.currentPage || newSession.currentPage,
       };
+    },
+    updateUserDetails(userDetails: UserDetails) {
+      this.userSession.userDetails = userDetails;
     },
     updateCurrentPage(page: string) {
       this.userSession.currentPage = page;

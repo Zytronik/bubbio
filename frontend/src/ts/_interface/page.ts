@@ -1,6 +1,6 @@
 import type { Component } from 'vue';
-import type { PAGE } from '../_constant/pages';
 import { BackButton } from './backButton';
+import { PAGE } from '../_enum/page';
 
 export interface Page {
   title: string;

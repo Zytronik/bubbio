@@ -1,8 +1,8 @@
-import { PAGE } from '../_constant/pages';
 import { setPage } from '../page/pageManager';
 import { AnimationSequence } from './animationSequence';
 import { AnimationConfig } from '../_interface/animationConfig';
 import { useSoundStore } from '@/stores/soundStore';
+import { PAGE } from '../_enum/page';
 
 export function transitionPageBackwardsAnimation(transitionToPage: PAGE) {
   useSoundStore().playSound('menu_back');

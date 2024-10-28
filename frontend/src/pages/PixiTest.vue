@@ -4,7 +4,7 @@
 </template>
 
 <script lang="ts">
-import { PAGE } from '@/ts/_constant/pages';
+import { PAGE } from '@/ts/_enum/page';
 import { setPage } from '@/ts/page/pageManager';
 
 export default {

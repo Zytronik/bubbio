@@ -25,10 +25,6 @@ export default {
 </script>
 
 <style scoped>
-.community {
-    cursor: pointer;
-}
-
 .overlay-container {
     width: 100%;
     height: calc(100vh - var(--header-height));

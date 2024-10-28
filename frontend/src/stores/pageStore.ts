@@ -1,4 +1,4 @@
-import { PAGE } from '@/ts/_constant/pages';
+import { PAGE } from '@/ts/_enum/page';
 import { defineStore } from 'pinia';
 
 export const usePageStore = defineStore('page', {

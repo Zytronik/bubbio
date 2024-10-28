@@ -1,6 +1,6 @@
 <template>
-  <div class="bottomBar">
-    <button class="openChannelButton" @click="openCommunityOverlay()">Community</button>
+  <div class="bottomBar" @click="openCommunityOverlay()">
+    <button class="openChannelButton">Community</button>
     <svg width="964" height="200" viewBox="0 0 964 200" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M862 0H102L0 100L102 200H862L964 100L862 0Z" fill="black" />
     </svg>
@@ -32,6 +32,16 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  cursor: pointer;
+  transition: 150ms;
+}
+
+.bottomBar>* {
+  top: calc(var(--header-height) / -2);
+}
+
+.bottomBar:hover {
+  height: calc(var(--header-height) * 0.75);
 }
 
 .bottomBar::after {
