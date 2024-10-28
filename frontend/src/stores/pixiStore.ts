@@ -1,22 +1,19 @@
 import { defineStore } from "pinia";
-import { Application, Renderer } from "pixi.js";
-import { ref } from "vue";
+import { Application } from "pixi.js";
 
 export const usePixiStore = defineStore('pixi', () => {
-    const pixiApp = ref<Application<Renderer> | null>(null);
+    const pixiApp = new Application();
     function initPixiApp() {
-        if (!pixiApp.value) {
-            pixiApp.value = new Application();
-            pixiApp.value.init({
-                resizeTo: window,
-            })
-        }
+        const CANVAS_ID = "#pixiCanvas";
+        pixiApp.init({
+            background: '#1099bb',
+            resizeTo: window,
+        }).then(async () => {
+          document.querySelector(CANVAS_ID)?.appendChild(pixiApp.canvas);
+        });
     }
     function getPixiApp() {
-        if (!pixiApp.value) {
-            throw new Error('PIXI Application has not been initialized.');
-        }
-        return pixiApp.value;
+        return pixiApp;
     }
     return { pixiApp, initPixiApp, getPixiApp }
 })

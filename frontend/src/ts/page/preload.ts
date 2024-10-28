@@ -8,16 +8,14 @@ export async function waitForLoadingScreen() {
   const soundStore = useSoundStore();
   const pixiStore = usePixiStore();
   const inputStore = useInputStore();
-  const CANVAS_ID = "#pixiCanvas";
 
   try {
     await Promise.all([
-      socketStore.initSocket(), 
-      soundStore.preloadSounds(), 
+      socketStore.initSocket(),
+      soundStore.preloadSounds(),
       pixiStore.initPixiApp(),
       inputStore.setupInputReader(),
     ]);
-    document.querySelector(CANVAS_ID)?.appendChild(pixiStore.getPixiApp().canvas);
   } catch (error) {
     console.error('Error during preloading:', error);
   }

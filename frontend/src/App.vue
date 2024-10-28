@@ -70,7 +70,6 @@ export default {
     onMounted(async () => {
       await waitForLoadingScreen();
       pageIsLoading.value = false;
-      //do stuff after this---------
       soundStore.playSound("menu_soundtrack");
     });
 
