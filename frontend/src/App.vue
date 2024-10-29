@@ -12,7 +12,7 @@
         <component :is="currentComponent" :key="currentPage" />
       </section>
     </article>
-    <PixiCanvas/>
+    <PixiCanvas />
   </main>
   <AppFooter />
 </template>
@@ -70,7 +70,7 @@ export default {
     onMounted(async () => {
       await waitForLoadingScreen();
       pageIsLoading.value = false;
-      soundStore.playSound("menu_soundtrack");
+      soundStore.playMusic("menu_soundtrack");
     });
 
     onUnmounted(() => {

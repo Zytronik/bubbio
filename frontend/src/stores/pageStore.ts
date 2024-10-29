@@ -1,4 +1,6 @@
 import { PAGE } from '@/ts/_enum/page';
+import { closeCommunityOverlay } from '@/ts/animation/closeCommunityOverlay';
+import { openCommunityOverlay } from '@/ts/animation/openCommunityOverlay';
 import { defineStore } from 'pinia';
 
 export const usePageStore = defineStore('page', {
@@ -19,6 +21,13 @@ export const usePageStore = defineStore('page', {
     },
     hideCommunityOverlay() {
       this.showCommunity = false;
+    },
+    toggleCommunityOverlayAnimation() {
+      if (this.showCommunity) {
+        closeCommunityOverlay();
+      } else {
+        openCommunityOverlay();
+      }
     },
   },
 });

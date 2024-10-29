@@ -8,14 +8,15 @@
             <button class="resetBtn secondary" @click="resetSlider">Reset</button>
             <div class="sliderWrapper">
                 <label>Value: {{ value }}</label>
-                <input type="range" :min="min" :max="max" v-model="value" class="slider" @input="updateValue" />
+                <input type="range" :min="min" :max="max" v-model="value" step="1" class="slider"
+                    @input="updateValue" />
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
     name: 'SliderSetting',
@@ -36,20 +37,28 @@ export default defineComponent({
             type: Number,
             default: 100,
         },
+        defaultValue: {
+            type: Number,
+            default: 50,
+        },
         initialValue: {
             type: Number,
             default: 50,
         },
     },
-    setup(props) {
+    emits: ['update:value'],
+    setup(props, { emit }) {
         const value = ref(props.initialValue);
 
-        function resetSlider() {
-            value.value = props.initialValue;
+        function updateValue() {
+            emit('update:value', value.value);
         }
 
-        function updateValue() {
-            console.log('Slider value:', value.value);
+        watch(value, updateValue);
+
+        function resetSlider() {
+            value.value = props.defaultValue;
+            updateValue();
         }
 
         return {
@@ -60,6 +69,7 @@ export default defineComponent({
     },
 });
 </script>
+
 
 <style scoped>
 .sliderWrapper {
