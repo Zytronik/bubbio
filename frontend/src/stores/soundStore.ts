@@ -64,10 +64,8 @@ export const useSoundStore = defineStore('soundStore', {
     },
     setMusicVolume(volume: number) {
       this.musicVolume = volume;
-      console.log(this.currentMusic, this.currentMusicKey);
       if (this.currentMusic && this.currentMusicKey) {
         const currentSound = this.sounds[this.currentMusicKey];
-        console.log(currentSound);
         if (currentSound) {
           this.currentMusic.volume(this.musicVolume * currentSound.volume);
         }

@@ -9,11 +9,11 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from 'src/_dto/auth.createUser';
 import axios from 'axios';
 import { User } from '@prisma/client';
-import { UserDetails } from 'src/_interface/session.userSession';
 import { RankInfo, Ratings } from 'src/_interface/ranked.rank';
 import { unrankedRatingDeviation } from 'src/ranked/ranks';
 import { RanksService } from 'src/ranked/ranks.service';
 import { FileStorageService } from './file-storage.service';
+import { UserDetails } from 'src/_interface/session.userDetails';
 
 @Injectable()
 export class UserService {
@@ -178,7 +178,6 @@ export class UserService {
       country: user.country,
       pbUrl: user.pbUrl,
       bannerUrl: user.bannerUrl,
-      inputSettings: user.inputSettings,
       LastDisconnectedAt: user.LastDisconnectedAt,
       rating: user.rating,
       ratingDeviation: user.ratingDeviation,
@@ -421,5 +420,20 @@ export class UserService {
     if (oldFilename && oldFilename !== fileUrl) {
       await this.fileStorageService.deleteFile(oldFilename, imgType);
     }
+  }
+
+  async updateUserSettings(userId: number, settings: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { settings: settings },
+    });
+  }
+
+  async getUserSettings(userId: number): Promise<string> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { settings: true },
+    });
+    return user.settings;
   }
 }

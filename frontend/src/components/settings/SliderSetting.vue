@@ -16,6 +16,8 @@
 </template>
 
 <script lang="ts">
+import { saveSettings } from '@/ts/page/settings';
+import debounce from 'debounce';
 import { defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
@@ -50,8 +52,14 @@ export default defineComponent({
     setup(props, { emit }) {
         const value = ref(props.initialValue);
 
+        const debouncedSaveSettings = debounce(() => {
+            saveSettings();
+        }, 1000);
+
         function updateValue() {
+            value.value = Math.round(value.value);
             emit('update:value', value.value);
+            debouncedSaveSettings();
         }
 
         watch(value, updateValue);

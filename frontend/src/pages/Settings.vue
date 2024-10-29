@@ -15,12 +15,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onUnmounted } from 'vue';
 import InputSettingsTab from '@/components/settings/InputSettingsTab.vue';
 import HandlingSettingsTab from '@/components/settings/HandlingSettingsTab.vue';
 import GraphicsSettingsTab from '@/components/settings/GraphicsSettingsTab.vue';
 import AudioSettingsTab from '@/components/settings/AudioSettingsTab.vue';
 import AccountSettingsTab from '@/components/settings/AccountSettingsTab.vue';
+import { saveSettings } from '@/ts/page/settings';
 
 export default defineComponent({
   name: 'SettingsPage',
@@ -36,6 +37,11 @@ export default defineComponent({
       currentTab: 'Input Settings',
       tabs: ['Input Settings', 'Handling Settings', 'Graphics Settings', 'Audio Settings', 'Account Settings'],
     };
+  },
+  setup() {
+    onUnmounted(() => {
+      saveSettings();
+    });
   },
 });
 </script>

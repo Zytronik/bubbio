@@ -8,7 +8,7 @@
             <button class="resetBtn secondary" @click="resetKeys(inputIndex)">Reset</button>
             <div class="customKeys">
                 <button v-for="(key, index) in customKeys" :key="index" class="keyBtn secondary"
-                    @click="changeKey(index, inputIndex)">
+                    @click="changeKey(index, inputIndex)" @contextmenu.prevent="resetKey(index, inputIndex)">
                     {{ key || "Not Set" }}
                 </button>
             </div>
@@ -18,6 +18,7 @@
 
 <script lang="ts">
 import { allInputs } from '@/ts/input/allInputs';
+import { saveSettings } from '@/ts/page/settings';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
@@ -52,10 +53,18 @@ export default defineComponent({
         };
     },
     methods: {
+        resetKey(index: number, inputIndex: number) {
+            const defaultKeyCode = index === 0 ? allInputs[inputIndex].defaultKeyCode : "";
+            allInputs[inputIndex].customKeyMap[index] = defaultKeyCode;
+            const keyBtn = document.querySelectorAll(".key-setting[data-input-index='" + inputIndex + "'] .keyBtn")[index];
+            keyBtn.textContent = defaultKeyCode || "Not Set";
+            saveSettings();
+        },
         resetKeys(inputIndex: number) {
             const defaultKeyCode = allInputs[inputIndex].defaultKeyCode;
             allInputs[inputIndex].customKeyMap = [defaultKeyCode, "", ""];
             this.resetKeysMarkup(inputIndex);
+            saveSettings();
         },
         resetKeysMarkup(inputIndex: number) {
             const keyBtns = document.querySelectorAll(".key-setting[data-input-index='" + inputIndex + "'] .keyBtn");
@@ -87,10 +96,10 @@ export default defineComponent({
         updateCustomKeyMarkup(keyCode: string) {
             const keyBtns = document.querySelectorAll(".key-setting[data-input-index='" + this.currentInputIndex + "'] .keyBtn");
             keyBtns[this.currentKeyIndex].textContent = keyCode;
-
         },
         updateCustomKeys(newKeys: string[]) {
             allInputs[this.currentInputIndex].customKeyMap = newKeys;
+            saveSettings();
         },
     },
 });
