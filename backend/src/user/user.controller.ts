@@ -16,7 +16,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthenticatedRequest } from 'src/_interface/auth.authRequest';
 import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
 import { ValidateImagePipe } from './validateImgPipeline';
-import { json } from 'stream/consumers';
 import { SaveSettingsDto } from 'src/_dto/user.saveSettings';
 
 @Controller('users')
