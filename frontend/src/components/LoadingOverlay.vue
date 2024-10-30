@@ -32,7 +32,7 @@ export default defineComponent({
   align-items: center;
   background-color: rgba(0, 0, 0, 1);
   z-index: 1000;
-  font-size: 3rem;
+  font-size: var(--font-size-5);
 }
 
 .loading-content {

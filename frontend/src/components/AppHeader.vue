@@ -116,7 +116,7 @@ export default {
   display: flex;
   flex-direction: row;
   margin-top: 8px;
-  font-size: 20px;
+  font-size: var(--font-size-2);
   align-items: center;
 }
 
@@ -145,7 +145,7 @@ export default {
 
 .profile-content h3 {
   margin: unset;
-  font-size: 20px;
+  font-size: var(--font-size-2);
 }
 
 .profile-content p {

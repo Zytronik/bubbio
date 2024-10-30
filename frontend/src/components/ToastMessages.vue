@@ -2,12 +2,7 @@
 <template>
   <div class="toast-container">
     <transition-group name="slide" tag="div">
-      <div
-        v-for="toast in toasts"
-        :key="toast.id"
-        :data-toast-id="toast.id"
-        :class="['toast', toast.type]"
-      >
+      <div v-for="toast in toasts" :key="toast.id" :data-toast-id="toast.id" :class="['toast', toast.type]">
         <div class="toast-content">
           <i :class="[toast.iconClass, 'toast-icon']"></i>
           <div class="message">
@@ -53,7 +48,7 @@ export default {
   padding: 20px 35px 20px 25px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  width: 300px;
+  width: 320px;
   transform: translateX(calc(100% + 30px));
   transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.25, 1.35);
 }
@@ -90,7 +85,7 @@ export default {
   min-width: 35px;
   border-radius: 50%;
   color: #fff;
-  font-size: 20px;
+  font-size: var(--font-size-2);
 }
 
 .toast.info .toast-icon {
@@ -113,13 +108,13 @@ export default {
 }
 
 .message-text {
-  font-size: 1.1em;
+  font-size: var(--font-size-1);
   font-weight: 600;
 }
 
 .text-2 {
   font-weight: 400;
-  font-size: 1em;
+  font-size: var(--font-size-1);
   opacity: 0.8;
 }
 
@@ -166,7 +161,7 @@ export default {
 
 .toast-btn {
   padding: 10px 40px;
-  font-size: 20px;
+  font-size: var(--font-size-2);
   outline: none;
   border: none;
   color: #fff;
