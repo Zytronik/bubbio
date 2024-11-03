@@ -1,5 +1,8 @@
+import { setupPixiContainers } from "@/ts/pixi/containers";
+import { allTextures } from "@/ts/pixi/textureReference";
+import { animationLoop } from "@/ts/pixi/animationLoop";
 import { defineStore } from "pinia";
-import { Application } from "pixi.js";
+import { Application, Assets } from "pixi.js";
 
 export const usePixiStore = defineStore('pixi', () => {
     const pixiApp = new Application();
@@ -9,7 +12,12 @@ export const usePixiStore = defineStore('pixi', () => {
             background: '#1099bb',
             resizeTo: window,
         }).then(async () => {
-          document.querySelector(CANVAS_ID)?.appendChild(pixiApp.canvas);
+            document.querySelector(CANVAS_ID)?.appendChild(pixiApp.canvas);
+            setupPixiContainers();
+            animationLoop();
+        });
+        allTextures.forEach(async asset => {
+            asset.texture = await Assets.load(asset.src);
         });
     }
     function getPixiApp() {

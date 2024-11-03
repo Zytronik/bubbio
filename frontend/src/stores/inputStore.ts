@@ -3,11 +3,12 @@ import { channelInput, shootInput } from "@/ts/input/allInputs";
 import { attachInputReader } from "@/ts/input/inputReader";
 import { defineStore } from "pinia";
 import { openCommunityOverlay } from "@/ts/animation/openCommunityOverlay";
+import { playExample } from "@/ts/pixi/animationLoop";
 
 export const useInputStore = defineStore('input', {
     state: () => ({
         hasAttached: false,
-        context: INPUT_CONTEXT.MENU,
+        context: INPUT_CONTEXT.GAME_NO_RESET,
     }),
     actions: {
         setInputContext(inputContext: INPUT_CONTEXT) {
@@ -18,7 +19,7 @@ export const useInputStore = defineStore('input', {
                 this.hasAttached = true;
                 attachInputReader();
                 channelInput.fire = openCommunityOverlay;
-                // shootInput.fire = 
+                shootInput.fire = playExample;
             }
         },
     },
