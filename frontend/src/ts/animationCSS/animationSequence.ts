@@ -1,4 +1,4 @@
-import { AnimationConfig } from '../_interface/animationConfig';
+import { AnimationConfig } from '../_interface/cssAnimationConfig';
 
 export class AnimationSequence {
   private animations: AnimationConfig[];

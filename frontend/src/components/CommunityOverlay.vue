@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { closeCommunityOverlay } from '@/ts/animation/closeCommunityOverlay';
+import { closeCommunityOverlay } from '@/ts/animationCSS/closeCommunityOverlay';
 
 export default {
     name: 'CommunityOverlay',

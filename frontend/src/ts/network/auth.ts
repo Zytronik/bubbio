@@ -5,7 +5,7 @@ import { jwtDecode, type JwtPayload } from 'jwt-decode';
 import { usePageStore } from '@/stores/pageStore';
 import { useSocketStore } from '@/stores/socketStore';
 import { UserSession } from '../_interface/userDetails';
-import { transitionPageBackwardsAnimation } from '../animation/transitionPageBackwards';
+import { transitionPageBackwardsAnimation } from '../animationCSS/transitionPageBackwards';
 import { PAGE } from '../_enum/page';
 export async function checkIfUsernameIsTakenAndValid(
   username: string,

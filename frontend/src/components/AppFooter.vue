@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { openCommunityOverlay } from '@/ts/animation/openCommunityOverlay';
+import { openCommunityOverlay } from '@/ts/animationCSS/openCommunityOverlay';
 
 export default {
   name: 'AppFooter',

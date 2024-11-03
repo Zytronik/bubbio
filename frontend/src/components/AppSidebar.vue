@@ -12,7 +12,7 @@
 <script lang="ts">
 import { useSoundStore } from '@/stores/soundStore';
 import { BackButton } from '@/ts/_interface/backButton';
-import { transitionPageBackwardsAnimation } from '@/ts/animation/transitionPageBackwards';
+import { transitionPageBackwardsAnimation } from '@/ts/animationCSS/transitionPageBackwards';
 import { defineComponent, PropType } from 'vue';
 
 

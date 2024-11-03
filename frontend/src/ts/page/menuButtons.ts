@@ -1,6 +1,6 @@
 import { useUserStore } from '@/stores/userStore';
 import { MenuButton } from '../_interface/menuButton';
-import { transitionPageForwardsAnimation } from '../animation/transitionPageForwards';
+import { transitionPageForwardsAnimation } from '../animationCSS/transitionPageForwards';
 import { useSoundStore } from '@/stores/soundStore';
 
 export function isButtonDisabled(button: MenuButton): boolean {

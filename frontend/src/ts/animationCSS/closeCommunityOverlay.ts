@@ -1,5 +1,5 @@
 import { AnimationSequence } from './animationSequence';
-import { AnimationConfig } from '../_interface/animationConfig';
+import { AnimationConfig } from '../_interface/cssAnimationConfig';
 import { useSoundStore } from '@/stores/soundStore';
 import { usePageStore } from '@/stores/pageStore';
 
