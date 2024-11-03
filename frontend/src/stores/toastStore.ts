@@ -5,7 +5,7 @@ import { nextTick } from 'vue';
 export const useToastStore = defineStore('toast', {
   state: () => ({
     toasts: [] as Toast[],
-    toastTime: 2000,
+    toastTime: 3000,
   }),
   actions: {
     showMessage(message: string, type: 'success' | 'error' | 'info') {

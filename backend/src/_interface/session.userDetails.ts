@@ -1,13 +1,4 @@
-import { RankInfo } from './rank';
-
-export interface UserSession {
-  role: 'guest' | 'spectator' | 'user' | null;
-  username: string;
-  currentPage: string;
-  clientId: string;
-  isRanked: boolean;
-  userDetails: UserDetails | null;
-}
+import { RankInfo } from './ranked.rank';
 
 export interface UserDetails {
   id: number;

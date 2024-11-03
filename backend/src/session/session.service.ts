@@ -2,7 +2,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Socket, Server } from 'socket.io';
-import { UserDetails, UserSession } from 'src/_interface/session.userSession';
+import { UserDetails } from 'src/_interface/session.userDetails';
+import { UserSession } from 'src/_interface/session.userSession';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()

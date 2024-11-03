@@ -6,4 +6,6 @@ export enum PAGE {
   sprintPage = 'sprintPage',
   scorePage = 'scorePage',
   pixiTest = 'pixiTest',
+  rankedPage = 'rankedPage',
+  roomListing = 'roomListing',
 }

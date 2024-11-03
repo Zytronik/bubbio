@@ -98,16 +98,16 @@
 }
 
 .menuBtn .text .firstLetter {
-  font-size: 145px;
+  font-size: var(--font-size-7);
 }
 
 .menuBtn .text > p span:first-of-type {
-  font-size: 65px;
+  font-size: var(--font-size-5);
   letter-spacing: 6px;
 }
 
 .menuBtn .text > p span:last-of-type {
-  font-size: 16px;
+  font-size: var(--font-size-0);
   background-color: white;
   color: black;
   width: calc(100% + 3%);

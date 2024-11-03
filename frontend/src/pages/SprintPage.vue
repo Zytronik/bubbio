@@ -1,6 +1,5 @@
 <template>
   <h1>Sprint</h1>
-  <button @click="setPage(PAGE.soloMenu)">Back</button>
 </template>
 
 <script lang="ts">

@@ -16,7 +16,7 @@ model User {
   country         String?
   pbUrl           String?         
   bannerUrl       String?          
-  inputSettings   String?
+  settings   String?
   LastDisconnectedAt  DateTime?
   rating            Float            @default(1500)
   ratingDeviation   Float            @default(350)

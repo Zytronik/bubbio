@@ -1,14 +1,15 @@
 <template>
-    <div class="setting key-setting">
+    <div class="setting key-setting" :data-input-index="inputIndex">
         <div class="text">
             <h3>{{ title }}</h3>
             <p class="dsc">{{ description }}</p>
         </div>
         <div class="keys">
-            <button class="resetBtn secondary" @click="resetKeys">Reset</button>
+            <button class="resetBtn secondary" @click="resetKeys(inputIndex)">Reset</button>
             <div class="customKeys">
-                <button v-for="(key, index) in keys" :key="index" class="keyBtn secondary">
-                    {{ key }}
+                <button v-for="(key, index) in customKeys" :key="index" class="keyBtn secondary"
+                    @click="changeKey(index, inputIndex)" @contextmenu.prevent="resetKey(index, inputIndex)">
+                    {{ key || "Not Set" }}
                 </button>
             </div>
         </div>
@@ -16,11 +17,17 @@
 </template>
 
 <script lang="ts">
+import { allInputs } from '@/ts/input/allInputs';
+import { saveSettings } from '@/ts/page/settings';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
     name: 'KeySetting',
     props: {
+        inputIndex: {
+            type: Number,
+            required: true,
+        },
         title: {
             type: String,
             required: true,
@@ -29,14 +36,70 @@ export default defineComponent({
             type: String,
             required: true,
         },
-        keys: {
+        customKeys: {
             type: Array as PropType<string[]>,
             required: true,
         },
+        defaultKey: {
+            type: String,
+            required: true,
+        },
+    },
+    data() {
+        return {
+            isSettingKey: false,
+            currentKeyIndex: -1,
+            currentInputIndex: -1,
+        };
     },
     methods: {
-        resetKeys() {
-            console.log('Reset keys');
+        resetKey(index: number, inputIndex: number) {
+            const defaultKeyCode = index === 0 ? allInputs[inputIndex].defaultKeyCode : "";
+            allInputs[inputIndex].customKeyMap[index] = defaultKeyCode;
+            const keyBtn = document.querySelectorAll(".key-setting[data-input-index='" + inputIndex + "'] .keyBtn")[index];
+            keyBtn.textContent = defaultKeyCode || "Not Set";
+            saveSettings();
+        },
+        resetKeys(inputIndex: number) {
+            const defaultKeyCode = allInputs[inputIndex].defaultKeyCode;
+            allInputs[inputIndex].customKeyMap = [defaultKeyCode, "", ""];
+            this.resetKeysMarkup(inputIndex);
+            saveSettings();
+        },
+        resetKeysMarkup(inputIndex: number) {
+            const keyBtns = document.querySelectorAll(".key-setting[data-input-index='" + inputIndex + "'] .keyBtn");
+            keyBtns.forEach((btn, index) => {
+                btn.textContent = index === 0 ? allInputs[inputIndex].defaultKeyCode : "Not Set";
+            });
+        },
+        changeKey(index: number, inputIndex: number) {
+            this.isSettingKey = true;
+            this.currentInputIndex = inputIndex;
+            this.currentKeyIndex = index;
+            this.showPressAnyKeyMarkupText();
+            window.addEventListener("keydown", this.handleKeydown);
+        },
+        showPressAnyKeyMarkupText() {
+            const keyBtns = document.querySelectorAll(".key-setting[data-input-index='" + this.currentInputIndex + "'] .keyBtn");
+            keyBtns[this.currentKeyIndex].textContent = "Press any key";
+        },
+        handleKeydown(event: KeyboardEvent) {
+            if (this.isSettingKey) {
+                const newKeys = [...this.customKeys];
+                newKeys[this.currentKeyIndex] = event.code;
+                this.updateCustomKeyMarkup(event.code);
+                this.updateCustomKeys(newKeys);
+                this.isSettingKey = false;
+                window.removeEventListener("keydown", this.handleKeydown);
+            }
+        },
+        updateCustomKeyMarkup(keyCode: string) {
+            const keyBtns = document.querySelectorAll(".key-setting[data-input-index='" + this.currentInputIndex + "'] .keyBtn");
+            keyBtns[this.currentKeyIndex].textContent = keyCode;
+        },
+        updateCustomKeys(newKeys: string[]) {
+            allInputs[this.currentInputIndex].customKeyMap = newKeys;
+            saveSettings();
         },
     },
 });
@@ -44,7 +107,7 @@ export default defineComponent({
 
 <style scoped>
 .customKeys button {
-    flex-grow: 1;
+    width: calc(100% / 3);
 }
 
 .customKeys {

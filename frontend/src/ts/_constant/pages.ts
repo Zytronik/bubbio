@@ -6,6 +6,8 @@ import StartMenu from '../../pages/StartMenu.vue';
 import SprintPage from '../../pages/SprintPage.vue';
 import ScorePage from '../../pages/ScorePage.vue';
 import PixiTest from '../../pages/PixiTest.vue';
+import RankedPage from '../../pages/RankedPage.vue';
+import RoomListing from '../../pages/RoomListing.vue';
 import { PAGE } from '../_enum/page';
 
 export const pages: Pages = {
@@ -55,6 +57,8 @@ export const pages: Pages = {
       PAGE.soloMenu,
       PAGE.multiMenu,
       PAGE.settings,
+      PAGE.rankedPage,
+      PAGE.roomListing,
     ],
     backButtons: [
       {
@@ -118,6 +122,16 @@ export const pages: Pages = {
         iconSrc: require('@/assets/img/icons/sprint.png'),
         disabled: false,
       },
+      {
+        page: PAGE.scorePage,
+        iconSrc: require('@/assets/img/icons/score.png'),
+        disabled: true,
+      },
+      {
+        page: PAGE.pixiTest,
+        iconSrc: require('@/assets/img/icons/pixi.png'),
+        disabled: true,
+      },
     ],
   },
   [PAGE.scorePage]: {
@@ -141,6 +155,11 @@ export const pages: Pages = {
         iconSrc: require('@/assets/img/icons/score.png'),
         disabled: false,
       },
+      {
+        page: PAGE.pixiTest,
+        iconSrc: require('@/assets/img/icons/pixi.png'),
+        disabled: true,
+      },
     ],
   },
   [PAGE.pixiTest]: {
@@ -152,6 +171,42 @@ export const pages: Pages = {
       PAGE.soloMenu,
       PAGE.sprintPage,
       PAGE.scorePage,
+    ],
+  },
+  [PAGE.rankedPage]: {
+    title: 'Ranked',
+    color: 'rgb(160, 0, 24)',
+    component: RankedPage,
+    allowedTransitions: [PAGE.startMenu, PAGE.multiMenu, PAGE.roomListing],
+    backButtons: [
+      {
+        page: PAGE.multiMenu,
+        iconSrc: require('@/assets/img/icons/ranked.png'),
+        disabled: false,
+      },
+      {
+        page: PAGE.roomListing,
+        iconSrc: require('@/assets/img/icons/rooms.png'),
+        disabled: true,
+      },
+    ],
+  },
+  [PAGE.roomListing]: {
+    title: 'Room Listing',
+    color: 'rgb(129, 33, 81)',
+    component: RoomListing,
+    allowedTransitions: [PAGE.startMenu, PAGE.multiMenu, PAGE.rankedPage],
+    backButtons: [
+      {
+        page: PAGE.rankedPage,
+        iconSrc: require('@/assets/img/icons/ranked.png'),
+        disabled: true,
+      },
+      {
+        page: PAGE.multiMenu,
+        iconSrc: require('@/assets/img/icons/rooms.png'),
+        disabled: false,
+      },
     ],
   },
 };

@@ -49,6 +49,7 @@ export const useSoundStore = defineStore('soundStore', {
           this.currentMusic.stop();
         }
         this.currentMusic = sound.howl;
+        this.currentMusicKey = key;
         this.currentMusic.volume(this.musicVolume * sound.volume);
         this.currentMusic.play();
       }

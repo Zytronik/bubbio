@@ -11,7 +11,7 @@
   background-color: transparent;
   top: 0;
   z-index: 1;
-  font-size: 2em;
+  font-size: var(--font-size-4);
   left: 50%;
   transform: translateX(-50%);
   outline: none;

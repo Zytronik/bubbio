@@ -2,6 +2,7 @@ import { UserService } from './user.service';
 import { CheckUsernameDto } from 'src/_dto/auth.checkUsername';
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
   Post,
@@ -15,6 +16,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthenticatedRequest } from 'src/_interface/auth.authRequest';
 import { JwtAuthGuard } from 'src/auth/jwt/auth.jwt.guard';
 import { ValidateImagePipe } from './validateImgPipeline';
+import { SaveSettingsDto } from 'src/_dto/user.saveSettings';
 
 @Controller('users')
 export class UserController {
@@ -53,5 +55,24 @@ export class UserController {
     const userId = req.user.userId;
     await this.userService.updateProfileImgs(userId, file, 'banner');
     return { message: 'Banner updated successfully.' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('settings/save')
+  async updateSettings(
+    @Req() req: AuthenticatedRequest,
+    @Body() settings: SaveSettingsDto,
+  ) {
+    const userId = req.user.userId;
+    const stringifySettings = JSON.stringify(settings);
+
+    await this.userService.updateUserSettings(userId, stringifySettings);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('settings/save')
+  async getSettings(@Req() req: AuthenticatedRequest) {
+    const userId = req.user.userId;
+    return await this.userService.getUserSettings(userId);
   }
 }

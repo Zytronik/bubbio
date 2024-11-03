@@ -9,6 +9,7 @@ import { useUserStore } from '@/stores/userStore';
 import { usePageStore } from '@/stores/pageStore';
 import { isLocal, socketIoHost } from '@/ts/_constant/paths';
 import { UserDetails, UserSession } from '@/ts/_interface/userDetails';
+import { loadSettings } from '@/ts/page/settings';
 
 export const useSocketStore = defineStore('socket', {
   state: () => ({
@@ -82,6 +83,7 @@ export const useSocketStore = defineStore('socket', {
           userStore.setUser(userSession);
           console.log('User connected:', userSession);
           resolve(userSession); // Resolve the Promise with UserSession
+          loadSettings();
         });
 
         this.webSocket.on('updateUser', (userDetails: UserDetails) => {
