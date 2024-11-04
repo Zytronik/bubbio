@@ -1,4 +1,4 @@
-import { TextureReference } from "../_interface/spriteReference";
+import { TextureReference } from "../_interface/textureReference";
 
 export const thisIsASprite: TextureReference = {
     src: "https://pixijs.com/assets/bunny.png"

@@ -1,8 +1,8 @@
 import { Sprite } from "pixi.js";
-import { thisIsASprite } from "../pixi/textureReference";
+import { thisIsASprite } from "../pixi/allTextures";
 import { PixiAnimation } from "../_interface/pixiAnimation";
 import { mainContainer } from "../pixi/containers";
-import { addPixiAnimation, getLerpT } from "../pixi/animationLoop";
+import { addPixiAnimation, getLerpT } from "../pixi/animation";
 
 export function playExample(): void {
     const x = Math.random() * 100;
@@ -19,6 +19,7 @@ export function playExample(): void {
         sprites: [
             bunny,
         ],
+        texts: [],
         container: mainContainer,
         attributes: [x, y, flipAmount],
         onStart: function (): void {
@@ -28,16 +29,16 @@ export function playExample(): void {
             const bunny = this.sprites[0];
             const x = this.attributes[0];
             const y = this.attributes[1];
-            const currentAngle = getLerpT(this.startMS, this.endMS, performance.now()) * flipAmount * 360;
+            const currentAngle = getLerpT(this.startMS, this.endMS, currentTime) * flipAmount * 360;
             bunny.x = x;
             bunny.y = y;
-            bunny.angle = currentAngle
+            bunny.angle = currentAngle;
         },
         onEnd: function (): void {
             this.sprites.forEach(sprite => {
                 this.container.removeChild(sprite);
-            })
-        }
+            });
+        },
     }
     addPixiAnimation(exampleAnim);
 }

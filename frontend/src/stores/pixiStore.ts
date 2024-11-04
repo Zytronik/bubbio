@@ -1,8 +1,9 @@
 import { setupPixiContainers } from "@/ts/pixi/containers";
-import { allTextures } from "@/ts/pixi/textureReference";
-import { animationLoop } from "@/ts/pixi/animationLoop";
+import { allTextures } from "@/ts/pixi/allTextures";
+import { animationLoop } from "@/ts/pixi/animation";
 import { defineStore } from "pinia";
 import { Application, Assets } from "pixi.js";
+import { allFonts } from "@/ts/pixi/allFonts";
 
 export const usePixiStore = defineStore('pixi', () => {
     const pixiApp = new Application();
@@ -19,9 +20,18 @@ export const usePixiStore = defineStore('pixi', () => {
         allTextures.forEach(async asset => {
             asset.texture = await Assets.load(asset.src);
         });
+        allFonts.forEach(async font => {
+            await Assets.load(font.src);
+        });
     }
     function getPixiApp() {
         return pixiApp;
     }
-    return { pixiApp, initPixiApp, getPixiApp }
+    function getCanvasHeight(): number {
+            return pixiApp.canvas.height;
+    }
+    function getCanvasWidth(): number {
+            return pixiApp.canvas.width;
+    }
+    return { pixiApp, initPixiApp, getPixiApp, getCanvasHeight, getCanvasWidth }
 })

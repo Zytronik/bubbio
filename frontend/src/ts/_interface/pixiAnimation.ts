@@ -1,9 +1,10 @@
-import { Container, Sprite } from "pixi.js";
+import { Container, Sprite, Text } from "pixi.js";
 
 export interface PixiAnimation {
     startMS: number,
     endMS: number,
     sprites: Sprite[],
+    texts: Text[],
     container: Container,
     attributes: number[],
     onStart: () => void,

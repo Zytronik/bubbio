@@ -3,6 +3,7 @@ import { channelInput } from '@/ts/input/allInputs';
 import { attachInputReader } from '@/ts/input/inputReader';
 import { defineStore } from 'pinia';
 import { usePageStore } from './pageStore';
+import { playCountdown } from '@/ts/animationPixi/countdown';
 
 export const useInputStore = defineStore('input', {
   state: () => ({
@@ -17,8 +18,8 @@ export const useInputStore = defineStore('input', {
       if (!this.hasAttached) {
         this.hasAttached = true;
         attachInputReader();
-        channelInput.fire = usePageStore().toggleCommunityOverlayAnimation;
-        // shootInput.fire =
+        // channelInput.fire = usePageStore().toggleCommunityOverlayAnimation;
+        channelInput.fire = playCountdown;
       }
     },
   },
