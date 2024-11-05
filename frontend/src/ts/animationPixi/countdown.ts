@@ -7,6 +7,7 @@ import { usePixiStore } from "@/stores/pixiStore";
 
 export function playCountdown() {
     const duration = 2000;
+    const segmentPercentages = [0.2, 0.4, 0.6, 0.8]
     const now = performance.now();
     const three = new Text({
         text: '3',
@@ -36,72 +37,90 @@ export function playCountdown() {
             fontSize: 1600,
         }
     });
+    [go, one, two, three].forEach(text => {
+        text.visible = false;
+        text.anchor.set(0.5);
+        text.x = usePixiStore().getCanvasWidth() / 2;
+        text.y = usePixiStore().getCanvasHeight() / 2;
+        countDownContainer.addChild(text);
+    });
+    three.y = -(three.height / 2);
     const threeTravelDistance = three.height / 2 + usePixiStore().getCanvasHeight() / 2;
-    const countdownAnimation: PixiAnimation = {
+    const threeDownAnimation: PixiAnimation = {
         startMS: now,
-        endMS: now + duration,
-        sprites: [],
-        texts: [go, one, two, three],
-        container: countDownContainer,
-        attributes: [0.2, 0.4, 0.6, 0.8, threeTravelDistance],
+        endMS: now + duration * segmentPercentages[0],
         onStart: function (): void {
-            this.container.visible = true;
-            this.texts.forEach(text => {
-                text.visible = false;
-                text.anchor.set(0.5);
-                text.x = usePixiStore().getCanvasWidth() / 2;
-                text.y = usePixiStore().getCanvasHeight() / 2;
-                this.container.addChild(text);
-            });
-            three.y = -(three.height / 2);
+            countDownContainer.visible = true;
+            three.visible = true;
         },
         renderFrame: function (currentTime: number): void {
             const t = getLerpT(this.startMS, this.endMS, currentTime);
-            const threeDownDuration = this.attributes[0];
-            const threeDuration = this.attributes[1];
-            const twoDuration = this.attributes[2];
-            const oneDuration = this.attributes[3];
-            const goDuration = 1;
-            const three = this.texts[3];
-            const two = this.texts[2];
-            const one = this.texts[1];
-            const go = this.texts[0];
-            if (t < threeDownDuration) {
-                const travelDistance = this.attributes[4];
-                const travelT = getLerpT(0, threeDownDuration, t);
-                three.visible = true;
-                three.y = -(three.height / 2) + travelT * travelDistance
-            }
-            else if (t < threeDuration) {
-                three.visible = true;
-                const shrinkT = getLerpT(threeDownDuration, threeDuration, t);
-                three.scale = 1 - (shrinkT * 0.2);
-            }
-            else if (t < twoDuration) {
-                three.visible = false;
-                two.visible = true;
-                const shrinkT = getLerpT(threeDuration, twoDuration, t);
-                two.scale = 1 - (shrinkT * 0.2);
-            }
-            else if (t < oneDuration) {
-                two.visible = false;
-                one.visible = true;
-                const shrinkT = getLerpT(twoDuration, oneDuration, t);
-                one.scale = 1 - (shrinkT * 0.2);
-            }
-            else if (t < goDuration) {
-                one.visible = false;
-                go.visible = true;
-                const shrinkT = getLerpT(oneDuration, goDuration, t);
-                go.scale = 1 - (shrinkT * 1);
-            }
+            three.y = -(three.height / 2) + t * threeTravelDistance
         },
         onEnd: function (): void {
-            this.container.visible = false;
-            this.texts.forEach(text => {
-                this.container.removeChild(text);
+            addPixiAnimation(threeShrinkAnimation);
+        }
+    }
+    const threeShrinkAnimation: PixiAnimation = {
+        startMS: now + duration * segmentPercentages[0],
+        endMS: now + duration * segmentPercentages[1],
+        onStart: function (): void {
+            //nothing :)
+        },
+        renderFrame: function (currentTime: number): void {
+            const t = getLerpT(this.startMS, this.endMS, currentTime);
+            three.scale = 1 - (t * 0.2);
+        },
+        onEnd: function (): void {
+            three.visible = false;
+            addPixiAnimation(twoShrinkAnimation);
+        }
+    }
+    const twoShrinkAnimation: PixiAnimation = {
+        startMS: now + duration * segmentPercentages[1],
+        endMS: now + duration * segmentPercentages[2],
+        onStart: function (): void {
+            two.visible = true;
+        },
+        renderFrame: function (currentTime: number): void {
+            const t = getLerpT(this.startMS, this.endMS, currentTime);
+            two.scale = 1 - (t * 0.2);
+        },
+        onEnd: function (): void {
+            two.visible = false;
+            addPixiAnimation(oneShrinkAnimation);
+        }
+    }
+    const oneShrinkAnimation: PixiAnimation = {
+        startMS: now + duration * segmentPercentages[2],
+        endMS: now + duration * segmentPercentages[3],
+        onStart: function (): void {
+            one.visible = true;
+        },
+        renderFrame: function (currentTime: number): void {
+            const t = getLerpT(this.startMS, this.endMS, currentTime);
+            one.scale = 1 - (t * 0.2);
+        },
+        onEnd: function (): void {
+            one.visible = false;
+            addPixiAnimation(goShrinkAnimation);
+        }
+    }
+    const goShrinkAnimation: PixiAnimation = {
+        startMS: now + duration * segmentPercentages[3],
+        endMS: now + duration,
+        onStart: function (): void {
+            go.visible = true;
+        },
+        renderFrame: function (currentTime: number): void {
+            const t = getLerpT(this.startMS, this.endMS, currentTime);
+            go.scale = 1 - (t * 1);
+        },
+        onEnd: function (): void {
+            [go, one, two, three].forEach(text => {
+                countDownContainer.removeChild(text);
             });
         }
     }
-    addPixiAnimation(countdownAnimation);
+    addPixiAnimation(threeDownAnimation);
 }
