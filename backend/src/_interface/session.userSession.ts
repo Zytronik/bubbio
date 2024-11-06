@@ -1,4 +1,4 @@
-import { UserDetails } from './session.userDetails';
+import { RankInfo } from './ranked.rank';
 
 export interface UserSession {
   role: 'guest' | 'spectator' | 'user' | null;
@@ -6,5 +6,19 @@ export interface UserSession {
   currentPage: string;
   clientId: string;
   isRanked: boolean;
-  userDetails: UserDetails;
+  userId: number;
+  email: string;
+  countryCode?: string;
+  country?: string;
+  pbUrl?: string;
+  bannerUrl?: string;
+  LastDisconnectedAt: Date;
+  rating: number;
+  ratingDeviation: number;
+  volatility: number;
+  createdAt: Date;
+  rank: RankInfo;
+  globalRank: number;
+  percentile: number;
+  probablyAroundRank: RankInfo;
 }

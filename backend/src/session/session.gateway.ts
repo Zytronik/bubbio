@@ -8,6 +8,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { UserSession } from 'src/_interface/session.userSession';
 import { SessionService } from './session.service';
+import { UserService } from 'src/user/user.service';
 
 @WebSocketGateway({
   connectionStateRecovery: {
@@ -23,7 +24,10 @@ export class SessionGateway
 
   private activeUsers: Map<string, UserSession> = new Map();
 
-  constructor(private readonly sessionService: SessionService) {}
+  constructor(
+    private readonly sessionService: SessionService,
+    private readonly userService: UserService,
+  ) {}
 
   async handleConnection(client: Socket) {
     const token = client.handshake.query.token as string;
@@ -88,9 +92,30 @@ export class SessionGateway
     const token = client.handshake.query.token as string;
     const decodedToken = this.sessionService.decodeToken(token);
     const userId = decodedToken.userId;
-    const userDetails = await this.sessionService.getDbUserDetails(userId);
-    if (userDetails) {
-      client.emit('updateUser', userDetails);
+    const username = decodedToken.username.toUpperCase();
+    const isRanked = await this.userService.isRanked(userId);
+    const incompleteSession: UserSession = {
+      role: 'user',
+      username,
+      currentPage: '/',
+      clientId: client.id,
+      isRanked,
+      userId,
+      email: '',
+      LastDisconnectedAt: undefined,
+      rating: 0,
+      ratingDeviation: 0,
+      volatility: 0,
+      createdAt: undefined,
+      rank: undefined,
+      globalRank: 0,
+      percentile: 0,
+      probablyAroundRank: undefined,
+    };
+    const userSession =
+      await this.userService.fillUserSessionWithDBInfo(incompleteSession);
+    if (userSession) {
+      client.emit('updateUser', userSession);
     }
   }
 }

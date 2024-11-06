@@ -1,16 +1,10 @@
-import type { UserDetails, UserSession } from '@/ts/_interface/userDetails';
+import { RankInfo } from '@/ts/_interface/rank';
+import type { UserSession } from '@/ts/_interface/userSession';
 import { defineStore } from 'pinia';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    userSession: {
-      clientId: '',
-      currentPage: '',
-      username: '',
-      role: null,
-      isRanked: false,
-      userDetails: null,
-    } as UserSession,
+    userSession: getEmptyUserSession(),
   }),
   actions: {
     setUser(newSession: UserSession) {
@@ -18,23 +12,16 @@ export const useUserStore = defineStore('user', {
         ...this.userSession,
         ...newSession,
         currentPage: this.userSession.currentPage || newSession.currentPage,
-      };
+      }
     },
-    updateUserDetails(userDetails: UserDetails) {
-      this.userSession.userDetails = userDetails;
+    updateUserSession(userSession: UserSession) {
+      this.userSession = userSession;
     },
     updateCurrentPage(page: string) {
       this.userSession.currentPage = page;
     },
     clearUser() {
-      this.userSession = {
-        clientId: '',
-        currentPage: '',
-        username: '',
-        role: null,
-        isRanked: false,
-        userDetails: null,
-      };
+      this.userSession = getEmptyUserSession();
     },
     isGuest() {
       return this.userSession.role === 'guest';
@@ -42,5 +29,38 @@ export const useUserStore = defineStore('user', {
     isUser() {
       return this.userSession.role === 'user';
     },
-  },
+    getUserSession(): UserSession {
+      return this.userSession;
+    }
+  }
 });
+
+function getEmptyRank(): RankInfo {
+  return {
+    ascii: "",
+    name: "",
+    iconName: "",
+    percentile: 0
+  }
+}
+
+function getEmptyUserSession(): UserSession {
+  return {
+    role: null,
+    username: '',
+    currentPage: '',
+    clientId: '',
+    isRanked: false,
+    userId: 0,
+    email: '',
+    LastDisconnectedAt: new Date(),
+    rating: 0,
+    ratingDeviation: 0,
+    volatility: 0,
+    createdAt: new Date(),
+    rank: getEmptyRank(),
+    globalRank: 0,
+    percentile: 0,
+    probablyAroundRank: getEmptyRank()
+  }
+}

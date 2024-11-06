@@ -13,7 +13,7 @@ import { RankInfo, Ratings } from 'src/_interface/ranked.rank';
 import { unrankedRatingDeviation } from 'src/ranked/ranks';
 import { RanksService } from 'src/ranked/ranks.service';
 import { FileStorageService } from './file-storage.service';
-import { UserDetails } from 'src/_interface/session.userDetails';
+import { UserSession } from 'src/_interface/session.userSession';
 
 @Injectable()
 export class UserService {
@@ -164,15 +164,22 @@ export class UserService {
     return user;
   }
 
-  async getUserDetailsById(userId: number): Promise<UserDetails> {
+  async fillUserSessionWithDBInfo(session: UserSession): Promise<UserSession> {
+    const userId = session.userId;
     const user: User = await this.getUserById(userId);
     const globalRank: number = await this.getGlobalRank(userId);
     const percentile: number = await this.getPercentile(user.id);
     const rankInfos: RankInfo = await this.ranksService.getRankInfo(user.id);
     const probablyAroundRank: RankInfo =
       await this.ranksService.getProbablyAroundRank(user.id);
+
     return {
-      id: user.id,
+      role: session.role,
+      username: session.username,
+      currentPage: session.currentPage,
+      clientId: session.clientId,
+      isRanked: session.isRanked,
+      userId: user.id,
       email: user.email,
       countryCode: user.countryCode,
       country: user.country,

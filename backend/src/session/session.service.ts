@@ -2,7 +2,6 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Socket, Server } from 'socket.io';
-import { UserDetails } from 'src/_interface/session.userDetails';
 import { UserSession } from 'src/_interface/session.userSession';
 import { UserService } from 'src/user/user.service';
 
@@ -28,17 +27,27 @@ export class SessionService {
       const decodedToken = this.decodeToken(token);
       const userId = decodedToken.userId;
       const username = decodedToken.username.toUpperCase();
-      const userDetails = await this.userService.getUserDetailsById(userId);
       const isRanked = await this.userService.isRanked(userId);
-
-      const userSession: UserSession = {
+      const incompleteSession: UserSession = {
         role: 'user',
         username,
         currentPage: '/',
-        userDetails,
-        isRanked: isRanked,
         clientId: client.id,
+        isRanked,
+        userId,
+        email: '',
+        LastDisconnectedAt: undefined,
+        rating: 0,
+        ratingDeviation: 0,
+        volatility: 0,
+        createdAt: undefined,
+        rank: undefined,
+        globalRank: 0,
+        percentile: 0,
+        probablyAroundRank: undefined,
       };
+      const userSession =
+        await this.userService.fillUserSessionWithDBInfo(incompleteSession);
 
       activeUsers.set(client.id, userSession);
       server.emit('usersOnline', this.getActiveUsers(activeUsers));
@@ -63,9 +72,19 @@ export class SessionService {
       role: 'guest',
       username: username,
       currentPage: '/',
-      userDetails: null,
-      isRanked: false,
       clientId: client.id,
+      isRanked: false,
+      userId: 0,
+      email: '',
+      LastDisconnectedAt: undefined,
+      rating: 0,
+      ratingDeviation: 0,
+      volatility: 0,
+      createdAt: undefined,
+      rank: undefined,
+      globalRank: 0,
+      percentile: 0,
+      probablyAroundRank: undefined,
     };
 
     activeUsers.set(client.id, guestSession);
@@ -85,9 +104,19 @@ export class SessionService {
       role: 'spectator',
       username: username,
       currentPage: '/',
-      userDetails: null,
-      isRanked: false,
       clientId: client.id,
+      isRanked: false,
+      userId: 0,
+      email: '',
+      LastDisconnectedAt: undefined,
+      rating: 0,
+      ratingDeviation: 0,
+      volatility: 0,
+      createdAt: undefined,
+      rank: undefined,
+      globalRank: 0,
+      percentile: 0,
+      probablyAroundRank: undefined,
     };
 
     activeUsers.set(client.id, spectatorSession);
@@ -122,9 +151,5 @@ export class SessionService {
     return this.jwtService.verify(token, {
       secret: this.configService.get<string>('JWT_SECRET'),
     });
-  }
-
-  async getDbUserDetails(userID: number): Promise<UserDetails> {
-    return await this.userService.getUserDetailsById(userID);
   }
 }

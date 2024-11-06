@@ -6,5 +6,5 @@ export const thisIsASprite: TextureReference = {
 
 export const allTextures: TextureReference[] = 
 [
-    thisIsASprite,
+    // thisIsASprite,
 ]

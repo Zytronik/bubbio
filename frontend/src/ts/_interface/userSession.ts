@@ -1,7 +1,12 @@
-import { RankInfo } from './ranked.rank';
+import { RankInfo } from './rank';
 
-export interface UserDetails {
-  id: number;
+export interface UserSession {
+  role: 'guest' | 'spectator' | 'user' | null;
+  username: string;
+  currentPage: string;
+  clientId: string;
+  isRanked: boolean;
+  userId: number;
   email: string;
   countryCode?: string;
   country?: string;

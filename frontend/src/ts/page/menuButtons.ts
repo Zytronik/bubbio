@@ -5,10 +5,10 @@ import { useSoundStore } from '@/stores/soundStore';
 
 export function isButtonDisabled(button: MenuButton): boolean {
   const userStore = useUserStore();
-  if (!userStore.userSession.userDetails) {
+  if (!userStore.userSession) {
     return false;
   }
-  const currentUserID = userStore.userSession.userDetails.id;
+  const currentUserID = userStore.userSession.userId;
   if (
     button.authIds &&
     (!currentUserID || !button.authIds.includes(currentUserID))

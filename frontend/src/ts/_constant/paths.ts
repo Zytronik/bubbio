@@ -1,4 +1,4 @@
-import { UserSession } from '../_interface/userDetails';
+import { UserSession } from '../_interface/userSession';
 
 const host: string = window.location.hostname;
 export let isLocal: boolean;
@@ -20,9 +20,9 @@ if (host === 'localhost' || ipRegex.test(host)) {
 }
 
 export function getUserPbUrl(userSession: UserSession): string {
-  if (userSession.userDetails) {
+  if (userSession) {
     return (
-      userSession.userDetails.pbUrl ||
+      userSession.pbUrl ||
       require(`../../assets/img/default/pbPlaceholder.png`)
     );
   }

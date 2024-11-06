@@ -8,7 +8,7 @@ import {
 import { useUserStore } from '@/stores/userStore';
 import { usePageStore } from '@/stores/pageStore';
 import { isLocal, socketIoHost } from '@/ts/_constant/paths';
-import { UserDetails, UserSession } from '@/ts/_interface/userDetails';
+import { UserSession } from '@/ts/_interface/userSession';
 import { loadSettings } from '@/ts/page/settings';
 
 export const useSocketStore = defineStore('socket', {
@@ -86,9 +86,9 @@ export const useSocketStore = defineStore('socket', {
           loadSettings();
         });
 
-        this.webSocket.on('updateUser', (userDetails: UserDetails) => {
-          userStore.updateUserDetails(userDetails);
-          console.log('User updated:', userDetails);
+        this.webSocket.on('updateUser', (userSession: UserSession) => {
+          userStore.updateUserSession(userSession);
+          console.log('User updated:', userSession);
         });
 
         this.updateUserPage(pageStore.currentPage);

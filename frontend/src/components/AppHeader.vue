@@ -5,15 +5,15 @@
       <div class="profile-content">
         <h3>{{ userSession.username }}</h3>
         <div class="ratingDetails">
-          <p v-if="userSession.userDetails && userSession.isRanked" class="rating">{{ userSession.userDetails.rating
+          <p v-if="userSession && userSession.isRanked" class="rating">{{ userSession.rating
             }}<span>±{{
-              userSession.userDetails.ratingDeviation }}</span>
+              userSession.ratingDeviation }}</span>
           </p>
-          <img v-if="userSession.userDetails && userSession.isRanked" class="rank-img"
-            :src="getUserRankImgUrl(userSession.userDetails.rank.iconName)" :alt="userSession.userDetails.rank.name">
+          <img v-if="userSession && userSession.isRanked" class="rank-img"
+            :src="getUserRankImgUrl(userSession.rank.iconName)" :alt="userSession.rank.name">
           <p v-else class="unranked">Unranked</p>
         </div>
-        <div v-if="userSession.userDetails && userSession.isRanked" class="progressBar-wrapper">
+        <div v-if="userSession && userSession.isRanked" class="progressBar-wrapper">
           <div class="progressBar">
             <div class="progressBarFill" :style="{
               'width': getProgressBarFillWidth(),
@@ -40,15 +40,14 @@ export default {
     const userSession = computed(() => userStore.userSession);
 
     function getProgressBarFillWidth() {
-      const userDetails = userSession.value.userDetails;
-      if (!userDetails) {
+      if (!userSession.value) {
         return '0%';
       }
-      const rank = userDetails.rank;
+      const rank = userSession.value.rank;
       if (!rank.nextRank) {
         return '0%';
       }
-      return (100 - (100 / (rank.percentile - rank.nextRank.percentile) * (rank.percentile - userDetails.percentile))) + '%';
+      return (100 - (100 / (rank.percentile - rank.nextRank.percentile) * (rank.percentile - userSession.value.percentile))) + '%';
     }
 
     return {
