@@ -1,4 +1,4 @@
-import { INPUT_CONTEXT } from '@/ts/_constant/inputContext';
+import { INPUT_CONTEXT } from '@/ts/_enum/inputContext';
 import { channelInput } from '@/ts/input/allInputs';
 import { attachInputReader } from '@/ts/input/inputReader';
 import { defineStore } from 'pinia';

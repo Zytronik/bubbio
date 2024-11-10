@@ -1,3 +1,4 @@
+import { UploadFileType } from '../_enum/uploadFileType';
 import { UserSession } from '../_interface/userSession';
 
 const host: string = window.location.hostname;
@@ -32,3 +33,9 @@ export function getUserPbUrl(userSession: UserSession): string {
 export function getUserRankImgUrl(rankName: string): string {
   return require(`../../assets/img/ranks/${rankName}.png`);
 }
+
+
+export const UploadFileTypeUrls: Record<UploadFileType, string> = {
+  [UploadFileType.ProfilePicture]: 'users/updateProfilePic',
+  [UploadFileType.ProfileBanner]: 'users/updateProfileBanner',
+};

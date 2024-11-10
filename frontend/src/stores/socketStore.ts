@@ -7,7 +7,7 @@ import {
 } from 'socket.io-client';
 import { useUserStore } from '@/stores/userStore';
 import { usePageStore } from '@/stores/pageStore';
-import { isLocal, socketIoHost } from '@/ts/_constant/paths';
+import { isLocal, socketIoHost } from '@/ts/page/paths';
 import { UserSession } from '@/ts/_interface/userSession';
 import { loadSettings } from '@/ts/page/settings';
 

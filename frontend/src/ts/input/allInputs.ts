@@ -1,4 +1,4 @@
-import { INPUT_CONTEXT } from "../_constant/inputContext";
+import { INPUT_CONTEXT } from "../_enum/inputContext";
 import { Input } from "../_interface/input";
 
 export const angleLeftInput: Input = {

@@ -13,13 +13,14 @@
 import { defineComponent } from 'vue';
 import SliderSetting from '@/components/settings/SliderSetting.vue';
 import { useSoundStore } from '@/stores/soundStore';
-import { defaultMusicVolume, defaultSfxVolume } from '@/ts/_constant/sounds';
 
 export default defineComponent({
     name: 'AudioSettingsTab',
     components: { SliderSetting },
     setup() {
         const soundStore = useSoundStore();
+        const defaultMusicVolume = soundStore.defaultMusicVolume;
+        const defaultSfxVolume = soundStore.defaultSfxVolume;
         const musicVolume = soundStore.musicVolume * 100;
         const sfxVolume = soundStore.sfxVolume * 100;
 

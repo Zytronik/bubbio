@@ -1,8 +1,8 @@
 import { useToastStore } from '@/stores/toastStore';
-import { UploadFileTypeUrls } from '../_constant/uploadFileTypeUrls';
 import { UploadFileType } from '../_enum/uploadFileType';
 import { httpClient } from '../network/httpClient';
 import { useSocketStore } from '@/stores/socketStore';
+import { UploadFileTypeUrls } from './paths';
 
 export async function uploadFile(
   file: File,

@@ -21,7 +21,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { usePageStore } from '@/stores/pageStore';
-import { pages } from './ts/_constant/pages';
+import { allPages } from './ts/page/allPages';
 import AppHeader from './components/AppHeader.vue';
 import { checkUserAuthentication, logUserOut } from './ts/network/auth';
 import LoginOverlay from './components/LoginOverlay.vue';
@@ -53,10 +53,10 @@ export default {
   setup() {
     const pageStore = usePageStore();
     const currentPage = storeToRefs(pageStore);
-    const currentComponent = computed(() => pages[pageStore.currentPage].component);
+    const currentComponent = computed(() => allPages[pageStore.currentPage].component);
     const currentPageName = computed(() => pageStore.currentPage);
-    const currentBackButtons = computed(() => pages[pageStore.currentPage].backButtons);
-    const currentPageColor = computed(() => pages[pageStore.currentPage].color);
+    const currentBackButtons = computed(() => allPages[pageStore.currentPage].backButtons);
+    const currentPageColor = computed(() => allPages[pageStore.currentPage].color);
     const showLogin = computed(() => !pageStore.isLoggedIn);
     const socketStore = useSocketStore();
     const pageIsLoading = ref(true);

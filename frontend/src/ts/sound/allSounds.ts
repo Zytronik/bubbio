@@ -1,8 +1,5 @@
 import { Sound } from '../_interface/sound';
 
-export const defaultSfxVolume = 0.5;
-export const defaultMusicVolume = 0.5;
-
 export const soundData: Record<string, Sound> = {
   menu_back: {
     path: require('@/assets/sounds/menu_back.wav'),

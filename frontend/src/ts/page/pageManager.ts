@@ -1,5 +1,5 @@
 import { usePageStore } from '@/stores/pageStore';
-import { pages } from '@/ts/_constant/pages';
+import { allPages } from '@/ts/page/allPages';
 import { watchEffect } from 'vue';
 import { checkUserAuthentication } from '../network/auth';
 import { useSocketStore } from '@/stores/socketStore';
@@ -8,7 +8,7 @@ import { PAGE } from '../_enum/page';
 export function canTransitionTo(newPage: PAGE): boolean {
   const pageStore = usePageStore();
   const currentPage = pageStore.currentPage;
-  const allowedTransitions = pages[currentPage].allowedTransitions;
+  const allowedTransitions = allPages[currentPage].allowedTransitions;
   return allowedTransitions.includes(newPage);
 }
 
@@ -51,5 +51,5 @@ export function initPageTransitionWatcher() {
 }
 
 function updateDocumentTitle(currentPage: PAGE) {
-  document.title = `${document.title.split('|')[0]} | ${pages[currentPage].title}`;
+  document.title = `${document.title.split('|')[0]} | ${allPages[currentPage].title}`;
 }

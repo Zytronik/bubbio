@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { ref, onMounted } from 'vue';
-import { patchNotes } from '@/ts/_constant/patchNotes';
+import { patchNotes } from '@/ts/page/patchNotes';
 
 export default {
   name: 'PatchNotes',

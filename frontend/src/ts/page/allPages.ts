@@ -10,7 +10,7 @@ import RankedPage from '../../pages/RankedPage.vue';
 import RoomListing from '../../pages/RoomListing.vue';
 import { PAGE } from '../_enum/page';
 
-export const pages: Pages = {
+export const allPages: Pages = {
   [PAGE.startMenu]: {
     title: 'Home',
     color: 'black',

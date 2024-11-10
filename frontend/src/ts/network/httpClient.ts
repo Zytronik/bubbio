@@ -1,5 +1,5 @@
 import axios, { type AxiosInstance } from 'axios';
-import { backendURL } from '../_constant/paths';
+import { backendURL } from '../page/paths';
 
 export const httpClient: AxiosInstance = axios.create({
   baseURL: backendURL,

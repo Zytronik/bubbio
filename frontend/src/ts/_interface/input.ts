@@ -1,4 +1,4 @@
-import { INPUT_CONTEXT } from "../_constant/inputContext";
+import { INPUT_CONTEXT } from "../_enum/inputContext";
 
 export interface Input {
     name: string;

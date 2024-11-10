@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import { useUserStore } from '@/stores/userStore';
-import { getUserPbUrl, getUserRankImgUrl } from '@/ts/_constant/paths';
+import { getUserPbUrl, getUserRankImgUrl } from '@/ts/page/paths';
 import { openCommunityOverlay } from '@/ts/animationCSS/openCommunityOverlay';
 import { isGuestOrLoggedIn, logUserOut } from '@/ts/network/auth';
 import { computed } from 'vue';

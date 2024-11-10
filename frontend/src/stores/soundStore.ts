@@ -1,8 +1,6 @@
 import {
-  defaultMusicVolume,
-  defaultSfxVolume,
   soundData,
-} from '@/ts/_constant/sounds';
+} from '@/ts/sound/allSounds';
 import { Sound } from '@/ts/_interface/sound';
 import { defineStore } from 'pinia';
 import { Howl } from 'howler';
@@ -12,8 +10,10 @@ export const useSoundStore = defineStore('soundStore', {
     sounds: {} as Record<string, Sound>,
     currentMusic: null as Howl | null,
     currentMusicKey: '' as string,
-    sfxVolume: defaultSfxVolume,
-    musicVolume: defaultMusicVolume,
+    defaultSfxVolume: 0.5,
+    defaultMusicVolume: 0.5,
+    sfxVolume: 0.5,
+    musicVolume: 0.5,
   }),
   actions: {
     preloadSounds() {
@@ -72,10 +72,10 @@ export const useSoundStore = defineStore('soundStore', {
       }
     },
     resetSfxVolume() {
-      this.setSfxVolume(defaultSfxVolume);
+      this.setSfxVolume(this.defaultSfxVolume);
     },
     resetMusicVolume() {
-      this.setMusicVolume(defaultMusicVolume);
+      this.setMusicVolume(this.defaultMusicVolume);
     },
   },
 });
