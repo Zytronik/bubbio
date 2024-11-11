@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { getEmptyGame, getNewSprintInstance } from "@/ts/game/setup";
+import { getEmptyGame,  } from "@/ts/game/setup";
 import { GAME_MODE } from "@/ts/_enum/gameMode";
 import { useUserStore } from "./userStore";
 

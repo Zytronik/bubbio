@@ -2,11 +2,7 @@ export interface GameStats {
     bubblesShot: number,
     bubblesCleared: number,
     attack: number,
-    clear3: number,
-    clear4: number,
-    clear5: number,
-    clear6plus: number,
-    highestBubbleClear: number,
+    clears: number[][], //clears[4][1] = 3 (4 bubble clear with 1 wallbounce - occured 3 times)
     perfectClears: number,
     currentCombo: number,
     highestCombo: number,

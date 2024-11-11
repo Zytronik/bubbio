@@ -10,6 +10,7 @@ export interface GameInstance {
     garbageSeed: number,
     angle: number,
     currentBubble: Bubble,
+    previewBubble?: Bubble,
     holdBubble?: Bubble,
     bubbleQueue: Bubble[],
     playGrid: Grid,
