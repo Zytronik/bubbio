@@ -22,7 +22,6 @@ export interface GameSettings {
     garbageMaxAtOnce: number,
     garbageCleanAmount: number,
     garbageColorAmount: number,
-    garbageToKill: number,
     
     countDownDuration: number,
     

@@ -1,10 +1,17 @@
+import { Container } from "pixi.js";
 import { GAME_MODE } from "../_enum/gameMode";
+import { Bubble } from "../_interface/game/bubble";
+import { Field } from "../_interface/game/field";
 import { Game } from "../_interface/game/game";
 import { GameInstance } from "../_interface/game/gameInstance";
+import { GameSettings } from "../_interface/game/gameSettings";
 import { GameStats } from "../_interface/game/gameStats";
+import { Grid } from "../_interface/game/grid";
 import { RoundData } from "../_interface/game/roundData";
+import { Row } from "../_interface/game/row";
 import { UserSession } from "../_interface/userSession";
 import { getNextSeed } from "./rng";
+import { SPRINT_SETTINGS } from "./settings/sprintSettings";
 
 export function getEmptyGame(): Game {
     return {
@@ -34,18 +41,65 @@ export function getEmptyStats(): GameStats {
     }
 }
 
-// export function getNewSprintInstance(): GameInstance {
-//     return {
-//         bubbleSeed: 0,
-//         garbageSeed: 0,
-//         angle: 0,
-//         currentBubble: undefined,
-//         bubbleQueue: [],
-//         playGrid: undefined,
-//         queuedGarbage: undefined,
-//         stats: getEmptyStats(),
-//         animationContainer: undefined,
-//         instanceAnimations: []
-//     }
-// }
+export function getNewSprintInstance(): GameInstance {
+    return {
+        bubbleSeed: 0,
+        garbageSeed: 0,
+        angle: 90,
+        currentBubble: getDefaultBubble(),
+        bubbleQueue: [],
+        playGrid: getEmptyGrid(SPRINT_SETTINGS),
+        queuedGarbage: {},
+        stats: getEmptyStats(),
+        animationContainer: new Container(),
+        instanceAnimations: [],
+    }
+}
 
+function getDefaultBubble(): Bubble {
+    return {
+        type: 0,
+        wallbounce: false,
+    }
+}
+
+function getEmptyGrid(settings: GameSettings): Grid {
+    const precisionWidth = settings.widthPrecisionUnits;
+    const bubblePrecisionRadius = precisionWidth / (2 * settings.gridWidth);
+    const bubblePrecisionDiameter = bubblePrecisionRadius * 2;
+    const precisionRowHeight = Math.floor(bubblePrecisionRadius * Math.sqrt(3));
+    const precisionHeight = precisionRowHeight * (settings.gridHeight + settings.gridExtraHeight)
+    const playGrid: Grid = {
+        gridWidth: settings.gridWidth,
+        gridHeight: settings.gridHeight,
+        extraGridHeight: settings.gridExtraHeight,
+        bubblePrecisionRadius,
+        precisionWidth,
+        precisionRowHeight,
+        precisionHeight,
+        rows: [],
+        launcherPrecisionPosition: { x: precisionWidth / 2, y: precisionHeight - bubblePrecisionRadius },
+        collisionRangeSquared: 0
+    }
+    for (let h = 0; h < playGrid.gridHeight + playGrid.extraGridHeight; h++) {
+        const isSmallRow = (h % 2 === 1);
+        const row: Row = {
+            fields: [],
+            size: playGrid.gridWidth - (isSmallRow ? 1 : 0),
+            isSmallerRow: isSmallRow,
+            isInDeathZone: h >= playGrid.gridHeight,
+        }
+        for (let w = 0; w < row.size; w++) {
+            const field: Field = {
+                coords: { x: w, y: h, },
+                precisionCoords: {
+                    x: w * bubblePrecisionDiameter + (isSmallRow ? bubblePrecisionDiameter : bubblePrecisionRadius),
+                    y: precisionRowHeight * h + bubblePrecisionRadius,
+                },
+            };
+            row.fields.push(field)
+        }
+        playGrid.rows.push(row);
+    }
+    return playGrid;
+}

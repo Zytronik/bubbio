@@ -18,7 +18,7 @@ export const useInputStore = defineStore('input', {
       if (!this.hasAttached) {
         this.hasAttached = true;
         attachInputReader();
-        // channelInput.fire = usePageStore().toggleCommunityOverlayAnimation;
+        channelInput.fire = usePageStore().toggleCommunityOverlayAnimation;
         channelInput.fire = playCountdown;
       }
     },
