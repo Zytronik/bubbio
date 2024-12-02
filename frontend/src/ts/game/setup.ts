@@ -18,7 +18,7 @@ export function getEmptyGame(): Game {
         gameMode: GAME_MODE.NONE,
         spectating: false,
         rounds: [],
-        instancesMap: new Map<UserSession, GameInstance>()
+        instancesMap: new Map<string, GameInstance>()
     }
 }
 
@@ -41,7 +41,7 @@ export function getEmptyStats(): GameStats {
     }
 }
 
-export function getNewSprintInstance(): GameInstance {
+export function newSprintInstance(): GameInstance {
     return {
         bubbleSeed: 0,
         garbageSeed: 0,
@@ -51,6 +51,8 @@ export function getNewSprintInstance(): GameInstance {
         playGrid: getEmptyGrid(SPRINT_SETTINGS),
         queuedGarbage: {},
         stats: getEmptyStats(),
+        left: false,
+        right: false,
         animationContainer: new Container(),
         instanceAnimations: [],
     }

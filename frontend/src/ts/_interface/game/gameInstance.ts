@@ -17,7 +17,9 @@ export interface GameInstance {
     queuedGarbage: GarbageQueue,
     stats: GameStats,
     //replaydata
-    
+
+    left: boolean,
+    right: boolean,
     animationContainer: Container,
     instanceAnimations: PixiAnimation[],
 }

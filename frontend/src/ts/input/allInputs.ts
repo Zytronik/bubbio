@@ -1,18 +1,16 @@
 import { INPUT_CONTEXT } from "../_enum/inputContext";
 import { Input } from "../_interface/input";
+import { leftDown, leftUp, rightDown, rightUp } from "../game/actions/aim";
 
 export const angleLeftInput: Input = {
     name: "Angle Left",
     description: "Move the angle of the cannon to the left",
     customKeyMap: ["ArrowLeft", "", ""],
     defaultKeyCode: "ArrowLeft",
-    isSingleTriggerAction: false,
+    isSingleTriggerAction: true,
     pressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
-    fire: () => {
-        console.error("no fire event attached to keyCode: " + angleLeftInput.name);
-    },
+    fire: () => leftDown(),
+    release: () => leftUp(),
     inputContext: [INPUT_CONTEXT.GAME_NO_RESET, INPUT_CONTEXT.GAME_WITH_RESET]
 };
 
@@ -21,13 +19,10 @@ export const angleRightInput: Input = {
     description: "Move the angle of the cannon to the right",
     customKeyMap: ["ArrowRight", "", ""],
     defaultKeyCode: "ArrowRight",
-    isSingleTriggerAction: false,
+    isSingleTriggerAction: true,
     pressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
-    fire: () => {
-        console.error("no fire event attached to keyCode: " + angleRightInput.name);
-    },
+    fire: () => rightDown(),
+    release: () => rightUp(),
     inputContext: [INPUT_CONTEXT.GAME_NO_RESET, INPUT_CONTEXT.GAME_WITH_RESET]
 };
 
@@ -38,8 +33,6 @@ export const changeAPSInput: Input = {
     defaultKeyCode: "ShiftLeft",
     isSingleTriggerAction: true,
     pressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
     fire: () => {
         console.error("no fire event attached to keyCode: " + changeAPSInput.name);
     },
@@ -56,8 +49,6 @@ export const centerCursorInput: Input = {
     defaultKeyCode: "ArrowUp",
     isSingleTriggerAction: true,
     pressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
     fire: () => {
         console.error("no fire event attached to keyCode: " + shootInput.name);
     },
@@ -71,8 +62,6 @@ export const mirrorCursorInput: Input = {
     defaultKeyCode: "ArrowDown",
     isSingleTriggerAction: true,
     pressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
     fire: () => {
         console.error("no fire event attached to keyCode: " + shootInput.name);
     },
@@ -86,8 +75,6 @@ export const shootInput: Input = {
     defaultKeyCode: "Space",
     isSingleTriggerAction: true,
     pressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
     fire: () => {
         console.error("no fire event attached to keyCode: " + shootInput.name);
     },
@@ -101,8 +88,6 @@ export const holdInput: Input = {
     defaultKeyCode: "ControlLeft",
     isSingleTriggerAction: true,
     pressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
     fire: () => {
         console.error("no fire event attached to keyCode: " + holdInput.name);
     },
@@ -116,8 +101,6 @@ export const resetInput: Input = {
     defaultKeyCode: "KeyR",
     isSingleTriggerAction: true,
     pressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
     fire: () => {
         console.error("no fire event attached to keyCode: " + resetInput.name);
     },
@@ -131,8 +114,6 @@ export const backInput: Input = {
     defaultKeyCode: "Escape",
     isSingleTriggerAction: true,
     pressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
     fire: () => {
         console.error("no fire event attached to keyCode: " + backInput.name);
     },
@@ -146,8 +127,6 @@ export const channelInput: Input = {
     defaultKeyCode: "F9",
     isSingleTriggerAction: true,
     pressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
     fire: () => {
         console.error("no fire event attached to keyCode: " + channelInput.name);
     },
@@ -222,8 +201,6 @@ export const defaultBlocker: Input = {
     defaultKeyCode: "",
     isSingleTriggerAction: true,
     pressed: false,
-    lastFiredAtTime: 0,
-    releasedAtTime: 0,
     fire: /* eslint-disable @typescript-eslint/no-empty-function */ () => { /* eslint-enable @typescript-eslint/no-empty-function */ },
     inputContext: [INPUT_CONTEXT.GAME_NO_RESET, INPUT_CONTEXT.GAME_WITH_RESET,]
 }

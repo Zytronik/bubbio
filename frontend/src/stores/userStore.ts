@@ -31,6 +31,9 @@ export const useUserStore = defineStore('user', {
     },
     getUserSession(): UserSession {
       return this.userSession;
+    },
+    getUserName(): string {
+      return this.userSession.username;
     }
   }
 });

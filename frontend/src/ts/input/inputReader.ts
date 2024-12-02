@@ -15,7 +15,6 @@ function handleKeyDown(event: KeyboardEvent): void {
             if (event.code === customCode && !input.pressed && checkInputContext(input)) {
                 event.preventDefault();
                 event.stopPropagation();
-                input.lastFiredAtTime = performance.now();
                 input.fire();
                 input.pressed = true;
             }
@@ -42,7 +41,6 @@ function handleKeyUp(event: KeyboardEvent): void {
                 event.preventDefault();
                 event.stopPropagation();
                 input.pressed = false;
-                input.releasedAtTime = performance.now();
                 if (input.release) {
                     input.release();
                 }
@@ -56,7 +54,6 @@ function handleHeldDownKeys(): void {
         if (checkInputContext(input)) {
             if (!input.isSingleTriggerAction && input.pressed) {
                 input.fire();
-                input.lastFiredAtTime = performance.now();
             }
         }
     });

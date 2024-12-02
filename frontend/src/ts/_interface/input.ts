@@ -7,8 +7,6 @@ export interface Input {
     defaultKeyCode: string;
     isSingleTriggerAction: boolean;
     pressed: boolean;
-    lastFiredAtTime: number;
-    releasedAtTime: number;
     fire: () => void;
     release?: () => void;
     inputContext: INPUT_CONTEXT[];
