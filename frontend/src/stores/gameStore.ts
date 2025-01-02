@@ -10,7 +10,7 @@ import { startAnimationLoop } from "@/ts/pixi/animation";
 
 export const useGameStore = defineStore('game', () => {
     const userSession = useUserStore().getUserSession()
-    const  game = getEmptyGame();
+    const game = getEmptyGame();
     function setupSprint(): void {
         game.gameMode = GAME_MODE.SPRINT;
         game.inputContext = INPUT_CONTEXT.GAME_WITH_RESET;
@@ -77,10 +77,12 @@ export const useGameStore = defineStore('game', () => {
         return game.instancesMap.values();
     }
 
-    return { setupSprint, startGame, 
-        pressedLeft, pressedRight, 
-        releasedLeft, releasedRight, 
-        toggleAPS, 
-        pressedCenter, pressedMirror, pressedShoot, pressedHold, 
-        getAllInstances }
+    return {
+        setupSprint, startGame,
+        pressedLeft, pressedRight,
+        releasedLeft, releasedRight,
+        toggleAPS,
+        pressedCenter, pressedMirror, pressedShoot, pressedHold,
+        getAllInstances
+    }
 })

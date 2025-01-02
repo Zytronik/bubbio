@@ -7,9 +7,9 @@ export function angleUpdate(deltaTimeMS: number): void {
         const previousAngle = gameInstance.angle;
         const angleChange = gameInstance.aps * deltaTimeMS / 1000;
         if (gameInstance.left && !gameInstance.right) {
-            gameInstance.angle = cleanUpAngle(previousAngle - angleChange);
+            gameInstance.angle = Number((previousAngle - angleChange).toFixed(2));
         } else if (!gameInstance.left && gameInstance.right) {
-            gameInstance.angle = cleanUpAngle(previousAngle + angleChange);
+            gameInstance.angle = Number((previousAngle + angleChange).toFixed(2));
         }
     }
 }
