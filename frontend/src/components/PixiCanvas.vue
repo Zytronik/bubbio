@@ -19,7 +19,7 @@ export default {
 #pixiCanvas {
   position: fixed;
   top: 0;
-  z-index: -2;
+  z-index: 0;
   left: 0;
   right: 0;
   bottom: 0;

@@ -2,7 +2,7 @@ import { Text } from "pixi.js";
 import { countDownContainer } from "../pixi/containers";
 import { countDownFont } from "../pixi/allFonts";
 import { PixiAnimation } from "../_interface/pixiAnimation";
-import { addPixiAnimation, getLerpT } from "../pixi/animation";
+import { playPixiAnimation, getLerpT } from "../pixi/animation";
 import { usePixiStore } from "@/stores/pixiStore";
 
 export function playCountdown() {
@@ -58,7 +58,7 @@ export function playCountdown() {
             three.y = -(three.height / 2) + t * threeTravelDistance
         },
         onEnd: function (): void {
-            addPixiAnimation(threeShrinkAnimation);
+            playPixiAnimation(threeShrinkAnimation);
         }
     }
     const threeShrinkAnimation: PixiAnimation = {
@@ -73,7 +73,7 @@ export function playCountdown() {
         },
         onEnd: function (): void {
             three.visible = false;
-            addPixiAnimation(twoShrinkAnimation);
+            playPixiAnimation(twoShrinkAnimation);
         }
     }
     const twoShrinkAnimation: PixiAnimation = {
@@ -88,7 +88,7 @@ export function playCountdown() {
         },
         onEnd: function (): void {
             two.visible = false;
-            addPixiAnimation(oneShrinkAnimation);
+            playPixiAnimation(oneShrinkAnimation);
         }
     }
     const oneShrinkAnimation: PixiAnimation = {
@@ -103,7 +103,7 @@ export function playCountdown() {
         },
         onEnd: function (): void {
             one.visible = false;
-            addPixiAnimation(goShrinkAnimation);
+            playPixiAnimation(goShrinkAnimation);
         }
     }
     const goShrinkAnimation: PixiAnimation = {
@@ -122,5 +122,5 @@ export function playCountdown() {
             });
         }
     }
-    addPixiAnimation(threeDownAnimation);
+    playPixiAnimation(threeDownAnimation);
 }

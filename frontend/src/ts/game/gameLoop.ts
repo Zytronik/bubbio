@@ -1,7 +1,7 @@
 import { angleUpdate } from "./angle";
 
 let gameLoopRunning = false;
-export function startGameLoop(): void {
+export function startGameLogicLoop(): void {
     if (!gameLoopRunning) {
         gameLoop();
         gameLoopRunning = true;

@@ -1,6 +1,6 @@
 <template>
   <h1>Sprint</h1>
-  <button v-on:click="startSprint()">testma game</button>
+  <button id="startbutton" v-on:click="startSprint()">testma game</button>
 </template>
 
 <script lang="ts">
@@ -31,4 +31,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+#startbutton {
+  position: fixed;
+  z-index: 3;
+}
+</style>

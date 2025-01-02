@@ -1,4 +1,4 @@
-import { Container } from "pixi.js";
+import { Container, Sprite } from "pixi.js";
 import { GAME_MODE } from "../_enum/gameMode";
 import { Bubble } from "../_interface/game/bubble";
 import { Field } from "../_interface/game/field";
@@ -13,6 +13,10 @@ import { getNextSeed } from "./rng";
 import { SPRINT_SETTINGS } from "./settings/sprintSettings";
 import { INPUT_CONTEXT } from "../_enum/inputContext";
 import { HANDLING_SETTINGS } from "./settings/handlingSettings";
+import { GameSprites } from "../_interface/game/gameSprites";
+import { arrowTexture } from "../pixi/allTextures";
+import { addAngleUpdateAnimation } from "../animationPixi/angleUpdate";
+import { gameContainer } from "../pixi/containers";
 
 export function getEmptyGame(): Game {
     return {
@@ -31,20 +35,8 @@ export function getEmptyRoundData(): RoundData {
     }
 }
 
-export function getEmptyStats(): GameStats {
-    return {
-        bubblesShot: 0,
-        bubblesCleared: 0,
-        attack: 0,
-        clears: [[]],
-        perfectClears: 0,
-        currentCombo: 0,
-        highestCombo: 0
-    }
-}
-
 export function newSprintInstance(): GameInstance {
-    return {
+    const instance: GameInstance = {
         gameSettings: SPRINT_SETTINGS,
         handlingSettings: HANDLING_SETTINGS,
         bubbleSeed: 0,
@@ -58,9 +50,13 @@ export function newSprintInstance(): GameInstance {
         left: false,
         right: false,
         aps: HANDLING_SETTINGS.defaultAPS,
+        gameSprites: getAllGameSprites(),
         animationContainer: new Container(),
         instanceAnimations: [],
     }
+    gameContainer.addChild(instance.animationContainer);
+    addAngleUpdateAnimation(instance);
+    return instance;
 }
 
 function getDefaultBubble(): Bubble {
@@ -109,4 +105,22 @@ function getEmptyGrid(settings: GameSettings): Grid {
         playGrid.rows.push(row);
     }
     return playGrid;
+}
+
+export function getEmptyStats(): GameStats {
+    return {
+        bubblesShot: 0,
+        bubblesCleared: 0,
+        attack: 0,
+        clears: [[]],
+        perfectClears: 0,
+        currentCombo: 0,
+        highestCombo: 0
+    }
+}
+
+function getAllGameSprites(): GameSprites {
+    return {
+        arrow: new Sprite(arrowTexture.texture),
+    }
 }

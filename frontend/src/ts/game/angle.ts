@@ -7,16 +7,17 @@ export function angleUpdate(deltaTimeMS: number): void {
         const previousAngle = gameInstance.angle;
         const angleChange = gameInstance.aps * deltaTimeMS / 1000;
         if (gameInstance.left && !gameInstance.right) {
-            gameInstance.angle = Number((previousAngle - angleChange).toFixed(2));
+            gameInstance.angle = cleanUpAngle(previousAngle - angleChange);
         } else if (!gameInstance.left && gameInstance.right) {
-            gameInstance.angle = Number((previousAngle + angleChange).toFixed(2));
+            gameInstance.angle = cleanUpAngle(previousAngle + angleChange);
         }
     }
 }
 
 export function getVector(angle: number): Coordinates {
     const cleanAngle = cleanUpAngle(angle);
-    return { x: cosTable[cleanAngle * 10], y: -sinTable[cleanAngle * 10] };
+    const tofix1 = Number((cleanAngle).toFixed(1));
+    return { x: cosTable[tofix1 * 10], y: -sinTable[tofix1 * 10] };
 }
 
 function cleanUpAngle(angle: number): number {
@@ -29,7 +30,7 @@ function cleanUpAngle(angle: number): number {
         return MAX_Angle;
     }
     else {
-        return Number(angle.toFixed(1));
+        return Number(angle.toFixed(2));
     }
 }
 

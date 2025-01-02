@@ -5,8 +5,8 @@ import { useUserStore } from "./userStore";
 import { useInputStore } from "./inputStore";
 import { INPUT_CONTEXT } from "@/ts/_enum/inputContext";
 import { GameInstance } from "@/ts/_interface/game/gameInstance";
-import { startGameLoop } from "@/ts/game/gameLoop";
-import { startAnimationLoop } from "@/ts/pixi/animation";
+import { startGameLogicLoop } from "@/ts/game/gameLoop";
+import { gameContainer } from "@/ts/pixi/containers";
 
 export const useGameStore = defineStore('game', () => {
     const userSession = useUserStore().getUserSession()
@@ -19,8 +19,8 @@ export const useGameStore = defineStore('game', () => {
     }
     function startGame(): void {
         useInputStore().setInputContext(game.inputContext);
-        startAnimationLoop();
-        startGameLoop();
+        gameContainer.visible = true;
+        startGameLogicLoop();
     }
     function pressedLeft(userName: string): void {
         const instance = game.instancesMap.get(userName);
@@ -83,6 +83,6 @@ export const useGameStore = defineStore('game', () => {
         releasedLeft, releasedRight,
         toggleAPS,
         pressedCenter, pressedMirror, pressedShoot, pressedHold,
-        getAllInstances
+        getAllInstances,
     }
 })

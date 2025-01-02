@@ -1,8 +1,8 @@
 import { Sprite } from "pixi.js";
-import { thisIsASprite } from "../pixi/allTextures";
+import { thisIsATexture } from "../pixi/allTextures";
 import { PixiAnimation } from "../_interface/pixiAnimation";
 import { mainContainer } from "../pixi/containers";
-import { addPixiAnimation, getLerpT } from "../pixi/animation";
+import { playPixiAnimation, getLerpT } from "../pixi/animation";
 
 export function playExample(): void {
     const x = Math.random() * 100;
@@ -10,7 +10,7 @@ export function playExample(): void {
     const now = performance.now();
     const duration = 2000;
     const flipAmount = 3;
-    const bunny = new Sprite(thisIsASprite.texture);
+    const bunny = new Sprite(thisIsATexture.texture);
     bunny.anchor.set(0.5);
 
     const exampleAnim: PixiAnimation = {
@@ -29,5 +29,5 @@ export function playExample(): void {
             mainContainer.removeChild(bunny);
         },
     }
-    addPixiAnimation(exampleAnim);
+    playPixiAnimation(exampleAnim);
 }

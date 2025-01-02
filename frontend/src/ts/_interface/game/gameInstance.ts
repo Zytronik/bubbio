@@ -6,6 +6,7 @@ import { Grid } from "./grid";
 import { PixiAnimation } from "../pixiAnimation";
 import { GameSettings } from "./gameSettings";
 import { HandlingSettings } from "./handlingSettings";
+import { GameSprites } from "./gameSprites";
 
 export interface GameInstance {
     gameSettings: GameSettings,
@@ -25,6 +26,8 @@ export interface GameInstance {
     left: boolean,
     right: boolean,
     aps: number,
+
+    gameSprites: GameSprites,
     animationContainer: Container,
     instanceAnimations: PixiAnimation[],
 }

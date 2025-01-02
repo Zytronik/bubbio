@@ -1,3 +1,4 @@
+import { useGameStore } from "@/stores/gameStore";
 import { PixiAnimation } from "../_interface/pixiAnimation";
 
 const ongoingAnimations: PixiAnimation[] = [];
@@ -20,10 +21,22 @@ function animationLoop(): void {
             animation.renderFrame(now);
         }
     }
+    for (const gameInstance of useGameStore().getAllInstances()) {
+        const gameAnimations = gameInstance.instanceAnimations;
+        for (let i = gameAnimations.length - 1; i >= 0; i--) {
+            const animation = gameAnimations[i];
+            if (animation.endMS < now) {
+                animation.onEnd();
+                gameAnimations.splice(i, 1);
+            } else {
+                animation.renderFrame(now);
+            }
+        }
+    }
     requestAnimationFrame(() => animationLoop());
 }
 
-export function addPixiAnimation(animation: PixiAnimation) {
+export function playPixiAnimation(animation: PixiAnimation) {
     animation.onStart();
     ongoingAnimations.push(animation);
 }
