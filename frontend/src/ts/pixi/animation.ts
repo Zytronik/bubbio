@@ -1,7 +1,15 @@
 import { PixiAnimation } from "../_interface/pixiAnimation";
 
 const ongoingAnimations: PixiAnimation[] = [];
-export function animationLoop(): void {
+let pixiAnimationRunning = false;
+export function startAnimationLoop(): void {
+    if (!pixiAnimationRunning) {
+        animationLoop();
+        pixiAnimationRunning = true;
+    }
+}
+
+function animationLoop(): void {
     const now = performance.now();
     for (let i = ongoingAnimations.length - 1; i >= 0; i--) {
         const animation = ongoingAnimations[i];

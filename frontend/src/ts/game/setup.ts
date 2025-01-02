@@ -9,13 +9,15 @@ import { GameStats } from "../_interface/game/gameStats";
 import { Grid } from "../_interface/game/grid";
 import { RoundData } from "../_interface/game/roundData";
 import { Row } from "../_interface/game/row";
-import { UserSession } from "../_interface/userSession";
 import { getNextSeed } from "./rng";
 import { SPRINT_SETTINGS } from "./settings/sprintSettings";
+import { INPUT_CONTEXT } from "../_enum/inputContext";
+import { HANDLING_SETTINGS } from "./settings/handlingSettings";
 
 export function getEmptyGame(): Game {
     return {
         gameMode: GAME_MODE.NONE,
+        inputContext: INPUT_CONTEXT.DISABLED,
         spectating: false,
         rounds: [],
         instancesMap: new Map<string, GameInstance>()
@@ -43,6 +45,8 @@ export function getEmptyStats(): GameStats {
 
 export function newSprintInstance(): GameInstance {
     return {
+        gameSettings: SPRINT_SETTINGS,
+        handlingSettings: HANDLING_SETTINGS,
         bubbleSeed: 0,
         garbageSeed: 0,
         angle: 90,
@@ -53,6 +57,7 @@ export function newSprintInstance(): GameInstance {
         stats: getEmptyStats(),
         left: false,
         right: false,
+        aps: HANDLING_SETTINGS.defaultAPS,
         animationContainer: new Container(),
         instanceAnimations: [],
     }

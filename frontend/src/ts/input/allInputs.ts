@@ -1,6 +1,6 @@
 import { INPUT_CONTEXT } from "../_enum/inputContext";
 import { Input } from "../_interface/input";
-import { leftDown, leftUp, rightDown, rightUp } from "../game/actions/aim";
+import { centerCursor, leftDown, leftUp, mirrorAngle, rightDown, rightUp, toggleAPS } from "../game/actions/aim";
 
 export const angleLeftInput: Input = {
     name: "Angle Left",
@@ -34,10 +34,10 @@ export const changeAPSInput: Input = {
     isSingleTriggerAction: true,
     pressed: false,
     fire: () => {
-        console.error("no fire event attached to keyCode: " + changeAPSInput.name);
+        toggleAPS();
     },
     release: () => {
-        console.error("no release event attached to keyCode: " + changeAPSInput.name);
+        toggleAPS();
     },
     inputContext: [INPUT_CONTEXT.GAME_NO_RESET, INPUT_CONTEXT.GAME_WITH_RESET]
 };
@@ -50,7 +50,7 @@ export const centerCursorInput: Input = {
     isSingleTriggerAction: true,
     pressed: false,
     fire: () => {
-        console.error("no fire event attached to keyCode: " + shootInput.name);
+        centerCursor();
     },
     inputContext: [INPUT_CONTEXT.GAME_NO_RESET, INPUT_CONTEXT.GAME_WITH_RESET]
 };
@@ -63,7 +63,7 @@ export const mirrorCursorInput: Input = {
     isSingleTriggerAction: true,
     pressed: false,
     fire: () => {
-        console.error("no fire event attached to keyCode: " + shootInput.name);
+        mirrorAngle();
     },
     inputContext: [INPUT_CONTEXT.GAME_NO_RESET, INPUT_CONTEXT.GAME_WITH_RESET]
 };

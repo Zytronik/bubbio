@@ -1,17 +1,17 @@
+import { useGameStore } from "@/stores/gameStore";
 import { Coordinates } from "../_interface/game/coordinates";
 
-export function angleLeft(deltaTime: number): void {
-    // const oldAngle = playerGameInstance.angle;
-    // const leftAmount = playerGameInstance.currentAPS * deltaTime / 1000
-    // playerGameInstance.angle = cleanUpAngle(oldAngle - leftAmount, playerGameInstance.gameSettings);
-    // previousUpdate = performance.now();
-}
 
-export function angleRight(): void {
-    // const oldAngle = playerGameInstance.angle;
-    // const rightAmount = playerGameInstance.currentAPS * timePassed / 1000
-    // playerGameInstance.angle = cleanUpAngle(oldAngle + rightAmount, playerGameInstance.gameSettings);
-    // previousUpdate = performance.now();
+export function angleUpdate(deltaTimeMS: number): void {
+    for (const gameInstance of useGameStore().getAllInstances()) {
+        const previousAngle = gameInstance.angle;
+        const angleChange = gameInstance.aps * deltaTimeMS / 1000;
+        if (gameInstance.left && !gameInstance.right) {
+            gameInstance.angle = cleanUpAngle(previousAngle - angleChange);
+        } else if (!gameInstance.left && gameInstance.right) {
+            gameInstance.angle = cleanUpAngle(previousAngle + angleChange);
+        }
+    }
 }
 
 export function getVector(angle: number): Coordinates {
