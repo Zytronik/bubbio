@@ -1,6 +1,7 @@
 import { INPUT_CONTEXT } from "../_enum/inputContext";
 import { Input } from "../_interface/input";
 import { centerCursor, leftDown, leftUp, mirrorAngle, rightDown, rightUp, toggleAPS } from "../game/actions/aim";
+import { gameLayoutSolo, gameLayout1v1, gameLayout1vMany } from "../pixi/containers";
 
 export const angleLeftInput: Input = {
     name: "Angle Left",
@@ -133,6 +134,44 @@ export const channelInput: Input = {
     inputContext: [INPUT_CONTEXT.MENU]
 };
 
+
+export const pixiDebug1: Input = {
+    name: "soloGameplayView",
+    description: "asdf",
+    customKeyMap: ["Numpad1", "", ""],
+    defaultKeyCode: "Numpad1",
+    isSingleTriggerAction: true,
+    pressed: false,
+    fire: () => {
+        gameLayoutSolo();
+    },
+    inputContext: [INPUT_CONTEXT.MENU, INPUT_CONTEXT.GAME_WITH_RESET]
+};
+export const pixiDebug2: Input = {
+    name: "1v1GameplayView",
+    description: "asdf",
+    customKeyMap: ["Numpad2", "", ""],
+    defaultKeyCode: "Numpad2",
+    isSingleTriggerAction: true,
+    pressed: false,
+    fire: () => {
+        gameLayout1v1();
+    },
+    inputContext: [INPUT_CONTEXT.MENU, INPUT_CONTEXT.GAME_WITH_RESET]
+};
+export const pixiDebug3: Input = {
+    name: "3ormoreplayers",
+    description: "asdf",
+    customKeyMap: ["Numpad3", "", ""],
+    defaultKeyCode: "Numpad3",
+    isSingleTriggerAction: true,
+    pressed: false,
+    fire: () => {
+        gameLayout1vMany();
+    },
+    inputContext: [INPUT_CONTEXT.MENU, INPUT_CONTEXT.GAME_WITH_RESET]
+};
+
 export const allInputs: Input[] = [
     angleLeftInput,
     angleRightInput,
@@ -144,6 +183,9 @@ export const allInputs: Input[] = [
     resetInput,
     backInput,
     channelInput,
+    pixiDebug1,
+    pixiDebug2,
+    pixiDebug3,
 ]
 
 const allKeyCodes = [

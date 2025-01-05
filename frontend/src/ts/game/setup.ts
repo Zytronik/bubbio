@@ -15,7 +15,7 @@ import { INPUT_CONTEXT } from "../_enum/inputContext";
 import { HANDLING_SETTINGS } from "./settings/handlingSettings";
 import { GameSprites } from "../_interface/game/gameSprites";
 import { arrowTexture } from "../pixi/allTextures";
-import { addAngleUpdateAnimation } from "../animationPixi/angleUpdate";
+import { addAngleUpdateAnimation } from "../animationPixi/angleAnimation";
 import { gameContainer } from "../pixi/containers";
 
 export function getEmptyGame(): Game {

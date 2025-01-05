@@ -10,7 +10,7 @@ export const usePixiStore = defineStore('pixi', () => {
     function initPixiApp() {
         const CANVAS_ID = "#pixiCanvas";
         pixiApp.init({
-            background: '#1099bb',
+            background: '#252525',
             resizeTo: window,
         }).then(async () => {
             document.querySelector(CANVAS_ID)?.appendChild(pixiApp.canvas);

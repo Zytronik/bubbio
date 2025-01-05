@@ -5,8 +5,10 @@ export function addAngleUpdateAnimation(instance: GameInstance): void {
     const container = instance.animationContainer;
     const arrow = instance.gameSprites.arrow;
     container.addChild(arrow);
-    arrow.x = 300;
-    arrow.y = 300;
+    arrow.x = 0;
+    arrow.y = 0;
+    arrow.height = 30;
+    arrow.width = 30;
     arrow.anchor.set(0.5);
     
     const animation: PixiAnimation = {
