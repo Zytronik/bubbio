@@ -20,7 +20,7 @@ export const useGameStore = defineStore('game', () => {
     }
     function startGame(): void {
         useInputStore().setInputContext(game.inputContext);
-        gameContainer.visible = true;
+        gameContainer.visible = true;    //this should become a store!
         startGameLogicLoop();
     }
     function pressedLeft(userName: string): void {
