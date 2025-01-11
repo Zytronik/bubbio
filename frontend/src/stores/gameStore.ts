@@ -7,19 +7,20 @@ import { INPUT_CONTEXT } from "@/ts/_enum/inputContext";
 import { GameInstance } from "@/ts/_interface/game/gameInstance";
 import { startGameLogicLoop } from "@/ts/game/gameLoop";
 import { gameContainer } from "@/ts/pixi/containers";
+import { addMonkeyActions } from "@/ts/animationPixi/monkeyActions";
 
 export const useGameStore = defineStore('game', () => {
-    const userSession = useUserStore().getUserSession()
     const game = getEmptyGame();
     function setupSprint(): void {
+        const userName = useUserStore().getUserName();
         game.gameMode = GAME_MODE.SPRINT;
         game.inputContext = INPUT_CONTEXT.GAME_WITH_RESET;
         game.spectating = false;
-        game.instancesMap.set(userSession.username, newSprintInstance());
+        game.instancesMap.set(userName, newSprintInstance());
     }
     function startGame(): void {
         useInputStore().setInputContext(game.inputContext);
-        gameContainer.visible = true;
+        gameContainer.visible = true;    //this should become a store!
         startGameLogicLoop();
     }
     function pressedLeft(userName: string): void {
@@ -73,12 +74,24 @@ export const useGameStore = defineStore('game', () => {
     function pressedHold(userName: string): void {
         console.log("you are not empty eslint :^)")
     }
-    function getAllInstances(): IterableIterator<GameInstance> {
-        return game.instancesMap.values();
+    function getAllInstances(): GameInstance[] {
+        return [...game.instancesMap.values()];
     }
 
     function createMonkeyTesting(monkeyAmount: number): void {
-        //LESGOO
+        // game = getEmptyGame();
+        game.gameMode = GAME_MODE.SPRINT;
+        game.inputContext = INPUT_CONTEXT.GAME_NO_RESET;
+        console.log(game.inputContext)
+        game.spectating = true;
+        for (let i = 1; i <= monkeyAmount; i++) {
+            const name = "Monkey-" + i;
+            console.log(name)
+            const instance = newSprintInstance()
+            addMonkeyActions(instance, name);
+            game.instancesMap.set(name, instance);
+        }
+        console.log(game)
     }
 
     return {

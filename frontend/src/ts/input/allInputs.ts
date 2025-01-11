@@ -1,7 +1,8 @@
+import { useGameStore } from "@/stores/gameStore";
 import { INPUT_CONTEXT } from "../_enum/inputContext";
 import { Input } from "../_interface/input";
 import { centerCursor, leftDown, leftUp, mirrorAngle, rightDown, rightUp, toggleAPS } from "../game/actions/aim";
-import { gameLayoutSolo, gameLayout1v1, gameLayout1vsX } from "../pixi/containers";
+import { updateContainerLayout } from "../pixi/containers";
 
 export const angleLeftInput: Input = {
     name: "Angle Left",
@@ -138,38 +139,42 @@ export const channelInput: Input = {
 export const pixiDebug1: Input = {
     name: "soloGameplayView",
     description: "asdf",
-    customKeyMap: ["Numpad1", "", ""],
+    customKeyMap: ["Numpad1", "KeyI", ""],
     defaultKeyCode: "Numpad1",
     isSingleTriggerAction: true,
     pressed: false,
     fire: () => {
-        gameLayoutSolo();
+        console.log("pressed debug 1");
+        useGameStore().createMonkeyTesting(0);
     },
-    inputContext: [INPUT_CONTEXT.MENU, INPUT_CONTEXT.GAME_WITH_RESET]
+    inputContext: [INPUT_CONTEXT.MENU, INPUT_CONTEXT.GAME_WITH_RESET, INPUT_CONTEXT.GAME_NO_RESET]
 };
 export const pixiDebug2: Input = {
     name: "1v1GameplayView",
     description: "asdf",
-    customKeyMap: ["Numpad2", "", ""],
+    customKeyMap: ["Numpad2", "KeyO", ""],
     defaultKeyCode: "Numpad2",
     isSingleTriggerAction: true,
     pressed: false,
     fire: () => {
-        gameLayout1v1();
+        console.log("pressed debug 2");
+        console.log(useGameStore().getAllInstances());
+        useGameStore().startGame();
     },
-    inputContext: [INPUT_CONTEXT.MENU, INPUT_CONTEXT.GAME_WITH_RESET]
+    inputContext: [INPUT_CONTEXT.MENU, INPUT_CONTEXT.GAME_WITH_RESET, INPUT_CONTEXT.GAME_NO_RESET]
 };
 export const pixiDebug3: Input = {
     name: "3ormoreplayers",
     description: "asdf",
-    customKeyMap: ["Numpad3", "", ""],
+    customKeyMap: ["Numpad3", "KeyP", ""],
     defaultKeyCode: "Numpad3",
     isSingleTriggerAction: true,
     pressed: false,
     fire: () => {
-        gameLayout1vsX();
+        console.log("pressed debug 3");
+        updateContainerLayout();
     },
-    inputContext: [INPUT_CONTEXT.MENU, INPUT_CONTEXT.GAME_WITH_RESET]
+    inputContext: [INPUT_CONTEXT.MENU, INPUT_CONTEXT.GAME_WITH_RESET, INPUT_CONTEXT.GAME_NO_RESET]
 };
 
 export const allInputs: Input[] = [

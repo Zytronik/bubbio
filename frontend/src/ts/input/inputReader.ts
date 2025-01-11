@@ -7,6 +7,18 @@ export function attachInputReader() {
     document.addEventListener("keydown", (event) => preventDefaults(event));
     document.addEventListener("keyup", (event) => handleKeyUp(event));
     handleHeldDownKeys();
+
+    //reallow ctrl+shift+r or F12 even during gameplay
+    document.addEventListener(
+        'keydown',
+        (event) => {
+            if (event.ctrlKey && event.shiftKey && event.code === 'KeyR' || event.code === 'F12') {
+                event.stopPropagation();
+                return;
+            }
+        },
+        { capture: true }
+    );
 }
 
 function handleKeyDown(event: KeyboardEvent): void {
