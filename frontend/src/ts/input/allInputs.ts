@@ -1,7 +1,7 @@
 import { INPUT_CONTEXT } from "../_enum/inputContext";
 import { Input } from "../_interface/input";
 import { centerCursor, leftDown, leftUp, mirrorAngle, rightDown, rightUp, toggleAPS } from "../game/actions/aim";
-import { gameLayoutSolo, gameLayout1v1, gameLayout1vMany } from "../pixi/containers";
+import { gameLayoutSolo, gameLayout1v1, gameLayout1vsX } from "../pixi/containers";
 
 export const angleLeftInput: Input = {
     name: "Angle Left",
@@ -167,7 +167,7 @@ export const pixiDebug3: Input = {
     isSingleTriggerAction: true,
     pressed: false,
     fire: () => {
-        gameLayout1vMany();
+        gameLayout1vsX();
     },
     inputContext: [INPUT_CONTEXT.MENU, INPUT_CONTEXT.GAME_WITH_RESET]
 };

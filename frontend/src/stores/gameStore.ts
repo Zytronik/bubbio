@@ -77,6 +77,10 @@ export const useGameStore = defineStore('game', () => {
         return game.instancesMap.values();
     }
 
+    function createMonkeyTesting(monkeyAmount: number): void {
+        //LESGOO
+    }
+
     return {
         setupSprint, startGame,
         pressedLeft, pressedRight,
@@ -84,5 +88,6 @@ export const useGameStore = defineStore('game', () => {
         toggleAPS,
         pressedCenter, pressedMirror, pressedShoot, pressedHold,
         getAllInstances,
+        createMonkeyTesting,
     }
 })

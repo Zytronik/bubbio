@@ -16,7 +16,7 @@ export function setupPixiContainers(): void {
 
 const manyPlayerContainers: Container[] = [];
 const maxWidthPercentage = 0.35;
-const playerCount = 2700;
+const playerCount = 5;
 function testingThings(): void {
     const height = usePixiStore().getCanvasHeight();
     const width = usePixiStore().getCanvasWidth();
@@ -36,13 +36,12 @@ export function gameLayoutSolo(): void {
     const canvasHeight = usePixiStore().getCanvasHeight();
     const player1 = manyPlayerContainers[0];
     player1.visible = true;
+    //topleft corner of container to middle
     player1.x = canvasWidth * 0.5;
     player1.y = canvasHeight * 0.5;
+    //shift content 50% up and left to center children
     player1.pivot.x = player1.width / 2;
     player1.pivot.y = player1.height / 2;
-    console.log(player1.width, player1.height)
-    console.log(player1.x, player1.y)
-    console.log(player1.pivot.x, player1.pivot.y)
     console.log("Showing Singleplayer Layout");
 }
 
@@ -58,6 +57,7 @@ export function gameLayout1v1(): void {
     player1.pivot.y = player1.height / 2;
 
     player2.visible = true;
+    player2.scale = 1
     player2.x = canvasWidth * 0.7;
     player2.y = canvasHeight * 0.5;
     player2.pivot.x = player1.width / 2;
@@ -66,24 +66,29 @@ export function gameLayout1v1(): void {
     console.log("Showing 2-Player Layout");
 }
 
-export function gameLayout1vMany(): void {
+//not sure about using pivot. its very funky with scale: cant imagine scaling and moving a container as an animation with pivot centering
+const RIGHT_SIDE = 0.52;
+const RIGHT_SIDE_WIDTH = 0.45;
+export function gameLayout1vsX(): void {
     const canvasWidth = usePixiStore().getCanvasWidth();
     const canvasHeight = usePixiStore().getCanvasHeight();
     const player1 = manyPlayerContainers[0];
+    //e.g. gridSize = 3 -> 3x3 grid
     const gridSize = Math.ceil(Math.sqrt(manyPlayerContainers.length - 1));
     player1.visible = true;
     player1.x = canvasWidth * 0.3;
     player1.y = canvasHeight * 0.5;
     player1.pivot.x = player1.width / 2;
     player1.pivot.y = player1.height / 2;
+    //orders the enemy players in a square grid on right side
     for (let gridY = 0; gridY < gridSize; gridY++) {
         for (let gridX = 0; gridX < gridSize; gridX++) {
             const i = (gridY * gridSize) + gridX + 1;
-            console.log("i: ", i);
             if (i < manyPlayerContainers.length) {
                 const otherPlayer = manyPlayerContainers[i];
                 otherPlayer.visible = true;
-                otherPlayer.x = canvasWidth * (0.52 + (gridX + 0.5) * (0.45 / gridSize));
+                otherPlayer.scale = 1
+                otherPlayer.x = canvasWidth * (RIGHT_SIDE + (gridX + 0.5) * (RIGHT_SIDE_WIDTH / gridSize));
                 otherPlayer.y = canvasHeight * (gridY + 0.5) * (1 / gridSize);
                 otherPlayer.pivot.x = otherPlayer.width / 2;
                 otherPlayer.pivot.y = otherPlayer.height / 2;
@@ -99,16 +104,3 @@ function getRandomHexColor(): string {
     const hex = Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
     return `#${hex}`;
 }
-
-/*
-if 2 Players
-    scale	1
-    x	0.7
-    y	0.5
-
-3-5 players sqrt(5-1) < 3 => gridSize = 2x2
-    scale	0.25
-    x	0.5 + 0.125
-    y	0.25 / 0.75
-
-*/
