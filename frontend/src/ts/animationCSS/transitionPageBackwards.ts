@@ -1,43 +1,19 @@
 import { setPage } from '../page/pageManager';
-import { AnimationSequence } from './animationSequence';
-import { AnimationConfig } from '../_interface/cssAnimationConfig';
 import { useSoundStore } from '@/stores/soundStore';
 import { PAGE } from '../_enum/page';
+import gsap from 'gsap';
 
 export function transitionPageBackwardsAnimation(transitionToPage: PAGE) {
   useSoundStore().playSound('menu_back');
-  const animations: AnimationConfig[] = [
-    {
-      selector: '.sidebar',
-      className: 'transitionPageBackwards-sideBar-slideOutToLeft',
-      duration: 400,
-    },
-    {
-      selector: '.sidebar',
-      addProperty: true,
-      propertyName: 'margin-left',
-      value: '-150px',
-    },
-    {
-      selector: '.pageContainer',
-      className: 'transitionPageBackwards-pageContainer-slideOutFromLeft',
-      duration: 150,
-      onEnd: () => {
-        setPage(transitionToPage);
-      },
-    },
-    {
-      selector: '.sidebar',
-      removeProperty: true,
-      propertyName: 'margin-left',
-    },
-    {
-      selector: '.pageWrapper',
-      className: 'transitionPageBackwards-pageWrapper-slideInFromLeft',
-      duration: 150,
-    },
-  ];
 
-  const animationSequence = new AnimationSequence(animations);
-  animationSequence.play();
+  const tl = gsap.timeline();
+  tl.to('.sidebarWrapper', { duration: 0.4, marginLeft: '-150px' });
+  tl.to('.pageContainer', { duration: 0.15, x: '100vw' });
+  tl.set('.pageContainer', { x: '0vw' });
+  tl.call(() => {
+    setPage(transitionToPage);
+  });
+  tl.set('.sidebarWrapper', { marginLeft: '0px' });
+  tl.set('.pageWrapper', { x: '-100vw' });
+  tl.to('.pageWrapper', { duration: 0.15, x: '0vw' });
 }

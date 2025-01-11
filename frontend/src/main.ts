@@ -3,7 +3,6 @@ import { createPinia } from 'pinia';
 import App from './App.vue';
 
 import './assets/css/main.css';
-import './assets/css/animations.css';
 import './assets/css/pages.css';
 import './assets/css/menus.css';
 import './assets/css/all.min.css';
