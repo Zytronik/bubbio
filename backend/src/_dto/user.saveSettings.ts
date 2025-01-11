@@ -36,12 +36,6 @@ class Input {
   @IsBoolean()
   pressed: boolean;
 
-  @IsNumber()
-  lastFiredAtTime: number;
-
-  @IsNumber()
-  releasedAtTime: number;
-
   fire: () => void;
 
   @IsOptional()
