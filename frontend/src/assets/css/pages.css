@@ -12,13 +12,14 @@
   position: relative;
   display: flex;
   flex-direction: row;
+  z-index: 1;
 }
 
 .pageTitle {
   position: absolute;
   z-index: 1;
   top: calc(var(--header-height) / -4);
-  left: calc(var(--header-profile-width) / 4);
+  left: calc(var(--header-profile-width) / 10);
   text-transform: uppercase;
 }
 

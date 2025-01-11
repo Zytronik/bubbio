@@ -15,6 +15,7 @@
     "core-js": "^3.8.3",
     "countup.js": "^2.8.0",
     "debounce": "^2.0.0",
+    "gsap": "^3.12.5",
     "howler": "^2.2.4",
     "jwt-decode": "^4.0.0",
     "pinia": "^2.2.2",

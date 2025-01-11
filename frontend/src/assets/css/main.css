@@ -54,7 +54,7 @@ h3 {
 }
 
 main {
-  padding: 5vh 0;
+  padding: calc(var(--header-height) / 2) 0;
   height: 100vh;
   display: flex;
 }
@@ -92,9 +92,8 @@ main {
   --font-size-2: 20px;
   --font-size-3: 24px;
   --font-size-4: 28px;
-  --font-size-4: 32px;
   --font-size-5: 65px;
-  --font-size-6: 130px;
+  --font-size-6: 120px;
   --font-size-7: 145px;
 }
 

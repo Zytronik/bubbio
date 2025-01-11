@@ -1,9 +1,11 @@
 <template>
-  <div v-if="backButtons" class="sidebar" :style="{ backgroundColor: backgroundColor }" @click.self="goBack()">
-    <div v-for="(button, index) in backButtons" :key="index" class="backButton" @mouseenter="handleButtonHover()"
-      :class="button.disabled ? 'disabled' : ''" @click="handleButtonClick(button)">
-      <div>
-        <img :src="button.iconSrc" />
+  <div class="sidebarWrapper" :style="{ backgroundColor: backgroundColor }" @click.self="goBack()">
+    <div v-if="backButtons" class="sidebar">
+      <div v-for="(button, index) in backButtons" :key="index" class="backButton" @mouseenter="handleButtonHover()"
+        :class="button.disabled ? 'disabled' : ''" @click="handleButtonClick(button)">
+        <div>
+          <img :src="button.iconSrc" />
+        </div>
       </div>
     </div>
   </div>
@@ -50,13 +52,17 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.sidebarWrapper {
+  padding: 5% 0;
+  cursor: pointer;
+}
+
 .sidebar {
+  z-index: 1;
   width: 100px;
   height: 100%;
-  cursor: pointer;
   display: flex;
   flex-direction: column;
-  padding: 5% 0;
   justify-content: space-evenly;
 }
 
