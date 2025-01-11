@@ -16,7 +16,7 @@ import { HANDLING_SETTINGS } from "./settings/handlingSettings";
 import { GameSprites } from "../_interface/game/gameSprites";
 import { arrowTexture } from "../pixi/allTextures";
 import { addAngleUpdateAnimation } from "../animationPixi/angleAnimation";
-import { gameContainer } from "../pixi/containers";
+import { gameContainer, createGameInstanceContainer } from "../pixi/containers";
 
 export function getEmptyGame(): Game {
     return {
@@ -51,10 +51,9 @@ export function newSprintInstance(): GameInstance {
         right: false,
         aps: HANDLING_SETTINGS.defaultAPS,
         gameSprites: getAllGameSprites(),
-        animationContainer: new Container(),
+        animationContainer: createGameInstanceContainer(),
         instanceAnimations: [],
     }
-    gameContainer.addChild(instance.animationContainer);
     addAngleUpdateAnimation(instance);
     return instance;
 }

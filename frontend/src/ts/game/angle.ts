@@ -3,7 +3,7 @@ import { Coordinates } from "../_interface/game/coordinates";
 
 
 export function angleUpdate(deltaTimeMS: number): void {
-    for (const gameInstance of useGameStore().getAllInstances()) {
+    useGameStore().getAllInstances().forEach(gameInstance => {
         const previousAngle = gameInstance.angle;
         const angleChange = gameInstance.aps * deltaTimeMS / 1000;
         if (gameInstance.left && !gameInstance.right) {
@@ -11,7 +11,7 @@ export function angleUpdate(deltaTimeMS: number): void {
         } else if (!gameInstance.left && gameInstance.right) {
             gameInstance.angle = cleanUpAngle(previousAngle + angleChange);
         }
-    }
+    });
 }
 
 export function getVector(angle: number): Coordinates {

@@ -4,6 +4,7 @@ import { PixiAnimation } from "../_interface/pixiAnimation";
 const ongoingAnimations: PixiAnimation[] = [];
 let pixiAnimationRunning = false;
 export function startAnimationLoop(): void {
+    console.log("start animatnion loop pixi")
     if (!pixiAnimationRunning) {
         animationLoop();
         pixiAnimationRunning = true;
@@ -21,7 +22,7 @@ function animationLoop(): void {
             animation.renderFrame(now);
         }
     }
-    for (const gameInstance of useGameStore().getAllInstances()) {
+    useGameStore().getAllInstances().forEach(gameInstance => {
         const gameAnimations = gameInstance.instanceAnimations;
         for (let i = gameAnimations.length - 1; i >= 0; i--) {
             const animation = gameAnimations[i];
@@ -32,7 +33,7 @@ function animationLoop(): void {
                 animation.renderFrame(now);
             }
         }
-    }
+    });
     requestAnimationFrame(() => animationLoop());
 }
 
