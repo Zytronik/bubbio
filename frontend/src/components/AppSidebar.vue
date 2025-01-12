@@ -54,11 +54,11 @@ export default defineComponent({
 <style scoped>
 .sidebarWrapper {
   padding: 5% 0;
+  z-index: 1;
   cursor: pointer;
 }
 
 .sidebar {
-  z-index: 1;
   width: 100px;
   height: 100%;
   display: flex;

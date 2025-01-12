@@ -8,4 +8,5 @@ export enum PAGE {
   pixiTest = 'pixiTest',
   rankedPage = 'rankedPage',
   roomListing = 'roomListing',
+  roomPage = 'roomPage',
 }

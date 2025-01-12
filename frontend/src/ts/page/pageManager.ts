@@ -4,6 +4,7 @@ import { watchEffect } from 'vue';
 import { checkUserAuthentication } from '../network/auth';
 import { useSocketStore } from '@/stores/socketStore';
 import { PAGE } from '../_enum/page';
+import { useLobbyStore } from '@/stores/lobbyStore';
 
 export function canTransitionTo(newPage: PAGE): boolean {
   const pageStore = usePageStore();
@@ -52,4 +53,12 @@ export function initPageTransitionWatcher() {
 
 function updateDocumentTitle(currentPage: PAGE) {
   document.title = `${document.title.split('|')[0]} | ${allPages[currentPage].title}`;
+}
+
+export function checkIfCanJoinRoomByUrl() {
+  const lobbyStore = useLobbyStore();
+  const currentRoomId = window.location.hash.slice(1);
+  if (currentRoomId) {
+    lobbyStore.joinLobby(currentRoomId);
+  }
 }

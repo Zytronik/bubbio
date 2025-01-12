@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mailer/mailer.module';
 import { UsersModule } from './user/user.module';
 import { SessionModule } from './session/session.module';
+import { LobbyModule } from './lobby/lobby.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SessionModule } from './session/session.module';
     MailModule,
     UsersModule,
     SessionModule,
+    LobbyModule,
   ],
   providers: [],
 })
