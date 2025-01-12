@@ -2,7 +2,7 @@
   "name": "blubbio",
   "productName": "blubbio",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "A fun game to play with your friends 👾🕹️",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -21,6 +21,7 @@
     "@electron-forge/plugin-fuses": "^7.6.0",
     "@electron-forge/plugin-webpack": "^7.6.0",
     "@electron/fuses": "^1.8.0",
+    "@types/electron-squirrel-startup": "^1.0.2",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vercel/webpack-asset-relocator-loader": "^1.7.3",
