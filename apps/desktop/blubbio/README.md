@@ -35,6 +35,6 @@ npm run make -- --platform=win32
 
 Run the app (on Windows)
 
-```ps1
-./out/blubbio-win32-x64/blubbio.exe --no-sandbox
-```
+> [!NOTE]
+> You need to move the `blubbio-win32-x64` to the `C:` drive.
+> Otherwise, your GPU will be blocked and WebGL won't be available.
