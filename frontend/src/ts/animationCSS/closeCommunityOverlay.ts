@@ -1,22 +1,13 @@
-import { AnimationSequence } from './animationSequence';
-import { AnimationConfig } from '../_interface/cssAnimationConfig';
 import { useSoundStore } from '@/stores/soundStore';
 import { usePageStore } from '@/stores/pageStore';
+import gsap from 'gsap';
 
 export function closeCommunityOverlay() {
   useSoundStore().playSound('menu_back');
 
-  const animations: AnimationConfig[] = [
-    {
-      selector: '.community',
-      className: 'closeCommunityOverlay-community-slideToBottom',
-      duration: 150,
-      onEnd: () => {
-        usePageStore().hideCommunityOverlay();
-      },
-    },
-  ];
-
-  const animationSequence = new AnimationSequence(animations);
-  animationSequence.play();
+  const tl = gsap.timeline();
+  tl.fromTo('.community', { y: '0vh' }, { duration: 0.15, y: '100vh' });
+  tl.call(() => {
+    usePageStore().hideCommunityOverlay();
+  });
 }
