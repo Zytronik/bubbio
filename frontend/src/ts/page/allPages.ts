@@ -9,13 +9,19 @@ import PixiTest from '../../pages/PixiTest.vue';
 import RankedPage from '../../pages/RankedPage.vue';
 import RoomListing from '../../pages/RoomListing.vue';
 import { PAGE } from '../_enum/page';
+import RoomPage from '@/pages/RoomPage.vue';
 
 export const allPages: Pages = {
   [PAGE.startMenu]: {
     title: 'Home',
     color: 'black',
     component: StartMenu,
-    allowedTransitions: [PAGE.soloMenu, PAGE.multiMenu, PAGE.settings],
+    allowedTransitions: [
+      PAGE.soloMenu,
+      PAGE.multiMenu,
+      PAGE.settings,
+      PAGE.roomPage,
+    ],
   },
   [PAGE.soloMenu]: {
     title: 'Solo Menu',
@@ -29,6 +35,7 @@ export const allPages: Pages = {
       PAGE.sprintPage,
       PAGE.scorePage,
       PAGE.pixiTest,
+      PAGE.roomPage,
     ],
     backButtons: [
       {
@@ -59,6 +66,7 @@ export const allPages: Pages = {
       PAGE.settings,
       PAGE.rankedPage,
       PAGE.roomListing,
+      PAGE.roomPage,
     ],
     backButtons: [
       {
@@ -87,6 +95,7 @@ export const allPages: Pages = {
       PAGE.soloMenu,
       PAGE.multiMenu,
       PAGE.settings,
+      PAGE.roomPage,
     ],
     backButtons: [
       {
@@ -115,6 +124,7 @@ export const allPages: Pages = {
       PAGE.soloMenu,
       PAGE.scorePage,
       PAGE.pixiTest,
+      PAGE.roomPage,
     ],
     backButtons: [
       {
@@ -143,6 +153,7 @@ export const allPages: Pages = {
       PAGE.soloMenu,
       PAGE.sprintPage,
       PAGE.pixiTest,
+      PAGE.roomPage,
     ],
     backButtons: [
       {
@@ -171,13 +182,19 @@ export const allPages: Pages = {
       PAGE.soloMenu,
       PAGE.sprintPage,
       PAGE.scorePage,
+      PAGE.roomPage,
     ],
   },
   [PAGE.rankedPage]: {
     title: 'Ranked',
     color: 'rgb(160, 0, 24)',
     component: RankedPage,
-    allowedTransitions: [PAGE.startMenu, PAGE.multiMenu, PAGE.roomListing],
+    allowedTransitions: [
+      PAGE.startMenu,
+      PAGE.multiMenu,
+      PAGE.roomListing,
+      PAGE.roomPage,
+    ],
     backButtons: [
       {
         page: PAGE.multiMenu,
@@ -195,7 +212,12 @@ export const allPages: Pages = {
     title: 'Room Listing',
     color: 'rgb(129, 33, 81)',
     component: RoomListing,
-    allowedTransitions: [PAGE.startMenu, PAGE.multiMenu, PAGE.rankedPage],
+    allowedTransitions: [
+      PAGE.startMenu,
+      PAGE.multiMenu,
+      PAGE.rankedPage,
+      PAGE.roomPage,
+    ],
     backButtons: [
       {
         page: PAGE.rankedPage,
@@ -204,6 +226,19 @@ export const allPages: Pages = {
       },
       {
         page: PAGE.multiMenu,
+        iconSrc: require('@/assets/img/icons/rooms.png'),
+        disabled: false,
+      },
+    ],
+  },
+  [PAGE.roomPage]: {
+    title: 'Room Page',
+    color: 'rgb(38, 16, 27)',
+    component: RoomPage,
+    allowedTransitions: [PAGE.startMenu, PAGE.roomListing],
+    backButtons: [
+      {
+        page: PAGE.roomListing,
         iconSrc: require('@/assets/img/icons/rooms.png'),
         disabled: false,
       },

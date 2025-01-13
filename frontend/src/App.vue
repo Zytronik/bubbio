@@ -31,7 +31,7 @@ import LoadingScreen from './components/LoadingOverlay.vue';
 import { waitForLoadingScreen } from './ts/page/preload';
 import AppFooter from './components/AppFooter.vue';
 import AppSidebar from './components/AppSidebar.vue';
-import { initPageTransitionWatcher } from './ts/page/pageManager';
+import { checkIfCanJoinRoomByUrl, initPageTransitionWatcher } from './ts/page/pageManager';
 import PatchNotes from './components/PatchNotes.vue';
 import { useSoundStore } from './stores/soundStore';
 import CommunityOverlay from './components/CommunityOverlay.vue';
@@ -71,6 +71,7 @@ export default {
       await waitForLoadingScreen();
       pageIsLoading.value = false;
       soundStore.playMusic("menu_soundtrack");
+      checkIfCanJoinRoomByUrl();
     });
 
     onUnmounted(() => {

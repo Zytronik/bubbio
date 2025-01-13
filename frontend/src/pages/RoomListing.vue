@@ -1,18 +1,44 @@
 <template>
   <h1>Room Listing</h1>
+
+  <p v-if="lobbies.length === 0">No lobbies available. Create one to get started!</p>
+
+  <ul v-else>
+    <li v-for="lobby in lobbies" :key="lobby.id">
+      <strong>{{ lobby.name }}</strong> - {{ lobby.users.length }} user(s)
+      <button @click="joinLobby(lobby.id)">Join</button>
+    </li>
+  </ul>
+
+  <button @click="createLobby">Create Lobby</button>
 </template>
 
 <script lang="ts">
-import { PAGE } from '@/ts/_enum/page';
-import { setPage } from '@/ts/page/pageManager';
+import { useLobbyStore } from '@/stores/lobbyStore';
+import { computed, onMounted } from 'vue';
 
 export default {
   name: 'RoomListing',
-  components: {},
   setup() {
+    const lobbyStore = useLobbyStore();
+    const lobbies = computed(() => lobbyStore.lobbies);
+
+    onMounted(() => {
+      lobbyStore.fetchLobbies();
+    });
+
+    function joinLobby(lobbyId: string) {
+      lobbyStore.joinLobby(lobbyId);
+    }
+
+    function createLobby() {
+      lobbyStore.createLobby();
+    }
+
     return {
-      setPage,
-      PAGE,
+      lobbies,
+      joinLobby,
+      createLobby,
     };
   },
 };

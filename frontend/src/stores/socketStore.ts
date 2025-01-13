@@ -10,6 +10,7 @@ import { usePageStore } from '@/stores/pageStore';
 import { isLocal, socketIoHost } from '@/ts/page/paths';
 import { UserSession } from '@/ts/_interface/userSession';
 import { loadSettings } from '@/ts/page/settings';
+import { useLobbyStore } from './lobbyStore';
 
 export const useSocketStore = defineStore('socket', {
   state: () => ({
@@ -90,6 +91,9 @@ export const useSocketStore = defineStore('socket', {
           userStore.updateUserSession(userSession);
           console.log('User updated:', userSession);
         });
+
+        const lobbyStore = useLobbyStore();
+        lobbyStore.initLobbyListeners();
 
         this.updateUserPage(pageStore.currentPage);
       });
