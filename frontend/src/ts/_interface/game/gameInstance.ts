@@ -7,6 +7,7 @@ import { PixiAnimation } from "../pixiAnimation";
 import { GameSettings } from "./gameSettings";
 import { HandlingSettings } from "./handlingSettings";
 import { GameSprites } from "./gameSprites";
+import { GameContainers } from "./gameContainers";
 
 export interface GameInstance {
     gameSettings: GameSettings,
@@ -28,6 +29,6 @@ export interface GameInstance {
     aps: number,
 
     gameSprites: GameSprites,
-    animationContainer: Container,
+    gameContainers: GameContainers,
     instanceAnimations: PixiAnimation[],
 }

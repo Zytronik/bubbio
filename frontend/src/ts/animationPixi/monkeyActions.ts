@@ -3,7 +3,6 @@ import { GameInstance } from "../_interface/game/gameInstance";
 import { PixiAnimation } from "../_interface/pixiAnimation";
 
 export function addMonkeyActions(instance: GameInstance, monkeyName: string): void {
-    console.log("addMonkeyActions", instance, monkeyName)
     const gameStore = useGameStore();
     const pressFrequency = 400;         //press something every 400ms
     let lastPressedAt = 0;
@@ -32,7 +31,7 @@ export function addMonkeyActions(instance: GameInstance, monkeyName: string): vo
 
                 const randomAction = actions[Math.floor(Math.random() * actions.length)];
                 randomAction();
-                console.log("Monkey ", monkeyName, " did ", randomAction.name);
+                // console.log("Monkey ", monkeyName, " did ", randomAction.name);
             }
         },
         onEnd: function (): void {

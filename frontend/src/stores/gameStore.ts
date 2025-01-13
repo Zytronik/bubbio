@@ -69,10 +69,10 @@ export const useGameStore = defineStore('game', () => {
         }
     }
     function pressedShoot(userName: string): void {
-        console.log("you are not empty eslint :^)")
+        // console.log("you are not empty eslint :^)")
     }
     function pressedHold(userName: string): void {
-        console.log("you are not empty eslint :^)")
+        // console.log("you are not empty eslint :^)")
     }
     function getAllInstances(): GameInstance[] {
         return [...game.instancesMap.values()];
@@ -82,7 +82,6 @@ export const useGameStore = defineStore('game', () => {
         // game = getEmptyGame();
         game.gameMode = GAME_MODE.SPRINT;
         game.inputContext = INPUT_CONTEXT.GAME_NO_RESET;
-        console.log(game.inputContext)
         game.spectating = true;
         for (let i = 1; i <= monkeyAmount; i++) {
             const name = "Monkey-" + i;

@@ -2,7 +2,7 @@ import { PixiAnimation } from "../_interface/pixiAnimation";
 import { GameInstance } from "../_interface/game/gameInstance";
 
 export function addAngleUpdateAnimation(instance: GameInstance): void {
-    const container = instance.animationContainer;
+    const container = instance.gameContainers.cursor;
     const arrow = instance.gameSprites.arrow;
     container.addChild(arrow);
     arrow.x = 0;
