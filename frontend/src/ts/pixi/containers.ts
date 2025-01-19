@@ -1,9 +1,11 @@
 import { usePixiStore } from "@/stores/pixiStore";
-import { Container, Graphics } from "pixi.js";
+import { Container, Graphics, RenderTexture } from "pixi.js";
 import { useGameStore } from "@/stores/gameStore";
 import { GameInstance } from "../_interface/game/gameInstance";
 import { getRandomHexColor } from "./color";
 import { GameContainers } from "../_interface/game/gameContainers";
+import { GameSprites } from "../_interface/game/gameSprites";
+import { circleGraphicsAsSprite } from "./spriteBuilder";
 
 export const mainContainer = new Container();
 export const gameContainer = new Container({ visible: false });
@@ -16,27 +18,21 @@ export function setupPixiContainers(): void {
     mainContainer.addChild(countDownContainer);
 }
 
-export function createGameInstanceContainer(): GameContainers {
+export function createGameInstanceContainer(sprites: GameSprites): GameContainers {
     const height = usePixiStore().getCanvasHeight();
     const width = usePixiStore().getCanvasWidth();
-    const instanceRoot = new Container({ visible: true });
-    const grid = new Container({ visible: true });
-    const cursor = new Container({ visible: true });
-    const containers: GameContainers = {
-        setupCanvasHeight: height,
-        setupCanvasWidth: width,
-        instanceRoot: instanceRoot,
-        grid: grid,
-        cursor: cursor,
-    }
-    gameContainer.addChild(containers.instanceRoot);
+    const instanceRootContainer = new Container({ visible: true });
+    const gridContainer = new Container({ visible: true });
+    const cursorContainer = new Container({ visible: true });
+
+    gameContainer.addChild(instanceRootContainer);
 
     const maxWidth = 0.35;
     const maxHeight = 0.95;
     const mainSquare = new Graphics();
     mainSquare.rect(0, 0, width * maxWidth, height * maxHeight);
     mainSquare.fill(getRandomHexColor());
-    containers.instanceRoot.addChild(mainSquare);
+    instanceRootContainer.addChild(mainSquare);
 
     const gridWidth = 0.6;
     const gridHeight = 0.9;
@@ -45,28 +41,66 @@ export function createGameInstanceContainer(): GameContainers {
     const gridSquare = new Graphics();
     gridSquare.rect(0, 0, mainSquare.width * gridWidth, mainSquare.height * gridHeight);
     gridSquare.fill(getRandomHexColor());
-    grid.x = mainSquare.width * gridXPos;
-    grid.y = mainSquare.height * gridYPos;
-    grid.pivot.x = gridSquare.width / 2;
-    grid.pivot.y = gridSquare.height / 2;
-    containers.grid.addChild(gridSquare);
+    gridContainer.x = mainSquare.width * gridXPos;
+    gridContainer.y = mainSquare.height * gridYPos;
+    gridContainer.pivot.x = gridSquare.width / 2;
+    gridContainer.pivot.y = gridSquare.height / 2;
+    gridContainer.addChild(gridSquare);
+
+    const bubbleGraphic = new Graphics();
+    bubbleGraphic.circle(0,0,500);
+    bubbleGraphic.fill(0xffffff);
+    bubbleGraphic.pivot.x = 0;
+    const blubbsprite = circleGraphicsAsSprite(bubbleGraphic);
+    const blubbsprite2 = circleGraphicsAsSprite(bubbleGraphic);
+    blubbsprite.width = 100;
+    blubbsprite.height = 100;
+    blubbsprite2.width = 100;
+    blubbsprite2.height = 100;
+    blubbsprite2.x = 200;
+    blubbsprite2.y = 100;
+
+    sprites.bgPurple.width = gridContainer.width;
+    sprites.bgPurple.height = gridContainer.height;
+    sprites.bgPurple.mask = blubbsprite;
+    sprites.bgRed.width = gridContainer.width;
+    sprites.bgRed.height = gridContainer.height;
+    sprites.bgRed.mask = blubbsprite2;
+
+    gridContainer.addChild(sprites.bgPurple);
+    gridContainer.addChild(sprites.bgRed);
+    gridContainer.addChild(blubbsprite);
+    gridContainer.addChild(blubbsprite2);
+    // gridContainer.addChild(sprites.bubble);
 
     const cursorWidth = 0.1;
-    const cursorHeight = 0.1;
     const cursorXPos = 0.5
     const cursorYPos = 1
     const cursorSquare = new Graphics();
-    cursorSquare.rect(0, 0, mainSquare.width * cursorWidth, mainSquare.height * cursorHeight);
+    cursorSquare.rect(0, 0, mainSquare.width * cursorWidth, mainSquare.width * cursorWidth);
     cursorSquare.fill(getRandomHexColor());
-    cursorSquare.x = grid.width * cursorXPos;
-    cursorSquare.y = grid.height * cursorYPos;
     cursorSquare.pivot.x = cursorSquare.width / 2;
     cursorSquare.pivot.y = cursorSquare.height / 2;
-    containers.cursor.addChild(cursorSquare);
+    cursorContainer.x = gridContainer.width * cursorXPos;
+    cursorContainer.y = gridContainer.height * cursorYPos;
+    cursorContainer.addChild(cursorSquare);
 
-    instanceRoot.addChild(grid);
-    grid.addChild(cursor);
+    const arrow = sprites.arrow;
+    arrow.width = cursorSquare.width;
+    arrow.height = cursorSquare.height;
+    arrow.anchor.set(0.5);
+    cursorContainer.addChild(arrow);
 
+    instanceRootContainer.addChild(gridContainer);
+    gridContainer.addChild(cursorContainer);
+
+    const containers: GameContainers = {
+        setupCanvasHeight: height,
+        setupCanvasWidth: width,
+        instanceRootContainer: instanceRootContainer,
+        gridContainer: gridContainer,
+        cursorContainer: cursorContainer,
+    }
     return containers;
 }
 
@@ -74,7 +108,7 @@ export function updateContainerLayout(): void {
     const instances: GameInstance[] = useGameStore().getAllInstances();
     const rootContainers: Container[] = [];
     instances.forEach(instance => {
-        rootContainers.push(instance.gameContainers.instanceRoot);
+        rootContainers.push(instance.gameContainers.instanceRootContainer);
     });
 
     const canvasWidth = usePixiStore().getCanvasWidth();

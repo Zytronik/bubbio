@@ -1,4 +1,4 @@
-import { Container, Sprite } from "pixi.js";
+import { Sprite } from "pixi.js";
 import { GAME_MODE } from "../_enum/gameMode";
 import { Bubble } from "../_interface/game/bubble";
 import { Field } from "../_interface/game/field";
@@ -14,9 +14,10 @@ import { SPRINT_SETTINGS } from "./settings/sprintSettings";
 import { INPUT_CONTEXT } from "../_enum/inputContext";
 import { HANDLING_SETTINGS } from "./settings/handlingSettings";
 import { GameSprites } from "../_interface/game/gameSprites";
-import { arrowTexture } from "../pixi/allTextures";
+import { arrowTexture, bgPurpleTexture, bgRedTexture, bubbleTexture } from "../pixi/allTextures";
 import { addAngleUpdateAnimation } from "../animationPixi/angleAnimation";
 import { createGameInstanceContainer } from "../pixi/containers";
+import { allBubbles } from "./allBubbles";
 
 export function getEmptyGame(): Game {
     return {
@@ -36,6 +37,7 @@ export function getEmptyRoundData(): RoundData {
 }
 
 export function newSprintInstance(): GameInstance {
+    const sprites = getAllGameSprites();
     const instance: GameInstance = {
         gameSettings: SPRINT_SETTINGS,
         handlingSettings: HANDLING_SETTINGS,
@@ -50,8 +52,8 @@ export function newSprintInstance(): GameInstance {
         left: false,
         right: false,
         aps: HANDLING_SETTINGS.defaultAPS,
-        gameSprites: getAllGameSprites(),
-        gameContainers: createGameInstanceContainer(),
+        gameSprites: sprites,
+        gameContainers: createGameInstanceContainer(sprites),
         instanceAnimations: [],
     }
     addAngleUpdateAnimation(instance);
@@ -98,6 +100,7 @@ function getEmptyGrid(settings: GameSettings): Grid {
                     x: w * bubblePrecisionDiameter + (isSmallRow ? bubblePrecisionDiameter : bubblePrecisionRadius),
                     y: precisionRowHeight * h + bubblePrecisionRadius,
                 },
+                bubble: allBubbles[w % allBubbles.length],
             };
             row.fields.push(field)
         }
@@ -121,5 +124,8 @@ export function getEmptyStats(): GameStats {
 function getAllGameSprites(): GameSprites {
     return {
         arrow: new Sprite(arrowTexture.texture),
+        bubble: new Sprite(bubbleTexture.texture),
+        bgRed: new Sprite(bgRedTexture.texture),
+        bgPurple: new Sprite(bgPurpleTexture.texture),
     }
 }
