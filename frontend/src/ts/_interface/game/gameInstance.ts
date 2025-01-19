@@ -1,4 +1,3 @@
-import { Container } from "pixi.js";
 import { Bubble } from "./bubble";
 import { GameStats } from "./gameStats";
 import { GarbageQueue } from "./garbageQueue";

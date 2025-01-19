@@ -19,64 +19,80 @@ export function setupPixiContainers(): void {
 export function createGameInstanceContainer(): GameContainers {
     const height = usePixiStore().getCanvasHeight();
     const width = usePixiStore().getCanvasWidth();
+    const instanceRoot = new Container({ visible: true });
+    const grid = new Container({ visible: true });
+    const cursor = new Container({ visible: true });
     const containers: GameContainers = {
         setupCanvasHeight: height,
         setupCanvasWidth: width,
-        instanceRoot: new Container({ visible: true }),
-        grid: new Container({ visible: true }),
-        cursor: new Container({ visible: true }),
+        instanceRoot: instanceRoot,
+        grid: grid,
+        cursor: cursor,
     }
     gameContainer.addChild(containers.instanceRoot);
 
     const maxWidth = 0.35;
-    const maxHeight = 0.9;
+    const maxHeight = 0.95;
     const mainSquare = new Graphics();
     mainSquare.rect(0, 0, width * maxWidth, height * maxHeight);
     mainSquare.fill(getRandomHexColor());
     containers.instanceRoot.addChild(mainSquare);
 
-    const gridWidth = 0.7;
-    const gridHeight = 0.7;
+    const gridWidth = 0.6;
+    const gridHeight = 0.9;
+    const gridXPos = 0.5
+    const gridYPos = 0.45
     const gridSquare = new Graphics();
     gridSquare.rect(0, 0, mainSquare.width * gridWidth, mainSquare.height * gridHeight);
     gridSquare.fill(getRandomHexColor());
+    grid.x = mainSquare.width * gridXPos;
+    grid.y = mainSquare.height * gridYPos;
+    grid.pivot.x = gridSquare.width / 2;
+    grid.pivot.y = gridSquare.height / 2;
     containers.grid.addChild(gridSquare);
 
     const cursorWidth = 0.1;
     const cursorHeight = 0.1;
+    const cursorXPos = 0.5
+    const cursorYPos = 1
     const cursorSquare = new Graphics();
     cursorSquare.rect(0, 0, mainSquare.width * cursorWidth, mainSquare.height * cursorHeight);
     cursorSquare.fill(getRandomHexColor());
+    cursorSquare.x = grid.width * cursorXPos;
+    cursorSquare.y = grid.height * cursorYPos;
+    cursorSquare.pivot.x = cursorSquare.width / 2;
+    cursorSquare.pivot.y = cursorSquare.height / 2;
     containers.cursor.addChild(cursorSquare);
 
-    containers.instanceRoot.addChild(containers.grid, containers.cursor);
+    instanceRoot.addChild(grid);
+    grid.addChild(cursor);
 
     return containers;
 }
 
 export function updateContainerLayout(): void {
     const instances: GameInstance[] = useGameStore().getAllInstances();
-    const pixiContainers: Container[] = [];
+    const rootContainers: Container[] = [];
     instances.forEach(instance => {
-        pixiContainers.push(instance.gameContainers.instanceRoot);
+        rootContainers.push(instance.gameContainers.instanceRoot);
     });
 
     const canvasWidth = usePixiStore().getCanvasWidth();
     const canvasHeight = usePixiStore().getCanvasHeight();
-    if (pixiContainers.length === 1) gameLayoutSolo(pixiContainers, canvasWidth, canvasHeight);
-    if (pixiContainers.length === 2) gameLayout1vs1(pixiContainers, canvasWidth, canvasHeight);
-    if (pixiContainers.length > 2) gameLayout1vsX(pixiContainers, canvasWidth, canvasHeight);
+    if (rootContainers.length === 1) gameLayoutSolo(rootContainers, canvasWidth, canvasHeight);
+    if (rootContainers.length === 2) gameLayout1vs1(rootContainers, canvasWidth, canvasHeight);
+    if (rootContainers.length > 2) gameLayout1vsX(rootContainers, canvasWidth, canvasHeight);
 }
 
 function gameLayoutSolo(containers: Container[], canvasWidth: number, canvasHeight: number): void {
-    const player1 = containers[0];
-    player1.visible = true;
+    const player1Root = containers[0];
+    player1Root.visible = true;
     //topleft corner of container to middle
-    player1.x = canvasWidth * 0.5;
-    player1.y = canvasHeight * 0.5;
+    player1Root.x = canvasWidth * 0.5;
+    player1Root.y = canvasHeight * 0.5;
     //shift content 50% up and left to center children
-    player1.pivot.x = player1.width / 2;
-    player1.pivot.y = player1.height / 2;
+    player1Root.pivot.x = player1Root.width / 2;
+    player1Root.pivot.y = player1Root.height / 2;
 }
 
 function gameLayout1vs1(containers: Container[], canvasWidth: number, canvasHeight: number): void {
