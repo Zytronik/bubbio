@@ -2,7 +2,7 @@ import { useGameStore } from "@/stores/gameStore";
 import { INPUT_CONTEXT } from "../_enum/inputContext";
 import { Input } from "../_interface/input";
 import { centerCursor, leftDown, leftUp, mirrorAngle, rightDown, rightUp, toggleAPS } from "../game/actions/aim";
-import { updateContainerLayout } from "../pixi/containers";
+import { updateContainerLayout } from "../pixi/container";
 
 export const angleLeftInput: Input = {
     name: "Angle Left",

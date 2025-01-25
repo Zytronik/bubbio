@@ -1,4 +1,4 @@
-import { setupPixiContainers } from "@/ts/pixi/containers";
+import { setupPixiContainers } from "@/ts/pixi/container";
 import { allTextures } from "@/ts/pixi/allTextures";
 import { startAnimationLoop } from "@/ts/pixi/animation";
 import { defineStore } from "pinia";

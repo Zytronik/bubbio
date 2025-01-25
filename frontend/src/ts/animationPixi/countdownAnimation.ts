@@ -1,5 +1,5 @@
 import { Text } from "pixi.js";
-import { countDownContainer } from "../pixi/containers";
+import { countDownContainer } from "../pixi/container";
 import { countDownFont } from "../pixi/allFonts";
 import { PixiAnimation } from "../_interface/pixiAnimation";
 import { playPixiAnimation, getLerpT } from "../pixi/animation";

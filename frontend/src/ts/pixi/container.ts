@@ -47,30 +47,30 @@ export function createGameInstanceContainer(sprites: GameSprites): GameContainer
     gridContainer.pivot.y = gridSquare.height / 2;
     gridContainer.addChild(gridSquare);
 
-    const bubbleGraphic = new Graphics();
-    bubbleGraphic.circle(0,0,500);
-    bubbleGraphic.fill(0xffffff);
-    bubbleGraphic.pivot.x = 0;
-    const blubbsprite = circleGraphicsAsSprite(bubbleGraphic);
-    const blubbsprite2 = circleGraphicsAsSprite(bubbleGraphic);
-    blubbsprite.width = 100;
-    blubbsprite.height = 100;
-    blubbsprite2.width = 100;
-    blubbsprite2.height = 100;
-    blubbsprite2.x = 200;
-    blubbsprite2.y = 100;
+    // const bubbleGraphic = new Graphics();
+    // bubbleGraphic.circle(0,0,500);
+    // bubbleGraphic.fill(0xffffff);
+    // bubbleGraphic.pivot.x = 0;
+    // const blubbsprite = circleGraphicsAsSprite(bubbleGraphic);
+    // const blubbsprite2 = circleGraphicsAsSprite(bubbleGraphic);
+    // blubbsprite.width = 100;
+    // blubbsprite.height = 100;
+    // blubbsprite2.width = 100;
+    // blubbsprite2.height = 100;
+    // blubbsprite2.x = 200;
+    // blubbsprite2.y = 100;
 
-    sprites.bgPurple.width = gridContainer.width;
-    sprites.bgPurple.height = gridContainer.height;
-    sprites.bgPurple.mask = blubbsprite;
-    sprites.bgRed.width = gridContainer.width;
-    sprites.bgRed.height = gridContainer.height;
-    sprites.bgRed.mask = blubbsprite2;
+    // sprites.bgPurple.width = gridContainer.width;
+    // sprites.bgPurple.height = gridContainer.height;
+    // sprites.bgPurple.mask = blubbsprite;
+    // sprites.bgRed.width = gridContainer.width;
+    // sprites.bgRed.height = gridContainer.height;
+    // sprites.bgRed.mask = blubbsprite2;
 
-    gridContainer.addChild(sprites.bgPurple);
-    gridContainer.addChild(sprites.bgRed);
-    gridContainer.addChild(blubbsprite);
-    gridContainer.addChild(blubbsprite2);
+    // gridContainer.addChild(sprites.bgPurple);
+    // gridContainer.addChild(sprites.bgRed);
+    // gridContainer.addChild(blubbsprite);
+    // gridContainer.addChild(blubbsprite2);
     // gridContainer.addChild(sprites.bubble);
 
     const cursorWidth = 0.1;

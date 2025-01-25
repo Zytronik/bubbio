@@ -6,7 +6,7 @@ import { useInputStore } from "./inputStore";
 import { INPUT_CONTEXT } from "@/ts/_enum/inputContext";
 import { GameInstance } from "@/ts/_interface/game/gameInstance";
 import { startGameLogicLoop } from "@/ts/game/gameLoop";
-import { gameContainer } from "@/ts/pixi/containers";
+import { gameContainer } from "@/ts/pixi/container";
 import { addMonkeyActions } from "@/ts/animationPixi/monkeyActions";
 
 export const useGameStore = defineStore('game', () => {

@@ -16,7 +16,7 @@ import { HANDLING_SETTINGS } from "./settings/handlingSettings";
 import { GameSprites } from "../_interface/game/gameSprites";
 import { arrowTexture, bgPurpleTexture, bgRedTexture, bubbleTexture } from "../pixi/allTextures";
 import { addAngleUpdateAnimation } from "../animationPixi/angleAnimation";
-import { createGameInstanceContainer } from "../pixi/containers";
+import { createGameInstanceContainer } from "../pixi/container";
 import { allBubbles } from "./allBubbles";
 
 export function getEmptyGame(): Game {
@@ -64,6 +64,7 @@ function getDefaultBubble(): Bubble {
     return {
         type: 0,
         wallbounce: false,
+        tint: ""
     }
 }
 

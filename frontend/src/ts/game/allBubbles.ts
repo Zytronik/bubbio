@@ -3,30 +3,37 @@ import { Bubble } from "../_interface/game/bubble"
 const red: Bubble = {
     type: 0,
     wallbounce: false,
+    tint: "#FF0000"
 }
 const orange: Bubble = {
     type: 1,
     wallbounce: false,
+    tint: "#ffa600"
 }
 const yellow: Bubble = {
     type: 2,
     wallbounce: false,
+    tint: "#ffff00"
 }
 const green: Bubble = {
     type: 3,
     wallbounce: false,
+    tint: "#00ff00"
 }
 const cyan: Bubble = {
     type: 4,
     wallbounce: false,
+    tint: "#00ffff"
 }
 const purple: Bubble = {
     type: 5,
     wallbounce: false,
+    tint: "#0000ff"
 }
 const white: Bubble = {
     type: 6,
     wallbounce: false,
+    tint: "#ff00ff"
 }
 export const allBubbles: Bubble[] = [
     red,
