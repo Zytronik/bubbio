@@ -3,6 +3,7 @@ import { INPUT_CONTEXT } from "../_enum/inputContext";
 import { Input } from "../_interface/input";
 import { centerCursor, leftDown, leftUp, mirrorAngle, rightDown, rightUp, toggleAPS } from "../game/actions/aim";
 import { updateContainerLayout } from "../pixi/container";
+import { usePageStore } from "@/stores/pageStore";
 
 export const angleLeftInput: Input = {
     name: "Angle Left",
@@ -130,7 +131,7 @@ export const channelInput: Input = {
     isSingleTriggerAction: true,
     pressed: false,
     fire: () => {
-        console.error("no fire event attached to keyCode: " + channelInput.name);
+        usePageStore().toggleCommunityOverlayAnimation();
     },
     inputContext: [INPUT_CONTEXT.MENU]
 };
