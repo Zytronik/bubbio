@@ -9,6 +9,7 @@ import { startGameLogicLoop } from "@/ts/game/gameLoop";
 import { gameContainer } from "@/ts/pixi/container";
 import { addMonkeyActions } from "@/ts/animationPixi/monkeyActions";
 import { centerAngle, mirrorAngle } from "@/ts/game/actions/aiming";
+import { shootBubble } from "@/ts/game/actions/shoot";
 
 export const useGameStore = defineStore('game', () => {
     const game = getEmptyGame();
@@ -70,7 +71,10 @@ export const useGameStore = defineStore('game', () => {
         }
     }
     function pressedShoot(userName: string): void {
-        // console.log("you are not empty eslint :^)")
+        const instance = game.instancesMap.get(userName);
+        if (instance) {
+            shootBubble(instance);
+        }
     }
     function pressedHold(userName: string): void {
         // console.log("you are not empty eslint :^)")

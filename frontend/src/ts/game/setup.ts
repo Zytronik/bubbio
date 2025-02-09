@@ -70,21 +70,21 @@ function getDefaultBubble(): Bubble {
 
 function getEmptyGrid(settings: GameSettings): Grid {
     const precisionWidth = settings.widthPrecisionUnits;
-    const bubblePrecisionRadius = precisionWidth / (2 * settings.gridWidth);
-    const bubblePrecisionDiameter = bubblePrecisionRadius * 2;
-    const precisionRowHeight = Math.floor(bubblePrecisionRadius * Math.sqrt(3));
+    const bubbleRadius = precisionWidth / (2 * settings.gridWidth);
+    const bubbleDiameter = bubbleRadius * 2;
+    const precisionRowHeight = Math.floor(bubbleRadius * Math.sqrt(3));
     const precisionHeight = precisionRowHeight * (settings.gridHeight + settings.gridExtraHeight)
     const playGrid: Grid = {
         gridWidth: settings.gridWidth,
         gridHeight: settings.gridHeight,
         extraGridHeight: settings.gridExtraHeight,
-        bubblePrecisionRadius,
+        bubbleFullRadius: bubbleRadius,
+        bubbleHitboxRadius: bubbleRadius * settings.collisionRangeFactor,
         precisionWidth,
         precisionRowHeight,
         precisionHeight,
         rows: [],
-        launcherPrecisionPosition: { x: precisionWidth / 2, y: precisionHeight - bubblePrecisionRadius },
-        collisionRangeSquared: 0
+        launcherPrecisionPosition: { x: precisionWidth / 2, y: precisionHeight - bubbleRadius },
     }
     for (let h = 0; h < playGrid.gridHeight + playGrid.extraGridHeight; h++) {
         const isSmallRow = (h % 2 === 1);
@@ -98,10 +98,10 @@ function getEmptyGrid(settings: GameSettings): Grid {
             const field: Field = {
                 coords: { x: w, y: h, },
                 precisionCoords: {
-                    x: w * bubblePrecisionDiameter + (isSmallRow ? bubblePrecisionDiameter : bubblePrecisionRadius),
-                    y: precisionRowHeight * h + bubblePrecisionRadius,
+                    x: w * bubbleDiameter + (isSmallRow ? bubbleDiameter : bubbleRadius),
+                    y: precisionRowHeight * h + bubbleRadius,
                 },
-                bubble: allBubbles[w % allBubbles.length],
+                bubble: (w < 5) ? allBubbles[w % allBubbles.length] : undefined,
             };
             row.fields.push(field)
         }
