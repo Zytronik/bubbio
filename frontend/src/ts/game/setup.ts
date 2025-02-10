@@ -101,7 +101,7 @@ function getEmptyGrid(settings: GameSettings): Grid {
                     x: w * bubbleDiameter + (isSmallRow ? bubbleDiameter : bubbleRadius),
                     y: precisionRowHeight * h + bubbleRadius,
                 },
-                bubble: (w < 5) ? allBubbles[w % allBubbles.length] : undefined,
+                bubble: (h < 5) ? allBubbles[w % allBubbles.length] : undefined,
             };
             row.fields.push(field)
         }

@@ -9,7 +9,7 @@ export function shootBubble(instance: GameInstance): void {
     const bubbleRadius = grid.bubbleHitboxRadius;
     const leftWallX = bubbleRadius;
     const rightWallX = grid.precisionWidth - bubbleRadius;
-    const ceilingY = grid.precisionHeight - bubbleRadius;
+    const ceilingY = bubbleRadius;
     const startPoint: Coordinates = grid.launcherPrecisionPosition;
     const initialFlightDirection: Coordinates = getVector(angle);
     const bubblesInGrid: Coordinates[] = getAllBubbleCoordinatesInGrid(grid);
@@ -18,15 +18,28 @@ export function shootBubble(instance: GameInstance): void {
     const currentFlightDirection: Coordinates = initialFlightDirection;
     findtravelLineCoords();
     console.log(travelLineCoords)
+    
+    function getAllBubbleCoordinatesInGrid(grid: Grid): Coordinates[] {
+        const allPrecisionCoords: Coordinates[] = [];
+        grid.rows.forEach(row => {
+            row.fields.forEach(field => {
+                field.bubble ? allPrecisionCoords.push(field.precisionCoords) : null;
+            });
+        });
+        return allPrecisionCoords;
+    }
 
     function findtravelLineCoords(): void {
         const currentPos = travelLineCoords[travelLineCoords.length - 1];
         const sideWallImpactTime = getTravelTimeToHitSideWall();
         const ceilingImpactTime = getTravelTimeToHitCeiling();
         const bubbleImpactTime = getTravelTimeToHitGridBubble();
+        // console.log(leftWallX, rightWallX, ceilingY, startPoint, currentPos, currentFlightDirection)
+        // console.log("sideWallImpactTime", sideWallImpactTime, "ceilingImpactTime", ceilingImpactTime, "bubbleImpactTime", bubbleImpactTime)
+        // console.log("bubblesInGrid", bubblesInGrid, "initialFlightDirection", initialFlightDirection, "travelLineCoords", travelLineCoords)
 
         if (bubbleImpactTime <= sideWallImpactTime && bubbleImpactTime < ceilingImpactTime) {
-            console.log("bubbleimpact", angle)
+            // console.log("bubbleimpact", angle)
             travelLineCoords.push({
                 x: currentPos.x + currentFlightDirection.x * bubbleImpactTime,
                 y: currentPos.y + currentFlightDirection.y * bubbleImpactTime,
@@ -35,7 +48,7 @@ export function shootBubble(instance: GameInstance): void {
         }
 
         if (ceilingImpactTime <= sideWallImpactTime && ceilingImpactTime < bubbleImpactTime) {
-            console.log("ceilingimpact", angle)
+            // console.log("ceilingimpact", angle)
             travelLineCoords.push({
                 x: currentPos.x + currentFlightDirection.x * ceilingImpactTime,
                 y: currentPos.y + currentFlightDirection.y * ceilingImpactTime,
@@ -44,7 +57,7 @@ export function shootBubble(instance: GameInstance): void {
         }
 
         if (sideWallImpactTime < bubbleImpactTime && sideWallImpactTime < ceilingImpactTime) {
-            console.log("wallimpact", angle)
+            // console.log("wallimpact", angle)
             travelLineCoords.push({
                 x: currentPos.x + currentFlightDirection.x * sideWallImpactTime,
                 y: currentPos.y + currentFlightDirection.y * sideWallImpactTime,
@@ -56,14 +69,16 @@ export function shootBubble(instance: GameInstance): void {
 
         function getTravelTimeToHitSideWall(): number {
             if (currentFlightDirection.x > 0) {
-                return (rightWallX - currentPos.x) / currentFlightDirection.x;
+                return Math.abs((rightWallX - currentPos.x) / currentFlightDirection.x);
+            } else if (currentFlightDirection.x < 0) {
+                return Math.abs((leftWallX - currentPos.x) / currentFlightDirection.x);
             } else {
-                return (leftWallX - currentPos.x) / currentFlightDirection.x;
+                return Infinity;
             }
         }
 
         function getTravelTimeToHitCeiling(): number {
-            return (ceilingY - currentPos.y) / currentFlightDirection.y;
+            return Math.abs((ceilingY - currentPos.y) / currentFlightDirection.y);
         }
 
         function getTravelTimeToHitGridBubble(): number {
@@ -96,7 +111,6 @@ export function shootBubble(instance: GameInstance): void {
 
         }
     }
-
 
 
     // let bounceAmount = 0
@@ -132,14 +146,4 @@ export function shootBubble(instance: GameInstance): void {
     //     game.gameTransitions.onGameDefeat();
     //     return { hasdied: true, clearAmount: bubblesCleared };
     // }
-}
-
-function getAllBubbleCoordinatesInGrid(grid: Grid): Coordinates[] {
-    const allPrecisionCoords: Coordinates[] = [];
-    grid.rows.forEach(row => {
-        row.fields.forEach(field => {
-            field.bubble ? allPrecisionCoords.push(field.precisionCoords) : null;
-        });
-    });
-    return allPrecisionCoords;
 }
