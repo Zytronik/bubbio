@@ -2,6 +2,7 @@ import { Coordinates } from "@/ts/_interface/game/coordinates";
 import { GameInstance } from "@/ts/_interface/game/gameInstance";
 import { getVector } from "./aiming";
 import { Grid } from "@/ts/_interface/game/grid";
+import { Field } from "@/ts/_interface/game/field";
 
 export function shootBubble(instance: GameInstance): void {
     const angle = instance.angle;
@@ -13,11 +14,11 @@ export function shootBubble(instance: GameInstance): void {
     const startPoint: Coordinates = grid.launcherPrecisionPosition;
     const initialFlightDirection: Coordinates = getVector(angle);
     const bubblesInGrid: Coordinates[] = getAllBubbleCoordinatesInGrid(grid);
-
     const travelLineCoords: Coordinates[] = [startPoint];
     const currentFlightDirection: Coordinates = initialFlightDirection;
+
     findtravelLineCoords();
-    console.log(travelLineCoords)
+    findNearestEmptyField();
     
     function getAllBubbleCoordinatesInGrid(grid: Grid): Coordinates[] {
         const allPrecisionCoords: Coordinates[] = [];
@@ -112,6 +113,20 @@ export function shootBubble(instance: GameInstance): void {
         }
     }
 
+    function findNearestEmptyField(): void {
+        // const impactLocation = travelLineCoords[travelLineCoords.length - 1]
+        // let nearestEmptyField: Field;
+        // let closestDistance = Infinity;
+        // getNearbyFields(grid, impactLocation).forEach(field => {
+        //     if (!field.bubble) {
+        //         const distance = getDistance(collisionCoords, field.centerPointCoords);
+        //         if (distance < closestDistance) {
+        //             closestDistance = distance;
+        //             nearestEmptyField = field;
+        //         }
+        //     }
+        // });
+    }
 
     // let bounceAmount = 0
     // while (!checkForCollision(grid, bubbleCoords)) {
@@ -146,4 +161,36 @@ export function shootBubble(instance: GameInstance): void {
     //     game.gameTransitions.onGameDefeat();
     //     return { hasdied: true, clearAmount: bubblesCleared };
     // }
+}
+
+export function getNearbyFields(playGrid: Grid, pointPosition: Coordinates): Field[] {
+    const bubbleRadius = playGrid.bubbleFullRadius;
+    const bubbleDiameter = playGrid.bubbleFullRadius * 2;
+    const row = Math.round((pointPosition.y - bubbleRadius) / playGrid.precisionRowHeight);
+    const isSmallerRow = playGrid.rows[row].isSmallerRow;
+    const xOffSet = (isSmallerRow ? bubbleDiameter : bubbleRadius)
+    const column = Math.round((pointPosition.x - xOffSet) / bubbleDiameter);
+    const nearbyFields: Field[] = []
+    getAdjacentFieldVectors(playGrid, { x: column, y: row }).forEach(fieldVector => {
+        const x = column + fieldVector.x;
+        const y = row + fieldVector.y;
+        if (playGrid.rows[y] && playGrid.rows[y].fields[x]) {
+            nearbyFields.push(playGrid.rows[y].fields[x]);
+        }
+    })
+    return nearbyFields;
+}
+
+function getAdjacentFieldVectors(playGrid: Grid, gridPosition: Coordinates): Coordinates[] {
+    const hexagonalShift = playGrid.rows[gridPosition.y].isSmallerRow ? 1 : -1;
+    const adjacentFieldVectors: Coordinates[] = [
+        { x: 0, y: 0, },
+        { x: -1, y: 0, },
+        { x: 1, y: 0, },
+        { x: hexagonalShift, y: -1, },
+        { x: hexagonalShift, y: 1, },
+        { x: 0, y: -1, },
+        { x: 0, y: +1, },
+    ]
+    return adjacentFieldVectors;
 }
